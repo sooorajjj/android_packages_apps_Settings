@@ -92,7 +92,7 @@ public class RadioInfo extends Activity {
     private static final int MENU_ITEM_TOGGLE_DATA  = 5;
     private static final int MENU_ITEM_TOGGLE_DATA_ON_BOOT = 6;
 
-    private TextView mImei;
+    private TextView mDeviceId; //DeviceId is the IMEI in GSM and the MEID in CDMA
     private TextView mImsi;
     private TextView number;
     private TextView callState;
@@ -402,7 +402,7 @@ public class RadioInfo extends Activity {
         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         phone = PhoneFactory.getDefaultPhone();
 
-        mImei = (TextView) findViewById(R.id.imei);
+        mDeviceId= (TextView) findViewById(R.id.imei);
         mImsi = (TextView) findViewById(R.id.imsi);
         number = (TextView) findViewById(R.id.number);
         callState = (TextView) findViewById(R.id.call);
@@ -526,7 +526,8 @@ public class RadioInfo extends Activity {
         menu.add(1, MENU_ITEM_TOGGLE_DATA,
                 0, R.string.radioInfo_menu_disableData).setOnMenuItemClickListener(mToggleData);
         menu.add(1, MENU_ITEM_TOGGLE_DATA_ON_BOOT,
-                0, R.string.radioInfo_menu_disableDataOnBoot).setOnMenuItemClickListener(mToggleDataOnBoot);
+                0, R.string.radioInfo_menu_disableDataOnBoot).setOnMenuItemClickListener(
+                mToggleDataOnBoot);
         return true;
     }
 
@@ -775,10 +776,10 @@ public class RadioInfo extends Activity {
 
         s = phone.getDeviceId();
         if (s == null) s = r.getString(R.string.radioInfo_unknown); 
-        mImei.setText(s);
+        mDeviceId.setText(s);
         
         s = phone.getSubscriberId();
-        if (s == null) s = r.getString(R.string.radioInfo_unknown); 
+        if (s == null) s = r.getString(R.string.radioInfo_unknown);
         mImsi.setText(s);
 
         s = phone.getLine1Number();
@@ -1025,7 +1026,7 @@ public class RadioInfo extends Activity {
     private MenuItem.OnMenuItemClickListener mViewSDNCallback = new MenuItem.OnMenuItemClickListener() {
         public boolean onMenuItemClick(MenuItem item) {
             Intent intent = new Intent(
-                Intent.ACTION_VIEW, Uri.parse("content://sim/sdn"));
+                    Intent.ACTION_VIEW, Uri.parse("content://icc/sdn"));
             // XXX We need to specify the component here because if we don't
             // the activity manager will try to resolve the type by calling
             // the content provider, which causes it to be loaded in a process
@@ -1080,7 +1081,7 @@ public class RadioInfo extends Activity {
 
     private MenuItem.OnMenuItemClickListener mGetPdpList = new MenuItem.OnMenuItemClickListener() {
         public boolean onMenuItemClick(MenuItem item) {
-            phone.getPdpContextList(null);
+            phone.getDataCallList(null);
             return true;
         }
     };

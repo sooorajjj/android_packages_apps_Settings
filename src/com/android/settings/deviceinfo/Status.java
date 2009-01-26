@@ -50,7 +50,7 @@ import java.lang.ref.WeakReference;
  * # Phone Number
  * # Network
  * # Roaming
- * # IMEI
+ * # Device Id (IMEI in GSM and MEID in CDMA)
  * # IMSI
  * # Network type
  * # Signal Strength
@@ -183,7 +183,9 @@ public class Status extends PreferenceActivity {
         mUptime = findPreference("up_time");
         mAwakeTime = findPreference("awake_time");
         
+        //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
         setSummaryText("imei", mPhone.getDeviceId());
+        
         setSummaryText("imei_sv",
                 ((TelephonyManager) getSystemService(TELEPHONY_SERVICE))
                         .getDeviceSoftwareVersion());
