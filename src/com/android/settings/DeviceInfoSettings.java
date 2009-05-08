@@ -17,6 +17,7 @@
 
 package com.android.settings;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
+import android.preference.PreferenceScreen;
 import android.util.Config;
 import android.util.Log;
 
@@ -62,6 +64,18 @@ public class DeviceInfoSettings extends PreferenceActivity {
         setStringSummary("build_number", Build.DISPLAY);
         findPreference("kernel_version").setSummary(getFormattedKernelVersion());
         findPreference("build_number").setSummary(getBuildVersion());
+
+        findPreference("system_tutorial").setOnPreferenceClickListener (
+           new Preference.OnPreferenceClickListener () {
+                public boolean onPreferenceClick(Preference preference) {
+                    try {
+                        startActivity (preference.getIntent());
+                    } catch ( ActivityNotFoundException e ) {
+                        Log.e ( TAG , "Unable to launch activity android.settings.SYSTEM_UPDATE_SETTINGS" );
+                    }
+                    return true;
+                }
+            } );
 
         /*
          * Settings is a generic app and should not contain any device-specific
