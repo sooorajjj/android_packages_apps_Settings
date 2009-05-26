@@ -291,6 +291,7 @@
     <!-- Radio Info screen. Label for a status item.  Used for diagnostic info screens, precise translation isn't needed -->
     <string name="radio_info_data_attempts_label">Data attempts:</string>
     <!-- Radio Info screen. Label for a status item.  Used for diagnostic info screens, precise translation isn't needed -->
+
     <string name="radio_info_gprs_service_label">GPRS service:</string>
     <!-- Radio Info screen. Label for a status item.  Used for diagnostic info screens, precise translation isn't needed -->
     <string name="radio_info_roaming_label">Roaming:</string>
@@ -433,6 +434,25 @@
     <string name="radio_controls_summary">Manage Wi-Fi, Bluetooth, airplane mode, &amp; mobile networks</string>
 
 
+    <!-- mobile network settings screen, setting check box title -->
+    <string name="roaming">Data roaming</string>
+    <!-- mobile network settings screen, setting option summary text when check box is selected -->
+    <string name="roaming_enable">Connect to data services when roaming</string>
+    <!-- mobile network settings screen, setting option summary text when check box is clear -->
+    <string name="roaming_disable">Connect to data services when roaming</string>
+    <!-- mobile network settings screen, dialog message when you are roaming and clear the "Data roaming" check box -->
+    <string name="roaming_reenable_message">You have lost data connectivity because you left your home network with data roaming turned off.</string>
+    <!-- mobile network settings screen, button on dialog box that appears when you are roaming and clear the "Data roaming" check box -->
+    <string name="roaming_turn_it_on_button">Turn it on</string>
+    <!-- mobile network settings screen, message in dialog box that appears when you select the "Data roaming" check box -->
+    <string name="roaming_warning">Allow data roaming? You may incur significant roaming charges!</string>
+    <!-- mobile network settings screen, title of dialog box that appears when you select the "Data roaming" check box -->
+    <string name="roaming_reenable_title">Attention</string>
+    <!-- mobile network settings screen, setting option name -->
+    <string name="networks">Operator selection</string>
+    <!-- mobile network settings screen, setting option summary text -->
+    <string name="sum_carrier_select">Select a network operator</string>
+
     <!-- Date and time settings -->
     <!-- Main Settings screen setting option name to go into the date and time settings-->
     <string name="date_and_time_settings_title">Date &amp; time</string>
@@ -491,6 +511,10 @@
     <string name="bluetooth_pairing_error_message">There was a problem pairing with <xliff:g id="device_name">%1$s</xliff:g>.</string> 
     <!-- Message for the error dialog when BT pairing fails because the PIN entered is incorrect. -->
     <string name="bluetooth_pairing_pin_error_message">There was a problem pairing with <xliff:g id="device_name">%1$s</xliff:g> because the typed PIN is incorrect.</string> 
+    <!-- Message for the error dialog when BT pairing fails because the other device is down. -->
+    <string name="bluetooth_pairing_device_down_error_message">Cannot establish communication with <xliff:g id="device_name">%1$s</xliff:g>.</string>
+    <!-- Message for the error dialog when BT pairing fails because the other device rejected the pairing. -->
+    <string name="bluetooth_pairing_rejected_error_message">Pairing rejected by <xliff:g id="device_name">%1$s</xliff:g>.</string>
 
     <!-- Message for the error dialog when BT connecting operation fails generically. -->
     <string name="bluetooth_connecting_error_message">There was a problem connecting to <xliff:g id="device_name">%1$s</xliff:g>.</string> 
@@ -807,6 +831,11 @@
     <string name="sync_settings">Data synchronization</string>
     <!-- Main Settings screen setting option summary text for the itme to go into the screen with data sync settings-->
     <string name="sync_settings_summary">Select which applications are synchronized</string>
+
+    <!-- Main Settings screen, setting option name to go into search settings -->
+    <string name="search_settings">Search</string>
+    <!-- Main Settings screen, setting option summary to go into search settings -->
+    <string name="search_settings_summary">Manage global search, web search and search history</string>
 
     <!-- Display settings -->
     <!-- Sound & display settings screen, section header for settings related to display -->
@@ -1245,6 +1274,8 @@
     <string name="uninstall_text">Uninstall</string>
     <!-- Manage applications, individual application info screen, button label under Storage heading. Button to clear all data associated with tis app (for exampel, remove all cached emails for an Email app) -->
     <string name="clear_user_data_text">Clear data</string>
+    <!-- Manage applications, restore updated system application to factory version -->
+    <string name="app_factory_reset">Factory reset</string>
     <!-- Manage applications, individual application info screen, screen, message text under Launch by default heading. This is present if the app is set as a default for some actions. -->
     <string name="auto_launch_enable_text">You have selected to launch this application by default for some actions.</string>
     <!-- Manage applications, individual application screen, text under Launch by default heading if the app is NOT a default for actions -->
@@ -1290,12 +1321,22 @@
 found in the list of installed applications.</string>
     <!-- Manage applications, individual application dialog box message. Shown when there was an error trying to clear the data. -->
     <string name="clear_data_failed">Unable to clear application data.</string>
+    <!-- Manage applications, factory reset dialog title for system applications. -->
+    <string name="app_factory_reset_dlg_title">Factory reset system app</string>
+    <!-- Manage applications, factory reset option dialog text for system applications. -->
+    <string name="app_factory_reset_dlg_text">Do you want to fallback to factory version of system application?</string>
+    <!-- Manage applications, title for dialog if clear data fails-->
+    <string name="clear_failed_dlg_title">Clear data</string>
+    <!-- Manage applications, text for dialog if clear data fails-->
+    <string name="clear_failed_dlg_text">Failed clearing data for application</string>
     <!-- Manage applications, individual application info screen, text that appears under the "Permissions" heading. This describes the permissions that the application has. -->
     <string name="security_settings_desc">This application can access the following on your phone:</string>
     <string name="computing_size">Computing\u2026</string>
     <string name="invalid_size_value">Unable to compute package size</string>
     <!-- String displayed when list is empty -->
     <string name="empty_list_msg">You do not have any third-party apps installed.</string>
+    <!-- Manage applications, version string displayed in app snippet -->
+    <string name="version_text">version <xliff:g id="version_num">%1$s</xliff:g></string>
 
     <!-- Language Settings --> <skip />
     <!-- Title of setting on main settings screen.  This item will take the user to the screen to tweak settings realted to locale and text -->
@@ -1532,3 +1573,5 @@ found in the list of installed applications.</string>
     <!-- label for usage time -->
     <string name="usage_time_label">Usage time</string>
 </resources>
+
+
