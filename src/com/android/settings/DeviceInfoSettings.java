@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +61,7 @@ public class DeviceInfoSettings extends PreferenceActivity {
         setStringSummary("device_model", Build.MODEL);
         setStringSummary("build_number", Build.DISPLAY);
         findPreference("kernel_version").setSummary(getFormattedKernelVersion());
+        findPreference("build_number").setSummary(getBuildVersion());
 
         /*
          * Settings is a generic app and should not contain any device-specific
@@ -146,6 +148,37 @@ public class DeviceInfoSettings extends PreferenceActivity {
                 "IO Exception when getting kernel version for Device Info screen",
                 e);
 
+            return "Unavailable";
+        }
+    }
+
+    private String getBuildVersion() {
+        String buildVersionStr;
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("/proc/socinfo"), 256);
+            try {
+                buildVersionStr = reader.readLine();
+            } finally {
+                reader.close();
+           }
+	    
+            String[] buildArray = new String [3];
+            buildArray = buildVersionStr.split("-");
+            
+	    if(buildArray.length < 3)
+	    {
+                return "Unavailable";
+            } else {
+                return (new StringBuilder(buildArray[0]).
+				append(buildArray[2]).
+				append(buildArray[1])).toString();
+            }
+        } catch (IOException e) {  
+            Log.e(TAG,
+                "IO Exception when getting Build version for Device Info screen",
+                e);
+ 
             return "Unavailable";
         }
     }
