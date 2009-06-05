@@ -197,25 +197,25 @@ public class SecuritySettings extends PreferenceActivity implements
         mChoosePattern = getPreferenceManager().createPreferenceScreen(this);
         mChoosePattern.setIntent(intent);
         inlinePrefCat.addPreference(mChoosePattern);
-
         int activePhoneType = TelephonyManager.getDefault().getPhoneType();
 
         // do not display SIM lock for CDMA phone
-        if (TelephonyManager.PHONE_TYPE_CDMA != activePhoneType)
-        {
-            PreferenceScreen simLockPreferences = getPreferenceManager()
-                    .createPreferenceScreen(this);
-            simLockPreferences.setTitle(R.string.sim_lock_settings_category);
+        // if (TelephonyManager.PHONE_TYPE_CDMA != activePhoneType)
+        //{
+        //    PreferenceScreen simLockPreferences = getPreferenceManager()
+        //            .createPreferenceScreen(this);
+        //    simLockPreferences.setTitle(R.string.sim_lock_settings_category);
             // Intent to launch SIM lock settings
-            intent = new Intent();
-            intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
-            simLockPreferences.setIntent(intent);
+        //    intent = new Intent();
+        //    intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
+         //   simLockPreferences.setIntent(intent);
 
-            PreferenceCategory simLockCat = new PreferenceCategory(this);
-            simLockCat.setTitle(R.string.sim_lock_settings_title);
-            root.addPreference(simLockCat);
-            simLockCat.addPreference(simLockPreferences);
-        }
+         //  PreferenceCategory simLockCat = new PreferenceCategory(this);
+         //   simLockCat.setTitle(R.string.sim_lock_settings_title);
+         //   root.addPreference(simLockCat);
+         //   simLockCat.addPreference(simLockPreferences);
+         //}
+        
 
         // Passwords
         PreferenceCategory passwordsCat = new PreferenceCategory(this);
