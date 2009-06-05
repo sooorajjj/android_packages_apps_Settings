@@ -488,7 +488,7 @@
     <!-- Main Settings screen setting option title for the item to take you the security and location screen -->
     <string name="security_settings_title">Security &amp; location</string>
     <!-- Main Settings screen setting option summary text for the item tot ake you to the security and location screen -->
-    <string name="security_settings_summary">Set My Location, screen unlock, SIM card lock, credential storage lock</string>
+    <string name="security_settings_summary">Set My Location, screen unlock, credential storage lock</string>
     <!-- In the security screen, the header title for settings related to  Passwords-->
     <string name="security_passwords_title">Passwords</string>
 
@@ -960,7 +960,7 @@
     <!-- About phone screen, summary of the item to go into the phone status screen -->
     <string name="device_status_summary">Phone number, signal, etc.</string>
     <!-- Main settings screen item's title to go into the SD card and storage settings screen-->
-    <string name="storage_settings_title">SD card &amp; phone storage</string>
+    <string name="storage_settings_title">SD card</string>
     <!-- Main settings screen item's summary for the SD card and storage settings -->
     <string name="storage_settings_summary">Unmount SD card, view available storage</string>
     <!-- Do not translate. About phone, status item title -->
