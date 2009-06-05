@@ -19,21 +19,21 @@
         
     <PreferenceCategory
             android:title="@string/sound_settings">
-            
+
+<!--            
         <CheckBoxPreference
                 android:key="silent"
                 android:title="@string/silent_mode_title"
                 android:summary="@string/silent_mode_summary"
                 android:persistent="false"
                 android:disableDependentsState="true" />
-    
+-->    
         <com.android.settings.RingerVolumePreference
                 android:key="ring_volume"
                 android:title="@string/ring_volume_title"
                 android:summary="@string/ring_volume_summary"
                 android:dialogTitle="@string/ring_volume_title"
                 android:persistent="false"
-                android:dependency="silent"
                 android:streamType="ring" />
     
         <VolumePreference
@@ -43,7 +43,8 @@
                 android:dialogTitle="@string/media_volume_title"
                 android:persistent="false"
                 android:streamType="music" />
-    
+   
+<!-- 
         <com.android.settings.DefaultRingtonePreference
                 android:key="ringtone"
                 android:title="@string/ringtone_title"
@@ -75,13 +76,12 @@
                 android:summaryOff="@string/dtmf_tone_enable_summary_off"
                 android:dependency="silent"
                 android:defaultValue="true" />
-
+-->
         <CheckBoxPreference
                 android:key="sound_effects"
                 android:title="@string/sound_effects_enable_title"
                 android:summaryOn="@string/sound_effects_enable_summary_on"
                 android:summaryOff="@string/sound_effects_enable_summary_off"
-                android:dependency="silent"
                 android:defaultValue="true" />
 
         <CheckBoxPreference
@@ -89,7 +89,6 @@
                 android:title="@string/play_media_notification_sounds_enable_title"
                 android:summaryOn="@string/play_media_notification_sounds_enable_summary_on"
                 android:summaryOff="@string/play_media_notification_sounds_enable_summary_off"
-                android:dependency="silent"
                 android:defaultValue="true" />
 
     </PreferenceCategory>
