@@ -56,17 +56,21 @@ public class RingerVolumePreference extends VolumePreference implements
         mNotificationsUseRingVolumeCheckbox =
                 (CheckBox) view.findViewById(R.id.same_notification_volume);
         mNotificationsUseRingVolumeCheckbox.setOnCheckedChangeListener(this);
-        mNotificationsUseRingVolumeCheckbox.setChecked(Settings.System.getInt(
-                getContext().getContentResolver(),
-                Settings.System.NOTIFICATIONS_USE_RING_VOLUME, 1) == 1);
+        //mNotificationsUseRingVolumeCheckbox.setChecked(Settings.System.getInt(
+        //        getContext().getContentResolver(),
+        //        Settings.System.NOTIFICATIONS_USE_RING_VOLUME, 1) == 1);
         
+        mNotificationsUseRingVolumeCheckbox.setChecked(true); // always use notification volumes
+        mNotificationsUseRingVolumeCheckbox.setVisibility(View.GONE);
+
         final SeekBar seekBar = (SeekBar) view.findViewById(R.id.notification_volume_seekbar);
         mNotificationSeekBarVolumizer = new SeekBarVolumizer(getContext(), seekBar,
                 AudioManager.STREAM_NOTIFICATION);
         
         mNotificationVolumeTitle = (TextView) view.findViewById(R.id.notification_volume_title);
         
-        setNotificationVolumeVisibility(!mNotificationsUseRingVolumeCheckbox.isChecked());
+        //setNotificationVolumeVisibility(!mNotificationsUseRingVolumeCheckbox.isChecked());
+        setNotificationVolumeVisibility(false);
     }
 
     @Override

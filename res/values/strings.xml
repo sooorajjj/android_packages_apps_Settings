@@ -810,9 +810,9 @@
     <!-- Sound settings screen, setting option summary text -->
     <string name="ringtone_summary">Set your default incoming call ringtone</string>
     <!-- Sound settings screen, setting option name -->
-    <string name="ring_volume_title">Ringer volume</string>
+    <string name="ring_volume_title">Notification volume</string>
     <!-- Sound settings screen, setting option summary text -->
-    <string name="ring_volume_summary">Set volume for incoming calls and notifications</string>
+    <string name="ring_volume_summary">Set volume for notifications</string>
     <!-- Sound settings screen, setting option name checkbox -->
     <string name="vibrate_title">Phone vibrate</string>
     <!-- Sound settings screen, setting option summary text -->
@@ -822,7 +822,7 @@
     <!-- Sound settings screen, setting option summary text -->
     <string name="notification_sound_summary">Set your default notification ringtone</string>
     <!-- Sound settings screen, the title of the volume bar to adjust the incoming call volume -->
-    <string name="incoming_call_volume_title">Incoming call volume</string>
+    <string name="incoming_call_volume_title"></string>
     <!-- Sound settings screen, the title of the volume bar to adjust the notification volume -->
     <string name="notification_volume_title">Notification volume</string>
     <!-- Sound settings screen, the caption of the checkbox for having the notification volume be
