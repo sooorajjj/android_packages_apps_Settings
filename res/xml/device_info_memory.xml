@@ -38,6 +38,7 @@
             style="?android:attr/preferenceInformationStyle" 
             android:title="@string/memory_available"
             android:summary="00"/>
+    <!--
         <PreferenceScreen 
             android:title="@string/master_clear_title" 
             android:summary="@string/master_clear_summary">
@@ -45,6 +46,7 @@
                 android:targetPackage="com.android.settings"
                 android:targetClass="com.android.settings.MasterClear" />
         </PreferenceScreen>
+    -->
     </PreferenceCategory>
 
 </PreferenceScreen>
