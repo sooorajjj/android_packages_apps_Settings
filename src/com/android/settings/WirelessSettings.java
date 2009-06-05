@@ -26,12 +26,12 @@ import android.preference.CheckBoxPreference;
 
 public class WirelessSettings extends PreferenceActivity {
 
-    private static final String KEY_TOGGLE_AIRPLANE = "toggle_airplane";
+    //private static final String KEY_TOGGLE_AIRPLANE = "toggle_airplane";
     private static final String KEY_TOGGLE_BLUETOOTH = "toggle_bluetooth";
     private static final String KEY_TOGGLE_WIFI = "toggle_wifi";
 
     private WifiEnabler mWifiEnabler;
-    private AirplaneModeEnabler mAirplaneModeEnabler;
+    //private AirplaneModeEnabler mAirplaneModeEnabler;
     private BluetoothEnabler mBtEnabler;
     
     @Override
@@ -48,7 +48,7 @@ public class WirelessSettings extends PreferenceActivity {
         super.onResume();
         
         mWifiEnabler.resume();
-        mAirplaneModeEnabler.resume();
+        //mAirplaneModeEnabler.resume();
         mBtEnabler.resume();
     }
     
@@ -57,7 +57,7 @@ public class WirelessSettings extends PreferenceActivity {
         super.onPause();
         
         mWifiEnabler.pause();
-        mAirplaneModeEnabler.pause();
+        //mAirplaneModeEnabler.pause();
         mBtEnabler.pause();
     }
     
@@ -68,9 +68,9 @@ public class WirelessSettings extends PreferenceActivity {
                 (WifiManager) getSystemService(WIFI_SERVICE),
                 (CheckBoxPreference) findPreference(KEY_TOGGLE_WIFI));
         
-        mAirplaneModeEnabler = new AirplaneModeEnabler(
-                this,
-                (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE));
+        //mAirplaneModeEnabler = new AirplaneModeEnabler(
+        //        this,
+        //        (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE));
         
         mBtEnabler = new BluetoothEnabler(
                 this,

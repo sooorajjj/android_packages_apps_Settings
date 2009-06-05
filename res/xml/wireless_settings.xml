@@ -22,13 +22,13 @@
                     android:key="toggle_wifi"
                     android:title="@string/wifi_quick_toggle_title"
                     android:summary="@string/wifi_quick_toggle_summary"
-                    android:persistent="false"
-                    android:dependency="toggle_airplane" />
+                    android:persistent="false" />
+                    <!-- android:dependency="toggle_airplane" /> -->
 
                 <PreferenceScreen
                     android:title="@string/wifi_settings"
-                    android:summary="@string/wifi_settings_summary"
-                    android:dependency="toggle_airplane">
+                    android:summary="@string/wifi_settings_summary">
+                    <!-- android:dependency="toggle_airplane"> -->
                     <intent
                         android:action="android.intent.action.MAIN"
                         android:targetPackage="com.android.settings"
@@ -39,19 +39,20 @@
                     android:key="toggle_bluetooth"
                     android:title="@string/bluetooth_quick_toggle_title"
                     android:summary="@string/bluetooth_quick_toggle_summary"
-                    android:persistent="false"
-                    android:dependency="toggle_airplane" />
+                    android:persistent="false" />
+                    <!-- android:dependency="toggle_airplane" /> -->
 
                 <PreferenceScreen
                     android:title="@string/bluetooth_settings_title"
-                    android:summary="@string/bluetooth_settings_summary"
-                    android:dependency="toggle_airplane">
+                    android:summary="@string/bluetooth_settings_summary">
+                    <!-- android:dependency="toggle_airplane"> -->
                     <intent
                         android:action="android.intent.action.MAIN"
                         android:targetPackage="com.android.settings"
                         android:targetClass="com.android.settings.bluetooth.BluetoothSettings" />
                 </PreferenceScreen>
 
+<!--
                 <PreferenceScreen
                     android:title="@string/vpn_settings_title"
                     android:summary="@string/vpn_settings_summary"
@@ -78,6 +79,6 @@
                     android:summary="@string/airplane_mode_summary"
                     android:persistent="false"
                     android:disableDependentsState="true" />
-
+-->
 
 </PreferenceScreen>
