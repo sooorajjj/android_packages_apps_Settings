@@ -103,11 +103,13 @@
     <PreferenceCategory
             android:title="@string/display_settings">
 
+<!--
         <CheckBoxPreference 
             android:key="accelerometer" 
             android:title="@string/accelerometer_title" 
             android:summaryOn="@string/accelerometer_summary_on"
             android:summaryOff="@string/accelerometer_summary_off"/>
+-->
     
         <CheckBoxPreference
                 android:key="animations"

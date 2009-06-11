@@ -48,12 +48,12 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
     private static final int FALLBACK_EMERGENCY_TONE_VALUE = 0;
     
     private static final String KEY_SILENT = "silent";
-    private static final String KEY_VIBRATE = "vibrate";
+    //private static final String KEY_VIBRATE = "vibrate";
     private static final String KEY_SCREEN_TIMEOUT = "screen_timeout";
-    private static final String KEY_DTMF_TONE = "dtmf_tone";
+    //private static final String KEY_DTMF_TONE = "dtmf_tone";
     private static final String KEY_SOUND_EFFECTS = "sound_effects";
     private static final String KEY_ANIMATIONS = "animations";
-    private static final String KEY_ACCELEROMETER = "accelerometer";
+    //private static final String KEY_ACCELEROMETER = "accelerometer";
     private static final String KEY_PLAY_MEDIA_NOTIFICATION_SOUNDS = "play_media_notification_sounds";
     private static final String KEY_COMPATIBILITY_MODE = "compatibility_mode";
     private static final String KEY_EMERGENCY_TONE ="emergency_tone";
@@ -75,7 +75,7 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
     //private CheckBoxPreference mDtmfTone;
     private CheckBoxPreference mSoundEffects;
     private CheckBoxPreference mAnimations;
-    private CheckBoxPreference mAccelerometer;
+    //private CheckBoxPreference mAccelerometer;
     private CheckBoxPreference mCompatibilityMode;
     private float[] mAnimationScales;
     
@@ -122,8 +122,8 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
                 Settings.System.SOUND_EFFECTS_ENABLED, 0) != 0);
         mAnimations = (CheckBoxPreference) findPreference(KEY_ANIMATIONS);
         mAnimations.setPersistent(false);
-        mAccelerometer = (CheckBoxPreference) findPreference(KEY_ACCELEROMETER);
-        mAccelerometer.setPersistent(false);
+        //mAccelerometer = (CheckBoxPreference) findPreference(KEY_ACCELEROMETER);
+        //mAccelerometer.setPersistent(false);
         mCompatibilityMode = (CheckBoxPreference) findPreference(KEY_COMPATIBILITY_MODE);
         mCompatibilityMode.setPersistent(false);
         mCompatibilityMode.setChecked(Settings.System.getInt(resolver,
@@ -211,9 +211,9 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
         if (animations != mAnimations.isChecked() || force) {
             mAnimations.setChecked(animations);
         }
-        mAccelerometer.setChecked(Settings.System.getInt(
-                getContentResolver(), 
-                Settings.System.ACCELEROMETER_ROTATION, 0) != 0);
+        //mAccelerometer.setChecked(Settings.System.getInt(
+        //        getContentResolver(),
+        //        Settings.System.ACCELEROMETER_ROTATION, 0) != 0);
     }
 
     private void setRingerMode(boolean silent, boolean vibrate) {
@@ -258,10 +258,10 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
             } catch (RemoteException e) {
             }
             
-        } else if (preference == mAccelerometer) {
-            Settings.System.putInt(getContentResolver(),
-                    Settings.System.ACCELEROMETER_ROTATION,
-                    mAccelerometer.isChecked() ? 1 : 0);
+        //} else if (preference == mAccelerometer) {
+        //    Settings.System.putInt(getContentResolver(),
+        //            Settings.System.ACCELEROMETER_ROTATION,
+        //            mAccelerometer.isChecked() ? 1 : 0);
         } else if (preference == mCompatibilityMode) {
             Settings.System.putInt(getContentResolver(),
                     Settings.System.COMPATIBILITY_MODE,
