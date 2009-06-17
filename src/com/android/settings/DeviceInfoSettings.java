@@ -170,7 +170,7 @@ public class DeviceInfoSettings extends PreferenceActivity {
         String buildVersionStr;
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("/proc/socinfo"), 256);
+            BufferedReader reader = new BufferedReader(new FileReader("/sys/devices/system/soc/soc0/build_id"), 256);
             try {
                 buildVersionStr = reader.readLine();
             } finally {
