@@ -931,9 +931,9 @@
     <!-- About phone screen, summary of the item to go into the phone status screen -->
     <string name="device_status_summary">IMEI, phone number, signal, etc.</string>
     <!-- Main settings screen item's title to go into the SD card and storage settings screen-->
-    <string name="storage_settings_title">SD card &amp; phone storage</string>
+    <string name="storage_settings_title">SD card, USB Mass Storage &amp; phone storage</string>
     <!-- Main settings screen item's summary for the SD card and storage settings -->
-    <string name="storage_settings_summary">Unmount SD card, view available storage</string>
+    <string name="storage_settings_summary">Unmount SD card, USB Mass Storage, view available storage</string>
     <!-- Do not translate. About phone, status item title -->
     <string name="status_imei">IMEI</string>
     <!-- Do not translate. About phone, status item title -->
@@ -986,6 +986,12 @@
     <string name="battery_status_title">Battery status</string>
     <!-- Phone info screen, section titles: -->
     <string name="battery_level_title">Battery level</string>
+
+    <!-- USB Mass Storage settings -->
+    <string name="ums_settings_title">USB Mass Storage</string>
+    <string name="ums_unmount_title">Unmount/Eject UMS device</string>
+    <string name="ums_unmount_summary">Select the UMS device to unmount for safe removal</string>
+    <string name="ums_mount_point_list">Available UMS Mount Points</string>
 
     <!-- APN Settings -->
     <!-- APN settings screen title -->

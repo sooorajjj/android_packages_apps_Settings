@@ -28,10 +28,14 @@ import android.os.Environment;
 import android.os.IMountService;
 import android.os.ServiceManager;
 import android.os.StatFs;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.util.Log;
+import java.util.StringTokenizer;
 
 import com.android.settings.R;
 
@@ -49,13 +53,20 @@ public class Memory extends PreferenceActivity {
     private static final String MEMORY_SD_UNMOUNT = "memory_sd_unmount";
 
     private static final String MEMORY_SD_FORMAT = "memory_sd_format";
+
+    private static final String UMS_UNMOUNT = "ums_unmount_key";
+
     private Resources mRes;
 
     private Preference mSdSize;
     private Preference mSdAvail;
     private Preference mSdUnmount;
     private Preference mSdFormat;
-    
+
+    // Display list of available UMS mount points to eject/unmount
+    private PreferenceScreen mUMSUnmount;
+    private PreferenceGroup mUMSUnmountList;
+
     // Access using getMountService()
     private IMountService mMountService = null;
 
@@ -70,6 +81,7 @@ public class Memory extends PreferenceActivity {
         mSdAvail = findPreference(MEMORY_SD_AVAIL);
         mSdUnmount = findPreference(MEMORY_SD_UNMOUNT);
         mSdFormat = findPreference(MEMORY_SD_FORMAT);
+        mUMSUnmount = (PreferenceScreen) findPreference(UMS_UNMOUNT);
     }
     
     @Override
@@ -112,14 +124,24 @@ public class Memory extends PreferenceActivity {
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference == mSdUnmount) {
-            unmount();
+            unmount(null);
             return true;
         } else if (preference == mSdFormat) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setClass(this, com.android.settings.MediaFormat.class);
             startActivity(intent);
             return true;
-        }
+        } else if (preference == mUMSUnmount) {
+            displayUMSMountPointList();
+            return true;
+        } else {
+            String unmount_value = preference.getTitle().toString();
+            if (unmount_value != null) {
+                unmount(unmount_value);
+                removeUMSMountPointList(false, unmount_value);
+                return true;
+            }
+         }
         
         return false;
     }
@@ -131,17 +153,63 @@ public class Memory extends PreferenceActivity {
         }
     };
 
-    private void unmount() {
+    private void unmount(String unmount_value) {
         IMountService mountService = getMountService();
         try {
             if (mountService != null) {
-                mountService.unmountMedia(Environment.getExternalStorageDirectory().toString());
+                if (unmount_value != null)
+                    mountService.unmountMedia(unmount_value);
+                else
+                    mountService.unmountMedia(Environment.getExternalStorageDirectory().toString());
             } else {
                 Log.e(TAG, "Mount service is null, can't unmount");
             }
         } catch (RemoteException ex) {
             // Failed for some reason, try to update UI to actual state
             updateMemoryStatus();
+        }
+    }
+
+    private void displayUMSMountPointList() {
+        mUMSUnmountList = (PreferenceGroup) getPreferenceScreen().findPreference(UMS_UNMOUNT);
+        removeUMSMountPointList(true, null);
+
+        IMountService mountService = getMountService();
+        String mount_point_list;
+        try {
+            if (mountService != null) {
+                mount_point_list = mountService.getMountPointList();
+
+                if (mount_point_list != null) {
+                    StringTokenizer st = new StringTokenizer(mount_point_list, ":");
+                    while (st.hasMoreElements()) {
+                        String mount_point_value = st.nextToken();
+                        if (!mount_point_value.equals("/sdcard")) {
+                            Preference mount_point_entry = new Preference(this, null);
+                            mount_point_entry.setTitle(mount_point_value);
+                            mUMSUnmountList.addPreference(mount_point_entry);
+                        }
+                    }
+                }
+            } else {
+                Log.e(TAG, "Mount service is null, can't unmount");
+            }
+        } catch (RemoteException ex) {
+            // Failed for some reason, try to update UI to actual state
+            updateMemoryStatus();
+        }
+    }
+
+    private void removeUMSMountPointList(Boolean all, String remove_mount_point) {
+        int count = mUMSUnmountList.getPreferenceCount();
+
+        for (int i=count-1; i>0; i--) {
+            Preference p = mUMSUnmountList.getPreference(i);
+            if (all) {
+                mUMSUnmountList.removePreference(p);
+            } else if(remove_mount_point != null && remove_mount_point.equals(p.getTitle())) {
+                mUMSUnmountList.removePreference(p);
+            }
         }
     }
 
