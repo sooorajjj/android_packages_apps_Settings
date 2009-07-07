@@ -38,14 +38,7 @@ import android.text.TextUtils;
 public class BluetoothPinRequest extends BroadcastReceiver {
 
     public static final int NOTIFICATION_ID = android.R.drawable.stat_sys_data_bluetooth;
-
-    /* If Notification is not needed, then set this to true. If the alert dialog for
-       Pin Code Entry needs to be handled through a notification, set this to false
-       TODO: Until a OBEX Connection Setup or OBEX App is in foreground information can be
-       shared, always enabling poping up the dialog.
-       */
-    public static final boolean mPopUpDialogAlways = true;
-
+    
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -60,7 +53,7 @@ public class BluetoothPinRequest extends BroadcastReceiver {
             pinIntent.setAction(BluetoothIntent.PAIRING_REQUEST_ACTION);
             pinIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             
-            if ( (localManager.getForegroundActivity() != null) || (mPopUpDialogAlways == true) ) {
+            if (localManager.getForegroundActivity() != null) {
                 // Since the BT-related activity is in the foreground, just open the dialog
                 context.startActivity(pinIntent);
                 
