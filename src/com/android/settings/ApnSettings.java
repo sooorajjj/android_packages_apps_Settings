@@ -210,6 +210,7 @@ public class ApnSettings extends PreferenceActivity implements
         switch (item.getItemId()) {
         case MENU_NEW:
             addNewApn();
+            finish();
             return true;
 
         case MENU_RESTORE:
