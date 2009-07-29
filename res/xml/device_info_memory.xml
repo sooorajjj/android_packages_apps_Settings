@@ -47,4 +47,13 @@
         </PreferenceScreen>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/ums_settings_title">
+        <PreferenceScreen
+            android:key="ums_unmount_key"
+            android:title="@string/ums_unmount_title"
+            android:summary="@string/ums_unmount_summary">
+            <PreferenceCategory android:title="@string/ums_mount_point_list"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+
 </PreferenceScreen>
