@@ -25,6 +25,7 @@
         </PreferenceScreen>
         
         <!-- Device status - launches activity -->
+        <!--
         <PreferenceScreen android:key="status_info"
                 android:title="@string/device_status" 
                 android:summary="@string/device_status_summary">
@@ -32,7 +33,7 @@
                     android:targetPackage="com.android.settings"
                     android:targetClass="com.android.settings.deviceinfo.Status" />
         </PreferenceScreen>
-        
+
         <PreferenceScreen
                 android:key="power_usage"
                 android:title="@string/power_usage_summary_title"
@@ -41,6 +42,8 @@
                     android:targetPackage="com.android.settings"
                     android:targetClass="com.android.settings.fuelgauge.PowerUsageSummary" />
         </PreferenceScreen>
+
+        -->
 
         <!-- Legal Information -->
         <PreferenceScreen
@@ -84,11 +87,14 @@
         </PreferenceScreen>
         -->
         <!-- System Tutorial - launches activity -->
+      
+        <!--
         <PreferenceScreen android:key="system_tutorial"
                 android:title="@string/system_tutorial_list_item_title" 
                 android:summary="@string/system_tutorial_list_item_summary">
             <intent android:action="android.intent.action.SYSTEM_TUTORIAL" />
         </PreferenceScreen>
+        -->
         
         <!-- Device hardware model -->
         <Preference android:key="device_model" 
@@ -103,11 +109,14 @@
                 android:summary="@string/device_info_default"/>
                 
         <!-- Device Baseband version -->
+        
+        <!--
         <Preference android:key="baseband_version" 
                 style="?android:preferenceInformationStyle"
                 android:title="@string/baseband_version"
                 android:summary="@string/device_info_default"/>
-        
+        -->
+
         <!-- Device Kernel version -->
         <Preference android:key="kernel_version" 
                 style="?android:preferenceInformationStyle"

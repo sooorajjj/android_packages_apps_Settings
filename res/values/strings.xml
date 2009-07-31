@@ -437,7 +437,7 @@
     <!-- Main Settings screen settings title for things like Wi-Fi, bluetooth, airplane mode.  This will take you to another screen with those settings. -->
     <string name="radio_controls_title">Wireless controls</string>
     <!-- Main Settings screen settings summary text for the "Wireless controls" setting -->
-    <string name="radio_controls_summary">Manage Wi-Fi, Bluetooth, airplane mode, mobile networks, &amp; VPNs</string>
+    <string name="radio_controls_summary">Manage Wi-Fi, Bluetooth, VPNs</string>
 
 
     <!-- mobile network settings screen, setting check box title -->
@@ -1156,9 +1156,9 @@
 
     <!-- About --> <skip />
     <!-- Main settings screen, setting title for the user to go into the About phone screen -->
-    <string name="about_settings">About phone</string>
+    <string name="about_settings">About System</string>
     <!-- Main settings screen, setting summary for the user to go into the About phone screen-->
-    <string name="about_settings_summary">View legal info, phone status, software version</string>
+    <string name="about_settings_summary">View legal info, system status, software version</string>
     <!-- About phone settings screen, setting option name to go to dialog that shows legal info -->
     <string name="legal_information">Legal information</string>
     <!-- About phone settings screen, setting option name to see a list of contributors -->
