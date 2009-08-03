@@ -2012,7 +2012,7 @@ found in the list of installed applications.</string>
     <string name="cstor_is_added">%s is added.</string>
 
     <!-- Sound settings screen, setting check box label -->
-    <string name="emergency_tone_title">Emergency tone</string>
+    <!-- <string name="emergency_tone_title">Emergency tone</string> -->
     <!-- Sound settings screen, setting option summary text -->
     <string name="emergency_tone_summary">Set behavior when an emergency call is placed</string>
 </resources>
