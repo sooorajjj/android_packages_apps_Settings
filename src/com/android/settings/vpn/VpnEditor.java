@@ -24,13 +24,16 @@ import android.content.Intent;
 import android.net.vpn.L2tpIpsecProfile;
 import android.net.vpn.L2tpIpsecPskProfile;
 import android.net.vpn.L2tpProfile;
+import android.net.vpn.PptpProfile;
 import android.net.vpn.VpnProfile;
 import android.net.vpn.VpnType;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +49,7 @@ public class VpnEditor extends PreferenceActivity {
 
     private VpnProfileEditor mProfileEditor;
     private boolean mAddingProfile;
+    private byte[] mOriginalProfileData;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,10 @@ public class VpnEditor extends PreferenceActivity {
         addPreferencesFromResource(R.xml.vpn_edit);
 
         initViewFor(p);
+
+        Parcel parcel = Parcel.obtain();
+        p.writeToParcel(parcel, 0);
+        mOriginalProfileData = parcel.marshall();
     }
 
     @Override
@@ -85,15 +93,28 @@ public class VpnEditor extends PreferenceActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_SAVE:
-                if (validateAndSetResult()) {
+                if (validateAndSetResult()) finish();
+                return true;
+
+            case MENU_CANCEL:
+                if (profileChanged()) {
+                    showCancellationConfirmDialog();
+                } else {
                     finish();
                 }
                 return true;
-            case MENU_CANCEL:
-                showCancellationConfirmDialog();
-                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                if (validateAndSetResult()) finish();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void initViewFor(VpnProfile profile) {
@@ -121,7 +142,7 @@ public class VpnEditor extends PreferenceActivity {
             return false;
         }
 
-        setResult(getProfile());
+        if (profileChanged()) setResult(getProfile());
         return true;
     }
 
@@ -141,6 +162,9 @@ public class VpnEditor extends PreferenceActivity {
 
             case L2TP:
                 return new L2tpEditor((L2tpProfile) p);
+
+            case PPTP:
+                return new PptpEditor((PptpProfile) p);
 
             default:
                 return new VpnProfileEditor(p);
@@ -166,5 +190,18 @@ public class VpnEditor extends PreferenceActivity {
 
     private VpnProfile getProfile() {
         return mProfileEditor.getProfile();
+    }
+
+    private boolean profileChanged() {
+        Parcel newParcel = Parcel.obtain();
+        getProfile().writeToParcel(newParcel, 0);
+        byte[] newData = newParcel.marshall();
+        if (mOriginalProfileData.length == newData.length) {
+            for (int i = 0, n = mOriginalProfileData.length; i < n; i++) {
+                if (mOriginalProfileData[i] != newData[i]) return true;
+            }
+            return false;
+        }
+        return true;
     }
 }
