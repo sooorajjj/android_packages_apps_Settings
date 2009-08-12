@@ -82,6 +82,7 @@ public class Memory extends PreferenceActivity {
         mSdUnmount = findPreference(MEMORY_SD_UNMOUNT);
         mSdFormat = findPreference(MEMORY_SD_FORMAT);
         mUMSUnmount = (PreferenceScreen) findPreference(UMS_UNMOUNT);
+        mUMSUnmountList = (PreferenceGroup) getPreferenceScreen().findPreference(UMS_UNMOUNT);
     }
     
     @Override
@@ -134,7 +135,8 @@ public class Memory extends PreferenceActivity {
         } else if (preference == mUMSUnmount) {
             displayUMSMountPointList();
             return true;
-        } else {
+        } else if(preference.getDependency() != null && 
+                  preference.getDependency().equals(mUMSUnmount.getKey()) ) {
             String unmount_value = preference.getTitle().toString();
             if (unmount_value != null) {
                 unmount(unmount_value);
@@ -171,7 +173,6 @@ public class Memory extends PreferenceActivity {
     }
 
     private void displayUMSMountPointList() {
-        mUMSUnmountList = (PreferenceGroup) getPreferenceScreen().findPreference(UMS_UNMOUNT);
         removeUMSMountPointList(true, null);
 
         IMountService mountService = getMountService();
@@ -188,6 +189,9 @@ public class Memory extends PreferenceActivity {
                             Preference mount_point_entry = new Preference(this, null);
                             mount_point_entry.setTitle(mount_point_value);
                             mUMSUnmountList.addPreference(mount_point_entry);
+                            // Mark these items as dependent on mUMSUnmount to be able
+                            // to get a hold of them when we need to delete them
+                            mount_point_entry.setDependency(mUMSUnmount.getKey());
                         }
                     }
                 }
