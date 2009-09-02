@@ -62,6 +62,9 @@ public class AdvancedSettings extends PreferenceActivity
         super.onCreate(savedInstanceState);
         
         addPreferencesFromResource(R.xml.wifi_advanced_settings);
+
+        initNumChannelsPreference();
+        initSleepPolicyPreference();
         
         mUseStaticIpCheckBox = (CheckBoxPreference) findPreference(KEY_USE_STATIC_IP);
 
@@ -76,8 +79,6 @@ public class AdvancedSettings extends PreferenceActivity
         super.onResume();
         
         updateUi();
-        initNumChannelsPreference();
-        initSleepPolicyPreference();
         refreshMacAddress();
     }
 
