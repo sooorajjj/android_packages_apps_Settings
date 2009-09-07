@@ -62,23 +62,23 @@ public class MasterClear extends Activity {
      */
     private Button.OnClickListener mFinalClickListener = new Button.OnClickListener() {
             public void onClick(View v) {
-                try {
-                            Process q = Runtime.getRuntime().exec("start factory_reset");
-                            int status_q = q.waitFor();
-                            for(;;); // Waiting for system to stop
-                } catch (IOException e) {
-                     Log.w("MasterClear", "Unable start service.");
-                } catch (InterruptedException e) {
-                     Log.w("MasterClear", "factory_reset service fails");
-                }
 
                 // Those monkeys kept committing suicide, so we add this property
                 // to disable going through with the master clear
                 if (!TextUtils.isEmpty(SystemProperties.get("ro.monkey"))) {
                     return;
                 }
-                
-                ICheckinService service = 
+
+                try {
+                     Process q = Runtime.getRuntime().exec("start factory_reset");
+                     int status_q = q.waitFor();
+                     for(;;); // Waiting for system to stop
+                } catch (IOException e) {
+                     Log.w("MasterClear", "Unable start service.");
+                } catch (InterruptedException e) {
+                     Log.w("MasterClear", "factory_reset service fails");
+                }
+                ICheckinService service =
                         ICheckinService.Stub.asInterface(ServiceManager.getService("checkin"));
                 if (service != null) {
                     try {
