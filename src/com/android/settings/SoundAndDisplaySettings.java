@@ -38,6 +38,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.IWindowManager;
 import android.telephony.TelephonyManager;
+import android.os.SystemProperties;
+import android.text.TextUtils;
 
 public class SoundAndDisplaySettings extends PreferenceActivity implements
         Preference.OnPreferenceChangeListener {
@@ -269,6 +271,8 @@ public class SoundAndDisplaySettings extends PreferenceActivity implements
 
     public boolean onPreferenceChange(Preference preference, Object objValue) {
         if (KEY_SCREEN_TIMEOUT.equals(preference.getKey())) {
+            if (!TextUtils.isEmpty(SystemProperties.get("ro.monkey")))
+                 return true;
             int value = Integer.parseInt((String) objValue);
             try {
                 Settings.System.putInt(getContentResolver(), 
