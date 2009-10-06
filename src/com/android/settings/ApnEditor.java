@@ -182,7 +182,18 @@ public class ApnEditor extends PreferenceActivity
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();        
     }
-    
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        final Intent intent = getIntent();
+        final String action = intent.getAction();
+
+        if (action.equals(Intent.ACTION_INSERT)) {
+            finish();
+        }
+    }
+
     private void fillUi() {
         if (mFirstTime) {            
             mFirstTime = false;
