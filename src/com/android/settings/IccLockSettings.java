@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +27,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.android.internal.telephony.Phone;
@@ -55,8 +57,8 @@ public class IccLockSettings extends PreferenceActivity
     private static final int ICC_REENTER_MODE = 4;
     
     // Keys in xml file
-    private static final String PIN_DIALOG = "sim_pin";
-    private static final String PIN_TOGGLE = "sim_toggle";
+    private static final String PIN_DIALOG = "icc_pin";
+    private static final String PIN_TOGGLE = "icc_toggle";
     // Keys in icicle
     private static final String DIALOG_STATE = "dialogState";
     private static final String DIALOG_PIN = "dialogPin";
@@ -120,7 +122,12 @@ public class IccLockSettings extends PreferenceActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.sim_lock_settings);
+        int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        if (TelephonyManager.PHONE_TYPE_GSM == activePhoneType) {
+            addPreferencesFromResource(R.xml.sim_lock_settings);
+        } else {
+            addPreferencesFromResource(R.xml.ruim_lock_settings);
+        }
 
         mPinDialog = (EditPinPreference) findPreference(PIN_DIALOG);
         mPinToggle = (CheckBoxPreference) findPreference(PIN_TOGGLE);
@@ -175,12 +182,17 @@ public class IccLockSettings extends PreferenceActivity
         if (mDialogState == OFF_MODE) {
             return;
         }
-        setDialogValues();
+        int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        if (TelephonyManager.PHONE_TYPE_GSM == activePhoneType) {
+            setDialogValuesForSim();
+        } else {
+            setDialogValuesForRuim();
+        }
         
         mPinDialog.showPinDialog();
     }
     
-    private void setDialogValues() {
+    private void setDialogValuesForSim() {
         mPinDialog.setText(mPin);
         String message = "";
         switch (mDialogState) {
@@ -210,16 +222,47 @@ public class IccLockSettings extends PreferenceActivity
         mPinDialog.setDialogMessage(message);
     }
 
+    private void setDialogValuesForRuim() {
+        mPinDialog.setText(mPin);
+        String message = "";
+        switch (mDialogState) {
+            case ICC_LOCK_MODE:
+                message = mRes.getString(R.string.ruim_enter_pin);
+                mPinDialog.setDialogTitle(mToState
+                        ? mRes.getString(R.string.ruim_enable_ruim_lock)
+                        : mRes.getString(R.string.ruim_disable_ruim_lock));
+                break;
+            case ICC_OLD_MODE:
+                message = mRes.getString(R.string.ruim_enter_old);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.ruim_change_pin));
+                break;
+            case ICC_NEW_MODE:
+                message = mRes.getString(R.string.ruim_enter_new);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.ruim_change_pin));
+                break;
+            case ICC_REENTER_MODE:
+                message = mRes.getString(R.string.ruim_reenter_new);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.ruim_change_pin));
+                break;
+        }
+        if (mError != null) {
+            message = mError + "\n" + message;
+            mError = null;
+        }
+        mPinDialog.setDialogMessage(message);
+    }
+
     public void onPinEntered(EditPinPreference preference, boolean positiveResult) {
         if (!positiveResult) {
             resetDialogState();
             return;
         }
+        boolean isGsmPhone = TelephonyManager.getDefault().getPhoneType() == TelephonyManager.PHONE_TYPE_GSM;
         
         mPin = preference.getText();
         if (!reasonablePin(mPin)) {
             // inject error message and display dialog again
-            mError = mRes.getString(R.string.sim_bad_pin);
+            mError = mRes.getString(isGsmPhone ? R.string.sim_bad_pin : R.string.ruim_bad_pin);
             showPinDialog();
             return;
         }
@@ -242,7 +285,7 @@ public class IccLockSettings extends PreferenceActivity
                 break;
             case ICC_REENTER_MODE:
                 if (!mPin.equals(mNewPin)) {
-                    mError = mRes.getString(R.string.sim_pins_dont_match);
+                    mError = mRes.getString(isGsmPhone ? R.string.sim_pins_dont_match : R.string.ruim_pins_dont_match);
                     mDialogState = ICC_NEW_MODE;
                     mPin = null;
                     showPinDialog();
@@ -326,6 +369,11 @@ public class IccLockSettings extends PreferenceActivity
         mError = null;
         mDialogState = ICC_OLD_MODE; // Default for when Change PIN is clicked
         mPin = "";
-        setDialogValues();
+        int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        if (TelephonyManager.PHONE_TYPE_GSM == activePhoneType) {
+            setDialogValuesForSim();
+        } else {
+            setDialogValuesForRuim();
+        }
     }
 }

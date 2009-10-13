@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,22 +201,26 @@ public class SecuritySettings extends PreferenceActivity implements
 
         int activePhoneType = TelephonyManager.getDefault().getPhoneType();
 
-        // do not display SIM lock for CDMA phone
-        if (TelephonyManager.PHONE_TYPE_CDMA != activePhoneType)
-        {
-            PreferenceScreen simLockPreferences = getPreferenceManager()
-                    .createPreferenceScreen(this);
-            simLockPreferences.setTitle(R.string.sim_lock_settings_category);
-            // Intent to launch SIM lock settings
-            intent = new Intent();
-            intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
-            simLockPreferences.setIntent(intent);
-
-            PreferenceCategory simLockCat = new PreferenceCategory(this);
-            simLockCat.setTitle(R.string.sim_lock_settings_title);
-            root.addPreference(simLockCat);
-            simLockCat.addPreference(simLockPreferences);
+        PreferenceScreen iccLockPreferences = getPreferenceManager()
+                .createPreferenceScreen(this);
+        if (TelephonyManager.PHONE_TYPE_GSM == activePhoneType) {
+            iccLockPreferences.setTitle(R.string.sim_lock_settings_category);
+        } else {
+            iccLockPreferences.setTitle(R.string.ruim_lock_settings_category);
         }
+        // Intent to launch ICC lock settings
+        intent = new Intent();
+        intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
+        iccLockPreferences.setIntent(intent);
+
+        PreferenceCategory iccLockCat = new PreferenceCategory(this);
+        if (TelephonyManager.PHONE_TYPE_GSM == activePhoneType) {
+            iccLockCat.setTitle(R.string.sim_lock_settings_title);
+        } else {
+            iccLockCat.setTitle(R.string.ruim_lock_settings_title);
+        }
+        root.addPreference(iccLockCat);
+        iccLockCat.addPreference(iccLockPreferences);
 
         // Passwords
         PreferenceCategory passwordsCat = new PreferenceCategory(this);
