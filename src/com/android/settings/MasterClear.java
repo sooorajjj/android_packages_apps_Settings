@@ -69,15 +69,6 @@ public class MasterClear extends Activity {
                     return;
                 }
 
-                try {
-                     Process q = Runtime.getRuntime().exec("start factory_reset");
-                     int status_q = q.waitFor();
-                     for(;;); // Waiting for system to stop
-                } catch (IOException e) {
-                     Log.w("MasterClear", "Unable start service.");
-                } catch (InterruptedException e) {
-                     Log.w("MasterClear", "factory_reset service fails");
-                }
                 ICheckinService service =
                         ICheckinService.Stub.asInterface(ServiceManager.getService("checkin"));
                 if (service != null) {
