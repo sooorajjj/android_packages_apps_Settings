@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
+import com.android.internal.telephony.CommandException;
 
 /**
  * Implements the preference screen to enable/disable ICC lock and
@@ -94,7 +95,7 @@ public class IccLockSettings extends PreferenceActivity
                     iccLockChanged(ar.exception == null);
                     break;
                 case CHANGE_ICC_PIN_COMPLETE:
-                    iccPinChanged(ar.exception == null);
+                    iccPinChanged(ar);
                     break;
             }
 
@@ -284,12 +285,20 @@ public class IccLockSettings extends PreferenceActivity
         resetDialogState();
     }
 
-    private void iccPinChanged(boolean success) {
-        if (!success) {
-         // TODO: I18N
-            Toast.makeText(this, mRes.getString(R.string.sim_change_failed),
-                    Toast.LENGTH_SHORT)
-                    .show();
+    private void iccPinChanged(AsyncResult ar) {
+        if (ar.exception != null) {
+            CommandException.Error err = ((CommandException)(ar.exception)).getCommandError();
+            // If the exception is REQUEST_NOT_SUPPORTED then change pin couldn't
+            // happen because SIM lock is not enabled.
+            if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
+               Toast.makeText(this, mRes.getString(R.string.sim_change_failed_enable_sim_lock),
+                         Toast.LENGTH_SHORT)
+                         .show();
+            } else {
+               Toast.makeText(this, mRes.getString(R.string.sim_change_failed),
+                         Toast.LENGTH_SHORT)
+                         .show();
+            }
         } else {
             Toast.makeText(this, mRes.getString(R.string.sim_change_succeeded),
                     Toast.LENGTH_SHORT)
