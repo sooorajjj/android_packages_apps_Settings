@@ -297,7 +297,15 @@ public class Status extends PreferenceActivity {
         } else {
             setSummaryText("roaming_state", mRes.getString(R.string.radioInfo_roaming_not));
         }
-        setSummaryText("operator_name", serviceState.getOperatorAlphaLong());
+        //If EONS is enabled, EONS name should be displayed.
+        String eonsName = SystemProperties.get("gsm.eons.name",null);
+        if ((SystemProperties.getBoolean("persist.cust.tel.adapt",false) ||
+             SystemProperties.getBoolean("persist.cust.tel.eons",false)) &&
+             !TextUtils.isEmpty(eonsName)) {
+            setSummaryText("operator_name", eonsName);
+        } else {
+            setSummaryText("operator_name", serviceState.getOperatorAlphaLong());
+        }
     }
     
     void updateSignalStrength() {
