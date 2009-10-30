@@ -29,6 +29,7 @@ import android.preference.PreferenceScreen;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
 import android.widget.Toast;
+import com.android.internal.telephony.gsm.CommandException;
 
 /**
  * Implements the preference screen to enable/disable SIM lock and
@@ -93,7 +94,7 @@ public class SimLockSettings extends PreferenceActivity
                     simLockChanged(ar.exception == null);
                     break;
                 case CHANGE_SIM_PIN_COMPLETE:
-                    simPinChanged(ar.exception == null);
+                    simPinChanged(ar);
                     break;
             }
 
@@ -283,12 +284,20 @@ public class SimLockSettings extends PreferenceActivity
         resetDialogState();
     }
 
-    private void simPinChanged(boolean success) {
-        if (!success) {
-         // TODO: I18N
-            Toast.makeText(this, mRes.getString(R.string.sim_change_failed), 
-                    Toast.LENGTH_SHORT)
-                    .show();
+    private void simPinChanged(AsyncResult ar) {
+        if (ar.exception != null) {
+            CommandException.Error err = ((CommandException)(ar.exception)).getCommandError();
+            // If the exception is REQUEST_NOT_SUPPORTED then change pin couldn't
+            // happen because SIM lock is not enabled.
+            if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
+               Toast.makeText(this, mRes.getString(R.string.sim_change_failed_enable_sim_lock),
+                         Toast.LENGTH_SHORT)
+                         .show();
+            } else {
+               Toast.makeText(this, mRes.getString(R.string.sim_change_failed),
+                         Toast.LENGTH_SHORT)
+                         .show();
+            }
         } else {
             Toast.makeText(this, mRes.getString(R.string.sim_change_succeeded), 
                     Toast.LENGTH_SHORT)
