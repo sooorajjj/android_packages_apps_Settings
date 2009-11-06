@@ -41,6 +41,8 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import android.util.Log;
+import android.telephony.TelephonyManager;
 
 public class DateTimeSettings 
         extends PreferenceActivity 
@@ -50,6 +52,7 @@ public class DateTimeSettings
     private static final String HOURS_12 = "12";
     private static final String HOURS_24 = "24";
     
+    private static final String TAG = "DateTimeSettings";
     private Calendar mDummyDate;
     private static final String KEY_DATE_FORMAT = "date_format";
     private static final String KEY_AUTO_TIME = "auto_time";
@@ -121,18 +124,21 @@ public class DateTimeSettings
     @Override
     protected void onResume() {
         super.onResume();
-        
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
+        int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        // If phone type is CDMA disable the manual time mode & force
+        // auto time mode
+        if (TelephonyManager.PHONE_TYPE_CDMA == activePhoneType) {
+            enableManualTime(false, true);
+        }
         ((CheckBoxPreference)mTime24Pref).setChecked(is24Hour());
-
         // Register for time ticks and other reasons for time change
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_TIME_TICK);
         filter.addAction(Intent.ACTION_TIME_CHANGED);
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         registerReceiver(mIntentReceiver, filter, null, null);
-        
         updateTimeAndDateDisplay();
     }
 
@@ -186,19 +192,14 @@ public class DateTimeSettings
 
     public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
         if (key.equals(KEY_DATE_FORMAT)) {
-            String format = preferences.getString(key, 
+            String format = preferences.getString(key,
                     getResources().getString(R.string.default_date_format));
-            Settings.System.putString(getContentResolver(), 
+            Settings.System.putString(getContentResolver(),
                     Settings.System.DATE_FORMAT, format);
             updateTimeAndDateDisplay();
         } else if (key.equals(KEY_AUTO_TIME)) {
             boolean autoEnabled = preferences.getBoolean(key, true);
-            Settings.System.putInt(getContentResolver(), 
-                    Settings.System.AUTO_TIME, 
-                    autoEnabled ? 1 : 0);
-            mTimePref.setEnabled(!autoEnabled);
-            mDatePref.setEnabled(!autoEnabled);
-            mTimeZone.setEnabled(!autoEnabled);
+            enableManualTime(true, autoEnabled);
         }
     }
 
@@ -281,13 +282,32 @@ public class DateTimeSettings
         }
         return false;
     }
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
             Intent data) {
         updateTimeAndDateDisplay();
     }
-    
+
+   /* sets the auto_time preference to true if enable flag is set true otherwise
+    * sets the auto_time preference based on the user selection(autoEnabled flag)
+    * passed as argument.
+    */
+    private void enableManualTime(boolean enable, boolean autoEnabled) {
+        if (enable == false) {
+            mAutoPref.setChecked(true);
+            mAutoPref.setEnabled(false);
+        }
+        else {
+            Settings.System.putInt(getContentResolver(),
+               Settings.System.AUTO_TIME, autoEnabled ? 1 : 0);
+        }
+        mTimePref.setEnabled(!autoEnabled);
+        mDatePref.setEnabled(!autoEnabled);
+        mTimeZone.setEnabled(!autoEnabled);
+
+    }
+
     private void timeUpdated() {
         Intent timeChanged = new Intent(Intent.ACTION_TIME_CHANGED);
         sendBroadcast(timeChanged);
@@ -306,7 +326,7 @@ public class DateTimeSettings
     }
     
     private String getDateFormat() {
-        return Settings.System.getString(getContentResolver(), 
+        return Settings.System.getString(getContentResolver(),
                 Settings.System.DATE_FORMAT);
     }
     
