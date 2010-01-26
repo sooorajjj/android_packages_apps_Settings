@@ -55,8 +55,8 @@ public class IccLockSettings extends PreferenceActivity
     private static final int ICC_REENTER_MODE = 4;
     
     // Keys in xml file
-    private static final String PIN_DIALOG = "sim_pin";
-    private static final String PIN_TOGGLE = "sim_toggle";
+    private static final String PIN_DIALOG = "icc_pin";
+    private static final String PIN_TOGGLE = "icc_toggle";
     // Keys in icicle
     private static final String DIALOG_STATE = "dialogState";
     private static final String DIALOG_PIN = "dialogPin";
@@ -111,8 +111,8 @@ public class IccLockSettings extends PreferenceActivity
     static String getSummary(Context context) {
         Resources res = context.getResources();
         String summary = isIccLockEnabled() 
-                ? res.getString(R.string.sim_lock_on)
-                : res.getString(R.string.sim_lock_off);
+                ? res.getString(R.string.icc_lock_on)
+                : res.getString(R.string.icc_lock_off);
         return summary;
     }
 
@@ -120,7 +120,7 @@ public class IccLockSettings extends PreferenceActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.sim_lock_settings);
+        addPreferencesFromResource(R.xml.icc_lock_settings);
 
         mPinDialog = (EditPinPreference) findPreference(PIN_DIALOG);
         mPinToggle = (CheckBoxPreference) findPreference(PIN_TOGGLE);
@@ -185,22 +185,22 @@ public class IccLockSettings extends PreferenceActivity
         String message = "";
         switch (mDialogState) {
             case ICC_LOCK_MODE:
-                message = mRes.getString(R.string.sim_enter_pin);
+                message = mRes.getString(R.string.icc_enter_pin);
                 mPinDialog.setDialogTitle(mToState 
-                        ? mRes.getString(R.string.sim_enable_sim_lock)
-                        : mRes.getString(R.string.sim_disable_sim_lock));
+                        ? mRes.getString(R.string.icc_enable_icc_lock)
+                        : mRes.getString(R.string.icc_disable_icc_lock));
                 break;
             case ICC_OLD_MODE:
-                message = mRes.getString(R.string.sim_enter_old);
-                mPinDialog.setDialogTitle(mRes.getString(R.string.sim_change_pin));
+                message = mRes.getString(R.string.icc_enter_old);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.icc_change_pin));
                 break;
             case ICC_NEW_MODE:
-                message = mRes.getString(R.string.sim_enter_new);
-                mPinDialog.setDialogTitle(mRes.getString(R.string.sim_change_pin));
+                message = mRes.getString(R.string.icc_enter_new);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.icc_change_pin));
                 break;
             case ICC_REENTER_MODE:
-                message = mRes.getString(R.string.sim_reenter_new);
-                mPinDialog.setDialogTitle(mRes.getString(R.string.sim_change_pin));
+                message = mRes.getString(R.string.icc_reenter_new);
+                mPinDialog.setDialogTitle(mRes.getString(R.string.icc_change_pin));
                 break;
         }
         if (mError != null) {
@@ -219,7 +219,7 @@ public class IccLockSettings extends PreferenceActivity
         mPin = preference.getText();
         if (!reasonablePin(mPin)) {
             // inject error message and display dialog again
-            mError = mRes.getString(R.string.sim_bad_pin);
+            mError = mRes.getString(R.string.icc_bad_pin);
             showPinDialog();
             return;
         }
@@ -242,7 +242,7 @@ public class IccLockSettings extends PreferenceActivity
                 break;
             case ICC_REENTER_MODE:
                 if (!mPin.equals(mNewPin)) {
-                    mError = mRes.getString(R.string.sim_pins_dont_match);
+                    mError = mRes.getString(R.string.icc_pins_dont_match);
                     mDialogState = ICC_NEW_MODE;
                     mPin = null;
                     showPinDialog();
@@ -281,7 +281,7 @@ public class IccLockSettings extends PreferenceActivity
         if (success) {
             mPinToggle.setChecked(mToState);
         } else {
-            Toast.makeText(this, mRes.getString(R.string.sim_lock_failed), Toast.LENGTH_SHORT)
+            Toast.makeText(this, mRes.getString(R.string.icc_lock_failed), Toast.LENGTH_SHORT)
                     .show();
         }
         resetDialogState();
@@ -293,16 +293,16 @@ public class IccLockSettings extends PreferenceActivity
             // If the exception is REQUEST_NOT_SUPPORTED then change pin couldn't
             // happen because SIM lock is not enabled.
             if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
-               Toast.makeText(this, mRes.getString(R.string.sim_change_failed_enable_sim_lock),
-                         Toast.LENGTH_SHORT)
-                         .show();
+                Toast.makeText(this, mRes.getString(R.string.icc_change_failed_enable_icc_lock),
+                        Toast.LENGTH_SHORT)
+                        .show();
             } else {
-               Toast.makeText(this, mRes.getString(R.string.sim_change_failed),
-                         Toast.LENGTH_SHORT)
-                         .show();
+                Toast.makeText(this, mRes.getString(R.string.icc_change_failed),
+                        Toast.LENGTH_SHORT)
+                        .show();
             }
         } else {
-            Toast.makeText(this, mRes.getString(R.string.sim_change_succeeded),
+            Toast.makeText(this, mRes.getString(R.string.icc_change_succeeded),
                     Toast.LENGTH_SHORT)
                     .show();
 
