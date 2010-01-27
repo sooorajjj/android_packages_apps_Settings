@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2008 The Android Open Source Project
+     Copyright (c) 2010, Code Aurora Forum. All rights reserved.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -38,6 +39,15 @@
             style="?android:attr/preferenceInformationStyle" 
             android:title="@string/memory_available"
             android:summary="00"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/ums_settings_title">
+        <PreferenceScreen
+            android:key="ums_unmount_key"
+            android:title="@string/ums_unmount_title"
+            android:summary="@string/ums_unmount_summary">
+            <PreferenceCategory android:title="@string/ums_mount_point_list"/>
+        </PreferenceScreen>
     </PreferenceCategory>
 
 </PreferenceScreen>
