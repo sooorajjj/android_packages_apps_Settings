@@ -171,24 +171,19 @@ public class SecuritySettings extends PreferenceActivity {
         mTactileFeedback.setTitle(R.string.lockpattern_settings_enable_tactile_feedback_title);
         inlinePrefCat.addPreference(mTactileFeedback);
 
-        int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        // SIM/RUIM lock
+        PreferenceScreen iccLockPreferences = getPreferenceManager()
+                .createPreferenceScreen(this);
+        iccLockPreferences.setTitle(R.string.icc_lock_settings_category);
+        // Intent to launch SIM/RUIM lock settings
+        intent = new Intent();
+        intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
+        iccLockPreferences.setIntent(intent);
 
-        // do not display SIM lock for CDMA phone
-        if (TelephonyManager.PHONE_TYPE_CDMA != activePhoneType)
-        {
-            PreferenceScreen simLockPreferences = getPreferenceManager()
-                    .createPreferenceScreen(this);
-            simLockPreferences.setTitle(R.string.sim_lock_settings_category);
-            // Intent to launch SIM lock settings
-            intent = new Intent();
-            intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
-            simLockPreferences.setIntent(intent);
-
-            PreferenceCategory simLockCat = new PreferenceCategory(this);
-            simLockCat.setTitle(R.string.sim_lock_settings_title);
-            root.addPreference(simLockCat);
-            simLockCat.addPreference(simLockPreferences);
-        }
+        PreferenceCategory iccLockCat = new PreferenceCategory(this);
+        iccLockCat.setTitle(R.string.icc_lock_settings_title);
+        root.addPreference(iccLockCat);
+        iccLockCat.addPreference(iccLockPreferences);
 
         // Passwords
         PreferenceCategory passwordsCat = new PreferenceCategory(this);
