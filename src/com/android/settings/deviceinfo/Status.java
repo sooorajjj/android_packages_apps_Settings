@@ -76,6 +76,9 @@ public class Status extends PreferenceActivity {
     private Preference mUptime;
 
     private static String sUnknown;
+
+    //Minimum length of MSISDN Number
+    private static final int MSISDN_MIN_LENGTH = 7;
     
     private Preference mBatteryStatus;
     private Preference mBatteryLevel;
@@ -225,8 +228,17 @@ public class Status extends PreferenceActivity {
                 getPreferenceScreen().removePreference(removablePref);
             }
         }
-
-        setSummaryText("number", mPhone.getLine1Number());
+	String msisdn = mPhone.getLine1Number();
+	if ((msisdn != null) && (msisdn.length() >= MSISDN_MIN_LENGTH)) {
+	    StringBuilder sb = new StringBuilder(msisdn);
+	    sb.insert(1, ' ');
+	    sb.insert(5, ' ');
+	    if (msisdn.length() > MSISDN_MIN_LENGTH) {
+		sb.insert(9, ' ');
+	    }
+	    msisdn = sb.toString();
+	}
+        setSummaryText("number", msisdn);
 
         mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
         mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
