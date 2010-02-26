@@ -120,6 +120,11 @@ public class IccLockSettings extends PreferenceActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (Utils.isMonkeyRunning()) {
+            finish();
+            return;
+        }
+
         addPreferencesFromResource(R.xml.icc_lock_settings);
 
         mPinDialog = (EditPinPreference) findPreference(PIN_DIALOG);
