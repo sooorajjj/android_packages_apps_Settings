@@ -27,6 +27,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.provider.Settings;
 import android.telephony.ServiceState;
+import android.text.TextUtils;
 
 import com.android.internal.telephony.TelephonyProperties;
 
@@ -63,13 +64,18 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     }
 
     public void resume() {
-        
-        // This is the widget enabled state, not the preference toggled state
-        mCheckBoxPref.setEnabled(true);
-        mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
 
-        mPhoneStateReceiver.registerIntent();
-        mCheckBoxPref.setOnPreferenceChangeListener(this);
+        if(!TextUtils.isEmpty(SystemProperties.get("ro.monkey"))){
+            mCheckBoxPref.setEnabled(false);
+        }
+        // This is the widget enabled state, not the preference toggled state
+        else{
+            mCheckBoxPref.setEnabled(true);
+            mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
+
+            mPhoneStateReceiver.registerIntent();
+            mCheckBoxPref.setOnPreferenceChangeListener(this);
+        }
     }
     
     public void pause() {
