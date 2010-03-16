@@ -1035,6 +1035,8 @@
     <string name="icc_enter_cancel">Cancel</string>
     <!-- ICC password can't be changed as ICC LOCK is not enabled: -->
     <string name="icc_change_failed_enable_icc_lock">Unable to Change SIM/RUIM PIN.\n Enable SIM/RUIM LOCK.</string>
+    <!-- ICC lock can't be changed - not supported -->
+    <string name="icc_lock_change_not_supported">Unable to Change SIM/RUIM Lock.\n SIM/RUIM doesn\'t support it.</string>
     <!-- ICC card lock settings screen, toast displayed on wrong PIN1: -->
     <string name="icc_pin_attempts">\nAttempts Remaining :</string>
     <!-- ICC card lock settings screen, toast displayed on PIN1 enable: -->

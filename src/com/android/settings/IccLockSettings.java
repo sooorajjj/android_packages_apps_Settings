@@ -92,7 +92,7 @@ public class IccLockSettings extends PreferenceActivity
             AsyncResult ar = (AsyncResult) msg.obj;
             switch (msg.what) {
                 case ENABLE_ICC_PIN_COMPLETE:
-                    iccLockChanged(ar.exception == null);
+                    iccLockChanged(ar);
                     break;
                 case CHANGE_ICC_PIN_COMPLETE:
                     iccPinChanged(ar);
@@ -282,18 +282,23 @@ public class IccLockSettings extends PreferenceActivity
 
     }
     
-    private void iccLockChanged(boolean success) {
-        if (success) {
-	    if (mToState) {
-		Toast.makeText(this, mRes.getString(R.string.icc_pin_enabled), Toast.LENGTH_SHORT)
-			.show();
-	    } else {
-		Toast.makeText(this, mRes.getString(R.string.icc_pin_disabled), Toast.LENGTH_SHORT)
-			.show();
-	    }
+    private void iccLockChanged(AsyncResult ar) {
+        if (ar.exception == null) {
+            if (mToState) {
+                Toast.makeText(this, mRes.getString(R.string.icc_pin_enabled), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, mRes.getString(R.string.icc_pin_disabled), Toast.LENGTH_SHORT).show();
+            }
             mPinToggle.setChecked(mToState);
         } else {
-	    displayRetryCounter(mRes.getString(R.string.icc_lock_failed));
+            CommandException.Error err = ((CommandException)(ar.exception)).getCommandError();
+            if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
+                Toast.makeText(this, mRes.getString(R.string.icc_lock_change_not_supported),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                displayRetryCounter(mRes.getString(R.string.icc_change_failed));
+            }
         }
         resetDialogState();
     }
@@ -308,7 +313,7 @@ public class IccLockSettings extends PreferenceActivity
                         Toast.LENGTH_SHORT)
                         .show();
             } else {
-		displayRetryCounter(mRes.getString(R.string.icc_change_failed));
+                displayRetryCounter(mRes.getString(R.string.icc_change_failed));
             }
         } else {
             Toast.makeText(this, mRes.getString(R.string.icc_change_succeeded),
