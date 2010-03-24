@@ -228,6 +228,7 @@ public class Status extends PreferenceActivity {
                 getPreferenceScreen().removePreference(removablePref);
             }
         }
+	String msisdnAlphaTag = mPhone.getLine1AlphaTag();
 	String msisdn = mPhone.getLine1Number();
 	if ((msisdn != null) && (msisdn.length() >= MSISDN_MIN_LENGTH)) {
 	    StringBuilder sb = new StringBuilder(msisdn);
@@ -238,7 +239,10 @@ public class Status extends PreferenceActivity {
 	    }
 	    msisdn = sb.toString();
 	}
-        setSummaryText("number", msisdn);
+	if ((msisdnAlphaTag != null) && (msisdn != null)) {
+	    setTitle("number", msisdnAlphaTag);
+	}
+	setSummaryText("number", msisdn);
 
         mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
         mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
@@ -297,6 +301,15 @@ public class Status extends PreferenceActivity {
              if (findPreference(preference) != null) {
                  findPreference(preference).setSummary(text);
              }
+    }
+
+    private void setTitle(String preference, String text) {
+	if (TextUtils.isEmpty(text)) {
+	    return;
+	}
+	if (findPreference(preference) != null) {
+	    findPreference(preference).setTitle(text);
+	}
     }
     
     private void updateNetworkType() {
