@@ -37,6 +37,7 @@ import android.preference.PreferenceScreen;
 import android.text.format.Formatter;
 import android.provider.Settings;
 import android.util.Log;
+import android.os.SystemProperties;
 import java.util.StringTokenizer;
 
 import com.android.settings.R;
@@ -126,6 +127,9 @@ public class Memory extends PreferenceActivity {
     
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        if (SystemProperties.getBoolean("ro.monkey", false)) {
+            return false;
+        }
         if (preference == mSdUnmount) {
             unmount(null);
             return true;
