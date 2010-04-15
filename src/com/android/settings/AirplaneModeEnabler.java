@@ -73,9 +73,9 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
             mCheckBoxPref.setEnabled(true);
             mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
 
-            mPhoneStateReceiver.registerIntent();
             mCheckBoxPref.setOnPreferenceChangeListener(this);
         }
+        mPhoneStateReceiver.registerIntent();
     }
     
     public void pause() {
