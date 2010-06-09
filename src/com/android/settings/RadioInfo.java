@@ -58,7 +58,6 @@ import com.android.internal.telephony.PhoneFactory;
 import com.android.internal.telephony.PhoneStateIntentReceiver;
 import com.android.internal.telephony.TelephonyProperties;
 import com.android.internal.telephony.gsm.GSMPhone;
-import com.android.internal.telephony.gsm.PdpConnection;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -534,7 +533,7 @@ public class RadioInfo extends Activity {
         // Get the toggle-data-on-boot menu item in the right state.
         item = menu.findItem(MENU_ITEM_TOGGLE_DATA_ON_BOOT);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(phone.getContext());
-        boolean value = sp.getBoolean(GSMPhone.DATA_DISABLED_ON_BOOT_KEY, false);
+        boolean value = sp.getBoolean(Phone.DATA_DISABLED_ON_BOOT_KEY, false);
         if (value) {
             item.setTitle(R.string.radioInfo_menu_enableDataOnBoot);
         } else {
@@ -950,12 +949,12 @@ public class RadioInfo extends Activity {
                   .append(DateUtils.timeString(dc.getConnectionTime()))
                   .append(" and elapsed ")
                   .append(DateUtils.formatElapsedTime(timeElapsed));
-
-                if (dc instanceof PdpConnection) {
-                    PdpConnection pdp = (PdpConnection)dc;
-                    sb.append("\n    to ")
-                      .append(pdp.getApn().toString());
-                }
+                  //TODO: fusion - will be changed later.
+//                if (dc instanceof MMDataConnection) {
+//                    MMDataConnection pdp = (MMDataConnection)dc;
+//                    sb.append("\n    to ")
+//                      .append(pdp.getApn().toString());
+//                }
                 sb.append("\ninterface: ")
                   .append(phone.getInterfaceName(phone.getActiveApnTypes()[0]))
                   .append("\naddress: ")
@@ -972,11 +971,13 @@ public class RadioInfo extends Activity {
                   .append("\n    fail because ")
                   .append(dc.getLastFailCause().toString());
             } else {
-                if (dc instanceof PdpConnection) {
-                    PdpConnection pdp = (PdpConnection)dc;
-                    sb.append("    is connecting to ")
-                      .append(pdp.getApn().toString());
-                } else {
+                //TODO: fusion - will be changed later.
+//                if (dc instanceof MMDataConnection) {
+//                    MMDataConnection pdp = (MMDataConnection) dc;
+//                    sb.append("    is connecting to ")
+//                      .append(pdp.getApn().toString());
+//                } else 
+                {
                     sb.append("    is connecting");
                 }
             }
@@ -1049,8 +1050,8 @@ public class RadioInfo extends Activity {
     private void toggleDataDisabledOnBoot() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(phone.getContext());
         SharedPreferences.Editor editor = sp.edit();
-        boolean value = sp.getBoolean(GSMPhone.DATA_DISABLED_ON_BOOT_KEY, false);
-        editor.putBoolean(GSMPhone.DATA_DISABLED_ON_BOOT_KEY, !value);
+        boolean value = sp.getBoolean(Phone.DATA_DISABLED_ON_BOOT_KEY, false);
+        editor.putBoolean(Phone.DATA_DISABLED_ON_BOOT_KEY, !value);
         byte[] data = mOem.getPsAutoAttachData(value);
         if (data == null) {
             // don't commit
