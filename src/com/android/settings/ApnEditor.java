@@ -369,9 +369,12 @@ public class ApnEditor extends PreferenceActivity
             return false;
         }
 
-        // If it's a new APN and a name or apn haven't been entered, then erase the entry
+        /*
+         * If new apn and name/apn not entered,
+         * then delete the entry and exit activity
+         */
         if (force && mNewApn && name.length() < 1 && apn.length() < 1) {
-            getContentResolver().delete(mUri, null, null);
+            deleteApn();
             return false;
         }
 
