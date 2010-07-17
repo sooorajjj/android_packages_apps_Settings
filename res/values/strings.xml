@@ -1397,6 +1397,8 @@
     <string name="apn_mcc">MCC</string>
     <!-- Edit access point labels: -->
     <string name="apn_mnc">MNC</string>
+    <!-- Edit access point labels: -->
+    <string name="ip_version">IP Version</string>
     <!-- Edit acces  point labels: Authenticaton type-->
     <string name="apn_auth_type">Authentication type</string>
     <!-- Authentication Typs: None -->

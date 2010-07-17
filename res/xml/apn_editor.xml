@@ -102,6 +102,12 @@
         android:inputType="number"
         />
     <ListPreference
+        android:title="@string/ip_version"
+        android:key="ip_version"
+        android:entries="@array/ip_version_entries"
+        android:entryValues="@array/ip_version_values"
+        />
+    <ListPreference
         android:title="@string/apn_auth_type"
         android:key="auth_type"
         android:entries="@array/apn_auth_entries"
