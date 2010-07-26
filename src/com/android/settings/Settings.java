@@ -29,16 +29,21 @@ public class Settings extends PreferenceActivity {
     private static final String KEY_SYNC_SETTINGS = "sync_settings";
     private static final String KEY_SEARCH_SETTINGS = "search_settings";
     private static final String KEY_DOCK_SETTINGS = "dock_settings";
-    
+    private static final String KEY_DUAL_SETTINGS = "dual_settings";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         addPreferencesFromResource(R.xml.settings);
-        
+
         int activePhoneType = TelephonyManager.getDefault().getPhoneType();
 
         PreferenceGroup parent = (PreferenceGroup) findPreference(KEY_PARENT);
+        if (!TelephonyManager.isDsdsEnabled()) {
+            parent.removePreference(findPreference(
+                    KEY_DUAL_SETTINGS));
+        }
         Utils.updatePreferenceToSpecificActivityOrRemove(this, parent, KEY_SYNC_SETTINGS, 0);
         Utils.updatePreferenceToSpecificActivityOrRemove(this, parent, KEY_SEARCH_SETTINGS, 0);
 
@@ -47,7 +52,7 @@ public class Settings extends PreferenceActivity {
             parent.removePreference(dockSettings);
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();

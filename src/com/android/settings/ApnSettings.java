@@ -41,6 +41,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.TelephonyIntents;
@@ -82,6 +83,7 @@ public class ApnSettings extends PreferenceActivity implements
     private RestoreApnProcessHandler mRestoreApnProcessHandler;
 
     private String mSelectedKey;
+    private int mSubscription;
 
     private IntentFilter mMobileStateFilter;
 
@@ -116,10 +118,12 @@ public class ApnSettings extends PreferenceActivity implements
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-
         addPreferencesFromResource(R.xml.apn_settings);
         getListView().setItemsCanFocus(true);
-
+        if (TelephonyManager.isDsdsEnabled()) {
+            mSubscription = getIntent().getIntExtra(SelectSubscription.SUBSCRIPTION_ID, 0);
+            Log.d(TAG, "onCreate received sub :" + mSubscription);
+        }
         mMobileStateFilter = new IntentFilter(
                 TelephonyIntents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED);
     }
@@ -127,7 +131,6 @@ public class ApnSettings extends PreferenceActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-
         registerReceiver(mMobileStateReceiver, mMobileStateFilter);
 
         if (!mRestoreDefaultApnMode) {
@@ -140,15 +143,29 @@ public class ApnSettings extends PreferenceActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        
+
         unregisterReceiver(mMobileStateReceiver);
     }
 
     private void fillList() {
-        String where = "numeric=\""
-            + android.os.SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, "")
-            + "\"";
-
+        String where;
+        if (TelephonyManager.isDsdsEnabled()) {
+            if (mSubscription == 0) {
+                // APNs are listed based on the MCC+MNC.
+                // Get the value from appropriate Telephony Property based on the subscription.
+                where  = "numeric=\""
+                    + android.os.SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, "")
+                    + "\"";
+            } else {
+                where  = "numeric=\""
+                    + android.os.SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC_SECOND_SUB, "")
+                    + "\"";
+            }
+        } else {
+           where  = "numeric=\""
+                    + android.os.SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, "")
+                    + "\"";
+        }
         Cursor cursor = managedQuery(Telephony.Carriers.CONTENT_URI, new String[] {
                 "_id", "name", "apn", "type"}, where,
                 Telephony.Carriers.DEFAULT_SORT_ORDER);
@@ -220,7 +237,11 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     private void addNewApn() {
-        startActivity(new Intent(Intent.ACTION_INSERT, Telephony.Carriers.CONTENT_URI));
+        Intent intent = new Intent(Intent.ACTION_INSERT, Telephony.Carriers.CONTENT_URI);
+        if (TelephonyManager.isDsdsEnabled()) {
+            intent.putExtra(SelectSubscription.SUBSCRIPTION_ID, mSubscription);
+        }
+        startActivity(intent);
     }
 
     @Override
@@ -317,7 +338,7 @@ public class ApnSettings extends PreferenceActivity implements
             switch (msg.what) {
                 case EVENT_RESTORE_DEFAULTAPN_START:
                     ContentResolver resolver = getContentResolver();
-                    resolver.delete(DEFAULTAPN_URI, null, null);                    
+                    resolver.delete(DEFAULTAPN_URI, null, null);
                     mRestoreApnUiHandler
                         .sendEmptyMessage(EVENT_RESTORE_DEFAULTAPN_COMPLETE);
                     break;

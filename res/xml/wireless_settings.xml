@@ -77,6 +77,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
+        android:key="network_settings"
         android:title="@string/network_settings_title"
         android:summary="@string/network_settings_summary"
         android:dependency="toggle_airplane">
@@ -84,6 +85,19 @@
             android:action="android.intent.action.MAIN"
             android:targetPackage="com.android.phone"
             android:targetClass="com.android.phone.Settings" />
+    </PreferenceScreen>
+
+    <!-- target class is com.android.settings.SelectSubscription
+         for DSDS -->
+    <PreferenceScreen
+        android:key="network_settings_dsds"
+        android:title="@string/network_settings_title"
+        android:summary="@string/network_settings_summary"
+        android:dependency="toggle_airplane">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.android.settings"
+            android:targetClass="com.android.settings.SelectSubscription" />
     </PreferenceScreen>
 
 </PreferenceScreen>

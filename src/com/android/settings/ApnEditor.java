@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.TelephonyProperties;
 
@@ -72,6 +73,7 @@ public class ApnEditor extends PreferenceActivity
 
     private String mCurMnc;
     private String mCurMcc;
+    private int mSubscription;
 
     private Uri mUri;
     private Cursor mCursor;
@@ -150,7 +152,11 @@ public class ApnEditor extends PreferenceActivity
 
         final Intent intent = getIntent();
         final String action = intent.getAction();
-
+        if (TelephonyManager.isDsdsEnabled()) {
+            // Read the subscription received from Phone settings.
+            mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_ID, 0);
+            Log.d(TAG,"ApnEditor onCreate received sub: " + mSubscription);
+        }
         mFirstTime = icicle == null;
 
         if (action.equals(Intent.ACTION_EDIT)) {
@@ -250,8 +256,21 @@ public class ApnEditor extends PreferenceActivity
             mMnc.setText(mCursor.getString(MNC_INDEX));
             mApnType.setText(mCursor.getString(TYPE_INDEX));
             if (mNewApn) {
-                String numeric =
-                    SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC);
+                String numeric;
+                if (TelephonyManager.isDsdsEnabled()) {
+                    // APNs are automatically added with MCC+MNC.
+                    // Get the value from appropriate Telephony Property based on the subscription.
+                    if (mSubscription == 0) {
+                        numeric =
+                            SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC);
+                    } else {
+                        numeric =
+                            SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC_SECOND_SUB);
+                    }
+                } else {
+                    numeric =
+                            SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC);
+                }
                 // MCC is first 3 chars and then in 2 - 3 chars of MNC
                 if (numeric != null && numeric.length() > 4) {
                     // Country code

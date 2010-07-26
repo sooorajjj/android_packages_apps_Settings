@@ -30,6 +30,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.util.Log;
+import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
@@ -45,6 +46,8 @@ public class WirelessSettings extends PreferenceActivity {
     private static final String KEY_BT_SETTINGS = "bt_settings";
     private static final String KEY_VPN_SETTINGS = "vpn_settings";
     private static final String KEY_TETHER_SETTINGS = "tether_settings";
+    private static final String KEY_NETWORK_SETTINGS = "network_settings";
+    private static final String KEY_NETWORK_SETTINGS_DSDS = "network_settings_dsds";
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
 
@@ -88,6 +91,13 @@ public class WirelessSettings extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.wireless_settings);
 
+        if (TelephonyManager.isDsdsEnabled()) {
+            // Display SUB1 and SUB2 options instead of default network settings menu
+            // that is displayed on clicking "Mobile Networks".
+            getPreferenceScreen().removePreference(findPreference(KEY_NETWORK_SETTINGS));
+        } else {
+            getPreferenceScreen().removePreference(findPreference(KEY_NETWORK_SETTINGS_DSDS));
+        }
         CheckBoxPreference airplane = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
         CheckBoxPreference wifi = (CheckBoxPreference) findPreference(KEY_TOGGLE_WIFI);
         CheckBoxPreference bt = (CheckBoxPreference) findPreference(KEY_TOGGLE_BLUETOOTH);
@@ -145,21 +155,21 @@ public class WirelessSettings extends PreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         mAirplaneModeEnabler.resume();
         mWifiEnabler.resume();
         mBtEnabler.resume();
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
-        
+
         mAirplaneModeEnabler.pause();
         mWifiEnabler.pause();
         mBtEnabler.pause();
     }
-    
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EXIT_ECM) {
