@@ -29,6 +29,7 @@ import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.os.Environment;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -70,6 +71,7 @@ public class TetherSettings extends PreferenceActivity {
     private ArrayList mUsbIfaces;
 
     private String[] mWifiRegexs;
+    private boolean mAllowTetherUms = SystemProperties.getBoolean("ro.usb.allow.tether.ums",false);
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -177,11 +179,13 @@ public class TetherSettings extends PreferenceActivity {
         mTetherChangeReceiver = new TetherChangeReceiver();
         Intent intent = registerReceiver(mTetherChangeReceiver, filter);
 
-        filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_SHARED);
-        filter.addAction(Intent.ACTION_MEDIA_UNSHARED);
-        filter.addDataScheme("file");
-        registerReceiver(mTetherChangeReceiver, filter);
+        if (!mAllowTetherUms) {
+            filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_MEDIA_SHARED);
+            filter.addAction(Intent.ACTION_MEDIA_UNSHARED);
+            filter.addDataScheme("file");
+            registerReceiver(mTetherChangeReceiver, filter);
+        }
 
         if (intent != null) mTetherChangeReceiver.onReceive(this, intent);
         mWifiApEnabler.resume();
@@ -213,8 +217,17 @@ public class TetherSettings extends PreferenceActivity {
         boolean usbAvailable = false;
         int usbError = ConnectivityManager.TETHER_ERROR_NO_ERROR;
         boolean usbErrored = false;
-        boolean massStorageActive =
-                Environment.MEDIA_SHARED.equals(Environment.getExternalStorageState());
+        boolean usbTetherDisabled = false;
+
+        /*
+         * The flag 'usbTetherDisabled' is used to disable tethering when USB mass storage is on.
+         * If 'mAllowTetherUms' flag is defined we allow mass storage along with tethering, so for
+         * targets where mass storage + tethering is supported usbTetherDisabled need not be updated
+         */
+        if (!mAllowTetherUms) {
+            usbTetherDisabled = Environment.MEDIA_SHARED.equals(Environment.getExternalStorageState());
+        }
+
         for (Object o : available) {
             String s = (String)o;
             for (String regex : mUsbRegexs) {
@@ -255,7 +268,7 @@ public class TetherSettings extends PreferenceActivity {
             mUsbTether.setSummary(R.string.usb_tethering_errored_subtext);
             mUsbTether.setEnabled(false);
             mUsbTether.setChecked(false);
-        } else if (massStorageActive) {
+        } else if (usbTetherDisabled) {
             mUsbTether.setSummary(R.string.usb_tethering_storage_active_subtext);
             mUsbTether.setEnabled(false);
             mUsbTether.setChecked(false);
