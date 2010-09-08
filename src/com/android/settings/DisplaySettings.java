@@ -191,6 +191,9 @@ public class DisplaySettings extends PreferenceActivity implements
 
         }
         if (KEY_SCREEN_TIMEOUT.equals(key)) {
+            if (Utils.isMonkeyRunning()) {
+                return false;
+            }
             int value = Integer.parseInt((String) objValue);
             try {
                 Settings.System.putInt(getContentResolver(),
