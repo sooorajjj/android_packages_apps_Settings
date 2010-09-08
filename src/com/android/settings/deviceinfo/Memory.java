@@ -48,6 +48,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.settings.R;
+import com.android.settings.Utils;
 
 import java.io.File;
 import java.util.HashSet;
@@ -147,9 +148,12 @@ public class Memory extends PreferenceActivity implements OnCancelListener {
        }
        return mMountService;
     }
-    
+
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        if (Utils.isMonkeyRunning()) {
+            return false;
+        }
         if (preference == mSdMountToggle) {
             String status = Environment.getExternalStorageState();
             if (status.equals(Environment.MEDIA_MOUNTED)) {

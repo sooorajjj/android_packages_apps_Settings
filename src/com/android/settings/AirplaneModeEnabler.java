@@ -35,7 +35,7 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     private final Context mContext;
 
     private PhoneStateIntentReceiver mPhoneStateReceiver;
-    
+
     private final CheckBoxPreference mCheckBoxPref;
 
     private static final int EVENT_SERVICE_STATE_CHANGED = 3;
@@ -52,46 +52,49 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     };
 
     public AirplaneModeEnabler(Context context, CheckBoxPreference airplaneModeCheckBoxPreference) {
-        
+
         mContext = context;
         mCheckBoxPref = airplaneModeCheckBoxPreference;
-        
+
         airplaneModeCheckBoxPreference.setPersistent(false);
-    
+
         mPhoneStateReceiver = new PhoneStateIntentReceiver(mContext, mHandler);
         mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
     }
 
     public void resume() {
-        
-        // This is the widget enabled state, not the preference toggled state
-        mCheckBoxPref.setEnabled(true);
-        mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
-
+        if (Utils.isMonkeyRunning()) {
+            mCheckBoxPref.setEnabled(false);
+        } else {
+            // This is the widget enabled state, not the preference toggled
+            // state
+            mCheckBoxPref.setEnabled(true);
+            mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
+            mCheckBoxPref.setOnPreferenceChangeListener(this);
+        }
         mPhoneStateReceiver.registerIntent();
-        mCheckBoxPref.setOnPreferenceChangeListener(this);
     }
-    
+
     public void pause() {
         mPhoneStateReceiver.unregisterIntent();
         mCheckBoxPref.setOnPreferenceChangeListener(null);
     }
-    
+
     public static boolean isAirplaneModeOn(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.AIRPLANE_MODE_ON, 0) != 0;
     }
 
     private void setAirplaneModeOn(boolean enabling) {
-        
+
         mCheckBoxPref.setEnabled(false);
         mCheckBoxPref.setSummary(enabling ? R.string.airplane_mode_turning_on
                 : R.string.airplane_mode_turning_off);
-        
+
         // Change the system setting
-        Settings.System.putInt(mContext.getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 
+        Settings.System.putInt(mContext.getContentResolver(), Settings.System.AIRPLANE_MODE_ON,
                                 enabling ? 1 : 0);
-        
+
         // Post the intent
         Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         intent.putExtra("state", enabling);
@@ -105,11 +108,11 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
         ServiceState serviceState = mPhoneStateReceiver.getServiceState();
         boolean airplaneModeEnabled = serviceState.getState() == ServiceState.STATE_POWER_OFF;
         mCheckBoxPref.setChecked(airplaneModeEnabled);
-        mCheckBoxPref.setSummary(airplaneModeEnabled ? null : 
-                mContext.getString(R.string.airplane_mode_summary));            
+        mCheckBoxPref.setSummary(airplaneModeEnabled ? null :
+                mContext.getString(R.string.airplane_mode_summary));
         mCheckBoxPref.setEnabled(true);
     }
-    
+
     /**
      * Called when someone clicks on the checkbox preference.
      */
