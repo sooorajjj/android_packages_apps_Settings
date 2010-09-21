@@ -40,6 +40,16 @@
             android:entries="@array/dualsim_entries"
             android:entryValues="@array/dualsim_values" />
 
+        <PreferenceScreen
+            android:key="config_sub"
+            android:title="@string/sel_sub_title"
+            android:summary="@string/sel_sub_summary"
+            android:persistent="false">
+            <intent android:action="android.intent.action.MAIN"
+                    android:targetPackage="com.android.phone"
+                    android:targetClass="com.android.phone.SetSubscription" />
+        </PreferenceScreen>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

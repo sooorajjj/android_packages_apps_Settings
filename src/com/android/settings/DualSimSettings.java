@@ -33,6 +33,7 @@ import android.os.AsyncResult;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.preference.PreferenceScreen;
 
 import com.android.internal.telephony.ProxyManager;
 import com.android.internal.telephony.PhoneFactory;
@@ -46,6 +47,9 @@ public class DualSimSettings extends PreferenceActivity implements DialogInterfa
     private static final String KEY_VOICE = "voice";
     private static final String KEY_DATA = "data";
     private static final String KEY_SMS = "sms";
+    private static final String KEY_CONFIG_SUB = "config_sub";
+
+    private static final String CONFIG_SUB = "CONFIG_SUB";
 
     private static final int DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS = 100;
 
@@ -58,6 +62,7 @@ public class DualSimSettings extends PreferenceActivity implements DialogInterfa
     private ListPreference mVoice;
     private ListPreference mData;
     private ListPreference mSms;
+    private PreferenceScreen mConfigSub;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,8 @@ public class DualSimSettings extends PreferenceActivity implements DialogInterfa
         mData.setOnPreferenceChangeListener(this);
         mSms = (ListPreference) findPreference(KEY_SMS);
         mSms.setOnPreferenceChangeListener(this);
+        mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
+        mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
     }
 
     @Override
