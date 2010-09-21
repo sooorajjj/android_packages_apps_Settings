@@ -91,10 +91,15 @@ public class WirelessSettings extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.wireless_settings);
 
+        PreferenceScreen ps;
         if (TelephonyManager.isDsdsEnabled()) {
             // Display SUB1 and SUB2 options instead of default network settings menu
             // that is displayed on clicking "Mobile Networks".
             getPreferenceScreen().removePreference(findPreference(KEY_NETWORK_SETTINGS));
+            ps = (PreferenceScreen) findPreference(KEY_NETWORK_SETTINGS_DSDS);
+            Intent intent = ps.getIntent();
+            intent.putExtra(SelectSubscription.PACKAGE, "com.android.phone");
+            intent.putExtra(SelectSubscription.TARGET_CLASS, "com.android.phone.Settings");
         } else {
             getPreferenceScreen().removePreference(findPreference(KEY_NETWORK_SETTINGS_DSDS));
         }
