@@ -1174,6 +1174,8 @@
     <string name="icc_change_failed">Unable to change PIN.\nPossibly incorrect PIN.</string>
     <!-- ICC card lock settings screen, ICC PIN dialog message when the entered PIN is correct-->
     <string name="icc_change_succeeded">SIM/RUIM PIN changed successfully</string>
+    <!-- ICC card lock settings screen, ICC PIN dialog message when Icc card is absent-->
+    <string name="icc_sim_absent">No SIM/RUIM</string>
     <!-- ICC card lock settings screen, toast after not entering correct ICC PIN -->
     <string name="icc_lock_failed">Unable to change SIM/RUIM card lock state.\nPossibly incorrect PIN.</string>
     <!-- ICC card lock settings screen, ICC PIN dialog button labels: -->
