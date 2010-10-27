@@ -1477,8 +1477,8 @@
     <!-- Dual Sim Settings screen, Voice Summary label -->
     <string name="sms_summary">Select the Subscription for Sending SMS</string>
 
-    <!-- Dual Sim Settings screen, Set DDS progess dialog message -->
-    <string name="set_data_subscription_progress">Set data subscription in progess</string>
+    <!-- Dual Sim Settings screen, Set DDS progress dialog message -->
+    <string name="set_data_subscription_progress">Set data subscription in progress</string>
     <!-- Dual Sim Settings screen, Set DDS success message -->
     <string name="set_dds_success">Set data subscription success</string>
     <!-- Dual Sim Settings screen, Set DDS failure message -->
