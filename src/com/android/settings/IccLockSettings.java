@@ -275,13 +275,13 @@ public class IccLockSettings extends PreferenceActivity
     }
 
     private void tryChangeIccLockState() {
-        // Try to change icc lock. If it succeeds, toggle the lock state and
+        // Try to change icc lock. If it succeeds, toggle the lock state and 
         // reset dialog state. Else inject error message and show dialog again.
         Message callback = Message.obtain(mHandler, ENABLE_ICC_PIN_COMPLETE);
         mPhone.getIccCard().setIccLockEnabled(mToState, mPin, callback);
 
     }
-
+    
     private void iccLockChanged(AsyncResult ar) {
         if (ar.exception == null) {
             if (mToState) {
@@ -291,52 +291,31 @@ public class IccLockSettings extends PreferenceActivity
             }
             mPinToggle.setChecked(mToState);
         } else {
-            if (ar.exception instanceof CommandException) {
-                if(((CommandException) (ar.exception)).getCommandError()
-                            == CommandException.Error.REQUEST_NOT_SUPPORTED) {
-                    Toast.makeText(this, mRes.getString(R.string.icc_lock_change_not_supported),
-                            Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    displayRetryCounter(mRes.getString(R.string.icc_change_failed));
-                }
-             } else {
-                 //check for the icc card presence for the default phone
-                 //TODO: Once SIM security support is extended for second subscription,
-                 // this needs to be changed to that particular subcription
-                 if (!(mPhone.getIccCard().hasIccCard())) {
-                     Toast.makeText(this, mRes.getString(R.string.icc_sim_absent),
-                             Toast.LENGTH_SHORT)
-                             .show();
-                 }
-             }
+            CommandException.Error err = ((CommandException)(ar.exception)).getCommandError();
+            if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
+                Toast.makeText(this, mRes.getString(R.string.icc_lock_change_not_supported),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                displayRetryCounter(mRes.getString(R.string.icc_change_failed));
+            }
         }
         resetDialogState();
     }
 
     private void iccPinChanged(AsyncResult ar) {
         if (ar.exception != null) {
-            if (ar.exception instanceof CommandException) {
-                if(((CommandException) (ar.exception)).getCommandError()
-                            == CommandException.Error.REQUEST_NOT_SUPPORTED) {
-                    // If the exception is REQUEST_NOT_SUPPORTED then change pin couldn't
-                    // happen because SIM lock is not enabled.
-                    Toast.makeText(this, mRes.getString(R.string.icc_change_failed_enable_icc_lock),
-                            Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    displayRetryCounter(mRes.getString(R.string.icc_change_failed));
-                }
+            CommandException.Error err = ((CommandException)(ar.exception)).getCommandError();
+            // If the exception is REQUEST_NOT_SUPPORTED then change pin couldn't
+            // happen because SIM lock is not enabled.
+            if (err == CommandException.Error.REQUEST_NOT_SUPPORTED) {
+               Toast.makeText(this, mRes.getString(R.string.icc_change_failed_enable_icc_lock),
+                         Toast.LENGTH_SHORT)
+                         .show();
             } else {
-                //check for the icc card presence for the default phone
-                //TODO: Once SIM security support is extended for second subscription,
-                // this needs to be changed to that particular subcription
-                if (!(mPhone.getIccCard().hasIccCard())) {
-                    Toast.makeText(this, mRes.getString(R.string.icc_sim_absent),
-                            Toast.LENGTH_SHORT)
-                            .show();
-                }
+               displayRetryCounter(mRes.getString(R.string.icc_change_failed));
             }
+
         } else {
             Toast.makeText(this, mRes.getString(R.string.icc_change_succeeded),
                     Toast.LENGTH_SHORT)
