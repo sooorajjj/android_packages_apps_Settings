@@ -1463,7 +1463,7 @@
     <string name="dual_settings_summary">Set up Dual Sim Settings for Voice, Data and SMS</string>
 
     <!-- Dual Sim Settings screen, Voice box label -->
-    <string name="voice_title">Voice Call</string>
+    <string name="voice_title">Voice/USSD/MMI</string>
     <!-- Dual Sim Settings screen, Voice Summary label -->
     <string name="voice_summary">Select Subscription for Voice Call</string>
 
