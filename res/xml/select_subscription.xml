@@ -14,29 +14,23 @@
      limitations under the License.
 -->
 
-<!-- Screen displayed with SUB1 and SUB2 options under Mobile Networks settings.
+<!-- Screen displayed with SUB1 and SUB2 options.
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceScreen
         android:key="subscription_id_00"
-        android:title="@string/subscription_0_title"
-        android:summary="@string/subscription_0_summary">
+        android:title="@string/subscription_0_title">
         <intent
-            android:action="android.intent.action.MAIN"
-            android:targetPackage="com.android.phone"
-            android:targetClass="com.android.phone.Settings" />
+            android:action="android.intent.action.MAIN" />
     </PreferenceScreen>
 
     <PreferenceScreen
         android:key="subscription_id_01"
-        android:title="@string/subscription_1_title"
-        android:summary="@string/subscription_1_summary">
+        android:title="@string/subscription_1_title">
         <intent
-            android:action="android.intent.action.MAIN"
-            android:targetPackage="com.android.phone"
-            android:targetClass="com.android.phone.Settings" />
+            android:action="android.intent.action.MAIN" />
     </PreferenceScreen>
 
 </PreferenceScreen>

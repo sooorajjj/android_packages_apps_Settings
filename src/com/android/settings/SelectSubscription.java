@@ -21,13 +21,14 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
-import android.util.Log;
 
 public class SelectSubscription extends PreferenceActivity {
 
     private static final String KEY_SUBSCRIPTION_0 = "subscription_id_00";
     private static final String KEY_SUBSCRIPTION_1 = "subscription_id_01";
     public static final String SUBSCRIPTION_ID = "SUBSCRIPTION_ID";
+    public static final String PACKAGE = "PACKAGE";
+    public static final String TARGET_CLASS = "TARGET_CLASS";
 
     private PreferenceScreen subscriptionPref0, subscriptionPref1;
 
@@ -36,7 +37,7 @@ public class SelectSubscription extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.select_sub_wireless_settings);
+        addPreferencesFromResource(R.xml.select_subscription);
     }
 
     @Override
@@ -46,6 +47,12 @@ public class SelectSubscription extends PreferenceActivity {
         subscriptionPref0 = (PreferenceScreen) findPreference(KEY_SUBSCRIPTION_0);
         subscriptionPref1 = (PreferenceScreen) findPreference(KEY_SUBSCRIPTION_1);
 
+        Intent intent =  getIntent();
+        String pkg = intent.getStringExtra(PACKAGE);
+        String targetClass = intent.getStringExtra(TARGET_CLASS);
+        // Set the target class.
+        subscriptionPref0.getIntent().setClassName(pkg, targetClass);
+        subscriptionPref1.getIntent().setClassName(pkg, targetClass);
         subscriptionPref0.getIntent().putExtra(SUBSCRIPTION_ID, 0);
         subscriptionPref1.getIntent().putExtra(SUBSCRIPTION_ID, 1);
     }
