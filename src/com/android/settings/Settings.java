@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2010, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +38,18 @@ public class Settings extends PreferenceActivity {
         addPreferencesFromResource(R.xml.settings);
 
         int activePhoneType = TelephonyManager.getDefault().getPhoneType();
+        int callSettingResIndex;
 
         PreferenceGroup parent = (PreferenceGroup) findPreference(KEY_PARENT);
         if (!TelephonyManager.isDsdsEnabled()) {
             parent.removePreference(findPreference(
                     KEY_DUAL_SETTINGS));
+            callSettingResIndex = 0;
+        } else {
+            callSettingResIndex = 1;
         }
+        findPreference(KEY_CALL_SETTINGS).getIntent().putExtra("RESOURCE_INDEX", callSettingResIndex);
+
         Utils.updatePreferenceToSpecificActivityOrRemove(this, parent, KEY_SYNC_SETTINGS, 0);
 
         Preference dockSettings = parent.findPreference(KEY_DOCK_SETTINGS);
