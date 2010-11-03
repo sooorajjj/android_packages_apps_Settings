@@ -27,10 +27,13 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.provider.Settings;
 import android.telephony.ServiceState;
+import android.util.Log;
 
 import com.android.internal.telephony.TelephonyProperties;
 
 public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListener {
+
+    private final String TAG = "phone";
 
     private final Context mContext;
 
@@ -39,6 +42,8 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     private final CheckBoxPreference mCheckBoxPref;
 
     private static final int EVENT_SERVICE_STATE_CHANGED = 3;
+
+    private int mState = ServiceState.STATE_POWER_OFF;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -86,7 +91,7 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     }
 
     private void setAirplaneModeOn(boolean enabling) {
-
+        Log.i(TAG, "setting airplane mode to " + enabling);
         mCheckBoxPref.setEnabled(false);
         mCheckBoxPref.setSummary(enabling ? R.string.airplane_mode_turning_on
                 : R.string.airplane_mode_turning_off);
@@ -106,11 +111,14 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
      */
     private void onAirplaneModeChanged() {
         ServiceState serviceState = mPhoneStateReceiver.getServiceState();
-        boolean airplaneModeEnabled = serviceState.getState() == ServiceState.STATE_POWER_OFF;
-        mCheckBoxPref.setChecked(airplaneModeEnabled);
-        mCheckBoxPref.setSummary(airplaneModeEnabled ? null :
+        if (serviceState.getState() != mState) {
+            mState = serviceState.getState();
+            boolean airplaneModeEnabled = mState == ServiceState.STATE_POWER_OFF;
+            mCheckBoxPref.setChecked(airplaneModeEnabled);
+            mCheckBoxPref.setSummary(airplaneModeEnabled ? null :
                 mContext.getString(R.string.airplane_mode_summary));
-        mCheckBoxPref.setEnabled(true);
+            mCheckBoxPref.setEnabled(true);
+        }
     }
 
     /**
