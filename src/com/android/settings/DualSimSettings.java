@@ -186,7 +186,6 @@ public class DualSimSettings extends PreferenceActivity implements DialogInterfa
             ProxyManager mProxyManager = ProxyManager.getInstance();
             Message setDdsMsg = Message.obtain(mHandler, EVENT_SET_DATA_SUBSCRIPTION_DONE, null);
             mProxyManager.setDataSubscription(D_value, setDdsMsg);
-            mData.setSummary(summaries[D_value]);
         }
 
         if (KEY_SMS.equals(key)) {
@@ -209,6 +208,8 @@ public class DualSimSettings extends PreferenceActivity implements DialogInterfa
                     Log.d(TAG, "EVENT_SET_DATA_SUBSCRIPTION_DONE");
                     dismissDialog(DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS);
                     getPreferenceScreen().setEnabled(true);
+                    updateDataSummary();
+
                     ar = (AsyncResult) msg.obj;
 
                     String status;
