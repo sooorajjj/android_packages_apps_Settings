@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,7 +176,13 @@ public class SecuritySettings extends PreferenceActivity {
         iccLockPreferences.setTitle(R.string.icc_lock_settings_category);
         // Intent to launch SIM/RUIM lock settings
         Intent intent = new Intent();
-        intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
+        if (TelephonyManager.isMultiSimEnabled()) {
+            intent.setClassName("com.android.settings", "com.android.settings.SelectSubscription");
+            intent.putExtra(SelectSubscription.PACKAGE, "com.android.settings");
+            intent.putExtra(SelectSubscription.TARGET_CLASS, "com.android.settings.IccLockSettings");
+        } else {
+            intent.setClassName("com.android.settings", "com.android.settings.IccLockSettings");
+        }
         iccLockPreferences.setIntent(intent);
 
         PreferenceCategory iccLockCat = new PreferenceCategory(this);
