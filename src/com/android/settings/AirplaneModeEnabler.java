@@ -63,15 +63,18 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     }
 
     public void resume() {
-        
-        // This is the widget enabled state, not the preference toggled state
-        mCheckBoxPref.setEnabled(true);
-        mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
-
+        if (Utils.isMonkeyRunning()) {
+            mCheckBoxPref.setEnabled(false);
+        } else {
+            // This is the widget enabled state, not the preference toggled
+            // state
+            mCheckBoxPref.setEnabled(true);
+            mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
+            mCheckBoxPref.setOnPreferenceChangeListener(this);
+        }
         mPhoneStateReceiver.registerIntent();
-        mCheckBoxPref.setOnPreferenceChangeListener(this);
     }
-    
+
     public void pause() {
         mPhoneStateReceiver.unregisterIntent();
         mCheckBoxPref.setOnPreferenceChangeListener(null);
