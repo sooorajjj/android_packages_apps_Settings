@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2011, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -59,6 +61,7 @@ public class DateTimeSettings
 
     private static final int DIALOG_DATEPICKER = 0;
     private static final int DIALOG_TIMEPICKER = 1;
+    private static final boolean isTimeDaemonEnabled = SystemProperties.getBoolean("persist.timed.enable", false);
     
     private CheckBoxPreference mAutoPref;
     private Preference mTimePref;
@@ -130,7 +133,7 @@ public class DateTimeSettings
         int activePhoneType = TelephonyManager.getDefault().getPhoneType();
         // If phone type is CDMA disable the manual time mode & force
         // auto time mode
-        if (TelephonyManager.PHONE_TYPE_CDMA == activePhoneType) {
+        if (TelephonyManager.PHONE_TYPE_CDMA == activePhoneType && !isTimeDaemonEnabled) {
             setAutoState(false, true);
         }
         ((CheckBoxPreference)mTime24Pref).setChecked(is24Hour());
