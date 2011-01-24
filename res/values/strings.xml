@@ -1169,6 +1169,16 @@
     <!-- Sound & display settings screen, setting option name to change whether the screen adjusts automatically based on lighting conditions -->
     <string name="automatic_brightness">Automatic brightness</string>
 
+    <!-- Dynamic Memory Manager Settings -->
+    <!-- Dynamic Memory Manager Window Title -->
+    <string name="dynamicmemorymanager">Dynamic Memory Manager Settings</string>
+    <!-- Dynamic Memory Manager Deep Power Down Enable -->
+    <string name="dmm_dpd_enable">Enable/Disable DMM Deep Power Down</string>
+    <!-- Dynamic Memory Manager Start Time -->
+    <string name="dmm_dpd_start_time"> Start Time</string>
+    <!-- Dynamic Memory Manager Stop Time -->
+    <string name="dmm_dpd_stop_time"> Stop Time</string>
+
     <!-- ICC lock settings title -->
     <string name="icc_lock_settings">SIM/RUIM card lock settings</string>
     <!-- Security & location settings screen, setting option name -->

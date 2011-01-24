@@ -74,6 +74,17 @@
                 android:targetClass="com.android.settings.MultiSimSettings" />
         </com.android.settings.IconPreferenceScreen>
 
+        <!-- Dynamic Memory Manager Service -->
+
+        <com.android.settings.IconPreferenceScreen
+            settings:icon="@drawable/ic_settings_display"
+            android:title="@string/dynamicmemorymanager">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="com.android.settings"
+                android:targetClass="com.android.settings.DynamicMemoryManagerSettings" />
+        </com.android.settings.IconPreferenceScreen>
+
         <!-- Security & Location -->
 
         <com.android.settings.IconPreferenceScreen
