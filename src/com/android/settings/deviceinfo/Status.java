@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2011, Code Aurora Forum. All rights reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,28 +33,20 @@ import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.telephony.PhoneNumberUtils;
+import android.preference.PreferenceScreen;
 import android.telephony.PhoneStateListener;
-import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.android.internal.telephony.Phone;
-import com.android.internal.telephony.PhoneFactory;
-import com.android.internal.telephony.PhoneStateIntentReceiver;
 import com.android.internal.telephony.TelephonyProperties;
 import com.android.settings.R;
+import com.android.settings.SelectSubscription;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 
 /**
  * Display the following information
- * # Phone Number
- * # Network
- * # Roaming
- * # Device Id (IMEI in GSM and MEID in CDMA)
- * # Network type
- * # Signal Strength
  * # Battery Strength  : TODO
  * # Uptime
  * # Awake Time
@@ -64,22 +57,25 @@ public class Status extends PreferenceActivity {
 
     private static final String KEY_WIFI_MAC_ADDRESS = "wifi_mac_address";
     private static final String KEY_BT_ADDRESS = "bt_address";
-    private static final int EVENT_SIGNAL_STRENGTH_CHANGED = 200;
-    private static final int EVENT_SERVICE_STATE_CHANGED = 300;
 
     private static final int EVENT_UPDATE_STATS = 500;
+    private static final String BUTTON_SELECT_SUB_KEY = "button_aboutphone_msim_status";
+
+    private final int mResources[] = {R.xml.device_info_status,
+                                      R.xml.device_info_msim_status};
 
     private TelephonyManager mTelephonyManager;
-    private Phone mPhone = null;
-    private PhoneStateIntentReceiver mPhoneStateReceiver;
+    private PhoneStateListener[] mPhoneStateListener;
     private Resources mRes;
-    private Preference mSignalStrength;
     private Preference mUptime;
 
     private static String sUnknown;
-    
+    private int mResId = 0;
+    private int mNumPhones = 0;
+
     private Preference mBatteryStatus;
     private Preference mBatteryLevel;
+    private int mDataState = TelephonyManager.DATA_DISCONNECTED;
 
     private Handler mHandler;
 
@@ -98,15 +94,6 @@ public class Status extends PreferenceActivity {
             }
 
             switch (msg.what) {
-                case EVENT_SIGNAL_STRENGTH_CHANGED:
-                    status.updateSignalStrength();
-                    break;
-
-                case EVENT_SERVICE_STATE_CHANGED:
-                    ServiceState serviceState = status.mPhoneStateReceiver.getServiceState();
-                    status.updateServiceState(serviceState);
-                    break;
-
                 case EVENT_UPDATE_STATS:
                     status.updateTimes();
                     sendEmptyMessageDelayed(EVENT_UPDATE_STATS, 1000);
@@ -116,7 +103,7 @@ public class Status extends PreferenceActivity {
     }
 
     private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver() {
-        
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -124,9 +111,9 @@ public class Status extends PreferenceActivity {
 
                 int level = intent.getIntExtra("level", 0);
                 int scale = intent.getIntExtra("scale", 100);
-                
+
                 mBatteryLevel.setSummary(String.valueOf(level * 100 / scale) + "%");
-                
+
                 int plugType = intent.getIntExtra("plugged", 0);
                 int status = intent.getIntExtra("status", BatteryManager.BATTERY_STATUS_UNKNOWN);
                 String statusString;
@@ -152,122 +139,84 @@ public class Status extends PreferenceActivity {
         }
     };
 
-    private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
-        @Override
-        public void onDataConnectionStateChanged(int state) {
-            updateDataState();
-            updateNetworkType();
-        }
-    };
-    
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         Preference removablePref;
 
         mHandler = new MyHandler(this);
-        
+
         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
 
-        addPreferencesFromResource(R.xml.device_info_status);
+        mResId = getIntent().getIntExtra("RESOURCE_INDEX", 0);
+        if (mResId < mResources.length) {
+            addPreferencesFromResource(mResources[mResId]);
+        }
+
+        mNumPhones = TelephonyManager.getPhoneCount();
+        mPhoneStateListener = new PhoneStateListener[mNumPhones];
+
+        for (int i=0; i < mNumPhones; i++) {
+            mPhoneStateListener[i] = getPhoneStateListener(i);
+            mTelephonyManager.listen(mPhoneStateListener[i],
+                            PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+        }
+
         mBatteryLevel = findPreference("battery_level");
         mBatteryStatus = findPreference("battery_status");
-        
+
+        PreferenceScreen selectSub = (PreferenceScreen) findPreference(BUTTON_SELECT_SUB_KEY);
+        if (selectSub != null) {
+            Intent intent = selectSub.getIntent();
+            intent.putExtra(SelectSubscription.PACKAGE, "com.android.settings");
+            intent.putExtra(SelectSubscription.TARGET_CLASS, "com.android.settings.deviceinfo.MSimStatus");
+        }
+
         mRes = getResources();
         if (sUnknown == null) {
             sUnknown = mRes.getString(R.string.device_info_default);
         }
-        
-        mPhone = PhoneFactory.getDefaultPhone();
-        // Note - missing in zaku build, be careful later...
-        mSignalStrength = findPreference("signal_strength");			
+
         mUptime = findPreference("up_time");
-        
-        //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
-        if (mPhone.getPhoneName().equals("CDMA")) {
-            setSummaryText("esn_number", mPhone.getEsn());
-            setSummaryText("meid_number", mPhone.getMeid());
-            setSummaryText("min_number", mPhone.getCdmaMin());
-            setSummaryText("prl_version", mPhone.getCdmaPrlVersion());
 
-            // device is not GSM/UMTS, do not display GSM/UMTS features
-            // check Null in case no specified preference in overlay xml
-            removablePref = findPreference("imei");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-            removablePref = findPreference("imei_sv");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-        } else {
-            setSummaryText("imei", mPhone.getDeviceId());
-
-            setSummaryText("imei_sv",
-                    ((TelephonyManager) getSystemService(TELEPHONY_SERVICE))
-                        .getDeviceSoftwareVersion());
-
-            // device is not CDMA, do not display CDMA features
-            // check Null in case no specified preference in overlay xml
-            removablePref = findPreference("prl_version");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-            removablePref = findPreference("esn_number");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-            removablePref = findPreference("meid_number");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-            removablePref = findPreference("min_number");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
-        }
-
-        String rawNumber = mPhone.getLine1Number();  // may be null or empty
-        String formattedNumber = null;
-        if (!TextUtils.isEmpty(rawNumber)) {
-            formattedNumber = PhoneNumberUtils.formatNumber(rawNumber);
-        }
-        // If formattedNumber is null or empty, it'll display as "Unknown".
-        setSummaryText("number", formattedNumber);
-
-        mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
-        mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
-        mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
-        
         setWifiStatus();
         setBtStatus();
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        mPhoneStateReceiver.registerIntent();
         registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        
-        updateSignalStrength();
-        updateServiceState(mPhone.getServiceState());
         updateDataState();
-        
-        mTelephonyManager.listen(mPhoneStateListener,
-                  PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+        for (int i=0; i < mNumPhones; i++) {
+            mTelephonyManager.listen(mPhoneStateListener[i], PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+        }
 
         mHandler.sendEmptyMessage(EVENT_UPDATE_STATS);
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
 
-        mPhoneStateReceiver.unregisterIntent();
-        mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+        for (int i=0; i < mNumPhones; i++) {
+            mTelephonyManager.listen(mPhoneStateListener[i], PhoneStateListener.LISTEN_NONE);
+        }
         unregisterReceiver(mBatteryInfoReceiver);
         mHandler.removeMessages(EVENT_UPDATE_STATS);
+    }
+
+    private PhoneStateListener getPhoneStateListener(int subscription) {
+        PhoneStateListener phoneStateListener = new PhoneStateListener(subscription) {
+            @Override
+            public void onDataConnectionStateChanged(int state) {
+                mDataState = state;
+                updateDataState();
+                updateNetworkType();
+            }
+        };
+        return phoneStateListener;
     }
 
     /**
@@ -280,7 +229,7 @@ public class Status extends PreferenceActivity {
             findPreference(preference).setSummary(
                     SystemProperties.get(property, alt));
         } catch (RuntimeException e) {
-            
+
         }
     }
 
@@ -293,17 +242,16 @@ public class Status extends PreferenceActivity {
                  findPreference(preference).setSummary(text);
              }
     }
-    
+
     private void updateNetworkType() {
         // Whether EDGE, UMTS, etc...
         setSummary("network_type", TelephonyProperties.PROPERTY_DATA_NETWORK_TYPE, sUnknown);
     }
-    
+
     private void updateDataState() {
-        int state = mTelephonyManager.getDataState();
         String display = mRes.getString(R.string.radioInfo_unknown);
 
-        switch (state) {
+        switch (mDataState) {
             case TelephonyManager.DATA_CONNECTED:
                 display = mRes.getString(R.string.radioInfo_data_connected);
                 break;
@@ -317,74 +265,17 @@ public class Status extends PreferenceActivity {
                 display = mRes.getString(R.string.radioInfo_data_disconnected);
                 break;
         }
-        
+
         setSummaryText("data_state", display);
     }
 
-    private void updateServiceState(ServiceState serviceState) {
-        int state = serviceState.getState();
-        String display = mRes.getString(R.string.radioInfo_unknown);
-        
-        switch (state) {
-            case ServiceState.STATE_IN_SERVICE:
-                display = mRes.getString(R.string.radioInfo_service_in);
-                break;
-            case ServiceState.STATE_OUT_OF_SERVICE:
-            case ServiceState.STATE_EMERGENCY_ONLY:
-                display = mRes.getString(R.string.radioInfo_service_out);
-                break;
-            case ServiceState.STATE_POWER_OFF:
-                display = mRes.getString(R.string.radioInfo_service_off);
-                break;
-        }
-        
-        setSummaryText("service_state", display);
-        
-        if (serviceState.getRoaming()) {
-            setSummaryText("roaming_state", mRes.getString(R.string.radioInfo_roaming_in));
-        } else {
-            setSummaryText("roaming_state", mRes.getString(R.string.radioInfo_roaming_not));
-        }
-        setSummaryText("operator_name", serviceState.getOperatorAlphaLong());
-    }
-    
-    void updateSignalStrength() {
-        // TODO PhoneStateIntentReceiver is deprecated and PhoneStateListener
-        // should probably used instead.
-
-        // not loaded in some versions of the code (e.g., zaku)
-        if (mSignalStrength != null) {
-            int state =
-                    mPhoneStateReceiver.getServiceState().getState();
-            Resources r = getResources();
-
-            if ((ServiceState.STATE_OUT_OF_SERVICE == state) ||
-                    (ServiceState.STATE_POWER_OFF == state)) {
-                mSignalStrength.setSummary("0");
-            }
-
-            int signalDbm = mPhoneStateReceiver.getSignalStrengthDbm();
-
-            if (-1 == signalDbm) signalDbm = 0;
-
-            int signalAsu = mPhoneStateReceiver.getSignalStrength();
-
-            if (-1 == signalAsu) signalAsu = 0;
-
-            mSignalStrength.setSummary(String.valueOf(signalDbm) + " "
-                        + r.getString(R.string.radioInfo_display_dbm) + "   "
-                        + String.valueOf(signalAsu) + " "
-                        + r.getString(R.string.radioInfo_display_asu));
-        }
-    }
-    
     private void setWifiStatus() {
         WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
         Preference wifiMacAddressPref = findPreference(KEY_WIFI_MAC_ADDRESS);
         String macAddress = wifiInfo == null ? null : wifiInfo.getMacAddress();
-        wifiMacAddressPref.setSummary(!TextUtils.isEmpty(macAddress) ? macAddress 
+        wifiMacAddressPref.setSummary(!TextUtils.isEmpty(macAddress) ? macAddress
                 : getString(R.string.status_unavailable));
     }
 
@@ -412,7 +303,7 @@ public class Status extends PreferenceActivity {
 
         mUptime.setSummary(convert(ut));
     }
-    
+
     private String pad(int n) {
         if (n >= 10) {
             return String.valueOf(n);

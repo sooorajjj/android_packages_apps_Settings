@@ -50,6 +50,7 @@ public class DeviceInfoSettings extends PreferenceActivity {
     private static final String KEY_COPYRIGHT = "copyright";
     private static final String KEY_SYSTEM_UPDATE_SETTINGS = "system_update_settings";
     private static final String PROPERTY_URL_SAFETYLEGAL = "ro.url.safetylegal";
+    private static final String KEY_STATUS = "status_info";
 
     long[] mHits = new long[3];
 
@@ -58,6 +59,8 @@ public class DeviceInfoSettings extends PreferenceActivity {
         super.onCreate(icicle);
 
         addPreferencesFromResource(R.xml.device_info_settings);
+        int resIndex = getIntent().getIntExtra("RESOURCE_INDEX", 0);
+        findPreference(KEY_STATUS).getIntent().putExtra("RESOURCE_INDEX", resIndex);
 
         // If we don't have an IME tutorial, remove that option
         String currentIme = Settings.Secure.getString(getContentResolver(),

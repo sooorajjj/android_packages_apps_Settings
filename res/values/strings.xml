@@ -1248,8 +1248,12 @@
     <string name="device_status_activity_title">Status</string>
     <!-- About phone screen, title of the item to go into the Phone status screen -->
     <string name="device_status">Status</string>
+    <!-- In About phone->Status screen, title of the item to go into the subscription status screen -->
+    <string name="device_additional_status">Additional Status Info</string>
     <!-- About phone screen, summary of the item to go into the phone status screen -->
-    <string name="device_status_summary">Phone number, signal, etc.</string>
+    <string name="device_status_summary">Battery Status, battery level, etc.</string>
+    <!-- About phone->Status screen, summary of the item to go into the subscription status screen -->
+    <string name="device_additional_status_summary">Phone number, Signal, IMEI, etc.</string>
 
     <!-- Main settings screen item's title to go into the storage settings screen [CHAR LIMIT=25] -->
     <string name="storage_settings">Storage</string>

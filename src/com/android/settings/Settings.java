@@ -32,6 +32,7 @@ public class Settings extends PreferenceActivity {
     private static final String KEY_DOCK_SETTINGS = "dock_settings";
     private static final String KEY_MULTI_SETTINGS = "multi_sim_settings";
     private static final String KEY_WIRELESS_SETTINGS = "wireless_settings";
+    private static final String KEY_ABOUT_PHONE = "about_settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class Settings extends PreferenceActivity {
         }
         findPreference(KEY_CALL_SETTINGS).getIntent().putExtra("RESOURCE_INDEX", settingsPrefScreenIndex);
         findPreference(KEY_WIRELESS_SETTINGS).getIntent().putExtra("RESOURCE_INDEX", settingsPrefScreenIndex);
+        findPreference(KEY_ABOUT_PHONE).getIntent().putExtra("RESOURCE_INDEX", settingsPrefScreenIndex);
 
         Utils.updatePreferenceToSpecificActivityOrRemove(this, parent, KEY_SYNC_SETTINGS, 0);
 

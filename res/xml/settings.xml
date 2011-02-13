@@ -190,6 +190,7 @@
         <!-- About Device -->
 
         <com.android.settings.IconPreferenceScreen
+            android:key="about_settings"
             settings:icon="@drawable/ic_settings_about"
             android:title="@string/about_settings">
             <intent
