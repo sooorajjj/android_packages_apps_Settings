@@ -358,9 +358,9 @@
 
     <!-- IPVersions used in APN editor -->
     <string-array name = "ip_version_entries">
-        <item>IPV4</item>
+        <item>IP</item>
         <item>IPV6</item>
-        <item>IPV4 and IPV6</item>
+        <item>IPV4V6</item>
     </string-array>
 
     <string-array translatable="false" name="ip_version_values">
