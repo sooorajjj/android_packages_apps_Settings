@@ -120,13 +120,16 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
             int timeout = getDiscoverableTimeout();
             manager.setDiscoverableTimeout(timeout);
 
-            mCheckBoxPreference.setSummaryOn(
-                    mContext.getResources().getString(R.string.bluetooth_is_discoverable, timeout));
+            if (timeout > 0) {
+                mCheckBoxPreference.setSummaryOn(
+                        mContext.getResources().getString(R.string.bluetooth_is_discoverable,
+                                                          timeout));
 
-            long endTimestamp = System.currentTimeMillis() + timeout * 1000;
-            persistDiscoverableEndTimestamp(endTimestamp);
+                long endTimestamp = System.currentTimeMillis() + timeout * 1000;
+                persistDiscoverableEndTimestamp(endTimestamp);
+            }
 
-            manager.setScanMode(BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE);
+            manager.setScanMode(BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE, timeout);
         } else {
             manager.setScanMode(BluetoothAdapter.SCAN_MODE_CONNECTABLE);
         }
@@ -134,7 +137,7 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
 
     private int getDiscoverableTimeout() {
         int timeout = SystemProperties.getInt(SYSTEM_PROPERTY_DISCOVERABLE_TIMEOUT, -1);
-        if (timeout <= 0) {
+        if (timeout < 0) {
             timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
         }
 
@@ -160,6 +163,11 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
     private void updateCountdownSummary() {
         int mode = mLocalManager.getBluetoothAdapter().getScanMode();
         if (mode != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            return;
+        }
+
+        if ( 0 == getDiscoverableTimeout()) {
+            mCheckBoxPreference.setSummaryOn(null);
             return;
         }
 
