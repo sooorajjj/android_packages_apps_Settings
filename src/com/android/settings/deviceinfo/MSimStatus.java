@@ -112,7 +112,7 @@ public class MSimStatus extends PreferenceActivity {
         } else {
             setSummaryText("imei", mPhone.getDeviceId());
 
-            setSummaryText("imei_sv", mTelephonyManager.getDeviceSoftwareVersion());
+            setSummaryText("imei_sv", mTelephonyManager.getDeviceSoftwareVersion(mSub));
 
             // device is not CDMA, do not display CDMA features
             // check Null in case no specified preference in overlay xml
