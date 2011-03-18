@@ -23,8 +23,8 @@
             android:key="voice"
             android:title="@string/voice_title"
             android:persistent="false"
-            android:entries="@array/multi_sim_entries"
-            android:entryValues="@array/multi_sim_values" />
+            android:entries="@array/multi_sim_entries_voice"
+            android:entryValues="@array/multi_sim_values_voice" />
 
         <ListPreference
             android:key="data"

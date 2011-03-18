@@ -58,6 +58,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     static final int SUBSCRIPTION_ID_0 = 0;
     static final int SUBSCRIPTION_ID_1 = 1;
     static final int SUBSCRIPTION_ID_INVALID = -1;
+    static final int PROMPT_OPTION = 2;
 
     private ListPreference mVoice;
     private ListPreference mData;
@@ -98,9 +99,9 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         updateSmsSummary();
     }
 
-     private void updateVoiceSummary() {
+    private void updateVoiceSummary() {
         int Voice_val = SUBSCRIPTION_ID_INVALID;
-        CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries);
+        CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries_voice);
 
         try {
             Voice_val = Settings.System.getInt(getContentResolver(),Settings.System.MULTI_SIM_VOICE_CALL);
@@ -108,13 +109,18 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
             Log.e(TAG, "Settings Exception Reading Multi sim Voice Call Values", snfe);
         }
 
-        Log.d(TAG, "updateVoiceSummary: Voice_val = " + Voice_val);
-        if (Voice_val == SUBSCRIPTION_ID_0) {
+        boolean promptEnabled  = PhoneFactory.isPromptEnabled();
+        Log.d(TAG, "updateVoiceSummary: Voice_val =  " + Voice_val + "promptEnabled = " + promptEnabled);
+        if (Voice_val == SUBSCRIPTION_ID_0 && (!promptEnabled)) {
             mVoice.setValue("0");
             mVoice.setSummary(summaries[0]);
-        } else if (Voice_val == SUBSCRIPTION_ID_1) {
+        } else if (Voice_val == SUBSCRIPTION_ID_1 && (!promptEnabled)) {
             mVoice.setValue("1");
             mVoice.setSummary(summaries[1]);
+        } else if (promptEnabled) {
+            Log.d(TAG, "prompt is enabled");
+            mVoice.setValue("2");
+            mVoice.setSummary(summaries[2]);
         } else {
             mVoice.setValue("0");
             mVoice.setSummary(summaries[0]);
@@ -172,9 +178,16 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries);
 
         if (KEY_VOICE.equals(key)) {
+            summaries = getResources().getTextArray(R.array.multi_sim_summaries_voice);
             int V_value = Integer.parseInt((String) objValue);
-            Log.d(TAG, "setVoiceSubscription " + V_value);
-            PhoneFactory.setVoiceSubscription(V_value);
+            if (V_value == PROMPT_OPTION) {
+                PhoneFactory.setPromptEnabled(true);
+                Log.d(TAG, "prompt is enabled " + V_value);
+            } else {
+                Log.d(TAG, "setVoiceSubscription " + V_value);
+                PhoneFactory.setPromptEnabled(false);
+                PhoneFactory.setVoiceSubscription(V_value);
+            }
             mVoice.setSummary(summaries[V_value]);
         }
 
