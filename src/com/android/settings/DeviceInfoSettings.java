@@ -76,7 +76,6 @@ public class DeviceInfoSettings extends PreferenceActivity {
 
         setStringSummary("firmware_version", Build.VERSION.RELEASE);
         findPreference("firmware_version").setEnabled(true);
-        setValueSummary("baseband_version", "gsm.version.baseband");
         setStringSummary("device_model", Build.MODEL);
         setStringSummary("build_number", Build.DISPLAY);
         findPreference("kernel_version").setSummary(getFormattedKernelVersion());
