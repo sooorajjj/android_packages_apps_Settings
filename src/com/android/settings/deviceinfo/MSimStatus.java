@@ -141,6 +141,10 @@ public class MSimStatus extends PreferenceActivity {
         }
         // If formattedNumber is null or empty, it'll display as "Unknown".
         setSummaryText("number", formattedNumber);
+
+        // baseband version
+        setSummaryText("baseband_version",
+            TelephonyManager.getTelephonyProperty("gsm.version.baseband", mSub, ""));
     }
 
     @Override
