@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.os.SystemProperties;
 
 import java.util.Map;
 
@@ -42,6 +43,8 @@ public class BrightnessPreference extends SeekBarPreference implements
     private int mOldAutomatic;
 
     private boolean mAutomaticAvailable;
+    private boolean mCablAvailable;
+    private boolean mTempDisableCabl;
     
     // Backlight range is from 0 - 255. Need to make sure that user
     // doesn't set the backlight to 0 and get stuck
@@ -54,6 +57,9 @@ public class BrightnessPreference extends SeekBarPreference implements
         mAutomaticAvailable = context.getResources().getBoolean(
                 com.android.internal.R.bool.config_automatic_brightness_available);
 
+        mCablAvailable = SystemProperties.getBoolean("ro.qualcomm.cabl", false);
+        mTempDisableCabl = false;
+
         setDialogLayoutResource(R.layout.preference_dialog_brightness);
         setDialogIcon(R.drawable.ic_settings_display);
     }
@@ -61,6 +67,11 @@ public class BrightnessPreference extends SeekBarPreference implements
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
+
+        if(mCablAvailable && SystemProperties.get("init.svc.abld").equals("running")) {
+            SystemProperties.set("ctl.stop", "abld");
+            mTempDisableCabl = true;
+        }
 
         mSeekBar = getSeekBar(view);
         mSeekBar.setMax(MAXIMUM_BACKLIGHT - MINIMUM_BACKLIGHT);
@@ -112,7 +123,6 @@ public class BrightnessPreference extends SeekBarPreference implements
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
-        
         if (positiveResult) {
             Settings.System.putInt(getContext().getContentResolver(), 
                     Settings.System.SCREEN_BRIGHTNESS,
@@ -125,6 +135,11 @@ public class BrightnessPreference extends SeekBarPreference implements
                 setBrightness(mOldBrightness);
             }
         }
+        if(mCablAvailable && mTempDisableCabl) {
+            SystemProperties.set("ctl.start", "abld");
+            mTempDisableCabl = false;
+        }
+
     }
     
     private void setBrightness(int brightness) {
