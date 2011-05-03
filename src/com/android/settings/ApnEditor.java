@@ -40,6 +40,7 @@ import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.internal.telephony.RILConstants;
 
 
 public class ApnEditor extends PreferenceActivity
@@ -147,8 +148,13 @@ public class ApnEditor extends PreferenceActivity
 
         mIp = (ListPreference) findPreference("ip_version");
         mIp.setOnPreferenceChangeListener(this);
-        mAuthType = (ListPreference) findPreference("auth_type");
-        mAuthType.setOnPreferenceChangeListener(this);
+        mAuthType = (ListPreference) findPreference(KEY_AUTH_TYPE);
+        mAuthType.setOnPreferenceChangeListener(this);        
+
+        /* TODO: align with 2.3.4_r1
+        mProtocol = (ListPreference) findPreference(KEY_PROTOCOL);
+        mProtocol.setOnPreferenceChangeListener(this);
+        */
 
         mRes = getResources();
 
@@ -298,7 +304,7 @@ public class ApnEditor extends PreferenceActivity
         pref.setValueIndex(index);
         String[] values = mRes.getStringArray(array);
         pref.setSummary(values[index]);
-    }
+   }
 
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String key = preference.getKey();
@@ -316,7 +322,18 @@ public class ApnEditor extends PreferenceActivity
             } catch (NumberFormatException e) {
                 return false;
             }
+            return true;
         }
+        /* TODO: align with 2.3.4_r1 
+        if (KEY_PROTOCOL.equals(key)) {
+            String protocol = protocolDescription((String) newValue);
+            if (protocol == null) {
+                return false;
+            }
+            mProtocol.setSummary(protocol);
+            mProtocol.setValue((String) newValue);
+        }
+        */
         return true;
     }
 

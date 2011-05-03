@@ -55,6 +55,7 @@ import java.lang.ref.WeakReference;
  */
 public class Status extends PreferenceActivity {
 
+    private static final String KEY_WIMAX_MAC_ADDRESS = "wimax_mac_address";
     private static final String KEY_WIFI_MAC_ADDRESS = "wifi_mac_address";
     private static final String KEY_BT_ADDRESS = "bt_address";
 
@@ -179,6 +180,13 @@ public class Status extends PreferenceActivity {
 
         mUptime = findPreference("up_time");
 
+        /* TODO: align with 2.3.4_r1
+        mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
+        mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
+        mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
+
+        setWimaxStatus();
+        */
         setWifiStatus();
         setBtStatus();
     }
@@ -188,6 +196,10 @@ public class Status extends PreferenceActivity {
         super.onResume();
 
         registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        /* TODO: align with 2.3.4_r1
+        updateSignalStrength();
+        updateServiceState(mPhone.getServiceState());
+        */ 
         updateDataState();
         for (int i=0; i < mNumPhones; i++) {
             mTelephonyManager.listen(mPhoneStateListener[i], PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
@@ -268,6 +280,55 @@ public class Status extends PreferenceActivity {
 
         setSummaryText("data_state", display);
     }
+
+    /* TODO: align with 2.3.4_r1
+    void updateSignalStrength() {
+        // TODO PhoneStateIntentReceiver is deprecated and PhoneStateListener
+        // should probably used instead.
+
+        // not loaded in some versions of the code (e.g., zaku)
+        if (mSignalStrength != null) {
+            int state =
+                    mPhoneStateReceiver.getServiceState().getState();
+            Resources r = getResources();
+
+            if ((ServiceState.STATE_OUT_OF_SERVICE == state) ||
+                    (ServiceState.STATE_POWER_OFF == state)) {
+                mSignalStrength.setSummary("0");
+            }
+
+            int signalDbm = mPhoneStateReceiver.getSignalStrengthDbm();
+
+            if (-1 == signalDbm) signalDbm = 0;
+
+            int signalAsu = mPhoneStateReceiver.getSignalStrength();
+
+            if (-1 == signalAsu) signalAsu = 0;
+
+            mSignalStrength.setSummary(String.valueOf(signalDbm) + " "
+                        + r.getString(R.string.radioInfo_display_dbm) + "   "
+                        + String.valueOf(signalAsu) + " "
+                        + r.getString(R.string.radioInfo_display_asu));
+        }
+    }
+
+    private void setWimaxStatus() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
+
+        if (ni == null) {
+            PreferenceScreen root = getPreferenceScreen();
+            Preference ps = (Preference) findPreference(KEY_WIMAX_MAC_ADDRESS);
+            if (ps != null)
+                root.removePreference(ps);
+        } else {
+            Preference wimaxMacAddressPref = findPreference(KEY_WIMAX_MAC_ADDRESS);
+            String macAddress = SystemProperties.get("net.wimax.mac.address",
+                    getString(R.string.status_unavailable));
+            wimaxMacAddressPref.setSummary(macAddress);
+        }
+    }
+    */
 
     private void setWifiStatus() {
         WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
