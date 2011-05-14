@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
@@ -34,6 +36,7 @@ import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -55,6 +58,7 @@ import java.lang.ref.WeakReference;
  */
 public class Status extends PreferenceActivity {
 
+    private static final String KEY_WIMAX_MAC_ADDRESS = "wimax_mac_address";
     private static final String KEY_WIFI_MAC_ADDRESS = "wifi_mac_address";
     private static final String KEY_BT_ADDRESS = "bt_address";
 
@@ -179,6 +183,13 @@ public class Status extends PreferenceActivity {
 
         mUptime = findPreference("up_time");
 
+	/* todo - align with 2.3.4_r1
+        mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
+        mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
+        mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
+
+        setWimaxStatus();
+	*/
         setWifiStatus();
         setBtStatus();
     }
@@ -188,6 +199,11 @@ public class Status extends PreferenceActivity {
         super.onResume();
 
         registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+	/* todo: align with 2.3.4_r1
+        updateSignalStrength();
+        updateServiceState(mPhone.getServiceState());
+	*/
         updateDataState();
         for (int i=0; i < mNumPhones; i++) {
             mTelephonyManager.listen(mPhoneStateListener[i], PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
@@ -267,6 +283,23 @@ public class Status extends PreferenceActivity {
         }
 
         setSummaryText("data_state", display);
+    }
+
+    private void setWimaxStatus() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
+
+        if (ni == null) {
+            PreferenceScreen root = getPreferenceScreen();
+            Preference ps = (Preference) findPreference(KEY_WIMAX_MAC_ADDRESS);
+            if (ps != null)
+                root.removePreference(ps);
+        } else {
+            Preference wimaxMacAddressPref = findPreference(KEY_WIMAX_MAC_ADDRESS);
+            String macAddress = SystemProperties.get("net.wimax.mac.address",
+                    getString(R.string.status_unavailable));
+            wimaxMacAddressPref.setSummary(macAddress);
+        }
     }
 
     private void setWifiStatus() {

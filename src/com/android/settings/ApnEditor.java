@@ -40,6 +40,7 @@ import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.internal.telephony.RILConstants;
 
 
 public class ApnEditor extends PreferenceActivity
@@ -123,7 +124,6 @@ public class ApnEditor extends PreferenceActivity
     private static final int TYPE_INDEX = 15;
     private static final int IP_INDEX = 16;
 
-
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -147,7 +147,7 @@ public class ApnEditor extends PreferenceActivity
 
         mIp = (ListPreference) findPreference("ip_version");
         mIp.setOnPreferenceChangeListener(this);
-        mAuthType = (ListPreference) findPreference("auth_type");
+        mAuthType = (ListPreference) findPreference(KEY_AUTH_TYPE);
         mAuthType.setOnPreferenceChangeListener(this);
 
         mRes = getResources();
@@ -261,7 +261,6 @@ public class ApnEditor extends PreferenceActivity
 
             int verIndex = getIpVersionIndex(mCursor.getString(IP_INDEX));
             mIp.setValueIndex(verIndex);
-
         }
 
         mName.setSummary(checkNull(mName.getText()));
@@ -316,8 +315,10 @@ public class ApnEditor extends PreferenceActivity
             } catch (NumberFormatException e) {
                 return false;
             }
+            return true;
         }
-        return true;
+
+	return true;
     }
 
     @Override
