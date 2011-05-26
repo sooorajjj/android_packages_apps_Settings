@@ -681,7 +681,7 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
     }
 
     private boolean isConnectableProfile(Profile profile) {
-        return profile.equals(Profile.HEADSET) || profile.equals(Profile.A2DP);
+        return profile.equals(Profile.HEADSET) || profile.equals(Profile.A2DP) || profile.equals(Profile.SAP);
     }
 
     public void onCreateContextMenu(ContextMenu menu) {
