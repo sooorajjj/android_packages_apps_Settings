@@ -183,13 +183,9 @@ public class Status extends PreferenceActivity {
 
         mUptime = findPreference("up_time");
 
-	/* todo - align with 2.3.4_r1
-        mPhoneStateReceiver = new PhoneStateIntentReceiver(this, mHandler);
-        mPhoneStateReceiver.notifySignalStrength(EVENT_SIGNAL_STRENGTH_CHANGED);
-        mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
-
+        /* TODO: align with 2.3.4_r1
         setWimaxStatus();
-	*/
+        */
         setWifiStatus();
         setBtStatus();
     }
@@ -199,11 +195,6 @@ public class Status extends PreferenceActivity {
         super.onResume();
 
         registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-
-	/* todo: align with 2.3.4_r1
-        updateSignalStrength();
-        updateServiceState(mPhone.getServiceState());
-	*/
         updateDataState();
         for (int i=0; i < mNumPhones; i++) {
             mTelephonyManager.listen(mPhoneStateListener[i], PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
@@ -285,6 +276,7 @@ public class Status extends PreferenceActivity {
         setSummaryText("data_state", display);
     }
 
+    /* TODO: align with 2.3.4_r1 */
     private void setWimaxStatus() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
