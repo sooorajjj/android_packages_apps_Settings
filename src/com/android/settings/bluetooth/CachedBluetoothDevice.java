@@ -475,6 +475,9 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
 
             case BluetoothClass.Device.Major.PHONE:
                 return R.drawable.ic_bt_cellphone;
+
+            case BluetoothClass.Device.Major.IMAGING:
+                return R.drawable.ic_bt_laptop;
             }
         } else {
             Log.w(TAG, "mBtClass is null");
