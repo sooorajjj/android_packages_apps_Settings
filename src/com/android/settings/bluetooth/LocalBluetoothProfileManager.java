@@ -21,7 +21,6 @@ import com.android.settings.R;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
-import android.bluetooth.BluetoothSap;
 import android.bluetooth.BluetoothUuid;
 import android.os.Handler;
 import android.os.ParcelUuid;
@@ -98,9 +97,6 @@ public abstract class LocalBluetoothProfileManager {
 
                 profileManager = new OppProfileManager(localManager);
                 sProfileMap.put(Profile.OPP, profileManager);
-
-                profileManager = new SAPProfileManager(localManager);
-                sProfileMap.put(Profile.SAP, profileManager);
             }
         }
     }
@@ -199,8 +195,7 @@ public abstract class LocalBluetoothProfileManager {
     public enum Profile {
         HEADSET(R.string.bluetooth_profile_headset),
         A2DP(R.string.bluetooth_profile_a2dp),
-        OPP(R.string.bluetooth_profile_opp),
-        SAP(R.string.bluetooth_profile_sap);
+        OPP(R.string.bluetooth_profile_opp);
 
         public final int localizedString;
 
@@ -570,91 +565,4 @@ public abstract class LocalBluetoothProfileManager {
             }
         }
     }
-
-
-    /**
-     * SAPProfileManager
-     */
-    private static class SAPProfileManager extends LocalBluetoothProfileManager {
-
-        private int mConnected = 0;
-        private BluetoothSap mService;
-
-        public SAPProfileManager(LocalBluetoothManager localManager) {
-            super(localManager);
-            mService = new BluetoothSap();
-        }
-
-        @Override
-        public Set<BluetoothDevice> getConnectedDevices() {
-            return null;
-        }
-
-        @Override
-        public boolean connect(BluetoothDevice device) {
-            return false;
-        }
-
-        @Override
-        public boolean disconnect(BluetoothDevice device) {
-
-            Log.i(TAG, "Disconnect the SAP");
-            return mService.disconnect();
-        }
-
-        @Override
-        public int getConnectionStatus(BluetoothDevice device) {
-            return convertState(mConnected);
-        }
-
-        @Override
-        public int getSummary(BluetoothDevice device) {
-            int connectionStatus = getConnectionStatus(device);
-
-            Log.i(TAG, "SAP getSummary" );
-            if (SettingsBtStatus.isConnectionStatusConnected(connectionStatus)) {
-                return R.string.bluetooth_sap_profile_summary_connected;
-            } else {
-                return R.string.bluetooth_sap_profile_summary_not_connected;
-            }
-
-        }
-
-        @Override
-        public boolean isPreferred(BluetoothDevice device) {
-            return true;
-        }
-
-        @Override
-        public int getPreferred(BluetoothDevice device) {
-            return -1;
-        }
-
-        @Override
-        public void setPreferred(BluetoothDevice device, boolean preferred) {
-        }
-
-        @Override
-        public boolean isProfileReady() {
-            return true;
-        }
-
-        @Override
-        public int convertState(int state) {
-            Log.i(TAG, "ConvertState of SAP   "  + state);
-            if ( mConnected != state)   {
-                //If there is a change in state
-                //update the state
-                mConnected = state;
-            }
-            switch (state) {
-            case 1:
-                return SettingsBtStatus.CONNECTION_STATUS_CONNECTED;
-            case 0:
-                return SettingsBtStatus.CONNECTION_STATUS_DISCONNECTED;
-            default:
-                return SettingsBtStatus.CONNECTION_STATUS_UNKNOWN;
-            }
-       }
-}
 }

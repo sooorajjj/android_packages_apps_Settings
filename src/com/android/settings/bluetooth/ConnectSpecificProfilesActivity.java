@@ -249,9 +249,6 @@ public class ConnectSpecificProfilesActivity extends PreferenceActivity
         }
     }
 
-    private boolean isServerRole(Profile profile) {
-        return profile.equals(Profile.SAP);
-    }
     private void refreshProfilePreference(CheckBoxPreference profilePref, Profile profile) {
         BluetoothDevice device = mCachedDevice.getDevice();
         LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
@@ -262,15 +259,6 @@ public class ConnectSpecificProfilesActivity extends PreferenceActivity
         /*
          * Gray out checkbox while connecting and disconnecting
          */
-        if (isServerRole(profile) && connectionStatus == SettingsBtStatus.CONNECTION_STATUS_DISCONNECTED) {
-                /*no connection initiation from SAP server side*/
-                profilePref.setEnabled(false);
-                profilePref.setSummary(getProfileSummary(profileManager, profile, device,
-                       connectionStatus, mOnlineMode));
-                Log.i(TAG, "SAP in disconnected mode -" + profile);
-                return;
-        }
-        Log.i(TAG, "refreshProfilePreference -" + profile);
         profilePref.setEnabled(!mCachedDevice.isBusy());
         profilePref.setSummary(getProfileSummary(profileManager, profile, device,
                 connectionStatus, mOnlineMode));
@@ -311,8 +299,6 @@ public class ConnectSpecificProfilesActivity extends PreferenceActivity
                 return R.string.bluetooth_a2dp_profile_summary_use_for;
             case HEADSET:
                 return R.string.bluetooth_headset_profile_summary_use_for;
-            case SAP:
-                return R.string.bluetooth_sap_profile_summary_use_for;
             default:
                 return 0;
         }
