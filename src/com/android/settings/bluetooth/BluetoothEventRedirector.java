@@ -138,6 +138,11 @@ public class BluetoothEventRedirector {
                         mManager.getCachedDeviceManager().onDeviceDisappeared(device);
                     }
                 }
+            } else if(action.equals(BluetoothDevice.SAP_STATE_CHANGED)) {
+                Log.i(TAG, "SAP state recieved ");
+                int state = intent.getIntExtra("state", 0);
+                mManager.getCachedDeviceManager().onProfileStateChanged(device,
+                        Profile.SAP, state);
             }
         }
     };
@@ -171,6 +176,8 @@ public class BluetoothEventRedirector {
 
         // Dock event broadcasts
         filter.addAction(Intent.ACTION_DOCK_EVENT);
+        //SAP profile state events
+        filter.addAction(BluetoothDevice.SAP_STATE_CHANGED);
 
         mManager.getContext().registerReceiver(mBroadcastReceiver, filter);
     }
