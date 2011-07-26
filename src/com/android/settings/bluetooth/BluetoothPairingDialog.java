@@ -54,6 +54,7 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
     private String mPasskey;
     private EditText mPairingView;
     private Button mOkButton;
+    private boolean mIsSecurityHigh;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -90,6 +91,8 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
         mLocalManager = LocalBluetoothManager.getInstance(this);
         mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mType = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
+        mIsSecurityHigh = intent.getBooleanExtra(BluetoothDevice.EXTRA_SECURE_PAIRING, false);
+        Log.i(TAG, "Secure is " + mIsSecurityHigh);
         if (mType == BluetoothDevice.PAIRING_VARIANT_PIN) {
             createUserEntryDialog();
         } else if (mType == BluetoothDevice.PAIRING_VARIANT_PASSKEY) {
@@ -152,7 +155,10 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
         mPairingView.addTextChangedListener(this);
 
         if (mType == BluetoothDevice.PAIRING_VARIANT_PIN) {
-            messageView.setText(getString(R.string.bluetooth_enter_pin_msg, name));
+            if (mIsSecurityHigh)
+                messageView.setText(getString(R.string.bluetooth_enter_pin_msg_hs, name));
+            else
+                messageView.setText(getString(R.string.bluetooth_enter_pin_msg, name));
             // Maximum of 16 characters in a PIN adb sync
             mPairingView.setFilters(new InputFilter[] {
                     new LengthFilter(BLUETOOTH_PIN_MAX_LENGTH) });
@@ -227,7 +233,9 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
     }
 
     public void afterTextChanged(Editable s) {
-        if (s.length() > 0) {
+        if (s.length() > 0 && !mIsSecurityHigh) {
+            mOkButton.setEnabled(true);
+        } else if (mIsSecurityHigh && s.length() == BLUETOOTH_PIN_MAX_LENGTH) {
             mOkButton.setEnabled(true);
         }
     }
