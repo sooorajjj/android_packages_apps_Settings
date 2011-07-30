@@ -155,6 +155,21 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
         }
     }
 
+    private boolean isServerRole(Profile profile) {
+        return profile.equals(Profile.SAP);
+    }
+
+    public void resetAllServerProfiles() {
+        for (Profile profile : mProfiles) {
+            if (isServerRole(profile)) {
+                /*set the server roles to disconnected  state*/
+                Log.i(TAG, "Reset the state of Profiles");
+                LocalBluetoothProfileManager.getProfileManager(mLocalManager,
+                profile).convertState(0);
+            }
+        }
+    }
+
     public void disconnect(Profile profile) {
         disconnectInt(this, profile);
     }
