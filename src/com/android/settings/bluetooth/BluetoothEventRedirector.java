@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.util.Log;
+import java.util.List;
 
 /**
  * BluetoothEventRedirector receives broadcasts and callbacks from the Bluetooth
@@ -53,6 +54,9 @@ public class BluetoothEventRedirector {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
                                         BluetoothAdapter.ERROR);
                 mManager.setBluetoothStateInt(state);
+                if (state == BluetoothAdapter.STATE_TURNING_OFF) {
+                    resetAllServerRoles();
+                }
             } else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
                 persistDiscoveringTimestamp();
                 mManager.onScanningStateChanged(true);
@@ -207,5 +211,13 @@ public class BluetoothEventRedirector {
         editor.putLong(LocalBluetoothManager.SHARED_PREFERENCES_KEY_DISCOVERING_TIMESTAMP,
                 System.currentTimeMillis());
         editor.apply();
+    }
+
+    private void resetAllServerRoles() {
+        List<CachedBluetoothDevice> cachedDevices =
+                mManager.getCachedDeviceManager().getCachedDevicesCopy();
+        for (CachedBluetoothDevice cachedDevice : cachedDevices) {
+               cachedDevice.resetAllServerProfiles();
+        }
     }
 }
