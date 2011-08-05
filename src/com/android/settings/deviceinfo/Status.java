@@ -42,6 +42,8 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneFactory;
 import com.android.settings.R;
 import com.android.settings.SelectSubscription;
 import android.util.Log;
@@ -147,7 +149,7 @@ public class Status extends PreferenceActivity {
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         Preference removablePref;
-
+        Phone phone;
         mHandler = new MyHandler(this);
 
         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
@@ -156,6 +158,32 @@ public class Status extends PreferenceActivity {
         if (mResId < mResources.length) {
             addPreferencesFromResource(mResources[mResId]);
         }
+        
+        phone = PhoneFactory.getDefaultPhone();
+        // Note - missing in zaku build, be careful later...
+        
+        //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
+        if (phone.getPhoneName().equals("CDMA")) {
+            setSummaryText("meid_number", phone.getMeid());
+            setSummaryText("min_number", phone.getCdmaMin());
+            if (getResources().getBoolean(R.bool.config_msid_enable)) {
+                findPreference("min_number").setTitle(R.string.status_msid_number);
+            }
+            setSummaryText("prl_version", phone.getCdmaPrlVersion());
+
+            // device is not GSM/UMTS, do not display GSM/UMTS features
+            // check Null in case no specified preference in overlay xml
+            removablePref = findPreference("imei");
+            if (removablePref != null) {
+                getPreferenceScreen().removePreference(removablePref);
+            }
+            removablePref = findPreference("imei_sv");
+            if (removablePref != null) {
+                getPreferenceScreen().removePreference(removablePref);
+            }
+        } else {
+            setSummaryText("imei", phone.getDeviceId());
+	}
 
         mNumPhones = TelephonyManager.getPhoneCount();
         mPhoneStateListener = new PhoneStateListener[mNumPhones];
