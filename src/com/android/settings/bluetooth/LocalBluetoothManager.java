@@ -239,6 +239,12 @@ public class LocalBluetoothManager {
     }
 
     public void setBluetoothEnabled(boolean enabled) {
+        if (enabled == false) {
+            if (mAdapter.isDiscovering()) {
+                Log.i(TAG, "Disabling scan process");
+                mAdapter.cancelDiscovery();
+            }
+        }
         boolean wasSetStateSuccessful = enabled
                 ? mAdapter.enable()
                 : mAdapter.disable();
