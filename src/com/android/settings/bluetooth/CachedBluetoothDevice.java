@@ -614,6 +614,11 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             }
             mConnectAfterPairing = false;
         }
+
+        if (bondState == BluetoothDevice.BOND_RETRY) {
+            Log.i(TAG, "Bond state is Retry, set autoconnect");
+            mConnectAfterPairing = true;
+        }
     }
 
     public void setBtClass(BluetoothClass btClass) {
