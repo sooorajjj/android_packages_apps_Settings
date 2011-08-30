@@ -80,15 +80,19 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if (!intent.getAction().equals(BluetoothDevice.ACTION_PAIRING_REQUEST))
+        if (intent == null || !BluetoothDevice.ACTION_PAIRING_REQUEST.equals(intent.getAction()))
         {
             Log.e(TAG,
                   "Error: this activity may be started only with intent " +
                   BluetoothDevice.ACTION_PAIRING_REQUEST);
             finish();
+            return;
         }
 
         mLocalManager = LocalBluetoothManager.getInstance(this);
+        if (mLocalManager == null) {
+            Log.e(TAG, "Unexpected error ! mLocalManager is NULL");
+        }
         mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mType = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
         mIsSecurityHigh = intent.getBooleanExtra(BluetoothDevice.EXTRA_SECURE_PAIRING, false);

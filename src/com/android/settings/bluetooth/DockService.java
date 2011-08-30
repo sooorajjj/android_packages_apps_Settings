@@ -251,7 +251,11 @@ public class DockService extends Service implements AlertDialog.OnMultiChoiceCli
                     mDialog = null;
                 }
                 mDevice = device;
-                createDialog(mContext, mDevice, state, startId);
+                if (mDevice != null) {
+                    createDialog(mContext, mDevice, state, startId);
+                } else {
+                    Log.e(TAG, "Error! mDevice is null, can't create dialog");
+                }
                 break;
 
             case MSG_TYPE_DOCKED:
@@ -653,6 +657,10 @@ public class DockService extends Service implements AlertDialog.OnMultiChoiceCli
         for (int i = 0; i < profiles.size(); i++) {
             LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
                     .getProfileManager(mBtManager, profiles.get(i));
+            if (profileManager == null) {
+                Log.e(TAG, "Unexpected error! profileManager is null");
+                return;
+            }
             int auto;
             if (Profile.A2DP == profiles.get(i)) {
                 auto = BluetoothA2dp.PRIORITY_AUTO_CONNECT;
@@ -712,6 +720,10 @@ public class DockService extends Service implements AlertDialog.OnMultiChoiceCli
             LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
                     .getProfileManager(mBtManager, mProfiles[i]);
 
+            if (profileManager == null) {
+                Log.e(TAG, "Error! profileManager is null");
+                continue;
+            }
             if (DEBUG) Log.d(TAG, mProfiles[i].toString() + " = " + mCheckedItems[i]);
 
             if (mCheckedItems[i]) {
