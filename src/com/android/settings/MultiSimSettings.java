@@ -78,6 +78,10 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         mSms.setOnPreferenceChangeListener(this);
         mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
         mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
+        if (isAirplaneModeOn()) {
+            Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
+            mConfigSub.setEnabled(false);
+        }
     }
 
     @Override
@@ -90,6 +94,11 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    private boolean isAirplaneModeOn() {
+        return Settings.System.getInt(getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) != 0;
     }
 
     private void updateState() {
