@@ -181,7 +181,12 @@ public class ConnectSpecificProfilesActivity extends PreferenceActivity
     private void onProfileCheckedStateChanged(Profile profile, boolean checked) {
         LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
                 .getProfileManager(mManager, profile);
-        profileManager.setPreferred(mCachedDevice.getDevice(), checked);
+        if (profileManager != null) {
+            profileManager.setPreferred(mCachedDevice.getDevice(), checked);
+        } else {
+            Log.e(TAG, "Unexpected eror! profileManager is null");
+            return;
+        }
         if (mOnlineMode) {
             if (checked) {
                 mCachedDevice.connect(profile);
