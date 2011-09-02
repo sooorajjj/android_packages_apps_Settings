@@ -250,7 +250,7 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             if (isConnectableProfile(profile)) {
                 LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
                         .getProfileManager(mLocalManager, profile);
-                if (profileManager.isPreferred(mDevice)) {
+                if (profileManager != null && profileManager.isPreferred(mDevice)) {
                     ++preferredProfiles;
                     disconnectConnected(this, profile);
                     connectInt(this, profile);
@@ -274,7 +274,9 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             if (isConnectableProfile(profile)) {
                 LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
                         .getProfileManager(mLocalManager, profile);
-                profileManager.setPreferred(mDevice, false);
+                if (profileManager != null) {
+                    profileManager.setPreferred(mDevice, false);
+                }
                 disconnectConnected(this, profile);
                 connectInt(this, profile);
             }
@@ -309,15 +311,19 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
 
         LocalBluetoothProfileManager profileManager =
                 LocalBluetoothProfileManager.getProfileManager(mLocalManager, profile);
-        int status = profileManager.getConnectionStatus(cachedDevice.mDevice);
-        if (profileManager.connect(cachedDevice.mDevice)) {
-            if (D) {
-                Log.d(TAG, "Command sent successfully:CONNECT " + describe(profile));
+        if (profileManager != null) {
+            int status = profileManager.getConnectionStatus(cachedDevice.mDevice);
+            if (profileManager.connect(cachedDevice.mDevice)) {
+                if (D) {
+                    Log.d(TAG, "Command sent successfully:CONNECT " + describe(profile));
+                }
+                return true;
+            } else {
+                Log.i(TAG, "Failed to connect " + profile.toString() + " to " + cachedDevice.mName);
+                return false;
             }
-            return true;
         }
-        Log.i(TAG, "Failed to connect " + profile.toString() + " to " + cachedDevice.mName);
-
+        Log.e(TAG, "Unexpected error! profileManager is null");
         return false;
     }
 
