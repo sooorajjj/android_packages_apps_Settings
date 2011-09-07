@@ -180,7 +180,7 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
         int status = profileManager.getConnectionStatus(cachedDevice.mDevice);
         if (profileManager.disconnect(cachedDevice.mDevice)) {
             if (D) {
-                Log.d(TAG, "Command sent successfully:DISCONNECT " + describe(profile));
+                Log.d(TAG, "Command sent successfully:DISCONNECT " + describe(cachedDevice, profile));
             }
             return true;
         }
@@ -315,7 +315,7 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             int status = profileManager.getConnectionStatus(cachedDevice.mDevice);
             if (profileManager.connect(cachedDevice.mDevice)) {
                 if (D) {
-                    Log.d(TAG, "Command sent successfully:CONNECT " + describe(profile));
+                    Log.d(TAG, "Command sent successfully:CONNECT " + describe(cachedDevice, profile));
                 }
                 return true;
             } else {
