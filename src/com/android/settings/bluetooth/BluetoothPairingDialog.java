@@ -153,7 +153,12 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
     private View createView() {
         View view = getLayoutInflater().inflate(R.layout.bluetooth_pin_entry, null);
 
-        String name = mLocalManager.getCachedDeviceManager().getName(mDevice);
+        String name = null;
+        if (mLocalManager != null) {
+            name = mLocalManager.getCachedDeviceManager().getName(mDevice);
+        } else {
+            Log.e(TAG, "Unexpected error ! mLocalManager is NULL");
+        }
         TextView messageView = (TextView) view.findViewById(R.id.message);
         mPairingView = (EditText) view.findViewById(R.id.text);
         mPairingView.addTextChangedListener(this);
