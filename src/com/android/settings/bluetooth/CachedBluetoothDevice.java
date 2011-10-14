@@ -312,6 +312,17 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
     private boolean connectInt(CachedBluetoothDevice cachedDevice, Profile profile) {
         if (!cachedDevice.ensurePaired()) return false;
 
+        int state = getBondState();
+
+        if (state == BluetoothDevice.BOND_BONDED) {
+
+                BluetoothAdapter adapter = mLocalManager.getBluetoothAdapter();
+                // connecting is unreliable while scanning, so cancel discovery
+                if (adapter.isDiscovering()) {
+                       adapter.cancelDiscovery();
+                }
+        }
+
         LocalBluetoothProfileManager profileManager =
                 LocalBluetoothProfileManager.getProfileManager(mLocalManager, profile);
         if (profileManager != null) {
