@@ -92,12 +92,23 @@ public class MSimStatus extends PreferenceActivity {
         // Note - missing in zaku build, be careful later...
         mSigStrength = findPreference("signal_strength");
 
+        if ((SystemProperties.getBoolean("ro.config.multimode_cdma", false))
+                || (mPhone.getPhoneName().equals("CDMA"))) {
+            setSummaryText("prl_version", mPhone.getCdmaPrlVersion());
+        } else {
+            // device is not CDMA, do not display CDMA features
+            // check Null in case no specified preference in overlay xml
+            removablePref = findPreference("prl_version");
+            if (removablePref != null) {
+                getPreferenceScreen().removePreference(removablePref);
+            }
+        }
+
         //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
         if (mPhone.getPhoneName().equals("CDMA")) {
             setSummaryText("esn_number", mPhone.getEsn());
             setSummaryText("meid_number", mPhone.getMeid());
             setSummaryText("min_number", mPhone.getCdmaMin());
-            setSummaryText("prl_version", mPhone.getCdmaPrlVersion());
 
             // device is not GSM/UMTS, do not display GSM/UMTS features
             // check Null in case no specified preference in overlay xml
@@ -114,12 +125,6 @@ public class MSimStatus extends PreferenceActivity {
 
             setSummaryText("imei_sv", mTelephonyManager.getDeviceSoftwareVersion(mSub));
 
-            // device is not CDMA, do not display CDMA features
-            // check Null in case no specified preference in overlay xml
-            removablePref = findPreference("prl_version");
-            if (removablePref != null) {
-                getPreferenceScreen().removePreference(removablePref);
-            }
             removablePref = findPreference("esn_number");
             if (removablePref != null) {
                 getPreferenceScreen().removePreference(removablePref);

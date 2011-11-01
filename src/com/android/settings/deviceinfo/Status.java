@@ -155,9 +155,14 @@ public class Status extends PreferenceActivity {
         if (mResId < mResources.length) {
             addPreferencesFromResource(mResources[mResId]);
         }
-        
+
         phone = PhoneFactory.getDefaultPhone();
-        
+
+        if ((SystemProperties.getBoolean("ro.config.multimode_cdma", false))
+                || (phone.getPhoneName().equals("CDMA"))) {
+            setSummaryText("prl_version", phone.getCdmaPrlVersion());
+        }
+
         //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
 
         if (phone.getPhoneName().equals("CDMA")) {
@@ -166,7 +171,6 @@ public class Status extends PreferenceActivity {
             if (getResources().getBoolean(R.bool.config_msid_enable)) {
                 findPreference("min_number").setTitle(R.string.status_msid_number);
             }
-            setSummaryText("prl_version", phone.getCdmaPrlVersion());
 
             // device is not GSM/UMTS, do not display GSM/UMTS features
             // check Null in case no specified preference in overlay xml
