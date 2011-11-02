@@ -75,7 +75,7 @@ public class SettingsBtStatus {
         case BluetoothDevice.BOND_NONE:
             return R.string.bluetooth_not_connected;
         default:
-            return 0;
+            return R.string.bluetooth_not_connected;
         }
     }
 }
