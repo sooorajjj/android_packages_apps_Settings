@@ -159,6 +159,7 @@ public class Status extends PreferenceActivity {
         phone = PhoneFactory.getDefaultPhone();
         
         //NOTE "imei" is the "Device ID" since it represents the IMEI in GSM and the MEID in CDMA
+
         if (phone.getPhoneName().equals("CDMA")) {
             setSummaryText("meid_number", phone.getMeid());
             setSummaryText("min_number", phone.getCdmaMin());
