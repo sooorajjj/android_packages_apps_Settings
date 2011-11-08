@@ -31,6 +31,7 @@ import android.preference.Preference;
 import android.preference.CheckBoxPreference;
 import android.provider.Settings;
 import android.util.Log;
+import android.os.SystemProperties;
 
 /**
  * BluetoothDiscoverableEnabler is a helper to manage the "Discoverable"
@@ -48,7 +49,7 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
     static final int DISCOVERABLE_TIMEOUT_ONE_HOUR = 3600;
     static final int DISCOVERABLE_TIMEOUT_NEVER = 0;
 
-    static final String SHARED_PREFERENCES_KEY_DISCOVERABLE_END_TIMESTAMP =
+    public static final String SHARED_PREFERENCES_KEY_DISCOVERABLE_END_TIMESTAMP =
         "discoverable_end_timestamp";
 
     private static final String VALUE_DISCOVERABLE_TIMEOUT_TWO_MINUTES = "twomin";
@@ -57,6 +58,9 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
     private static final String VALUE_DISCOVERABLE_TIMEOUT_NEVER = "never";
 
     static final int DEFAULT_DISCOVERABLE_TIMEOUT = DISCOVERABLE_TIMEOUT_TWO_MINUTES;
+
+    /* Variables to synchronize UI timer updates for discoverability period. */
+    private static boolean mWasDiscoverable = false;
 
     private final Context mContext;
     private final Handler mUiHandler;
@@ -72,7 +76,24 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
                 int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE,
                         BluetoothAdapter.ERROR);
                 if (mode != BluetoothAdapter.ERROR) {
+                    Log.v(TAG, "onReceive called for scan mode change");
                     handleModeChanged(mode);
+                }
+            }
+            else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR);
+                if (state == BluetoothAdapter.STATE_OFF) {
+                    if (isDiscoverable()) {
+                        Log.v(TAG, "onReceive called for bt off: " +
+                            SystemProperties.get("bluetooth.prev.discoverable"));
+                        SystemProperties.set("bluetooth.prev.discoverable","true");
+                    } else {
+                        Log.v(TAG, "onReceive called for bt off: " +
+                            SystemProperties.get("bluetooth.prev.discoverable"));
+                        SystemProperties.set("bluetooth.prev.discoverable","false");
+                    }
+
                 }
             }
         }
@@ -108,10 +129,25 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
         }
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         mContext.registerReceiver(mReceiver, filter);
         mCheckBoxPreference.setOnPreferenceChangeListener(this);
         mTimeoutListPreference.setOnPreferenceChangeListener(this);
-        handleModeChanged(mLocalManager.getBluetoothAdapter().getScanMode());
+        if ("true".equals(SystemProperties.get("bluetooth.prev.discoverable"))) {
+            mWasDiscoverable = true;
+        }
+        Log.v(TAG, "resume called: previous discoverable state: " + mWasDiscoverable);
+        Log.v(TAG, "resume called: bluetooth.onboot.discov: " +
+              SystemProperties.get("bluetooth.onboot.discov"));
+        if ("true".equals(SystemProperties.get("bluetooth.onboot.discov"))) {
+            Log.v(TAG, "resume called: reset system property and make connectable only");
+            /* Reset the property and make the device connectable only for BT on at
+             * boot irrespective of previous scan state */
+            SystemProperties.set("bluetooth.onboot.discov","false");
+            setEnabled(false);
+        } else {
+            handleModeChanged(mLocalManager.getBluetoothAdapter().getScanMode());
+        }
     }
 
     public void pause() {
@@ -149,7 +185,7 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
                         mContext.getResources().getString(R.string.bluetooth_is_discoverable,
                                                           timeout));
 
-                long endTimestamp = System.currentTimeMillis() + timeout * 1000;
+                long endTimestamp = System.currentTimeMillis() + timeout * 1000L;
                 persistDiscoverableEndTimestamp(endTimestamp);
                 updateCountdownSummary();
             }
@@ -206,10 +242,56 @@ public class BluetoothDiscoverableEnabler implements Preference.OnPreferenceChan
     private void handleModeChanged(int mode) {
         if (mode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             mCheckBoxPreference.setChecked(true);
+            int timeout = getDiscoverableTimeout();
+            Log.v(TAG, "handleModeChanged called: previous discoverable state: " + mWasDiscoverable
+                       + ", " + SystemProperties.get("bluetooth.prev.discoverable"));
+            Log.v(TAG, "handleModeChanged called: Discoverable Timeout: " + timeout +
+                       " seconds, previous discoverable state: " + (mWasDiscoverable ||
+                       "true".equals(SystemProperties.get("bluetooth.prev.discoverable"))));
+            if (timeout > 0 && (mWasDiscoverable ||
+                              "true".equals(SystemProperties.get("bluetooth.prev.discoverable")))) {
+                /* If discoverable period was earlier cancelled by BT being turned off,
+                 * either from BluetoothSettings or WirelessSettings view then
+                 * local BT is made discoverable with previously selected discoverable
+                 * period in successive BT on iterations from either of these views */
+                mWasDiscoverable = false;
+                SystemProperties.set("bluetooth.prev.discoverable","false");
+                long endTimestamp = System.currentTimeMillis() + timeout * 1000;
+                persistDiscoverableEndTimestamp(endTimestamp);
+            }
             updateCountdownSummary();
         } else {
             mCheckBoxPreference.setChecked(false);
+            Log.v(TAG, "handleModeChanged called: previous discoverable state: " + mWasDiscoverable
+                       + ", " + SystemProperties.get("bluetooth.prev.discoverable"));
+            Log.v(TAG, "handleModeChanged called: Bluetooth State: " +
+                        mLocalManager.getBluetoothAdapter().getState());
+            if (mLocalManager.getBluetoothAdapter().getState() != BluetoothAdapter.STATE_OFF) {
+                /* After BT discoverable period has completely elapsed then reset the
+                 * variables used to restart the discoverable period if cancelled
+                 * because of BT off operation */
+                mWasDiscoverable = false;
+                SystemProperties.set("bluetooth.prev.discoverable","false");
+                SystemProperties.set("bluetooth.onboot.discov","false");
+            }
         }
+    }
+
+    private boolean isDiscoverable() {
+        long currentTimestamp = System.currentTimeMillis();
+        long endTimestamp = mLocalManager.getSharedPreferences().getLong(
+                SHARED_PREFERENCES_KEY_DISCOVERABLE_END_TIMESTAMP, 0);
+
+        Log.v(TAG, "isDiscoverable: currentTimestamp: " + currentTimestamp
+                    + ", endTimestamp: " + endTimestamp);
+        if (currentTimestamp >= endTimestamp) {
+            Log.v(TAG, "isDiscoverable: Not discoverable");
+            return false;
+        } else {
+            Log.v(TAG, "isDiscoverable: Discoverable");
+            return true;
+        }
+
     }
 
     private void updateCountdownSummary() {

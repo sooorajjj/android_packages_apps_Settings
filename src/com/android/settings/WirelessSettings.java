@@ -17,9 +17,12 @@
 
 package com.android.settings;
 
+import com.android.settings.bluetooth.LocalBluetoothManager;
+import com.android.settings.bluetooth.BluetoothDiscoverableEnabler;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
@@ -36,8 +39,11 @@ import com.android.internal.telephony.TelephonyProperties;
 import com.android.settings.bluetooth.BluetoothEnabler;
 import com.android.settings.wifi.WifiEnabler;
 import com.android.settings.nfc.NfcEnabler;
+import android.content.BroadcastReceiver;
+import android.util.Log;
 
 public class WirelessSettings extends PreferenceActivity {
+    private static final String TAG = "WirelessSettings";
 
     private static final String KEY_TOGGLE_AIRPLANE = "toggle_airplane";
     private static final String KEY_TOGGLE_BLUETOOTH = "toggle_bluetooth";
@@ -172,6 +178,8 @@ public class WirelessSettings extends PreferenceActivity {
                 }
             }
         }
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
@@ -195,6 +203,14 @@ public class WirelessSettings extends PreferenceActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.v(TAG, "Releasing the Intent receiver");
+        unregisterReceiver(mReceiver);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EXIT_ECM) {
             Boolean isChoiceYes = data.getBooleanExtra(EXIT_ECM_RESULT, false);
@@ -203,4 +219,44 @@ public class WirelessSettings extends PreferenceActivity {
                     mAirplaneModePreference.isChecked());
         }
     }
+
+
+    private boolean isDiscoverable() {
+        LocalBluetoothManager LocalManager = LocalBluetoothManager.getInstance(this);
+
+        if (LocalManager != null) {
+          long currentTimestamp = System.currentTimeMillis();
+          long endTimestamp = LocalManager.getSharedPreferences().getLong(
+                 BluetoothDiscoverableEnabler.SHARED_PREFERENCES_KEY_DISCOVERABLE_END_TIMESTAMP, 0);
+          Log.v(TAG, "isDiscoverable: currentTimestamp: " + currentTimestamp
+                    + ", endTimestamp: " + endTimestamp);
+          if (currentTimestamp >= endTimestamp) {
+              Log.v(TAG, "isDiscoverable: Not discoverable");
+              return false;
+          } else {
+              Log.v(TAG, "isDiscoverable: Discoverable");
+              return true;
+          }
+        }
+        Log.v(TAG, "isDiscoverable: LocalBluetoothManager is null");
+        return false;
+    }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR);
+                if (state == BluetoothAdapter.STATE_OFF) {
+                    if (isDiscoverable()) {
+                        SystemProperties.set("bluetooth.prev.discoverable","true");
+                    } else {
+                        SystemProperties.set("bluetooth.prev.discoverable","false");
+                    }
+                }
+            }
+        }
+    };
+
 }
