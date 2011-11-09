@@ -241,6 +241,12 @@ public class BluetoothPairingDialog extends AlertActivity implements DialogInter
         unregisterReceiver(mReceiver);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        onCancel();
+    }
+
     public void afterTextChanged(Editable s) {
         if (s.length() > 0 && !mIsSecurityHigh) {
             mOkButton.setEnabled(true);
