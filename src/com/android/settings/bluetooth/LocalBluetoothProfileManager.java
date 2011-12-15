@@ -21,11 +21,11 @@ import com.android.settings.R;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
+import android.bluetooth.BluetoothHid;
 import android.bluetooth.BluetoothUuid;
 import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +54,12 @@ public abstract class LocalBluetoothProfileManager {
     /* package */ static final ParcelUuid[] OPP_PROFILE_UUIDS = new ParcelUuid[] {
         BluetoothUuid.ObexObjectPush
     };
+
+    /* TI HID port - start */
+    /* package */ static final ParcelUuid[] HID_PROFILE_UUIDS = new ParcelUuid[] {
+        BluetoothUuid.HID
+    };
+    /* TI HID port - end */
 
     /**
      * An interface for notifying BluetoothHeadset IPC clients when they have
@@ -97,6 +103,10 @@ public abstract class LocalBluetoothProfileManager {
 
                 profileManager = new OppProfileManager(localManager);
                 sProfileMap.put(Profile.OPP, profileManager);
+                /* TI HID port - start */
+                profileManager = new HidProfileManager(localManager);
+                sProfileMap.put(Profile.HID, profileManager);
+                /* TI HID port - end */
             }
         }
     }
@@ -161,6 +171,11 @@ public abstract class LocalBluetoothProfileManager {
         if (BluetoothUuid.containsAnyUuid(uuids, OPP_PROFILE_UUIDS)) {
             profiles.add(Profile.OPP);
         }
+        /* TI HID port - start */
+        if (BluetoothUuid.containsAnyUuid(uuids, HID_PROFILE_UUIDS)) {
+            profiles.add(Profile.HID);
+        }
+        /* TI HID port - end */
     }
 
     protected LocalBluetoothProfileManager(LocalBluetoothManager localManager) {
@@ -195,7 +210,9 @@ public abstract class LocalBluetoothProfileManager {
     public enum Profile {
         HEADSET(R.string.bluetooth_profile_headset),
         A2DP(R.string.bluetooth_profile_a2dp),
-        OPP(R.string.bluetooth_profile_opp);
+        OPP(R.string.bluetooth_profile_opp),
+        HID(R.string.bluetooth_profile_hid); /* TI HID port - added HID support here */
+
 
         public final int localizedString;
 
@@ -565,4 +582,88 @@ public abstract class LocalBluetoothProfileManager {
             }
         }
     }
+    /* TI HID port - start */
+    /**
+     * HidProfileManager is an abstraction for the {@link BluetoothHid} service.
+     */
+    private static class HidProfileManager extends LocalBluetoothProfileManager {
+        private BluetoothHid mService;
+        public HidProfileManager(LocalBluetoothManager localManager) {
+                super(localManager);
+                mService = new BluetoothHid(localManager.getContext());
+        }
+
+        @Override
+        public boolean connect(BluetoothDevice device) {
+            Set<BluetoothDevice> inputs = mService.getConnectedInputs();
+            if (inputs != null) {
+                for (BluetoothDevice input : inputs) {
+                    mService.disconnectInput(input);
+                }
+            }
+            return mService.connectInput(device);
+        }
+
+        @Override
+        public boolean disconnect(BluetoothDevice device) {
+            return mService.disconnectInput(device);
+        }
+
+        @Override
+        public int getConnectionStatus(BluetoothDevice device) {
+            return convertState(mService.getInputState(device));
+        }
+
+        @Override
+        public int getSummary(BluetoothDevice device) {
+            int connectionStatus = getConnectionStatus(device);
+
+            if (SettingsBtStatus.isConnectionStatusConnected(connectionStatus)) {
+                return R.string.bluetooth_hid_profile_summary_connected;
+            } else {
+                return SettingsBtStatus.getConnectionStatusSummary(connectionStatus);
+            }
+        }
+
+        @Override
+        public boolean isPreferred(BluetoothDevice device) {
+            return true;
+        }
+
+        @Override
+        public void setPreferred(BluetoothDevice device, boolean preferred) {
+
+        }
+
+         @Override
+        public boolean isProfileReady() {
+            return true;
+        }
+        @Override
+        public int convertState(int hidState) {
+            switch (hidState) {
+            case BluetoothHid.STATE_CONNECTED:
+                return SettingsBtStatus.CONNECTION_STATUS_CONNECTED;
+            case BluetoothHid.STATE_CONNECTING:
+                return SettingsBtStatus.CONNECTION_STATUS_CONNECTING;
+            case BluetoothHid.STATE_DISCONNECTED:
+                return SettingsBtStatus.CONNECTION_STATUS_DISCONNECTED;
+            case BluetoothHid.STATE_DISCONNECTING:
+                return SettingsBtStatus.CONNECTION_STATUS_DISCONNECTING;
+            default:
+                return SettingsBtStatus.CONNECTION_STATUS_UNKNOWN;
+            }
+        }
+
+        @Override
+        public int getPreferred(BluetoothDevice device) {
+            return -1;
+        }
+
+        @Override
+        public Set<BluetoothDevice> getConnectedDevices() {
+            return null;
+        }
+    }
+    /* TI HID port - end */
 }

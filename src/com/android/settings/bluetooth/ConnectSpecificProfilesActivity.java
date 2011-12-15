@@ -299,6 +299,10 @@ public class ConnectSpecificProfilesActivity extends PreferenceActivity
                 return R.string.bluetooth_a2dp_profile_summary_use_for;
             case HEADSET:
                 return R.string.bluetooth_headset_profile_summary_use_for;
+            /* TI HID port - start */
+            case HID:
+               return R.string.bluetooth_hid_profile_summary_use_for;
+            /* TI HID port - end */
             default:
                 return 0;
         }

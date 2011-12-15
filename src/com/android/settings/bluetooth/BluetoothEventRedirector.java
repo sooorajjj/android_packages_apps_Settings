@@ -24,6 +24,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
+import android.bluetooth.BluetoothHid;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -119,6 +120,17 @@ public class BluetoothEventRedirector {
                 mManager.getCachedDeviceManager().onProfileStateChanged(device,
                         Profile.A2DP, newState);
 
+            } else if (action.equals(BluetoothHid.ACTION_INPUT_STATE_CHANGED)){
+                int newState = intent.getIntExtra(BluetoothHid.EXTRA_INPUT_STATE, 0);
+                int oldState = intent.getIntExtra(BluetoothHid.EXTRA_PREVIOUS_INPUT_STATE, 0);
+                if (newState == BluetoothHid.STATE_DISCONNECTED &&
+                        oldState == BluetoothHid.STATE_CONNECTING) {
+                    Log.i(TAG, "Failed to connect BT HID");
+                }
+                Log.d(TAG, "HID profile ProfileStateChanged");
+                mManager.getCachedDeviceManager().onProfileStateChanged(device,
+                        Profile.HID, newState);
+
             } else if (action.equals(BluetoothDevice.ACTION_CLASS_CHANGED)) {
                 mManager.getCachedDeviceManager().onBtClassChanged(device);
 
@@ -168,6 +180,7 @@ public class BluetoothEventRedirector {
         filter.addAction(BluetoothHeadset.ACTION_STATE_CHANGED);
         filter.addAction(BluetoothDevice.ACTION_CLASS_CHANGED);
         filter.addAction(BluetoothDevice.ACTION_UUID);
+        filter.addAction(BluetoothHid.ACTION_INPUT_STATE_CHANGED);
 
         // Dock event broadcasts
         filter.addAction(Intent.ACTION_DOCK_EVENT);

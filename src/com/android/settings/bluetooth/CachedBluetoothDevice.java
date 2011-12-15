@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
 /**
  * CachedBluetoothDevice represents a remote Bluetooth device. It contains
  * attributes of the device (such as the address, name, RSSI, etc.) and
@@ -485,6 +486,8 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
                 return R.drawable.ic_bt_headphones_a2dp;
             } else if (mProfiles.contains(Profile.HEADSET)) {
                 return R.drawable.ic_bt_headset_hfp;
+            } else if (mProfiles.contains(Profile.HID)) {
+                return R.drawable.ic_bt_hidp;
             }
         } else if (mBtClass != null) {
             if (mBtClass.doesClassMatch(BluetoothClass.PROFILE_A2DP)) {
@@ -494,6 +497,10 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             if (mBtClass.doesClassMatch(BluetoothClass.PROFILE_HEADSET)) {
                 return R.drawable.ic_bt_headset_hfp;
             }
+            if (mBtClass.doesClassMatch(BluetoothClass.PROFILE_HID)) {
+                return R.drawable.ic_bt_hidp;
+            }
+
         }
         return 0;
     }
@@ -535,6 +542,14 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
                     Log.v(TAG, "opp classbits != uuid");
                     printUuids = true;
                 }
+                /* TI HID port - start */
+                if (bluetoothClass.doesClassMatch(BluetoothClass.PROFILE_HID) !=
+                   mProfiles.contains(Profile.HID)) {
+                   Log.v(TAG, "HID classbits != uuid");
+                   printUuids = true;
+                }
+                /* TI HID port - end */
+
             }
 
             if (printUuids) {
@@ -634,7 +649,7 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
      * @return A one-off summary that is applicable for the current state, or 0.
      */
     private int getOneOffSummary() {
-        boolean isA2dpConnected = false, isHeadsetConnected = false, isConnecting = false;
+        boolean isA2dpConnected = false, isHeadsetConnected = false, isConnecting = false, isHidConnected = false;
 
         if (mProfiles.contains(Profile.A2DP)) {
             LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
@@ -651,6 +666,15 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
                     SettingsBtStatus.CONNECTION_STATUS_CONNECTING;
             isHeadsetConnected = profileManager.isConnected(mDevice);
         }
+        /* TI HID port - start */
+        if (mProfiles.contains(Profile.HID)) {
+            LocalBluetoothProfileManager profileManager = LocalBluetoothProfileManager
+                    .getProfileManager(mLocalManager, Profile.HID);
+            isConnecting |= profileManager.getConnectionStatus(mDevice) ==
+                    SettingsBtStatus.CONNECTION_STATUS_CONNECTING;
+            isHidConnected = profileManager.isConnected(mDevice);
+        }
+       /* TI HID port - end */
 
         if (isConnecting) {
             // If any of these important profiles is connecting, prefer that
@@ -662,7 +686,11 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
             return R.string.bluetooth_summary_connected_to_a2dp;
         } else if (isHeadsetConnected) {
             return R.string.bluetooth_summary_connected_to_headset;
-        } else {
+        }/* TI HID port - start */
+          else if(isHidConnected) {
+            return R.string.bluetooth_summary_connected_to_hid;
+        }/* TI HID port - end */
+          else {
             return 0;
         }
     }
@@ -677,8 +705,9 @@ public class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> 
         return connectableProfiles;
     }
 
+    /* TI HID port - added HID support here */
     private boolean isConnectableProfile(Profile profile) {
-        return profile.equals(Profile.HEADSET) || profile.equals(Profile.A2DP);
+        return profile.equals(Profile.HEADSET) || profile.equals(Profile.A2DP)|| profile.equals(Profile.HID);
     }
 
     public void onCreateContextMenu(ContextMenu menu) {
