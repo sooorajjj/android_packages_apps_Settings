@@ -28,6 +28,8 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.provider.Settings;
 import android.util.Log;
+import android.net.wifi.WifiManager;
+import android.os.SystemProperties;
 
 /**
  * WifiP2pEnabler is a helper to manage the Wifi p2p on/off
@@ -40,6 +42,7 @@ public class WifiP2pEnabler implements Preference.OnPreferenceChangeListener {
     private final IntentFilter mIntentFilter;
     private WifiP2pManager mWifiP2pManager;
     private WifiP2pManager.Channel mChannel;
+    private WifiManager mWifiManager;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -57,6 +60,7 @@ public class WifiP2pEnabler implements Preference.OnPreferenceChangeListener {
         mContext = context;
         mCheckBox = checkBox;
 
+        mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         mWifiP2pManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
         if (mWifiP2pManager != null) {
             mChannel = mWifiP2pManager.initialize(mContext, mContext.getMainLooper(), null);
@@ -92,6 +96,9 @@ public class WifiP2pEnabler implements Preference.OnPreferenceChangeListener {
         mCheckBox.setEnabled(false);
         final boolean enable = (Boolean) value;
         if (enable) {
+            if (mWifiManager != null) {
+                mWifiManager.setWifiEnabled(false);
+            }
             mWifiP2pManager.enableP2p(mChannel);
         } else {
             mWifiP2pManager.disableP2p(mChannel);
