@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5 minūtes"</string>
     <string name="screen_timeout_10m">"10 minūtes"</string>
     <string name="screen_timeout_30m">"30 minūtes"</string>
+    <string name="screen_timeout_never">"Nekad"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Nekad"</item>
     <item msgid="2194151041885903260">"15 sekundes"</item>

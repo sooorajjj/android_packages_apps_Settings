@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5 menit"</string>
     <string name="screen_timeout_10m">"10 menit"</string>
     <string name="screen_timeout_30m">"30 menit"</string>
+    <string name="screen_timeout_never">"Jangan"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Tidak pernah"</item>
     <item msgid="2194151041885903260">"15 detik"</item>

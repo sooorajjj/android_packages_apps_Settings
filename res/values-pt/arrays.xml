@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5 minutos"</string>
     <string name="screen_timeout_10m">"10 minutos"</string>
     <string name="screen_timeout_30m">"30 minutos"</string>
+    <string name="screen_timeout_never">"Nunca"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Nunca"</item>
     <item msgid="2194151041885903260">"15 segundos"</item>

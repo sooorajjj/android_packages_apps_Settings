@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"amaminithii angu-5"</string>
     <string name="screen_timeout_10m">"10 amaminithi"</string>
     <string name="screen_timeout_30m">"30 amaminithi"</string>
+    <string name="screen_timeout_never">"Akusoze"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Akusoze"</item>
     <item msgid="2194151041885903260">"15 amasekhondi"</item>

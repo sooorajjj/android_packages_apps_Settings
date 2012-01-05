@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5分"</string>
     <string name="screen_timeout_10m">"10分"</string>
     <string name="screen_timeout_30m">"30分"</string>
+    <string name="screen_timeout_never">"保存しない"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"起動しない"</item>
     <item msgid="2194151041885903260">"15秒"</item>
