@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5 хвилин"</string>
     <string name="screen_timeout_10m">"10 хвилин"</string>
     <string name="screen_timeout_30m">"30 хвилин"</string>
+    <string name="screen_timeout_never">"Ніколи"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Ніколи"</item>
     <item msgid="2194151041885903260">"15 секунд"</item>

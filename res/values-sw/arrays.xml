@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"Dakika 5"</string>
     <string name="screen_timeout_10m">"Dakika 10"</string>
     <string name="screen_timeout_30m">"Dakika 30"</string>
+    <string name="screen_timeout_never">"Katu"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Katu"</item>
     <item msgid="2194151041885903260">"Sekunde 15"</item>

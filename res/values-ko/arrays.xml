@@ -36,6 +36,7 @@
     <string name="screen_timeout_5m">"5분"</string>
     <string name="screen_timeout_10m">"10분"</string>
     <string name="screen_timeout_30m">"30분"</string>
+    <string name="screen_timeout_never">"안함"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"사용 안함"</item>
     <item msgid="2194151041885903260">"15초"</item>
