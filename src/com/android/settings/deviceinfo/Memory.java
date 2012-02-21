@@ -1,18 +1,31 @@
-/*
- * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/** Copyright (C) 2008 The Android Open Source Project
+     Copyright (c) 2012, Code Aurora Forum. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+    * Neither the name of Code Aurora Forum, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 package com.android.settings.deviceinfo;
 
@@ -33,8 +46,10 @@ import android.os.storage.IMountService;
 import android.os.storage.StorageEventListener;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.Menu;
@@ -48,6 +63,7 @@ import com.android.settings.Utils;
 
 public class Memory extends SettingsPreferenceFragment {
     private static final String TAG = "MemorySettings";
+    private static final String STORAGE_MGR_KEY = "storage_mgr";
 
     private static final int DLG_CONFIRM_UNMOUNT = 1;
     private static final int DLG_ERROR_UNMOUNT = 2;
@@ -67,6 +83,9 @@ public class Memory extends SettingsPreferenceFragment {
 
     private StorageVolumePreferenceCategory mInternalStorageVolumePreferenceCategory;
     private StorageVolumePreferenceCategory[] mStorageVolumePreferenceCategories;
+
+    private String internalStr;
+    private String externalStr;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -109,6 +128,23 @@ public class Memory extends SettingsPreferenceFragment {
         // mass storage is enabled if primary volume supports it
         final StorageVolume[] storageVolumes = mStorageManager.getVolumeList();
         return (storageVolumes.length > 0 && storageVolumes[0].allowMassStorage());
+        // only show options menu if we are not using the legacy USB mass storage support
+        setHasOptionsMenu(!massStorageEnabled);
+
+        //add internal storage
+        Utils.updatePreferenceToSpecificActivityOrRemove(getActivity(), (PreferenceGroup)getPreferenceScreen(),
+                STORAGE_MGR_KEY,
+                Utils.UPDATE_PREFERENCE_FLAG_SET_TITLE_TO_MATCHING_ACTIVITY);
+        internalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.internal_sd));
+        externalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.external_sd));
+
+    }
+
+    private void updateSDMountStatus(){
+        Preference strageManager = findPreference(STORAGE_MGR_KEY);
+        if(strageManager != null){
+            strageManager.setSummary("1".equals(SystemProperties.get("persist.sys.emmcsdcard.enabled")) ? internalStr:externalStr);
+        }
     }
 
     @Override
@@ -125,6 +161,8 @@ public class Memory extends SettingsPreferenceFragment {
         for (int i = 0; i < mStorageVolumePreferenceCategories.length; i++) {
             mStorageVolumePreferenceCategories[i].onResume();
         }
+
+        updateSDMountStatus();
     }
 
     StorageEventListener mStorageListener = new StorageEventListener() {
