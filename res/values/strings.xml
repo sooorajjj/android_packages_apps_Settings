@@ -4261,4 +4261,9 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
+<!-- for internal storage -->
+   <string name="summary_storage_manage">SD card device: %1$s</string>
+    <string name="external_sd">External SD</string>
+    <string name="internal_sd">Internal SD</string>
+	
 </resources>
