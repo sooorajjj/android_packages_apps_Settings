@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (c) 2012, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,6 +196,10 @@ public class StorageMeasurement {
         bundle.putLong(AVAIL_SIZE, mAvailSize);
         bundle.putLong(APPS_USED, mAppsSize);
         bundle.putLong(DOWNLOADS_SIZE, mDownloadsSize);
+        //Add the other storage capacity information into other category
+        if(mIsInternal) {
+            mMiscSize = mMiscSize + mTotalSize - mAvailSize - mAppsSize - mDownloadsSize;
+        }
         bundle.putLong(MISC_SIZE, mMiscSize);
         bundle.putLongArray(MEDIA_SIZES, mMediaSizes);
 
