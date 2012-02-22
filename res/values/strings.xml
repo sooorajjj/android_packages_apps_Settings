@@ -375,6 +375,8 @@
 
     <!-- HTTP proxy settings title -->
     <string name="proxy_settings_title">Proxy settings</string>
+    <!-- HTTP Ethernet proxy settings title -->
+    <string name="ethernet_proxy_settings_title">Ethernet proxy settings</string>
     <!-- HTTP proxy settings. Button to clear the proxy box. -->
     <string name="proxy_clear_text">Clear</string>
     <!-- HTTP proxy settings. The port number label. -->
