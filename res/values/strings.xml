@@ -1237,6 +1237,24 @@ alog [CHAR LIMIT=none] -->
     <string name="nsd_quick_toggle_title">Network service discovery</string>
     <!-- Description of NFC in the 1st level settings screen. [CHAR LIMIT=NONE] -->
     <string name="nsd_quick_toggle_summary">Allow apps on other devices to discover apps on this device</string>
+    <!-- Ethernet configuration dialog -->
+    <string name="eth_config_title">Configure Ethernet device</string>
+    <string name="eth_setting">Ethernet setting</string>
+    <string name="eth_dev_list">Ethernet Devices:</string>
+    <string name="eth_con_type">Connection Type</string>
+    <string name="eth_con_type_dhcp">DHCP</string>
+    <string name="eth_con_type_manual">Static IP</string>
+    <string name="eth_dns">DNS address</string>
+    <string name="eth_gw">Gateway address</string>
+    <string name="eth_ipaddr">IP address</string>
+    <string name="eth_quick_toggle_title">Ethernet</string>
+    <string name="eth_quick_toggle_summary">Turn on Ethernet</string>
+    <string name="eth_radio_ctrl_title">Ethernet configuration</string>
+    <string name="eth_conf_perf_title">Ethernet configuration</string>
+    <string name="eth_conf_summary">Configure Ethernet devices</string>
+    <string name="eth_mask">Netmask</string>
+    <string name="eth_toggle_summary_off">Turn off Ethernet</string>
+    <string name="eth_toggle_summary_on">Turn on Ethernet</string>
 
     <!-- Wi-Fi Settings --> <skip />
     <!-- Used in the 1st-level settings screen to turn on Wi-Fi -->
