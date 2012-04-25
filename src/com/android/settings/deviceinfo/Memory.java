@@ -36,6 +36,7 @@ import android.os.storage.StorageVolume;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -107,7 +108,7 @@ public class Memory extends SettingsPreferenceFragment {
         }
 
         // only show options menu if we are not using the legacy USB mass storage support
-        setHasOptionsMenu(!massStorageEnabled);
+        setHasOptionsMenu(true);
     }
 
     @Override
