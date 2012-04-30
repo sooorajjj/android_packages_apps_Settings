@@ -23,6 +23,7 @@ import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothInputDevice;
 import android.bluetooth.BluetoothPan;
 import android.bluetooth.BluetoothSap;
+import android.bluetooth.BluetoothDUN;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothUuid;
 import android.content.Context;
@@ -80,6 +81,7 @@ final class LocalBluetoothProfileManager {
     private OppProfile mOppProfile;
     private final PanProfile mPanProfile;
     private SapProfile mSapProfile;
+    private DUNProfile mDUNProfile;
 
     /**
      * Mapping from profile name, e.g. "HEADSET" to profile object.
@@ -120,6 +122,9 @@ final class LocalBluetoothProfileManager {
         mSapProfile = new SapProfile();
         addSapProfile(mSapProfile, SapProfile.NAME,
                 BluetoothDevice.SAP_STATE_CHANGED);
+        mDUNProfile = new DUNProfile();
+        addDUNProfile(mDUNProfile, DUNProfile.NAME,
+                BluetoothDevice.DUN_STATE_CHANGED);
 
 
         Log.d(TAG, "LocalBluetoothProfileManager construction complete");
@@ -199,6 +204,14 @@ final class LocalBluetoothProfileManager {
         Log.d(TAG,"Added handler for SAP state changed Notifications");
     }
 
+    private void addDUNProfile(LocalBluetoothProfile profile,
+            String profileName, String stateChangedAction) {
+        mEventManager.addProfileHandler(stateChangedAction,
+                new DUNStateChangedHandler(profile));
+        mProfileNameMap.put(profileName, profile);
+        Log.d(TAG,"Added handler for DUN state changed Notifications");
+    }
+
     LocalBluetoothProfile getProfileByName(String name) {
         return mProfileNameMap.get(name);
     }
@@ -261,7 +274,30 @@ final class LocalBluetoothProfileManager {
                 Log.w(TAG, "No Cached device!,  shouldn't reach here");
             }
         }
-      }
+    }
+    /* State Change Handler for DUN Profile*/
+    private class DUNStateChangedHandler extends StateChangedHandler {
+
+       DUNStateChangedHandler(LocalBluetoothProfile profile) {
+              super(profile);
+       }
+
+        @Override
+        public void onReceive(Context context, Intent intent, BluetoothDevice device) {
+            DUNProfile dunProfile = (DUNProfile) mProfile;
+            int state =  intent.getIntExtra("state", 0);
+            Log.d(TAG, "DUNStateChanged" + state);
+            CachedBluetoothDevice cachedDevice = mDeviceManager.findDevice(device);
+            if (cachedDevice != null) {
+                cachedDevice.onProfileStateChanged(mProfile, state);
+                cachedDevice.refresh();
+                /*Update the DUN State here*/
+                dunProfile.setConnectionStatus(state);
+            } else {
+                Log.w(TAG, "No Cached device!,  shouldn't reach here");
+            }
+        }
+    }
 
     /** State change handler for NAP and PANU profiles. */
     private class PanStateChangedHandler extends StateChangedHandler {

@@ -337,6 +337,7 @@
     <!-- Activity label of BluetoothPermissionActivity for SAP [CHAR LIMIT=none]-->
     <string name="bluetooth_sap_connection_permission_request">"Sap connection request"</string>
 
+    <string name="bluetooth_dun_connection_permission_request">"Dun connection request"</string>
     <!-- Notification message when a remote Bluetooth device wants to connect to a Bluetooth profile [CHAR LIMIT=none]-->
     <string name="bluetooth_connection_notif_message">"Touch to connect to \u0022<xliff:g id="device_name">%1$s</xliff:g>\u0022."</string>
 
@@ -376,6 +377,12 @@ alog [CHAR LIMIT=none] -->
     <string name="bluetooth_sap_acceptance_dialog_text">%1$s would like to access your SIM. Give access to %2$s?</string>
     <!-- Bluetooth SAP permission Alert Activity checkbox text [CHAR LIMIT=none] -->
     <string name="bluetooth_sap_remember_choice">Don\'t ask again</string>
+
+    <string name="bluetooth_dun_request">"DUN request"</string>
+    <!-- Bluetooth DUN permission Alert Activity text [CHAR LIMIT=none] -->
+    <string name="bluetooth_dun_acceptance_dialog_text">%1$s would like to use DUN. Give access to %2$s?</string>
+    <!-- Bluetooth DUN permission Alert Activity checkbox text [CHAR LIMIT=none] -->
+    <string name="bluetooth_dun_remember_choice">Don\'t ask again</string>
 
     <!-- Date & time settings screen title -->
     <string name="date_and_time">Date &amp; time settings</string>
@@ -1109,7 +1116,8 @@ alog [CHAR LIMIT=none] -->
     <string name="bluetooth_profile_pan_nap">Internet connection sharing</string>
     <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the SAP profile. -->
     <string name="bluetooth_profile_sap">SIM Access</string>
-
+    <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the DUN profile. -->
+    <string name="bluetooth_profile_dun">Dial-up Network Access</string>
     <!-- Bluetooth settings.  Message for disconnecting from the A2DP profile. [CHAR LIMIT=80] -->
     <string name="bluetooth_disconnect_a2dp_profile"><xliff:g id="device_name">%1$s</xliff:g> will be disconnected from media audio.</string>
     <!-- Bluetooth settings.  Message for disconnecting from the headset profile. [CHAR LIMIT=80] -->
@@ -1143,10 +1151,14 @@ alog [CHAR LIMIT=none] -->
     <string name="bluetooth_opp_profile_summary_connected">Connected to file transfer server</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the SAP checkbox preference when SAP is connected. -->
     <string name="bluetooth_sap_profile_summary_connected">Connected to SIM Access Server</string>
+    <!-- Bluetooth settings.  Connection options screen.  The summary for the DUN checkbox preference when DUN is connected. -->
+    <string name="bluetooth_dun_profile_summary_connected">Connected to DUN Server</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the OPP checkbox preference when OPP is not connected. -->
     <string name="bluetooth_opp_profile_summary_not_connected">Not connected to file transfer server</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the SAP checkbox preference when SAP is not connected. -->
     <string name="bluetooth_sap_profile_summary_not_connected">Not connected to SIM Access Server</string>
+    <!-- Bluetooth settings.  Connection options screen.  The summary for the DUN checkbox preference when DUN is not connected. -->
+    <string name="bluetooth_dun_profile_summary_not_connected">Not connected to DUN Server</string>
     <!-- Bluetooth settings. Connection options screen. The summary for the HID checkbox preference when HID is connected. -->
     <string name="bluetooth_hid_profile_summary_connected">Connected to input device</string>
     <!-- Bluetooth settings. Connection options screen. The summary for the checkbox preference when PAN is connected (user role). [CHAR LIMIT=25]-->
@@ -1162,6 +1174,8 @@ alog [CHAR LIMIT=none] -->
     <string name="bluetooth_opp_profile_summary_use_for">Use for file transfer</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the SAP checkbox preference that describes how checking it will set the SAP profile as preferred. -->
     <string name="bluetooth_sap_profile_summary_use_for">Use for SIM Access</string>
+    <!-- Bluetooth settings.  Connection options screen.  The summary for the DUN checkbox preference that describes how checking it will set the DUN profile as preferred. -->
+    <string name="bluetooth_dun_profile_summary_use_for">Use for Dial-up Network Access</string>
     <!-- Bluetooth settings. Connection options screen. The summary
          for the HID checkbox preference that describes how checking it
          will set the HID profile as preferred. -->
@@ -1436,6 +1450,8 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_p2p_menu_create_group">Create group</string>
     <!-- Menu option to remove a group-->
     <string name="wifi_p2p_menu_remove_group">Remove group</string>
+    <!-- Menu option to Wi-Fi p2p advanced settings -->
+    <string name="wifi_p2p_menu_advanced">Advanced</string>
     <!-- Title for available p2p devices -->
     <string name="wifi_p2p_available_devices">Available devices</string>
     <string name="wifi_p2p_on_summary">Turn on wifi direct</string>
