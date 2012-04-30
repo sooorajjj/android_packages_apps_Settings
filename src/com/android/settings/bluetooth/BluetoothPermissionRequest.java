@@ -42,6 +42,7 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
     private static final int NOTIFICATION_ID_ACCESS_FTP = -1000005;
     private static final int NOTIFICATION_ID_ACCESS_MAP = -1000007;
     private static final int NOTIFICATION_ID_ACCESS_SAP = -1000009;
+    private static final int NOTIFICATION_ID_ACCESS_DUN = -1000011;
 
     Context mContext;
     int mRequestType;
@@ -117,6 +118,9 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
                 } else if (mRequestType == BluetoothDevice.REQUEST_TYPE_SIM_ACCESS) {
                    notificationId = NOTIFICATION_ID_ACCESS_SAP;
                    stringId = R.string.bluetooth_sap_connection_permission_request;
+                } else if (mRequestType == BluetoothDevice.REQUEST_TYPE_DUN_ACCESS) {
+                   notificationId = NOTIFICATION_ID_ACCESS_DUN;
+                   stringId = R.string.bluetooth_dun_connection_permission_request;
                 } else {
                   /* Unhandled request */
                   return;
@@ -158,6 +162,8 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
                 notificationId = NOTIFICATION_ID_ACCESS_MAP;
             } else if(clearNotification == BluetoothDevice.REQUEST_TYPE_SIM_ACCESS) {
                 notificationId = NOTIFICATION_ID_ACCESS_SAP;
+            } else if(clearNotification == BluetoothDevice.REQUEST_TYPE_DUN_ACCESS) {
+                notificationId = NOTIFICATION_ID_ACCESS_DUN;
             } else {
               /* Do not clear */
               return;

@@ -64,6 +64,12 @@ public class BluetoothPermissionActivity extends AlertActivity implements
 
     private static final int MSG_INTERNAL_USER_CONFIRM_TIMEOUT = 1;
     private static final int TIME_TO_WAIT = 30000;
+    /* Need it just to distinguish between DUN and SAP, because use the same routines
+       to call here*/
+    private String mUuid = null;
+    private static final String SAP_UUID = "0000112D-0000-1000-8000-00805F9B34FB";
+    private static final String DUN_UUID = "00001103-0000-1000-8000-00805F9B34FB";
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -107,8 +113,12 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         } else if (requestType == BluetoothDevice.REQUEST_TYPE_MESSAGE_ACCESS) {
             showMasDialog();
         }  else if (requestType == BluetoothDevice.REQUEST_TYPE_SIM_ACCESS) {
+            mUuid = SAP_UUID;
             showSapDialog();
-        } else {
+        } else if (requestType == BluetoothDevice.REQUEST_TYPE_DUN_ACCESS) {
+            mUuid = DUN_UUID;
+            showDUNDialog();
+        }else {
             Log.e(TAG, "Error: bad request type: " + requestType);
             finish();
             return;
@@ -200,6 +210,19 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         setupAlert();
     }
 
+    private void showDUNDialog() {
+        final AlertController.AlertParams p = mAlertParams;
+        p.mIconId = android.R.drawable.ic_dialog_info;
+        p.mTitle = getString(R.string.bluetooth_dun_request);
+        p.mView = createDUNDialogView();
+        p.mPositiveButtonText = getString(android.R.string.yes);
+        p.mPositiveButtonListener = this;
+        p.mNegativeButtonText = getString(android.R.string.no);
+        p.mNegativeButtonListener = this;
+        mOkButton = mAlert.getButton(DialogInterface.BUTTON_POSITIVE);
+        setupAlert();
+    }
+
     private String createConnectionDisplayText() {
         String mRemoteName = mDevice != null ? mDevice.getAliasName() : null;
 
@@ -241,6 +264,15 @@ public class BluetoothPermissionActivity extends AlertActivity implements
 
         if (mRemoteName == null) mRemoteName = getString(R.string.unknown);
         String mMessage1 = getString(R.string.bluetooth_sap_acceptance_dialog_text,
+                                     mRemoteName, mRemoteName);
+        return mMessage1;
+    }
+
+    private String createDUNDisplayText() {
+        String mRemoteName = mDevice != null ? mDevice.getAliasName() : null;
+
+        if (mRemoteName == null) mRemoteName = getString(R.string.unknown);
+        String mMessage1 = getString(R.string.bluetooth_dun_acceptance_dialog_text,
                                      mRemoteName, mRemoteName);
         return mMessage1;
     }
@@ -324,6 +356,24 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         return mView;
     }
 
+    private View createDUNDialogView() {
+        mView = getLayoutInflater().inflate(R.layout.bluetooth_dun_access, null);
+        messageView = (TextView)mView.findViewById(R.id.message);
+        messageView.setText(createDUNDisplayText());
+        mRememberChoice = (CheckBox)mView.findViewById(R.id.bluetooth_dun_remember_choice);
+        mRememberChoice.setChecked(false);
+        mRememberChoice.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mRememberChoiceValue = true;
+                } else {
+                    mRememberChoiceValue = false;
+                }
+            }
+            });
+        return mView;
+    }
+
     private void onPositive() {
         if (DEBUG) Log.d(TAG, "onPositive mRememberChoiceValue: " + mRememberChoiceValue);
 
@@ -364,7 +414,9 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         if (extraName != null) {
             intent.putExtra(extraName, extraValue);
         }
-
+        if ((mUuid == DUN_UUID) || (mUuid == SAP_UUID)) {
+            intent.putExtra("uuid", mUuid);
+        }
         requestType = 0;
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE, mDevice);
         sendBroadcast(intent, android.Manifest.permission.BLUETOOTH_ADMIN);
