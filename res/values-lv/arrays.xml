@@ -29,15 +29,13 @@
     <item msgid="5345178126174698955">"Klusais okeāns"</item>
     <item msgid="8392017019801393511">"Visas"</item>
   </string-array>
-  <string-array name="screen_timeout_entries">
-    <item msgid="3342301044271143016">"15 sekundes"</item>
-    <item msgid="8881760709354815449">"30 sekundes"</item>
-    <item msgid="7589406073232279088">"1 minūte"</item>
-    <item msgid="7001195990902244174">"2 minūtes"</item>
-    <item msgid="7489864775127957179">"5 minūtes"</item>
-    <item msgid="2314124409517439288">"10 minūtes"</item>
-    <item msgid="6864027152847611413">"30 minūtes"</item>
-  </string-array>
+    <string name="screen_timeout_15s">"15 sekundes"</string>
+    <string name="screen_timeout_30s">"30 sekundes"</string>
+    <string name="screen_timeout_1m">"1 minūte"</string>
+    <string name="screen_timeout_2m">"2 minūtes"</string>
+    <string name="screen_timeout_5m">"5 minūtes"</string>
+    <string name="screen_timeout_10m">"10 minūtes"</string>
+    <string name="screen_timeout_30m">"30 minūtes"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Nekad"</item>
     <item msgid="2194151041885903260">"15 sekundes"</item>

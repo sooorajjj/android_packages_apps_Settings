@@ -54,13 +54,13 @@
 
     <!-- Display settings.  The delay in inactivity before the screen is turned off. These are shown in a list dialog. -->
     <string-array name="screen_timeout_entries">
-        <item>15 seconds</item>
-        <item>30 seconds</item>
-        <item>1 minute</item>
-        <item>2 minutes</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-        <item>30 minutes</item>
+        <item>@string/screen_timeout_15s</item>
+        <item>@string/screen_timeout_30s</item>
+        <item>@string/screen_timeout_1m</item>
+        <item>@string/screen_timeout_2m</item>
+        <item>@string/screen_timeout_5m</item>
+        <item>@string/screen_timeout_10m</item>
+        <item>@string/screen_timeout_30m</item>
     </string-array>
 
     <!-- Do not translate. -->

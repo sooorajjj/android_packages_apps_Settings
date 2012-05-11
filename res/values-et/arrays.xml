@@ -29,15 +29,13 @@
     <item msgid="5345178126174698955">"Vaikne ookean"</item>
     <item msgid="8392017019801393511">"Kõik"</item>
   </string-array>
-  <string-array name="screen_timeout_entries">
-    <item msgid="3342301044271143016">"15 sekundit"</item>
-    <item msgid="8881760709354815449">"30 sekundit"</item>
-    <item msgid="7589406073232279088">"1 minut"</item>
-    <item msgid="7001195990902244174">"2 minutit"</item>
-    <item msgid="7489864775127957179">"5 minutit"</item>
-    <item msgid="2314124409517439288">"10 minutit"</item>
-    <item msgid="6864027152847611413">"30 minutit"</item>
-  </string-array>
+    <string name="screen_timeout_15s">"15 sekundit"</string>
+    <string name="screen_timeout_30s">"30 sekundit"</string>
+    <string name="screen_timeout_1m">"1 minut"</string>
+    <string name="screen_timeout_2m">"2 minutit"</string>
+    <string name="screen_timeout_5m">"5 minutit"</string>
+    <string name="screen_timeout_10m">"10 minutit"</string>
+    <string name="screen_timeout_30m">"30 minutit"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Mitte kunagi"</item>
     <item msgid="2194151041885903260">"15 sekundit"</item>
