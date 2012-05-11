@@ -29,15 +29,13 @@
     <item msgid="5345178126174698955">"Пацифик"</item>
     <item msgid="8392017019801393511">"Све"</item>
   </string-array>
-  <string-array name="screen_timeout_entries">
-    <item msgid="3342301044271143016">"15 секунди"</item>
-    <item msgid="8881760709354815449">"30 секунди"</item>
-    <item msgid="7589406073232279088">"1 минут"</item>
-    <item msgid="7001195990902244174">"2 минута"</item>
-    <item msgid="7489864775127957179">"5 минута"</item>
-    <item msgid="2314124409517439288">"10 минута"</item>
-    <item msgid="6864027152847611413">"30 минута"</item>
-  </string-array>
+    <string name="screen_timeout_15s">"15 секунди"</string>
+    <string name="screen_timeout_30s">"30 секунди"</string>
+    <string name="screen_timeout_1m">"1 минут"</string>
+    <string name="screen_timeout_2m">"2 минута"</string>
+    <string name="screen_timeout_5m">"5 минута"</string>
+    <string name="screen_timeout_10m">"10 минута"</string>
+    <string name="screen_timeout_30m">"30 минута"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Никад"</item>
     <item msgid="2194151041885903260">"15 секунди"</item>

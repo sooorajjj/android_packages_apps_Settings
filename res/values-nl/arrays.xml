@@ -29,15 +29,13 @@
     <item msgid="5345178126174698955">"Stille Oceaan"</item>
     <item msgid="8392017019801393511">"Alles"</item>
   </string-array>
-  <string-array name="screen_timeout_entries">
-    <item msgid="3342301044271143016">"15 seconden"</item>
-    <item msgid="8881760709354815449">"30 seconden"</item>
-    <item msgid="7589406073232279088">"1 minuut"</item>
-    <item msgid="7001195990902244174">"2 minuten"</item>
-    <item msgid="7489864775127957179">"5 minuten"</item>
-    <item msgid="2314124409517439288">"10 minuten"</item>
-    <item msgid="6864027152847611413">"30 minuten"</item>
-  </string-array>
+    <string name="screen_timeout_15s">"15 seconden"</string>
+    <string name="screen_timeout_30s">"30 seconden"</string>
+    <string name="screen_timeout_1m">"1 minuut"</string>
+    <string name="screen_timeout_2m">"2 minuten"</string>
+    <string name="screen_timeout_5m">"5 minuten"</string>
+    <string name="screen_timeout_10m">"10 minuten"</string>
+    <string name="screen_timeout_30m">"30 minuten"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"Nooit"</item>
     <item msgid="2194151041885903260">"15 seconden"</item>

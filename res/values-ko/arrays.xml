@@ -29,15 +29,13 @@
     <item msgid="5345178126174698955">"태평양"</item>
     <item msgid="8392017019801393511">"전체"</item>
   </string-array>
-  <string-array name="screen_timeout_entries">
-    <item msgid="3342301044271143016">"15초"</item>
-    <item msgid="8881760709354815449">"30초"</item>
-    <item msgid="7589406073232279088">"1분"</item>
-    <item msgid="7001195990902244174">"2분"</item>
-    <item msgid="7489864775127957179">"5분"</item>
-    <item msgid="2314124409517439288">"10분"</item>
-    <item msgid="6864027152847611413">"30분"</item>
-  </string-array>
+    <string name="screen_timeout_15s">"15초"</string>
+    <string name="screen_timeout_30s">"30초"</string>
+    <string name="screen_timeout_1m">"1분"</string>
+    <string name="screen_timeout_2m">"2분"</string>
+    <string name="screen_timeout_5m">"5분"</string>
+    <string name="screen_timeout_10m">"10분"</string>
+    <string name="screen_timeout_30m">"30분"</string>
   <string-array name="dream_timeout_entries">
     <item msgid="3149294732238283185">"사용 안함"</item>
     <item msgid="2194151041885903260">"15초"</item>
