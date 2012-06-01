@@ -3887,6 +3887,11 @@ found in the list of installed apps.</string>
     <string name="set_dds_failed">Error in set data subscription.  Clean up any existing data connection and try again.</string>
     <!-- Multi Sim Settings screen, Set DDS error message -->
     <string name="set_dds_error">Error in set data subscription.</string>
+    <!-- Multi Sim Settings screen, Set SMS error message -->
+    <string name="set_sms_error">Error in set sms subscription. Subscription not active.</string>
+    <!-- Multi Sim Settings screen, Set VOICE error message -->
+    <string name="set_voice_error">Error in set voice subscription. Subscription not active.</string>
+
 
     <!-- Mobile networks, item title to go into the network settings -->
     <string name="subscription_01_title">SUB 1</string>
