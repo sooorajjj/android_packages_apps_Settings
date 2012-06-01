@@ -323,6 +323,10 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     }
 
     void displayAlertDialog(String msg) {
+        if (!mIsForeground) {
+            Log.d(TAG, "The activitiy is not in foreground. Do not display dialog!!!");
+            return;
+        }
         Log.d(TAG, "displayErrorDialog!" + msg);
         new AlertDialog.Builder(this).setMessage(msg)
                .setTitle(android.R.string.dialog_alert_title)
