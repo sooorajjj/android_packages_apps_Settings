@@ -35,6 +35,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.preference.PreferenceScreen;
 
+import com.android.internal.telephony.Subscription.SubscriptionStatus;
 import com.android.internal.telephony.SubscriptionManager;
 import com.android.internal.telephony.MSimPhoneFactory;
 
@@ -56,6 +57,8 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     static final int EVENT_SET_DATA_SUBSCRIPTION_DONE = 1;
     static final int EVENT_SUBSCRIPTION_ACTIVATED = 2;
     static final int EVENT_SUBSCRIPTION_DEACTIVATED = 3;
+    static final int EVENT_SET_VOICE_SUBSCRIPTION = 4;
+    static final int EVENT_SET_SMS_SUBSCRIPTION = 5;
     protected boolean mIsForeground = false;
     static final int SUBSCRIPTION_ID_0 = 0;
     static final int SUBSCRIPTION_ID_1 = 1;
@@ -198,38 +201,52 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
 
     public boolean onPreferenceChange(Preference preference, Object objValue) {
         final String key = preference.getKey();
+        String status;
         CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries);
 
         if (KEY_VOICE.equals(key)) {
             summaries = getResources().getTextArray(R.array.multi_sim_summaries_voice);
-            int V_value = Integer.parseInt((String) objValue);
-            if (V_value == PROMPT_OPTION) {
+            int voiceSub = Integer.parseInt((String) objValue);
+            if (voiceSub == PROMPT_OPTION) {
                 MSimPhoneFactory.setPromptEnabled(true);
-                Log.d(TAG, "prompt is enabled " + V_value);
-            } else {
-                Log.d(TAG, "setVoiceSubscription " + V_value);
+                mVoice.setSummary(summaries[voiceSub]);
+                Log.d(TAG, "prompt is enabled " + voiceSub);
+            } else if (subManager.getCurrentSubscription(voiceSub).subStatus
+                   == SubscriptionStatus.SUB_ACTIVATED) {
+                Log.d(TAG, "setVoiceSubscription " + voiceSub);
                 MSimPhoneFactory.setPromptEnabled(false);
-                MSimPhoneFactory.setVoiceSubscription(V_value);
+                MSimPhoneFactory.setVoiceSubscription(voiceSub);
+                mVoice.setSummary(summaries[voiceSub]);
+            } else {
+                status = getResources().getString(R.string.set_voice_error);
+                displayAlertDialog(status);
             }
-            mVoice.setSummary(summaries[V_value]);
+            mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_VOICE_SUBSCRIPTION));
         }
 
         if (KEY_DATA.equals(key)) {
-            int D_value = Integer.parseInt((String) objValue);
-            Log.d(TAG, "setDataSubscription " + D_value);
+            int dataSub = Integer.parseInt((String) objValue);
+            Log.d(TAG, "setDataSubscription " + dataSub);
             if (mIsForeground) {
                 showDialog(DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS);
             }
             SubscriptionManager mSubscriptionManager = SubscriptionManager.getInstance();
             Message setDdsMsg = Message.obtain(mHandler, EVENT_SET_DATA_SUBSCRIPTION_DONE, null);
-            mSubscriptionManager.setDataSubscription(D_value, setDdsMsg);
+            mSubscriptionManager.setDataSubscription(dataSub, setDdsMsg);
         }
 
         if (KEY_SMS.equals(key)) {
-            int S_value = Integer.parseInt((String) objValue);
-            Log.d(TAG, "setSMSSubscription " + S_value);
-            MSimPhoneFactory.setSMSSubscription(S_value);
-            mSms.setSummary(summaries[S_value]);
+            int smsSub = Integer.parseInt((String) objValue);
+            Log.d(TAG, "setSMSSubscription " + smsSub);
+            if (subManager.getCurrentSubscription(smsSub).subStatus
+                    == SubscriptionStatus.SUB_ACTIVATED) {
+                MSimPhoneFactory.setSMSSubscription(smsSub);
+                mSms.setSummary(summaries[smsSub]);
+            } else {
+                status = getResources().getString(R.string.set_sms_error);
+                displayAlertDialog(status);
+            }
+            mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_SMS_SUBSCRIPTION));
         }
 
         return true;
@@ -284,6 +301,12 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                         mVoice.setEntries(R.array.multi_sim_entries_voice_without_prompt);
                         mVoice.setEntryValues(R.array.multi_sim_values_voice_without_prompt);
                     }
+                    break;
+                case EVENT_SET_VOICE_SUBSCRIPTION:
+                    updateVoiceSummary();
+                    break;
+                case EVENT_SET_SMS_SUBSCRIPTION:
+                    updateSmsSummary();
                     break;
             }
         }
