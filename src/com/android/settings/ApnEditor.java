@@ -235,6 +235,13 @@ public class ApnEditor extends PreferenceActivity
         super.onPause();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     private void fillUi() {
         if (mFirstTime) {
             mFirstTime = false;
