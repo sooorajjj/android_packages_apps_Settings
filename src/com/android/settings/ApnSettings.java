@@ -149,6 +149,13 @@ public class ApnSettings extends PreferenceActivity implements
         unregisterReceiver(mMobileStateReceiver);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        finish();
+    }
+
     private void fillList() {
         String where = "numeric=\""
                 + MSimTelephonyManager.getTelephonyProperty
