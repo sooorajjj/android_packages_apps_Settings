@@ -402,6 +402,10 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         CachedBluetoothDeviceManager cachedDeviceManager =
             bluetoothManager.getCachedDeviceManager();
         CachedBluetoothDevice cachedDevice = cachedDeviceManager.findDevice(mDevice);
-        cachedDevice.setPhonebookPermissionChoice(permissionChoice);
+        try {
+            cachedDevice.setPhonebookPermissionChoice(permissionChoice);
+        } catch (NullPointerException ex) {
+            Log.e(TAG, "Exception occured in savePhonebookPermissionChoice");
+        }
     }
 }
