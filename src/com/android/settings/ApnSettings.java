@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
+ * Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,17 +143,19 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
+                MSimTelephonyManager.getDefault().getDefaultSubscription());
+        Log.d(TAG, "onNewIntent received sub :" + mSubscription);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
  
         unregisterReceiver(mMobileStateReceiver);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        finish();
     }
 
     private void fillList() {
