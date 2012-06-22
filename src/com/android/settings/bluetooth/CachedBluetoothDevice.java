@@ -213,6 +213,12 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         mIsConnectingErrorPossible = true;
 
         int preferredProfiles = 0;
+        if ((connectAllProfiles == false) &&
+            (mLocalAdapter.isHostPatchRequired(mDevice,
+             BluetoothAdapter.HOST_PATCH_AVOID_CONNECT_ON_PAIR))) {
+             Log.d(TAG, "No connection expected with current device");
+             return;
+        }
         for (LocalBluetoothProfile profile : mProfiles) {
             if (connectAllProfiles ? profile.isConnectable() : profile.isAutoConnectable()) {
                 if (profile.isPreferred(mDevice)) {
