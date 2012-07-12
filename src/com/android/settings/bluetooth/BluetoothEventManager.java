@@ -162,6 +162,7 @@ final class BluetoothEventManager {
             // send callback to update UI and possibly start scanning
             synchronized (mCallbacks) {
                 for (BluetoothCallback callback : mCallbacks) {
+                    mDeviceManager.removeAllDevices(BluetoothDevice.BOND_NONE);
                     callback.onBluetoothStateChanged(state);
                 }
             }
