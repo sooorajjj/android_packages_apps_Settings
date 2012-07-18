@@ -77,6 +77,32 @@ final class Utils {
         return dialog;
     }
 
+    // Create (or recycle existing) and show disconnect dialog.
+    static AlertDialog showDisconnectDialog(Context context,
+            AlertDialog dialog,
+            DialogInterface.OnClickListener disconnectListener,
+            DialogInterface.OnClickListener cancelListener,
+            CharSequence title, CharSequence message) {
+        if (dialog == null) {
+            dialog = new AlertDialog.Builder(context)
+                    .setPositiveButton(android.R.string.ok, disconnectListener)
+                    .setNegativeButton(android.R.string.cancel, cancelListener)
+                    .create();
+        } else {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            // use disconnectListener for the correct profile(s)
+            CharSequence okText = context.getText(android.R.string.ok);
+            dialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                    okText, disconnectListener);
+        }
+        dialog.setTitle(title);
+        dialog.setMessage(message);
+        dialog.show();
+        return dialog;
+    }
+
     // TODO: wire this up to show connection errors...
     static void showConnectingError(Context context, String name) {
         // if (!mIsConnectingErrorPossible) {
