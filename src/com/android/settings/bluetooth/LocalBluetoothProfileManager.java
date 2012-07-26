@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +22,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothInputDevice;
 import android.bluetooth.BluetoothPan;
+import android.bluetooth.BluetoothSap;
+import android.bluetooth.BluetoothDUN;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothUuid;
 import android.content.Context;
@@ -77,6 +80,8 @@ final class LocalBluetoothProfileManager {
     private final HidProfile mHidProfile;
     private OppProfile mOppProfile;
     private final PanProfile mPanProfile;
+    private SapProfile mSapProfile;
+    private DUNProfile mDUNProfile;
 
     /**
      * Mapping from profile name, e.g. "HEADSET" to profile object.
@@ -112,6 +117,15 @@ final class LocalBluetoothProfileManager {
         mPanProfile = new PanProfile(context);
         addPanProfile(mPanProfile, PanProfile.NAME,
                 BluetoothPan.ACTION_CONNECTION_STATE_CHANGED);
+
+
+        mSapProfile = new SapProfile();
+        addSapProfile(mSapProfile, SapProfile.NAME,
+                BluetoothDevice.SAP_STATE_CHANGED);
+        mDUNProfile = new DUNProfile();
+        addDUNProfile(mDUNProfile, DUNProfile.NAME,
+                BluetoothDevice.DUN_STATE_CHANGED);
+
 
         Log.d(TAG, "LocalBluetoothProfileManager construction complete");
     }
@@ -182,6 +196,22 @@ final class LocalBluetoothProfileManager {
         mProfileNameMap.put(profileName, profile);
     }
 
+    private void addSapProfile(LocalBluetoothProfile profile,
+            String profileName, String stateChangedAction) {
+        mEventManager.addProfileHandler(stateChangedAction,
+                new SapStateChangedHandler(profile));
+        mProfileNameMap.put(profileName, profile);
+        Log.d(TAG,"Added handler for SAP state changed Notifications");
+    }
+
+    private void addDUNProfile(LocalBluetoothProfile profile,
+            String profileName, String stateChangedAction) {
+        mEventManager.addProfileHandler(stateChangedAction,
+                new DUNStateChangedHandler(profile));
+        mProfileNameMap.put(profileName, profile);
+        Log.d(TAG,"Added handler for DUN state changed Notifications");
+    }
+
     LocalBluetoothProfile getProfileByName(String name) {
         return mProfileNameMap.get(name);
     }
@@ -221,6 +251,51 @@ final class LocalBluetoothProfileManager {
 
             cachedDevice.onProfileStateChanged(mProfile, newState);
             cachedDevice.refresh();
+        }
+    }
+    private class SapStateChangedHandler extends StateChangedHandler {
+
+       SapStateChangedHandler(LocalBluetoothProfile profile) {
+              super(profile);
+       }
+
+        @Override
+        public void onReceive(Context context, Intent intent, BluetoothDevice device) {
+            SapProfile sapProfile = (SapProfile) mProfile;
+            int state =  intent.getIntExtra("state", 0);
+            Log.d(TAG, "SapStateChanged" + state);
+            CachedBluetoothDevice cachedDevice = mDeviceManager.findDevice(device);
+            if (cachedDevice != null) {
+                cachedDevice.onProfileStateChanged(mProfile, state);
+                cachedDevice.refresh();
+                /*Update the Sap State here*/
+                sapProfile.setConnectionStatus(state);
+            } else {
+                Log.w(TAG, "No Cached device!,  shouldn't reach here");
+            }
+        }
+    }
+    /* State Change Handler for DUN Profile*/
+    private class DUNStateChangedHandler extends StateChangedHandler {
+
+       DUNStateChangedHandler(LocalBluetoothProfile profile) {
+              super(profile);
+       }
+
+        @Override
+        public void onReceive(Context context, Intent intent, BluetoothDevice device) {
+            DUNProfile dunProfile = (DUNProfile) mProfile;
+            int state =  intent.getIntExtra("state", 0);
+            Log.d(TAG, "DUNStateChanged" + state);
+            CachedBluetoothDevice cachedDevice = mDeviceManager.findDevice(device);
+            if (cachedDevice != null) {
+                cachedDevice.onProfileStateChanged(mProfile, state);
+                cachedDevice.refresh();
+                /*Update the DUN State here*/
+                dunProfile.setConnectionStatus(state);
+            } else {
+                Log.w(TAG, "No Cached device!,  shouldn't reach here");
+            }
         }
     }
 
@@ -338,6 +413,62 @@ final class LocalBluetoothProfileManager {
 
         if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.NAP) &&
             mPanProfile != null) {
+            profiles.add(mPanProfile);
+            removedProfiles.remove(mPanProfile);
+        }
+    }
+    /**
+     * Fill in a list of LocalBluetoothProfile objects that are supported by
+     * the local device and the remote device without deleting existing.
+     *
+     * @param uuids of the remote device
+     * @param localUuids UUIDs of the local device
+     * @param profiles The list of profiles to fill
+     * @param removedProfiles list of profiles that were removed
+     */
+    synchronized void addNewProfiles(ParcelUuid[] uuids, ParcelUuid[] localUuids,
+            Collection<LocalBluetoothProfile> profiles,
+            Collection<LocalBluetoothProfile> removedProfiles) {
+
+        if (uuids == null) {
+            return;
+        }
+
+        if (mHeadsetProfile != null) {
+            if (((BluetoothUuid.isUuidPresent(localUuids, BluetoothUuid.HSP_AG) &&
+                    BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.HSP)) ||
+                    (BluetoothUuid.isUuidPresent(localUuids, BluetoothUuid.Handsfree_AG) &&
+                            BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.Handsfree))) &&
+                        !profiles.contains(mHeadsetProfile)) {
+                profiles.add(mHeadsetProfile);
+                removedProfiles.remove(mHeadsetProfile);
+            }
+        }
+
+        if (BluetoothUuid.containsAnyUuid(uuids, A2dpProfile.SINK_UUIDS) &&
+            (mA2dpProfile != null) &&
+            !profiles.contains(mA2dpProfile)) {
+            profiles.add(mA2dpProfile);
+            removedProfiles.remove(mA2dpProfile);
+        }
+
+        if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.ObexObjectPush) &&
+            (mOppProfile != null) &&
+            !profiles.contains(mOppProfile)) {
+            profiles.add(mOppProfile);
+            removedProfiles.remove(mOppProfile);
+        }
+
+        if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.Hid) &&
+            (mHidProfile != null) &&
+            !profiles.contains(mHidProfile)) {
+            profiles.add(mHidProfile);
+            removedProfiles.remove(mHidProfile);
+        }
+
+        if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.NAP) &&
+            (mPanProfile != null) &&
+            !profiles.contains(mPanProfile)) {
             profiles.add(mPanProfile);
             removedProfiles.remove(mPanProfile);
         }
