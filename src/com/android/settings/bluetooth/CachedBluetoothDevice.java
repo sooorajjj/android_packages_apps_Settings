@@ -219,8 +219,12 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if ((connectAllProfiles == false) &&
             (mLocalAdapter.isHostPatchRequired(mDevice,
              BluetoothAdapter.HOST_PATCH_AVOID_CONNECT_ON_PAIR))) {
-             Log.d(TAG, "No connection expected with current device");
-             return;
+             //Depending on class of device restricting the connection only to Carkit.
+             BluetoothClass btClass = mDevice.getBluetoothClass();
+             if (btClass.getDeviceClass() == BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE) {
+                 Log.d(TAG, "No connection expected with current device");
+                 return;
+             }
         }
         for (LocalBluetoothProfile profile : mProfiles) {
             if (connectAllProfiles ? profile.isConnectable() : profile.isAutoConnectable()) {
