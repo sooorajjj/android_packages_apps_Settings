@@ -91,6 +91,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.telephony.MSimTelephonyManager;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -169,6 +170,7 @@ public class DataUsageSummary extends Fragment {
     private static final String TAB_MOBILE = "mobile";
     private static final String TAB_WIFI = "wifi";
     private static final String TAB_ETHERNET = "ethernet";
+    private static final String TAB_SIM = "SIM";
 
     private static final String TAG_CONFIRM_DATA_DISABLE = "confirmDataDisable";
     private static final String TAG_CONFIRM_DATA_ROAMING = "confirmDataRoaming";
@@ -630,7 +632,16 @@ public class DataUsageSummary extends Fragment {
             mTabHost.addTab(buildTabSpec(TAB_3G, R.string.data_usage_tab_3g));
             mTabHost.addTab(buildTabSpec(TAB_4G, R.string.data_usage_tab_4g));
         } else if (hasReadyMobileRadio(context)) {
-            mTabHost.addTab(buildTabSpec(TAB_MOBILE, R.string.data_usage_tab_mobile));
+            // support dual sim data traffic statistics
+            int phoneCount = MSimTelephonyManager.getDefault().getPhoneCount();
+            if (phoneCount > 1) {
+                for (int i = 0; i < phoneCount; i++) {
+                    mTabHost.addTab(buildTabSpec(getSubTag(i+1), getSubTitle(i+1)));
+                }
+            } else {
+                mTabHost.addTab(buildTabSpec(TAB_MOBILE,
+                        R.string.data_usage_tab_mobile));
+            }
         }
         if (mShowWifi && hasWifiRadio(context)) {
             mTabHost.addTab(buildTabSpec(TAB_WIFI, R.string.data_usage_tab_wifi));
@@ -674,6 +685,11 @@ public class DataUsageSummary extends Fragment {
     private TabSpec buildTabSpec(String tag, int titleRes) {
         return mTabHost.newTabSpec(tag).setIndicator(getText(titleRes)).setContent(
                 mEmptyTabContent);
+    }
+
+    private TabSpec buildTabSpec(String tag, String title) {
+        return mTabHost.newTabSpec(tag).setIndicator(title)
+                .setContent(mEmptyTabContent);
     }
 
     private OnTabChangeListener mTabListener = new OnTabChangeListener() {
@@ -720,6 +736,17 @@ public class DataUsageSummary extends Fragment {
             setPreferenceTitle(mDisableAtLimitView, R.string.data_usage_disable_mobile_limit);
             mTemplate = buildTemplateMobileAll(getActiveSubscriberId(context));
 
+        } else if (currentTab.startsWith(TAB_SIM)) {
+            for (int i = 1; i <= MSimTelephonyManager.getDefault()
+                    .getPhoneCount(); i++) {
+                if (currentTab.equals(getSubTag(i))) {
+                    setPreferenceTitle(mDataEnabledView,
+                            R.string.data_usage_enable_mobile);
+                    setPreferenceTitle(mDisableAtLimitView,
+                            R.string.data_usage_disable_mobile_limit);
+                    mTemplate = buildTemplateMobileAll(getActiveSubscriberId(i-1));
+                }
+            }
         } else if (TAB_3G.equals(currentTab)) {
             setPreferenceTitle(mDataEnabledView, R.string.data_usage_enable_3g);
             setPreferenceTitle(mDisableAtLimitView, R.string.data_usage_disable_3g_limit);
@@ -943,7 +970,7 @@ public class DataUsageSummary extends Fragment {
         }
 
         // TODO: move enabled state directly into policy
-        if (TAB_MOBILE.equals(mCurrentTab)) {
+        if (TAB_MOBILE.equals(mCurrentTab) || mCurrentTab.startsWith(TAB_SIM)) {
             mBinding = true;
             mDataEnabled.setChecked(isMobileDataEnabled());
             mBinding = false;
@@ -1049,7 +1076,7 @@ public class DataUsageSummary extends Fragment {
 
             final boolean dataEnabled = isChecked;
             final String currentTab = mCurrentTab;
-            if (TAB_MOBILE.equals(currentTab)) {
+            if (TAB_MOBILE.equals(currentTab) || currentTab.startsWith(TAB_SIM)) {
                 if (dataEnabled) {
                     setMobileDataEnabled(true);
                 } else {
@@ -1204,7 +1231,7 @@ public class DataUsageSummary extends Fragment {
 
         final int summaryRes;
         if (TAB_MOBILE.equals(mCurrentTab) || TAB_3G.equals(mCurrentApp)
-                || TAB_4G.equals(mCurrentApp)) {
+                || TAB_4G.equals(mCurrentApp) || mCurrentTab.startsWith(TAB_SIM)) {
             summaryRes = R.string.data_usage_total_during_range_mobile;
         } else {
             summaryRes = R.string.data_usage_total_during_range;
@@ -1298,6 +1325,10 @@ public class DataUsageSummary extends Fragment {
         final TelephonyManager tele = TelephonyManager.from(context);
         final String actualSubscriberId = tele.getSubscriberId();
         return SystemProperties.get(TEST_SUBSCRIBER_PROP, actualSubscriberId);
+    }
+
+    private static String getActiveSubscriberId(int sub) {
+        return MSimTelephonyManager.getDefault().getSubscriberId(sub);
     }
 
     private DataUsageChartListener mChartListener = new DataUsageChartListener() {
@@ -1682,6 +1713,10 @@ public class DataUsageSummary extends Fragment {
             } else if (TAB_MOBILE.equals(currentTab)) {
                 message = res.getString(R.string.data_usage_limit_dialog_mobile);
                 limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+            } else if (currentTab.startsWith(TAB_SIM)) {
+                message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+
             } else {
                 throw new IllegalArgumentException("unknown current tab: " + currentTab);
             }
@@ -2400,5 +2435,27 @@ public class DataUsageSummary extends Fragment {
         final TextView summary = (TextView) parent.findViewById(android.R.id.summary);
         summary.setVisibility(View.VISIBLE);
         summary.setText(string);
+    }
+
+    /**
+     * get tab name for a special sub when there are more than one sub.
+     */
+    private String getSubTag(int i) {
+        if (i <= 0) {
+            return "";
+        } else {
+            return TAB_SIM + i;
+        }
+    }
+
+    /**
+     * get title of a special sub when there are more than one sub.
+     */
+    private String getSubTitle(int i) {
+        if (i <= 0) {
+            return "";
+        } else {
+            return getText(R.string.data_usage_tab_slot).toString() + i;
+        }
     }
 }
