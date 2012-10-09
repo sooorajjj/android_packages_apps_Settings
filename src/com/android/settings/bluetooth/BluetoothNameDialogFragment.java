@@ -100,7 +100,8 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 String deviceName = mDeviceNameView.getText().toString();
-                                setDeviceName(deviceName);
+                                if (deviceName.length() > 0)
+                                    setDeviceName(deviceName);
                             }
                         })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -135,7 +136,8 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
         mDeviceNameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE &&
+                    v.getText().toString().length() > 0) {
                     setDeviceName(v.getText().toString());
                     mAlertDialog.dismiss();
                     return true;    // action handled
