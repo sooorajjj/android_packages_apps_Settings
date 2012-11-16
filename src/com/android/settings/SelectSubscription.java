@@ -31,19 +31,21 @@ package com.android.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-
+import android.telephony.MSimTelephonyManager;
 
 public class SelectSubscription extends PreferenceActivity {
 
-    private static final String KEY_SUBSCRIPTION_01 = "subscription_01";
-    private static final String KEY_SUBSCRIPTION_02 = "subscription_02";
+    private static final String PREF_PARENT_KEY = "parent_pref";
     public static final String SUBSCRIPTION_KEY = "subscription";
     public static final String PACKAGE = "PACKAGE";
     public static final String TARGET_CLASS = "TARGET_CLASS";
+    private int[] resourceIndex = {R.string.subscription_01_title, R.string.subscription_02_title,
+            R.string.subscription_03_title};
 
-    private PreferenceScreen subscriptionPref0, subscriptionPref1;
+    private Preference subscriptionPref;
 
 
     @Override
@@ -51,29 +53,45 @@ public class SelectSubscription extends PreferenceActivity {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.select_subscription);
+        PreferenceScreen prefParent = (PreferenceScreen) getPreferenceScreen().
+                findPreference(PREF_PARENT_KEY);
+
+        Intent intent =  getIntent();
+        String pkg = intent.getStringExtra(PACKAGE);
+        String targetClass = intent.getStringExtra(TARGET_CLASS);
+
+        int numPhones = MSimTelephonyManager.getDefault().getPhoneCount();
+        Intent selectIntent;
+
+
+        for (int i = 0; i < numPhones; i++) {
+            selectIntent = new Intent();
+            subscriptionPref = new Preference(getApplicationContext());
+            // Set the package and target class.
+            selectIntent.setClassName(pkg, targetClass);
+            selectIntent.putExtra(SUBSCRIPTION_KEY, i);
+            subscriptionPref.setIntent(selectIntent);
+            subscriptionPref.setTitle(resourceIndex[i]);
+            subscriptionPref.setOnPreferenceClickListener(mPreferenceClickListener);
+            prefParent.addPreference(subscriptionPref);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        subscriptionPref0 = (PreferenceScreen) findPreference(KEY_SUBSCRIPTION_01);
-        subscriptionPref1 = (PreferenceScreen) findPreference(KEY_SUBSCRIPTION_02);
-
-        Intent intent =  getIntent();
-        String pkg = intent.getStringExtra(PACKAGE);
-        String targetClass = intent.getStringExtra(TARGET_CLASS);
-        // Set the target class.
-        // suscription_01 denotes subscription id 0
-        // suscription_02 denotes subscription id 1
-        subscriptionPref0.getIntent().setClassName(pkg, targetClass);
-        subscriptionPref1.getIntent().setClassName(pkg, targetClass);
-        subscriptionPref0.getIntent().putExtra(SUBSCRIPTION_KEY, 0);
-        subscriptionPref1.getIntent().putExtra(SUBSCRIPTION_KEY, 1);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
     }
+
+    Preference.OnPreferenceClickListener mPreferenceClickListener =
+            new Preference.OnPreferenceClickListener() {
+       public boolean onPreferenceClick(Preference preference) {
+           startActivity(preference.getIntent());
+           return true;
+       }
+    };
 }

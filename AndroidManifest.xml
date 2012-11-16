@@ -63,6 +63,9 @@
             android:uiOptions="splitActionBarWhenNarrow"
             android:hardwareAccelerated="true">
 
+        <uses-library
+            android:name="com.android.qualcomm.qcrilhook">
+        </uses-library>
         <!-- Settings -->
 
         <activity android:name="Settings"
