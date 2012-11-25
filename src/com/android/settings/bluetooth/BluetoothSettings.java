@@ -125,7 +125,7 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment {
                 activity.getActionBar().setCustomView(actionBarSwitch, new ActionBar.LayoutParams(
                         ActionBar.LayoutParams.WRAP_CONTENT,
                         ActionBar.LayoutParams.WRAP_CONTENT,
-                        Gravity.CENTER_VERTICAL | Gravity.END));
+                        Gravity.CENTER_VERTICAL | Gravity.RIGHT));
             }
         }
 
@@ -282,7 +282,7 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment {
 
                 // Available devices category
                 if (mAvailableDevicesCategory == null) {
-                    mAvailableDevicesCategory = new BluetoothProgressCategory(getActivity(), null);
+                    mAvailableDevicesCategory = new ProgressCategory(getActivity(), null,  R.string.bluetooth_devices_no_devices_found);
                 } else {
                     mAvailableDevicesCategory.removeAll();
                 }

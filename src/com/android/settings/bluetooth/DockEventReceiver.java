@@ -59,11 +59,8 @@ public final class DockEventReceiver extends BroadcastReceiver {
 
         if (Intent.ACTION_DOCK_EVENT.equals(intent.getAction())
                 || ACTION_DOCK_SHOW_UI.endsWith(intent.getAction())) {
-            if ((device == null) && (ACTION_DOCK_SHOW_UI.endsWith(intent.getAction()) ||
-                    ((state != Intent.EXTRA_DOCK_STATE_UNDOCKED) &&
-                     (state != Intent.EXTRA_DOCK_STATE_LE_DESK)))) {
-                if (DEBUG) Log.d(TAG,
-                        "Wrong state: "+state+" or intent: "+intent.toString()+" with null device");
+            if (device == null) {
+                if (DEBUG) Log.d(TAG, "Device is missing");
                 return;
             }
 

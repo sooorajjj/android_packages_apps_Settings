@@ -36,7 +36,6 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -270,6 +269,8 @@ public final class DockService extends Service implements ServiceListener {
             case MSG_TYPE_SHOW_UI:
                 if (device != null) {
                     createDialog(device, state, startId);
+                } else {
+                    Log.e(TAG, "Error! mDevice is null, can't create dialog");
                 }
                 break;
 
@@ -328,30 +329,28 @@ public final class DockService extends Service implements ServiceListener {
     private boolean msgTypeUndockedPermanent(BluetoothDevice device, int startId) {
         // Grace period passed. Disconnect.
         handleUndocked(device);
-        if (device != null) {
-            final SharedPreferences prefs = getPrefs();
+        final SharedPreferences prefs = getPrefs();
 
-            if (DEBUG) {
-                Log.d(TAG, "DISABLE_BT_WHEN_UNDOCKED = "
-                        + prefs.getBoolean(KEY_DISABLE_BT_WHEN_UNDOCKED, false));
-            }
+        if (DEBUG) {
+            Log.d(TAG, "DISABLE_BT_WHEN_UNDOCKED = "
+                    + prefs.getBoolean(KEY_DISABLE_BT_WHEN_UNDOCKED, false));
+        }
 
-            if (prefs.getBoolean(KEY_DISABLE_BT_WHEN_UNDOCKED, false)) {
-                if (hasOtherConnectedDevices(device)) {
-                    // Don't disable BT if something is connected
-                    prefs.edit().remove(KEY_DISABLE_BT_WHEN_UNDOCKED).apply();
-                } else {
-                    // BT was disabled when we first docked
-                    if (DEBUG) {
-                        Log.d(TAG, "QUEUED BT DISABLE");
-                    }
-                    // Queue a delayed msg to disable BT
-                    Message newMsg = mServiceHandler.obtainMessage(
-                            MSG_TYPE_DISABLE_BT, 0, startId, null);
-                    mServiceHandler.sendMessageDelayed(newMsg,
-                            DISABLE_BT_GRACE_PERIOD);
-                    return true;
+        if (prefs.getBoolean(KEY_DISABLE_BT_WHEN_UNDOCKED, false)) {
+            if (hasOtherConnectedDevices(device)) {
+                // Don't disable BT if something is connected
+                prefs.edit().remove(KEY_DISABLE_BT_WHEN_UNDOCKED).apply();
+            } else {
+                // BT was disabled when we first docked
+                if (DEBUG) {
+                    Log.d(TAG, "QUEUED BT DISABLE");
                 }
+                // Queue a delayed msg to disable BT
+                Message newMsg = mServiceHandler.obtainMessage(
+                        MSG_TYPE_DISABLE_BT, 0, startId, null);
+                mServiceHandler.sendMessageDelayed(newMsg,
+                        DISABLE_BT_GRACE_PERIOD);
+                return true;
             }
         }
         return false;
@@ -372,41 +371,29 @@ public final class DockService extends Service implements ServiceListener {
         mServiceHandler.removeMessages(MSG_TYPE_DISABLE_BT);
         getPrefs().edit().remove(KEY_DISABLE_BT).apply();
 
-        if (device != null) {
-            if (!device.equals(mDevice)) {
-                if (mDevice != null) {
-                    // Not expected. Cleanup/undock existing
-                    handleUndocked(mDevice);
-                }
-
-                mDevice = device;
-
-                // Register first in case LocalBluetoothProfileManager
-                // becomes ready after isManagerReady is called and it
-                // would be too late to register a service listener.
-                mProfileManager.addServiceListener(this);
-                if (mProfileManager.isManagerReady()) {
-                    handleDocked(device, state, startId);
-                    // Not needed after all
-                    mProfileManager.removeServiceListener(this);
-                } else {
-                    final BluetoothDevice d = device;
-                    mRunnable = new Runnable() {
-                        public void run() {
-                            handleDocked(d, state, startId);  // FIXME: WTF runnable here?
-                        }
-                    };
-                    return true;
-                }
+        if (device != null && !device.equals(mDevice)) {
+            if (mDevice != null) {
+                // Not expected. Cleanup/undock existing
+                handleUndocked(mDevice);
             }
-        } else {
-            // display dialog to enable dock for media audio only in the case of low end docks and
-            // if not already selected by user
-            int dockAudioMediaEnabled = Settings.Global.getInt(getContentResolver(),
-                    Settings.Global.DOCK_AUDIO_MEDIA_ENABLED, -1);
-            if (dockAudioMediaEnabled == -1 &&
-                    state == Intent.EXTRA_DOCK_STATE_LE_DESK) {
-                handleDocked(null, state, startId);
+
+            mDevice = device;
+
+            // Register first in case LocalBluetoothProfileManager
+            // becomes ready after isManagerReady is called and it
+            // would be too late to register a service listener.
+            mProfileManager.addServiceListener(this);
+            if (mProfileManager.isManagerReady()) {
+                handleDocked(device, state, startId);
+                // Not needed after all
+                mProfileManager.removeServiceListener(this);
+            } else {
+                final BluetoothDevice d = device;
+                mRunnable = new Runnable() {
+                    public void run() {
+                        handleDocked(d, state, startId);  // FIXME: WTF runnable here?
+                    }
+                };
                 return true;
             }
         }
@@ -444,25 +431,21 @@ public final class DockService extends Service implements ServiceListener {
                     + " Device: " + (device == null ? "null" : device.getAliasName()));
         }
 
+        if (device == null) {
+            Log.w(TAG, "device is null");
+            return null;
+        }
+
         int msgType;
         switch (state) {
             case Intent.EXTRA_DOCK_STATE_UNDOCKED:
                 msgType = MSG_TYPE_UNDOCKED_TEMPORARY;
                 break;
             case Intent.EXTRA_DOCK_STATE_DESK:
+            case Intent.EXTRA_DOCK_STATE_LE_DESK:
             case Intent.EXTRA_DOCK_STATE_HE_DESK:
             case Intent.EXTRA_DOCK_STATE_CAR:
-                if (device == null) {
-                    Log.w(TAG, "device is null");
-                    return null;
-                }
-                /// Fall Through ///
-            case Intent.EXTRA_DOCK_STATE_LE_DESK:
                 if (DockEventReceiver.ACTION_DOCK_SHOW_UI.equals(intent.getAction())) {
-                    if (device == null) {
-                        Log.w(TAG, "device is null");
-                        return null;
-                    }
                     msgType = MSG_TYPE_SHOW_UI;
                 } else {
                     msgType = MSG_TYPE_DOCKED;
@@ -495,53 +478,35 @@ public final class DockService extends Service implements ServiceListener {
 
         startForeground(0, new Notification());
 
+        // Device in a new dock.
+        boolean firstTime = !LocalBluetoothPreferences.hasDockAutoConnectSetting(this, device.getAddress());
+
+        CharSequence[] items = initBtSettings(device, state, firstTime);
+
         final AlertDialog.Builder ab = new AlertDialog.Builder(this);
-        View view;
-        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        ab.setTitle(getString(R.string.bluetooth_dock_settings_title));
 
-        if (device != null) {
-            // Device in a new dock.
-            boolean firstTime =
-                    !LocalBluetoothPreferences.hasDockAutoConnectSetting(this, device.getAddress());
+        // Profiles
+        ab.setMultiChoiceItems(items, mCheckedItems, mMultiClickListener);
 
-            CharSequence[] items = initBtSettings(device, state, firstTime);
-
-            ab.setTitle(getString(R.string.bluetooth_dock_settings_title));
-
-            // Profiles
-            ab.setMultiChoiceItems(items, mCheckedItems, mMultiClickListener);
-
-            // Remember this settings
-            view = inflater.inflate(R.layout.remember_dock_setting, null);
-            CheckBox rememberCheckbox = (CheckBox) view.findViewById(R.id.remember);
-
-            // check "Remember setting" by default if no value was saved
-            boolean checked = firstTime ||
-                    LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress());
-            rememberCheckbox.setChecked(checked);
-            rememberCheckbox.setOnCheckedChangeListener(mCheckedChangeListener);
-            if (DEBUG) {
-                Log.d(TAG, "Auto connect = "
-                  + LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress()));
-            }
-        } else {
-            ab.setTitle(getString(R.string.bluetooth_dock_settings_title));
-
-            view = inflater.inflate(R.layout.dock_audio_media_enable_dialog, null);
-            CheckBox audioMediaCheckbox =
-                    (CheckBox) view.findViewById(R.id.dock_audio_media_enable_cb);
-
-            boolean checked = Settings.Global.getInt(getContentResolver(),
-                                    Settings.Global.DOCK_AUDIO_MEDIA_ENABLED, 0) == 1;
-
-            audioMediaCheckbox.setChecked(checked);
-            audioMediaCheckbox.setOnCheckedChangeListener(mCheckedChangeListener);
-        }
-
+        // Remember this settings
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
         float pixelScaleFactor = getResources().getDisplayMetrics().density;
+        View view = inflater.inflate(R.layout.remember_dock_setting, null);
+        CheckBox rememberCheckbox = (CheckBox) view.findViewById(R.id.remember);
+
+        // check "Remember setting" by default if no value was saved
+        boolean checked = firstTime || LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress());
+        rememberCheckbox.setChecked(checked);
+        rememberCheckbox.setOnCheckedChangeListener(mCheckedChangeListener);
         int viewSpacingLeft = (int) (14 * pixelScaleFactor);
         int viewSpacingRight = (int) (14 * pixelScaleFactor);
         ab.setView(view, viewSpacingLeft, 0 /* top */, viewSpacingRight, 0 /* bottom */);
+        if (DEBUG) {
+            Log.d(TAG, "Auto connect = "
+                    + LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress()));
+        }
 
         // Ok Button
         ab.setPositiveButton(getString(android.R.string.ok), mClickListener);
@@ -575,9 +540,6 @@ public final class DockService extends Service implements ServiceListener {
                     if (mDevice != null) {
                         LocalBluetoothPreferences.saveDockAutoConnectSetting(
                                 DockService.this, mDevice.getAddress(), isChecked);
-                    } else {
-                        Settings.Global.putInt(getContentResolver(),
-                                Settings.Global.DOCK_AUDIO_MEDIA_ENABLED, isChecked ? 1 : 0);
                     }
                 }
             };
@@ -865,8 +827,7 @@ public final class DockService extends Service implements ServiceListener {
 
     private synchronized void handleDocked(BluetoothDevice device, int state,
             int startId) {
-        if (device != null &&
-                LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress())) {
+        if (LocalBluetoothPreferences.getDockAutoConnectSetting(this, device.getAddress())) {
             // Setting == auto connect
             initBtSettings(device, state, false);
             applyBtSettings(mDevice, startId);
@@ -884,10 +845,8 @@ public final class DockService extends Service implements ServiceListener {
         }
         mDevice = null;
         mPendingDevice = null;
-        if (device != null) {
-            CachedBluetoothDevice cachedDevice = getCachedBluetoothDevice(device);
-            cachedDevice.disconnect();
-        }
+        CachedBluetoothDevice cachedDevice = getCachedBluetoothDevice(device);
+        cachedDevice.disconnect();
     }
 
     private CachedBluetoothDevice getCachedBluetoothDevice(BluetoothDevice device) {

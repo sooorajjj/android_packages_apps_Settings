@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2012, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +20,7 @@ package com.android.settings.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothPbap;
+import android.bluetooth.BluetoothSap;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
@@ -30,42 +31,23 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * PBAPServer Profile
+ * SapProfile handles Bluetooth SAP profile.
  */
-final class PbapServerProfile implements LocalBluetoothProfile {
-    private static final String TAG = "PbapServerProfile";
-    private static boolean V = true;
+final class SapProfile implements LocalBluetoothProfile {
+    private BluetoothSap mService;
+    private int mConnectionStatus = 0;
 
-    private BluetoothPbap mService;
-    private boolean mIsProfileReady;
+    // Tethering direction for each device
+    private final HashMap<BluetoothDevice, Integer> mDeviceRoleMap =
+            new HashMap<BluetoothDevice, Integer>();
 
-    static final String NAME = "PBAP Server";
+    static final String NAME = "SAP";
 
     // Order of this profile in device profiles list
-    private static final int ORDINAL = 6;
+    private static final int ORDINAL = 5;
 
-    // These callbacks run on the main thread.
-    private final class PbapServiceListener
-            implements BluetoothPbap.ServiceListener {
-
-        public void onServiceConnected(BluetoothPbap proxy) {
-            if (V) Log.d(TAG,"Bluetooth service connected");
-            mService = (BluetoothPbap) proxy;
-            mIsProfileReady=true;
-        }
-
-        public void onServiceDisconnected() {
-            if (V) Log.d(TAG,"Bluetooth service disconnected");
-            mIsProfileReady=false;
-        }
-    }
-
-    public boolean isProfileReady() {
-        return mIsProfileReady;
-    }
-
-    PbapServerProfile(Context context) {
-        BluetoothPbap pbap = new BluetoothPbap(context, new PbapServiceListener());
+    SapProfile() {
+        mService = new BluetoothSap();
     }
 
     public boolean isConnectable() {
@@ -77,28 +59,24 @@ final class PbapServerProfile implements LocalBluetoothProfile {
     }
 
     public boolean connect(BluetoothDevice device) {
-        /*Can't connect from server */
         return false;
-
     }
 
     public boolean disconnect(BluetoothDevice device) {
-        if (mService == null) return false;
-        return mService.disconnect();
+        boolean ret = mService.disconnect();
+        return ret;
     }
 
     public int getConnectionStatus(BluetoothDevice device) {
-        if (mService == null) {
-            return BluetoothProfile.STATE_DISCONNECTED;
-        }
-        if (mService.isConnected(device))
-            return BluetoothProfile.STATE_CONNECTED;
-        else
-            return BluetoothProfile.STATE_DISCONNECTED;
+        return mConnectionStatus;
+    }
+
+    public void setConnectionStatus(int status) {
+        mConnectionStatus = status;
     }
 
     public boolean isPreferred(BluetoothDevice device) {
-        return false;
+        return true;
     }
 
     public int getPreferred(BluetoothDevice device) {
@@ -106,7 +84,11 @@ final class PbapServerProfile implements LocalBluetoothProfile {
     }
 
     public void setPreferred(BluetoothDevice device, boolean preferred) {
-        // ignore: isPreferred is always true for PBAP
+        // ignore: isPreferred is always true for SAP
+    }
+
+    public boolean isProfileReady() {
+        return true;
     }
 
     public String toString() {
@@ -118,25 +100,26 @@ final class PbapServerProfile implements LocalBluetoothProfile {
     }
 
     public int getNameResource(BluetoothDevice device) {
-      return 0;
+        return R.string.bluetooth_profile_sap;
     }
 
     public int getSummaryResourceForDevice(BluetoothDevice device) {
-        return 0;
+        int state = getConnectionStatus(device);
+        switch (state) {
+            case BluetoothProfile.STATE_DISCONNECTED:
+                return R.string.bluetooth_sap_profile_summary_use_for;
+
+            case BluetoothProfile.STATE_CONNECTED:
+                    return R.string.bluetooth_sap_profile_summary_connected;
+
+            default:
+                return Utils.getConnectionStateSummary(state);
+        }
     }
 
     public int getDrawableResource(BluetoothClass btClass) {
-        return 0;
+        //TODO change this for SAP
+        return R.drawable.ic_bt_network_pan;
     }
-    protected void finalize() {
-        if (V) Log.d(TAG, "finalize()");
-        if (mService != null) {
-            try {
-                mService.close();
-                mService = null;
-            }catch (Throwable t) {
-                Log.w(TAG, "Error cleaning up PBAP proxy", t);
-            }
-        }
-    }
+
 }

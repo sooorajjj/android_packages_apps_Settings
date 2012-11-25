@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ **Copyright (c) 2012, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +56,8 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
     private static final String KEY_UNPAIR = "unpair";
 
     public static final String EXTRA_DEVICE = "device";
+    public static final String DISCONNECT_PROFILE = "profile";
+
     private RenameEditTextPreference mRenameDeviceNamePref;
     private LocalBluetoothManager mManager;
     private CachedBluetoothDevice mCachedDevice;
@@ -68,6 +71,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
 
     private AlertDialog mDisconnectDialog;
     private boolean mProfileGroupIsRemoved;
+    private LocalBluetoothProfile mDisconnectingProfile;
 
     private class RenameEditTextPreference implements TextWatcher{
         public void afterTextChanged(Editable s) {
@@ -93,8 +97,10 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         super.onCreate(savedInstanceState);
 
         BluetoothDevice device;
+        int profileRes = 0;
         if (savedInstanceState != null) {
             device = savedInstanceState.getParcelable(EXTRA_DEVICE);
+            profileRes = savedInstanceState.getInt(DISCONNECT_PROFILE, 0);
         } else {
             Bundle args = getArguments();
             device = args.getParcelable(EXTRA_DEVICE);
@@ -129,6 +135,13 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
 
         // Add a preference for each profile
         addPreferencesForProfiles();
+
+        if (profileRes != 0) {
+            mDisconnectingProfile = getProfile(profileRes);
+            if (mDisconnectingProfile != null) {
+                onProfileClicked(mDisconnectingProfile);
+            }
+        }
     }
 
     @Override
@@ -136,6 +149,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         super.onDestroy();
         if (mDisconnectDialog != null) {
             mDisconnectDialog.dismiss();
+            mDisconnectingProfile = null;
             mDisconnectDialog = null;
         }
     }
@@ -144,6 +158,11 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(EXTRA_DEVICE, mCachedDevice.getDevice());
+        if (mDisconnectingProfile != null) {
+            Log.e(TAG, "adding profile to disconnect");
+            outState.putInt(DISCONNECT_PROFILE,
+                    mDisconnectingProfile.getNameResource(mCachedDevice.getDevice()));
+        }
     }
 
     @Override
@@ -191,6 +210,15 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
             getPreferenceScreen().addPreference(mProfileContainer);
             mProfileGroupIsRemoved = false;
         }
+    }
+
+    private LocalBluetoothProfile getProfile(int profileRes) {
+        for (LocalBluetoothProfile profile : mCachedDevice.getConnectableProfiles()) {
+            if (profile.getNameResource(mCachedDevice.getDevice()) == profileRes) {
+               return profile;
+            }
+        }
+        return null;
     }
 
     /**
@@ -241,7 +269,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
             mCachedDevice.setName((String) newValue);
         } else if (preference instanceof CheckBoxPreference) {
             LocalBluetoothProfile prof = getProfileOf(preference);
-            onProfileClicked(prof, (CheckBoxPreference) preference);
+            onProfileClicked(prof);
             return false;   // checkbox will update from onDeviceAttributesChanged() callback
         } else {
             return false;
@@ -250,7 +278,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         return true;
     }
 
-    private void onProfileClicked(LocalBluetoothProfile profile, CheckBoxPreference profilePref) {
+    private void onProfileClicked(LocalBluetoothProfile profile) {
         BluetoothDevice device = mCachedDevice.getDevice();
 
         int status = profile.getConnectionStatus(device);
@@ -258,16 +286,11 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
                 status == BluetoothProfile.STATE_CONNECTED;
 
         if (isConnected) {
+            mDisconnectingProfile = null;
             askDisconnect(getActivity(), profile);
         } else {
-            if (profile.isPreferred(device)) {
-                // profile is preferred but not connected: disable auto-connect
-                profile.setPreferred(device, false);
-                refreshProfilePreference(profilePref, profile);
-            } else {
-                profile.setPreferred(device, true);
-                mCachedDevice.connectProfile(profile);
-            }
+            profile.setPreferred(device, true);
+            mCachedDevice.connectProfile(profile);
         }
     }
 
@@ -289,13 +312,34 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         DialogInterface.OnClickListener disconnectListener =
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                Log.e(TAG, "removing profile to disconnect");
+                mDisconnectingProfile = null;
                 device.disconnect(profile);
                 profile.setPreferred(device.getDevice(), false);
             }
         };
 
+        DialogInterface.OnClickListener cancelOptListener =
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Log.e(TAG, "removing profile to disconnect");
+                mDisconnectingProfile = null;
+            }
+        };
+
+        DialogInterface.OnCancelListener cancelListener =
+                new DialogInterface.OnCancelListener() {
+            public void onCancel(DialogInterface dialog) {
+                Log.e(TAG, "removing profile to disconnect");
+                mDisconnectingProfile = null;
+            }
+        };
+
         mDisconnectDialog = Utils.showDisconnectDialog(context,
-                mDisconnectDialog, disconnectListener, title, Html.fromHtml(message));
+                mDisconnectDialog, disconnectListener, cancelOptListener,
+                title, Html.fromHtml(message));
+        mDisconnectDialog.setOnCancelListener(cancelListener);
+        mDisconnectingProfile = profile;
     }
 
     public void onDeviceAttributesChanged() {
@@ -333,10 +377,19 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
     private void refreshProfilePreference(CheckBoxPreference profilePref,
             LocalBluetoothProfile profile) {
         BluetoothDevice device = mCachedDevice.getDevice();
+        int connectionStatus = profile.getConnectionStatus(device);
 
         /*
          * Gray out checkbox while connecting and disconnecting
          */
+        if (isServerRole(profile) && connectionStatus == BluetoothProfile.STATE_DISCONNECTED) {
+            /*no connection initiation from SAP server side*/
+            profilePref.setEnabled(false);
+            profilePref.setSummary(profile.getSummaryResourceForDevice(device));
+            Log.i(TAG, "SAP in disconnected mode -" + profile);
+            return;
+            }
+
         profilePref.setEnabled(!mCachedDevice.isBusy());
         profilePref.setChecked(profile.isPreferred(device));
         profilePref.setSummary(profile.getSummaryResourceForDevice(device));
@@ -363,4 +416,13 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
     private void unpairDevice() {
         mCachedDevice.unpair();
     }
+
+    private boolean getAutoConnect(LocalBluetoothProfile prof) {
+        return prof.isPreferred(mCachedDevice.getDevice());
+    }
+
+    private boolean isServerRole(LocalBluetoothProfile profile) {
+        return (profile.equals("SAP") || (profile.equals("DUN")));
+    }
+
 }

@@ -21,7 +21,6 @@ import com.android.settings.R;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 /**
  * BluetoothEventManager receives broadcasts and callbacks from the Bluetooth
@@ -100,7 +100,6 @@ final class BluetoothEventManager {
 
         // Dock event broadcasts
         addHandler(Intent.ACTION_DOCK_EVENT, new DockEventHandler());
-
         mContext.registerReceiver(mBroadcastReceiver, mAdapterIntentFilter);
     }
 
@@ -165,8 +164,12 @@ final class BluetoothEventManager {
                     callback.onBluetoothStateChanged(state);
                 }
             }
-            // Inform CachedDeviceManager that the adapter state has changed
-            mDeviceManager.onBluetoothStateChanged(state);
+
+            /*Reset the connection state of all server role based
+            profiles*/
+            if (state == BluetoothAdapter.STATE_TURNING_OFF) {
+                resetAllServerRoles();
+            }
         }
     }
 
@@ -288,6 +291,14 @@ final class BluetoothEventManager {
                         cachedDevice.setVisible(false);
                     }
                 }
+                if (cachedDevice.isRemovable()) {
+                    synchronized (mCallbacks) {
+                        for (BluetoothCallback callback : mCallbacks) {
+                            callback.onDeviceDeleted(cachedDevice);
+                        }
+                    }
+                    mDeviceManager.onDeviceDeleted(cachedDevice);
+                }
                 int reason = intent.getIntExtra(BluetoothDevice.EXTRA_REASON,
                         BluetoothDevice.ERROR);
 
@@ -369,6 +380,7 @@ final class BluetoothEventManager {
             }
         }
     }
+
     boolean readPairedDevices() {
         Set<BluetoothDevice> bondedDevices = mLocalAdapter.getBondedDevices();
         if (bondedDevices == null) {
@@ -386,5 +398,13 @@ final class BluetoothEventManager {
         }
 
         return deviceAdded;
+    }
+
+    private void resetAllServerRoles() {
+        Collection<CachedBluetoothDevice> cachedDevices =
+                mDeviceManager.getCachedDevicesCopy();
+        for (CachedBluetoothDevice cachedDevice : cachedDevices) {
+               cachedDevice.resetAllServerProfiles();
+        }
     }
 }
