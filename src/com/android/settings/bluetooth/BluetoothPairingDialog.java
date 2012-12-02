@@ -58,7 +58,6 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     private String mPairingKey;
     private EditText mPairingView;
     private Button mOkButton;
-    private boolean mIsSecurityHigh;
 
     /**
      * Dismiss the dialog if the bond state changes to bonded or none,
@@ -89,7 +88,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if (intent == null || !BluetoothDevice.ACTION_PAIRING_REQUEST.equals(intent.getAction()))
+        if (!intent.getAction().equals(BluetoothDevice.ACTION_PAIRING_REQUEST))
         {
             Log.e(TAG, "Error: this activity may be started only with intent " +
                   BluetoothDevice.ACTION_PAIRING_REQUEST);
@@ -107,8 +106,6 @@ public final class BluetoothPairingDialog extends AlertActivity implements
 
         mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mType = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
-        mIsSecurityHigh = intent.getBooleanExtra(BluetoothDevice.EXTRA_SECURE_PAIRING, false);
-        Log.i(TAG, "Secure is " + mIsSecurityHigh);
 
         switch (mType) {
             case BluetoothDevice.PAIRING_VARIANT_PIN:
@@ -189,11 +186,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
         int maxLength;
         switch (mType) {
             case BluetoothDevice.PAIRING_VARIANT_PIN:
-                if (mIsSecurityHigh)
-                    messageId1 = R.string.bluetooth_enter_pin_msg_hs;
-                else
-                    messageId1 = R.string.bluetooth_enter_pin_msg;
-
+                messageId1 = R.string.bluetooth_enter_pin_msg;
                 messageId2 = R.string.bluetooth_enter_pin_other_device;
                 // Maximum of 16 characters in a PIN
                 maxLength = BLUETOOTH_PIN_MAX_LENGTH;
@@ -304,27 +297,9 @@ public final class BluetoothPairingDialog extends AlertActivity implements
         unregisterReceiver(mReceiver);
     }
 
-    @Override
-    protected void onUserLeaveHint() {
-        Log.i(TAG, "User pressed Home key, Destroying the pairing process");
-        onCancel();
-        super.onUserLeaveHint();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.i(TAG, "User pressed Back Key. Destroying the pairing process");
-        onCancel();
-        finish();
-    }
-
     public void afterTextChanged(Editable s) {
         if (mOkButton != null) {
-            if (s.length() > 0 && !mIsSecurityHigh) {
-                mOkButton.setEnabled(true);
-            } else if (mIsSecurityHigh && s.length() == BLUETOOTH_PIN_MAX_LENGTH) {
-                mOkButton.setEnabled(true);
-            }
+            mOkButton.setEnabled(s.length() > 0);
         }
     }
 

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2012, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +19,13 @@ package com.android.settings.bluetooth;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.ParcelUuid;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
+import android.bluetooth.BluetoothAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,8 +63,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private boolean mLocalNapRoleConnected;
 
     private boolean mVisible;
-
-    private boolean mDeviceRemove;
 
     private int mPhonebookPermissionChoice;
 
@@ -122,7 +119,11 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             Log.d(TAG, "onProfileStateChanged: profile " + profile +
                     " newProfileState " + newProfileState);
         }
-
+        if (mLocalAdapter.getBluetoothState() == BluetoothAdapter.STATE_TURNING_OFF)
+        {
+            if (Utils.D) Log.d(TAG, " BT Turninig Off...Profile conn state change ignored...");
+            return;
+        }
         mProfileConnectionState.put(profile, newProfileState);
         if (newProfileState == BluetoothProfile.STATE_CONNECTED) {
             if (!mProfiles.contains(profile)) {
@@ -141,11 +142,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             mProfiles.remove(profile);
             mRemovedProfiles.add(profile);
             mLocalNapRoleConnected = false;
-        } else if ((profile instanceof SapProfile || profile instanceof DUNProfile) &&
-            newProfileState == BluetoothProfile.STATE_DISCONNECTED) {
-            mProfiles.remove(profile);
-            mRemovedProfiles.add(profile);
-            Log.d(TAG, "Removed Profile from the list");
         }
     }
 
@@ -165,23 +161,20 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         for (LocalBluetoothProfile profile : mProfiles) {
             disconnect(profile);
         }
+        // Disconnect  PBAP server in case its connected
+        // This is to ensure all the profiles are disconnected as some CK/Hs do not
+        // disconnect  PBAP connection when HF connection is brought down
+        PbapServerProfile PbapProfile = mProfileManager.getPbapProfile();
+        if (PbapProfile.getConnectionStatus(mDevice) == BluetoothProfile.STATE_CONNECTED)
+        {
+            PbapProfile.disconnect(mDevice);
+        }
     }
 
     void disconnect(LocalBluetoothProfile profile) {
         if (profile.disconnect(mDevice)) {
             if (Utils.D) {
                 Log.d(TAG, "Command sent successfully:DISCONNECT " + describe(profile));
-            }
-        }
-    }
-
-    public void resetAllServerProfiles() {
-        for (LocalBluetoothProfile profile : mProfiles) {
-            if (profile instanceof SapProfile) {
-                ((SapProfile)profile).setConnectionStatus(BluetoothProfile.STATE_DISCONNECTED);
-            }
-            if (profile instanceof DUNProfile) {
-                ((DUNProfile)profile).setConnectionStatus(BluetoothProfile.STATE_DISCONNECTED);
             }
         }
     }
@@ -204,28 +197,21 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private void connectWithoutResettingTimer(boolean connectAllProfiles) {
         // Try to initialize the profiles if they were not.
         if (mProfiles.isEmpty()) {
-            if (!updateProfiles()) {
-                // If UUIDs are not available yet, connect will be happen
-                // upon arrival of the ACTION_UUID intent.
-                if (DEBUG) Log.d(TAG, "No profiles. Maybe we will connect later");
-                return;
-            }
+            // if mProfiles is empty, then do not invoke updateProfiles. This causes a race
+            // condition with carkits during pairing, wherein RemoteDevice.UUIDs have been updated
+            // from bluetooth stack but ACTION.uuid is not sent yet.
+            // Eventually ACTION.uuid will be received which shall trigger the connection of the
+            // various profiles
+            // If UUIDs are not available yet, connect will be happen
+            // upon arrival of the ACTION_UUID intent.
+            Log.d(TAG, "No profiles. Maybe we will connect later");
+            return;
         }
 
         // Reset the only-show-one-error-dialog tracking variable
         mIsConnectingErrorPossible = true;
 
         int preferredProfiles = 0;
-        if ((connectAllProfiles == false) &&
-            (mLocalAdapter.isHostPatchRequired(mDevice,
-             BluetoothAdapter.HOST_PATCH_AVOID_CONNECT_ON_PAIR))) {
-             //Depending on class of device restricting the connection only to Carkit.
-             BluetoothClass btClass = mDevice.getBluetoothClass();
-             if (btClass.getDeviceClass() == BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE) {
-                 Log.d(TAG, "No connection expected with current device");
-                 return;
-             }
-        }
         for (LocalBluetoothProfile profile : mProfiles) {
             if (connectAllProfiles ? profile.isConnectable() : profile.isAutoConnectable()) {
                 if (profile.isPreferred(mDevice)) {
@@ -266,20 +252,13 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         // Reset the only-show-one-error-dialog tracking variable
         mIsConnectingErrorPossible = true;
         connectInt(profile);
+        // Refresh the UI based on profile.connect() call
+        refresh();
     }
 
-    private void connectInt(LocalBluetoothProfile profile) {
+    synchronized void connectInt(LocalBluetoothProfile profile) {
         if (!ensurePaired()) {
             return;
-        } else {
-            // connecting is unreliable while scanning, so cancel discovery
-            if (mLocalAdapter == null) {
-                Log.e(TAG, "Adapter is null");
-                return;
-            }
-            if (mLocalAdapter.isDiscovering()) {
-                mLocalAdapter.cancelDiscovery();
-            }
         }
         if (profile.connect(mDevice)) {
             if (Utils.D) {
@@ -322,8 +301,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     }
 
     void unpair() {
-        disconnect();
-
         int state = getBondState();
 
         if (state == BluetoothDevice.BOND_BONDING) {
@@ -338,7 +315,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
                     if (Utils.D) {
                         Log.d(TAG, "Command sent successfully:REMOVE_BOND " + describe(null));
                     }
-                    setRemovable(true);
                 } else if (Utils.V) {
                     Log.v(TAG, "Framework rejected command immediately:REMOVE_BOND " +
                             describe(null));
@@ -355,6 +331,16 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             mProfileConnectionState.put(profile, state);
         }
         return mProfileConnectionState.get(profile);
+    }
+
+    public void clearProfileConnectionState ()
+    {
+        if (Utils.D) {
+            Log.d(TAG," Clearing all connection state for dev:" + mDevice.getName());
+        }
+        for (LocalBluetoothProfile profile :getProfiles()) {
+            mProfileConnectionState.put(profile, BluetoothProfile.STATE_DISCONNECTED);
+        }
     }
 
     // TODO: do any of these need to run async on a background thread?
@@ -411,22 +397,12 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         return mVisible;
     }
 
-    boolean isRemovable () {
-        return mDeviceRemove;
-   }
-
-
     void setVisible(boolean visible) {
         if (mVisible != visible) {
             mVisible = visible;
             dispatchAttributesChanged();
         }
     }
-
-    void setRemovable(boolean removable) {
-        mDeviceRemove = removable;
-    }
-
 
     int getBondState() {
         return mDevice.getBondState();
@@ -486,18 +462,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         ParcelUuid[] localUuids = mLocalAdapter.getUuids();
         if (localUuids == null) return false;
 
-        if (mProfileManager == null) {
-            Log.e(TAG, "ProfileManager is null");
-            return false;
-        }
-        boolean isSpecialMappingDev = mLocalAdapter.isHostPatchRequired(mDevice,
-                                   BluetoothAdapter.HOST_PATCH_DONT_REMOVE_SERVICE);
-
-        if (!isSpecialMappingDev) {
-            mProfileManager.updateProfiles(uuids, localUuids, mProfiles, mRemovedProfiles);
-        } else {
-            mProfileManager.addNewProfiles(uuids, localUuids, mProfiles, mRemovedProfiles);
-        }
+        mProfileManager.updateProfiles(uuids, localUuids, mProfiles, mRemovedProfiles, mLocalNapRoleConnected);
 
         if (DEBUG) {
             Log.e(TAG, "updating profiles for " + mDevice.getAliasName());
@@ -551,9 +516,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             setPhonebookPermissionChoice(PHONEBOOK_ACCESS_UNKNOWN);
         }
 
-        if (bondState == BluetoothDevice.BOND_BONDED) {
-            fetchName();
-        }
         refresh();
 
         if (bondState == BluetoothDevice.BOND_BONDED) {
@@ -563,11 +525,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
                 connect(false);
             }
             mConnectAfterPairing = false;
-        }
-
-        if (bondState == BluetoothDevice.BOND_RETRY) {
-            Log.i(TAG, "Bond state is Retry, set autoconnect");
-            mConnectAfterPairing = true;
         }
     }
 
