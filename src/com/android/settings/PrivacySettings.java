@@ -16,6 +16,8 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.backup.IBackupManager;
@@ -43,6 +45,8 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
     private static final String BACKUP_DATA = "backup_data";
     private static final String AUTO_RESTORE = "auto_restore";
     private static final String CONFIGURE_ACCOUNT = "configure_account";
+    private static final String FACTORY_RESET = "factory_reset";
+
     private IBackupManager mBackupManager;
     private CheckBoxPreference mBackup;
     private CheckBoxPreference mAutoRestore;
@@ -70,6 +74,13 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
                 resolveContentProvider(GSETTINGS_PROVIDER, 0) == null) {
             screen.removePreference(findPreference(BACKUP_CATEGORY));
         }
+
+        // for MPQ targets, do the following
+        if (MpqUtils.isTargetMpq() == true) {
+            Preference factoryReset = screen.findPreference(FACTORY_RESET);
+            factoryReset.setSummary(getResources().getString(R.string.mpq_master_clear_summary));
+        }
+
         updateToggles();
     }
 

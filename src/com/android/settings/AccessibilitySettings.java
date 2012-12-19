@@ -62,6 +62,7 @@ import android.widget.TextView;
 import com.android.internal.content.PackageMonitor;
 import com.android.internal.view.RotationPolicy;
 import com.android.settings.AccessibilitySettings.ToggleSwitch.OnBeforeCheckedChangeListener;
+import com.qualcomm.util.MpqUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -290,6 +291,15 @@ public class AccessibilitySettings extends SettingsPreferenceFragment implements
             for (int i = 0; i < timeoutValueCount; i++) {
                mLongPressTimeoutValuetoTitleMap.put(timeoutValues[i], timeoutTitles[i]);
             }
+        }
+
+        // do the following for MPQ targets
+        if (MpqUtils.isTargetMpq() == true) {
+            // remove the 'power button ends call' preference
+            mSystemsCategory.removePreference(mTogglePowerButtonEndsCallPreference);
+
+            // remove the 'auto-rotate' screen preference
+            mSystemsCategory.removePreference(mToggleLockScreenRotationPreference);
         }
 
         // Script injection.

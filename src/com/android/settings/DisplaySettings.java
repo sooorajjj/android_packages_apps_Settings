@@ -36,6 +36,7 @@ import android.util.Log;
 
 import com.android.internal.view.RotationPolicy;
 import com.android.settings.DreamSettings;
+import com.qualcomm.util.MpqUtils;
 
 import java.util.ArrayList;
 
@@ -51,6 +52,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_FONT_SIZE = "font_size";
     private static final String KEY_NOTIFICATION_PULSE = "notification_pulse";
     private static final String KEY_SCREEN_SAVER = "screensaver";
+    private static final String KEY_BRIGHTNESS = "brightness";
 
     private CheckBoxPreference mAccelerometer;
     private ListPreference mFontSizePref;
@@ -92,12 +94,25 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
         
         mScreenTimeoutPreference = (ListPreference) findPreference(KEY_SCREEN_TIMEOUT);
-        final long currentTimeout = Settings.System.getLong(resolver, SCREEN_OFF_TIMEOUT,
-                FALLBACK_SCREEN_TIMEOUT_VALUE);
-        mScreenTimeoutPreference.setValue(String.valueOf(currentTimeout));
-        mScreenTimeoutPreference.setOnPreferenceChangeListener(this);
-        disableUnusableTimeouts(mScreenTimeoutPreference);
-        updateTimeoutPreferenceDescription(currentTimeout);
+
+        // Hide the Screen timeout settings for MPQ targets
+        PreferenceScreen thisScreen = getPreferenceScreen();
+        if( MpqUtils.isTargetMpq() == true) {
+            thisScreen.removePreference(mScreenTimeoutPreference);
+        }
+        else {
+            final long currentTimeout = Settings.System.getLong(resolver, SCREEN_OFF_TIMEOUT,
+                    FALLBACK_SCREEN_TIMEOUT_VALUE);
+            mScreenTimeoutPreference.setValue(String.valueOf(currentTimeout));
+            mScreenTimeoutPreference.setOnPreferenceChangeListener(this);
+            disableUnusableTimeouts(mScreenTimeoutPreference);
+            updateTimeoutPreferenceDescription(currentTimeout);
+        }
+
+        // Hide the brightness entry for MPQ targets
+        if( MpqUtils.isTargetMpq() == true) {
+            getPreferenceScreen().removePreference(findPreference(KEY_BRIGHTNESS));
+        }
 
         mFontSizePref = (ListPreference) findPreference(KEY_FONT_SIZE);
         mFontSizePref.setOnPreferenceChangeListener(this);

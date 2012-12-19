@@ -16,6 +16,7 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
 
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
@@ -90,6 +91,11 @@ public class LocationSettings extends SettingsPreferenceFragment
         mNetwork = (CheckBoxPreference) root.findPreference(KEY_LOCATION_NETWORK);
         mGps = (CheckBoxPreference) root.findPreference(KEY_LOCATION_GPS);
         mAssistedGps = (CheckBoxPreference) root.findPreference(KEY_ASSISTED_GPS);
+
+        // For MPQ targets, name the title appropriately
+        if( MpqUtils.isTargetMpq() == true) {
+            mNetwork.setTitle(getResources().getString(R.string.mpq_location_network_based));
+        }
 
         mLocationAccess.setOnPreferenceChangeListener(this);
         return root;

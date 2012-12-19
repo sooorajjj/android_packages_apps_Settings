@@ -16,6 +16,8 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
+
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
@@ -199,6 +201,13 @@ public class WirelessSettings extends SettingsPreferenceFragment {
             Preference ps = findPreference(KEY_CELL_BROADCAST_SETTINGS);
             if (ps != null) root.removePreference(ps);
         }
+
+        // For MPQ targets, remove 'Airplane mode', 'Mobile networks' & 'Cell broadcasts'
+        if( MpqUtils.isTargetMpq() == true) {
+            getPreferenceScreen().removePreference(mAirplaneModePreference);
+            getPreferenceScreen().removePreference(findPreference(KEY_MOBILE_NETWORK_SETTINGS));
+            getPreferenceScreen().removePreference(findPreference(KEY_CELL_BROADCAST_SETTINGS));
+        }
     }
 
     @Override
@@ -230,10 +239,13 @@ public class WirelessSettings extends SettingsPreferenceFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_EXIT_ECM) {
-            Boolean isChoiceYes = data.getBooleanExtra(EXIT_ECM_RESULT, false);
-            // Set Airplane mode based on the return value and checkbox state
-            mAirplaneModeEnabler.setAirplaneModeInECM(isChoiceYes,
-                    mAirplaneModePreference.isChecked());
+            // do the below for non-MPQ targets
+            if (MpqUtils.isTargetMpq() == false) {
+                Boolean isChoiceYes = data.getBooleanExtra(EXIT_ECM_RESULT, false);
+                // Set Airplane mode based on the return value and checkbox state
+                mAirplaneModeEnabler.setAirplaneModeInECM(isChoiceYes,
+                        mAirplaneModePreference.isChecked());
+            }
         }
     }
 

@@ -19,6 +19,8 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
+
 import com.android.internal.util.ArrayUtils;
 import com.android.settings.accounts.AccountSyncSettings;
 import com.android.settings.accounts.AuthenticatorHelper;
@@ -440,6 +442,15 @@ public class Settings extends PreferenceActivity
                 target.remove(header);
             }
 
+            // For MPQ targets, hide the battery related setting
+            if (id == R.id.battery_settings)
+            {
+               if (MpqUtils.isTargetMpq() == true)
+               {
+                  target.remove(header);
+               }
+            }
+
             // Increment if the current one wasn't removed by the Utils code.
             if (target.get(i) == header) {
                 // Hold on to the first header, when we need to reset to the top-level
@@ -703,6 +714,17 @@ public class Settings extends PreferenceActivity
                         holder.summary.setVisibility(View.GONE);
                     }
                     break;
+            }
+
+
+            // For MPQ targets, rename the 'About Setting' appropriately
+            if (header.id == R.id.about_settings)
+            {
+              if (MpqUtils.isTargetMpq() == true)
+               {
+                  holder.title.setText(getContext().getResources()
+                           .getString(R.string.mpq_about_tv_settings));
+               }
             }
 
             return view;

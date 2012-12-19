@@ -46,6 +46,7 @@ import android.util.Log;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.widget.LockPatternUtils;
+import com.qualcomm.util.MpqUtils;
 
 import java.util.ArrayList;
 
@@ -140,7 +141,11 @@ public class SecuritySettings extends SettingsPreferenceFragment
                     break;
             }
         }
-        addPreferencesFromResource(resid);
+
+        // Remove the security setting chooser for MPQ targets
+        if( MpqUtils.isTargetMpq() == false) {
+            addPreferencesFromResource(resid);
+        }
 
 
         // Add options for device encryption
@@ -177,6 +182,17 @@ public class SecuritySettings extends SettingsPreferenceFragment
         // lock instantly on power key press
         mPowerButtonInstantlyLocks = (CheckBoxPreference) root.findPreference(
                 KEY_POWER_INSTANTLY_LOCKS);
+
+        // modify the screen titles for MPQ targets
+        if (MpqUtils.isTargetMpq() == true) {
+            PreferenceGroup securityCategory = (PreferenceGroup)root.findPreference(KEY_SECURITY_CATEGORY);
+            securityCategory.setTitle(getResources().getString(R.string.mpq_crypt_keeper_encrypt_title));
+            securityCategory.setSummary(getResources().getString(R.string.mpq_crypt_keeper_encrypt_summary));
+
+            Preference prefDetail = securityCategory.getPreference(0);
+            prefDetail.setTitle(getResources().getString(R.string.mpq_crypt_keeper_encrypt_title));
+            prefDetail.setSummary(getResources().getString(R.string.mpq_crypt_keeper_encrypt_summary));
+        }
 
         // don't display visible pattern if biometric and backup is not pattern
         if (resid == R.xml.security_settings_biometric_weak &&
