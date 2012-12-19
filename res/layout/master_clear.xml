@@ -34,6 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
+                android:id="@+id/master_clear_desc"
                 android:text="@string/master_clear_desc" />
             <TextView android:id="@+id/also_erases_external"
                 android:layout_width="match_parent"
