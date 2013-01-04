@@ -135,16 +135,6 @@ public class Memory extends SettingsPreferenceFragment {
         // mass storage is enabled if primary volume supports it
         final StorageVolume[] storageVolumes = mStorageManager.getVolumeList();
         return (storageVolumes.length > 0 && storageVolumes[0].allowMassStorage());
-        // only show options menu if we are not using the legacy USB mass storage support
-        setHasOptionsMenu(!massStorageEnabled);
-
-        //add internal storage
-        Utils.updatePreferenceToSpecificActivityOrRemove(getActivity(), (PreferenceGroup)getPreferenceScreen(),
-                STORAGE_MGR_KEY,
-                Utils.UPDATE_PREFERENCE_FLAG_SET_TITLE_TO_MATCHING_ACTIVITY);
-        internalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.internal_sd));
-        externalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.external_sd));
-
     }
 
     private void updateSDMountStatus(){
