@@ -36,23 +36,17 @@
         <ListPreference
             android:key="voice"
             android:title="@string/voice_title"
-            android:persistent="false"
-            android:entries="@array/multi_sim_entries_voice"
-            android:entryValues="@array/multi_sim_values_voice" />
+            android:persistent="false" />
 
         <ListPreference
             android:key="data"
             android:title="@string/data_title"
-            android:persistent="false"
-            android:entries="@array/multi_sim_entries"
-            android:entryValues="@array/multi_sim_values" />
+            android:persistent="false" />
 
         <ListPreference
             android:key="sms"
             android:title="@string/sms_title"
-            android:persistent="false"
-            android:entries="@array/multi_sim_entries"
-            android:entryValues="@array/multi_sim_values" />
+            android:persistent="false" />
 
         <PreferenceScreen
             android:key="config_sub"
@@ -63,6 +57,16 @@
                     android:targetPackage="com.android.phone"
                     android:targetClass="com.android.phone.SetSubscription" />
         </PreferenceScreen>
+
+        <CheckBoxPreference
+            android:key="tune_away"
+            android:title="@string/tune_away_title"
+            android:persistent="false" />
+
+        <ListPreference
+            android:key="priority_subscription"
+            android:title="@string/priority_sub_title"
+            android:persistent="false" />
 
     </PreferenceCategory>
 

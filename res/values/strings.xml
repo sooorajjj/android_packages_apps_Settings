@@ -4180,8 +4180,22 @@ alog [CHAR LIMIT=none] -->
     <string name="subscription_01_summary">Set options for SUB1 network settings</string>
     <!-- Mobile networks, item title to go into the network settings -->
     <string name="subscription_02_title">SUB 2</string>
+    <!-- Mobile networks, item title to go into the network settings -->
+    <string name="subscription_03_title">SUB 3</string>
     <!-- Mobile networks, the item summary for the user to go into the network settings -->
     <string name="subscription_02_summary">Set options for SUB2 network settings</string>
+
+    <!--Prompt, used only for voice-->
+    <string name="prompt">Prompt</string>
+    <string name="prompt_user">Prompt User</string>
+
+    <!-- Tune Away settings -->
+    <string name="tune_away_title">Tune Away</string>
+    <string name="tune_away_Default">Disable</string>
+
+    <!-- Priority subscription settings -->
+    <string name="priority_sub_title">Priority Subscription</string>
+    <string name="priority_sub_summary">Select Priority Subscription</string>
 
     <!-- A menu item in "About phone" that allows the user to update the phone with settings
     from their cell phone carrier. The use of the string is similar to the string
