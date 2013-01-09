@@ -16,6 +16,8 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorDescription;
@@ -130,6 +132,14 @@ public class MasterClear extends Fragment {
     private void establishInitialState() {
         mInitiateButton = (Button) mContentView.findViewById(R.id.initiate_master_clear);
         mInitiateButton.setOnClickListener(mInitiateListener);
+        TextView descTextView = (TextView) mContentView.findViewById(R.id.master_clear_desc);
+
+        // For MPQ, set the button text appropriately
+        if (MpqUtils.isTargetMpq() == true) {
+            descTextView.setText(getResources().getString(R.string.mpq_master_clear_desc));
+            mInitiateButton.setText(getResources().getString(R.string.mpq_master_clear_button_text));
+        }
+
         mExternalStorageContainer = mContentView.findViewById(R.id.erase_external_container);
         mExternalStorage = (CheckBox) mContentView.findViewById(R.id.erase_external);
 

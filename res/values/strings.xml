@@ -4271,4 +4271,30 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
+
+    <!-- 'About TV' string -->
+    <string name="mpq_about_tv_settings">About TV</string>
+    <!-- 'Wifi & network location -->
+    <string name="mpq_location_network_based">Wi-Fi &amp; ethernet network location</string>
+    <!-- ikeypad sounds settings label -->
+    <string name="mpq_dtmf_tone_enable_title">Keypad touch tones</string>
+    <!-- Backup & restore label -->
+    <string name="mpq_master_clear_summary">Erases all data on TV</string>
+    <!-- Title of the preferences item to control encryption -->
+    <string name="mpq_crypt_keeper_encrypt_title">Encrypt TV</string>
+    <!-- summary to be shown in 'Encrypt TV' settings category -->
+    <string name="mpq_crypt_keeper_encrypt_summary">
+    Require a numeric PIN or password to decrypt your TV each time you
+    power it on</string>
+    <!-- Encryption string description  -->
+    <string name="mpq_crypt_keeper_desc">
+    You can encrypt your accounts, settings, downloaded apps and their data,
+    media, and other files. Once you encrypt your TV, you need to type a numeric PIN
+    or password to decrypt it each time you power it on. You can\'t decrypt your TV
+    except by performing a factory data reset, erasing all your data.\n\nEncryption takes
+    an hour or more.</string>
+    <!-- Master clear description -->
+    <string name="mpq_master_clear_desc">"This will erase all data from your TV\'s <b>internal storage</b>, including:\n\n<li>Your Google account</li>\n<li>System and app data and settings</li>\n<li>Downloaded apps</li>"</string>
+    <!-- master reset button text -->
+    <string name="mpq_master_clear_button_text">Reset TV</string>
 </resources>

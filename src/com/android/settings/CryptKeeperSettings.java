@@ -17,6 +17,7 @@
 package com.android.settings;
 
 import com.android.internal.widget.LockPatternUtils;
+import com.qualcomm.util.MpqUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class CryptKeeperSettings extends Fragment {
     private static final String TAG = "CryptKeeper";
@@ -71,10 +73,12 @@ public class CryptKeeperSettings extends Fragment {
                      plugged == BatteryManager.BATTERY_PLUGGED_USB) &&
                      invalidCharger == 0;
 
-                // Update UI elements based on power/battery status
-                mInitiateButton.setEnabled(levelOk && pluggedOk);
-                mPowerWarning.setVisibility(pluggedOk ? View.GONE : View.VISIBLE );
-                mBatteryWarning.setVisibility(levelOk ? View.GONE : View.VISIBLE);
+                if (MpqUtils.isTargetMpq() == false) {
+                    // Update UI elements based on power/battery status
+                    mInitiateButton.setEnabled(levelOk && pluggedOk);
+                    mPowerWarning.setVisibility(pluggedOk ? View.GONE : View.VISIBLE );
+                    mBatteryWarning.setVisibility(levelOk ? View.GONE : View.VISIBLE);
+                }
             }
         }
     };
@@ -113,6 +117,11 @@ public class CryptKeeperSettings extends Fragment {
 
         mPowerWarning = mContentView.findViewById(R.id.warning_unplugged);
         mBatteryWarning = mContentView.findViewById(R.id.warning_low_charge);
+
+        if (MpqUtils.isTargetMpq() == true) {
+            TextView descriptionTextView = (TextView)(mContentView.findViewById(R.id.crypt_description));
+            descriptionTextView.setText(getResources().getString(R.string.mpq_crypt_keeper_desc));
+        }
 
         return mContentView;
     }

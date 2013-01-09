@@ -16,6 +16,8 @@
 
 package com.android.settings;
 
+import com.qualcomm.util.MpqUtils;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -193,6 +195,20 @@ public class SoundSettings extends SettingsPreferenceFragment implements
                 }
             }
         };
+
+        // Do the following for MPQ targets
+        if (MpqUtils.isTargetMpq() == true) {
+            mDtmfTone.setTitle(getResources().getString(R.string.mpq_dtmf_tone_enable_title));
+
+            // remove the ringtone preference title
+            getPreferenceScreen().removePreference(findPreference(KEY_CATEGORY_CALLS));
+
+            // remove the ringtone preference
+            getPreferenceScreen().removePreference(mRingtonePreference);
+
+            // remove the screen lock sounds
+            getPreferenceScreen().removePreference(mLockSounds);
+        }
     }
 
     @Override
