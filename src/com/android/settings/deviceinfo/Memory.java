@@ -100,15 +100,6 @@ public class Memory extends SettingsPreferenceFragment {
 
         mResources = getResources();
 
-        if (!Environment.isExternalStorageEmulated()) {
-            // External storage is separate from internal storage; need to
-            // show internal storage as a separate item.
-            mInternalStorageVolumePreferenceCategory = new StorageVolumePreferenceCategory(
-                    getActivity(), mResources, null, mStorageManager, false);
-            getPreferenceScreen().addPreference(mInternalStorageVolumePreferenceCategory);
-            mInternalStorageVolumePreferenceCategory.init();
-        }
-
         StorageVolume[] storageVolumes = mStorageManager.getVolumeList();
         int length = storageVolumes.length;
         mStorageVolumePreferenceCategories = new StorageVolumePreferenceCategory[length];
