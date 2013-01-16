@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2013 The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,7 +283,7 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment {
 
                 // Available devices category
                 if (mAvailableDevicesCategory == null) {
-                    mAvailableDevicesCategory = new ProgressCategory(getActivity(), null,  R.string.bluetooth_devices_no_devices_found);
+                    mAvailableDevicesCategory = new BluetoothProgressCategory(getActivity(), null);
                 } else {
                     mAvailableDevicesCategory.removeAll();
                 }
