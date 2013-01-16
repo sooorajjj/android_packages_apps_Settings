@@ -448,8 +448,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                 boolean tuneAwayValue = mQcRilHook.qcRilGetTuneAway();
                 mTuneAwayValue = tuneAwayValue;
                 Log.e(TAG, "resumeTuneAwayStatus qcRilGetTuneAway value is: " + mTuneAwayValue);
-                mTuneAway.setChecked(tuneAwayValue);
-                mTuneAway.setSummary(tuneAwayValue ? "Enable" : "Disable");
+                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_TUNE_AWAY_DONE));
             }
         }).start();
     }
@@ -480,8 +479,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                 } else {
                     // Update old value to user
                 }
-                mPrioritySub.setValue(Integer.toString(mPrioritySubValue));
-                mPrioritySub.setSummary(summaries[mPrioritySubValue]);
+                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_PRIORITY_SUBSCRIPTION));
             }
         }).start();
     }

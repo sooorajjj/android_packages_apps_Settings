@@ -4136,7 +4136,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Multi Sim Settings screen, Select Sub label -->
     <string name="sel_sub_title">Configure Subscriptions </string>
     <!-- Multi Sim Settings screen, Select Sub Summary label -->
-    <string name="sel_sub_summary">Select the Subscription for SUB-1 and SUB-2</string>
+    <string name="sel_sub_summary">Select the Subscription for Activate or Deactivate</string>
     <!-- Select Subscription screen title -->
     <string name="select_subscription">Select Subscription</string>
 
