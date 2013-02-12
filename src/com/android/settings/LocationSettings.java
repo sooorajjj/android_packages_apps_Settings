@@ -95,6 +95,9 @@ public class LocationSettings extends SettingsPreferenceFragment
         // For MPQ targets, name the title appropriately
         if( MpqUtils.isTargetMpq() == true) {
             mNetwork.setTitle(getResources().getString(R.string.mpq_location_network_based));
+
+            // gps provider not required for MPQ
+            root.removePreference(mGps);
         }
 
         mLocationAccess.setOnPreferenceChangeListener(this);
@@ -154,7 +157,11 @@ public class LocationSettings extends SettingsPreferenceFragment
                 res, LocationManager.GPS_PROVIDER);
         boolean networkEnabled = Settings.Secure.isLocationProviderEnabled(
                 res, LocationManager.NETWORK_PROVIDER);
-        mGps.setChecked(gpsEnabled);
+
+        if (mGps != null) {
+            mGps.setChecked(gpsEnabled);
+        }
+
         mNetwork.setChecked(networkEnabled);
         mLocationAccess.setChecked(gpsEnabled || networkEnabled);
         if (mAssistedGps != null) {
