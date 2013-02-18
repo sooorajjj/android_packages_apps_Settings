@@ -1871,11 +1871,11 @@ alog [CHAR LIMIT=none] -->
     <string name="dialog_title_font_size">Font size</string>
 
     <!-- SIM lock settings title -->
-    <string name="sim_lock_settings">SIM/RUIM card lock settings</string>
+    <string name="sim_lock_settings">SIM card lock settings</string>
     <!-- Security & location settings screen, setting option name -->
-    <string name="sim_lock_settings_category">Set up SIM/RUIM card lock</string>
+    <string name="sim_lock_settings_category">Set up SIM card lock</string>
     <!-- Security & location settings screen, section heading for settings related to sim card locking -->
-    <string name="sim_lock_settings_title">SIM/RUIM card lock</string>
+    <string name="sim_lock_settings_title">SIM card lock</string>
     <!-- SIM card lock settings screen, setting check box label -->
     <string name="sim_pin_toggle">Lock SIM card</string>
     <!-- SIM card lock settings screen, setting option summary text when SIM lock check box is selected -->
@@ -4338,7 +4338,8 @@ alog [CHAR LIMIT=none] -->
     <string name="select_subscription">Select Subscription</string>
 
     <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
-    <string name="multi_sim_settings_title">Multi Sim Settings</string>
+    <string name="multi_sim_settings_title">Dual SIM settings</string>
+    <string name="multi_sim_settings_title_Multi">Multi Sim Settings</string>
     <!-- Main settings screen, Multi Sim settings summary for item to go into Multi settings -->
     <string name="multi_sim_settings_summary">Set up Multi Sim Settings for Voice, Data and SMS</string>
 
@@ -4353,7 +4354,7 @@ alog [CHAR LIMIT=none] -->
     <string name="data_summary">Select Subscription for Data Call</string>
 
     <!-- Multi Sim Settings screen, SMS box label -->
-    <string name="sms_title">SMS </string>
+    <string name="sms_title">Messaging</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="sms_summary">Select the Subscription for Sending SMS</string>
 
@@ -4509,6 +4510,86 @@ alog [CHAR LIMIT=none] -->
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
     <string name="apn_PPP_number">PPP phone number</string>
+    
+    <!-- for multisim settings -->
+    <string name="mobile_network_setting">Mobile network settings</string>
+    <string name="call_settings">Call settings</string>
+    <!-- Multi SIM settings screen, preferred subscription settings -->
+    <string name="preferred_subs_settings_title">Preferred SIM settings</string>
+    <!-- Multi Sim Setting screen, countdown timer waiting time -->
+    <string name="countdown_time_title">Count down time</string>
+    <!-- Multi Sim Setting screen, countdown timer no wait -->
+    <string name="no_wait_time">no wait</string>
+    <!-- Multi Sim Setting screen, countdown timer always wait -->
+    <string name="infinite_wait_time">always wait</string>
+    <!-- Multi Sim Setting screen, countdown timer wait time unit -->
+    <string name="wait_time_unit">s</string>
+    <!-- Multi Sim Select Subscription screen, invalid subscription -->
+    <string name="subscription_invalid">Card Absent Or Disabled</string>
+    <!-- Dual Sim Setting screen,  item title to preferred callback setting -->
+    <string name="preferred_callback_title">Preferred callback</string>
+    <!-- Dual Sim Settings screen, callback enable summary label -->
+    <string name="callback_enable_summary">Preferred callback is ON</string>
+    <!-- Dual Sim Settings screen, callback disable summary label -->
+    <string name="callback_disable_summary">Preferred callback is OFF</string>
+    <string name="close_dialog">OK</string>
+    <string name="sim_naming_title">SIM Card Naming</string>
+    <string name="summary_network_settings">Set options for mobile networks, APNs</string>
+    <string name="summary_call_settings">Set voice mail, call options for dual SIMs</string>
+    <string name="sim_enabler_title">SIM card</string>
+    <string name="sim_enabler">SIM card</string>
+    <string name="sim_enabler_summary">SIM is %1$s</string>
+    <string name="sim_enabled">enabled</string>
+    <string name="sim_disabled">disabled</string>
+    <string name="sim_missing">missing or error</string>
+    <string name="sim_enabler_need_enable_sim">Will enable it, are you sure?</string>
+    <string name="sim_enabler_need_disable_sim">Will disable it, are you sure?</string>
+    <string name="sim_enabler_airplane_on">ERROR, airplane mode is on!</string>
+    <string name="sim_enabler_in_call">ERROR, in call!</string>
+    <string name="sim_enabler_both_inactive">"Error, can't disable both at the same time!"</string>
+    <string name="sim_enabler_enabling">Enabling</string>
+    <string name="sim_enabler_disabling">Disabling</string>
+    <string name="sub_activate_success">Activate success.</string>
+    <string name="sub_activate_failed">Activate failed</string>
+    <string name="sub_deactivate_success">Deactivate success</string>
+    <string name="sub_deactivate_failed">Deactivate failed</string>
+    <string name="sub_deactivate_not_supported">Deactivate not supported</string>
+    <string name="sub_activate_not_supported">Activate not supported</string>
+    <string name="sub_not_changed">State not changed</string>
+    <string name="title_sim_alias">Alias name</string>
+<!-- for brightness adjusting -->
+    <string name="normal_brightness_title">Brightness Adjusting</string>
+    <string name="normal_brightness_summary">Brightness Adjusting ,normal brightness handling</string>
+    <string name="enhanced_brightness_title">Enhanced Brightness Adjusting</string>
+    <string name="enhanced_brightness_summary">It is usually used to improve video quality and save more power when playing video clips. </string>
+    <string name="cabl_levels_summary">A lower level means more power is saved, but could
+                cause the screen to be dimmer than expected</string>
+    <string name="brightness_settings_category">Brightness </string>
+    <string name="normal_brightness">Normal Brightness</string>
+    <string name="enhanced_brightness">Dynamic Brightness </string>
+    <string name="choose_brightness_settings">Choose Brightness Settings </string>
+    
+    <!--for key backlight-->
+    <string name="key_backlight_title">Key backlight</string>
+    
+    <!-- for internal storage -->
+    <string name="summary_storage_manage">SD card device: %1$s</string>
+    <string name="external_sd">External SD</string>
+    <string name="internal_sd">Internal SD</string>
+    <!--search function for application settings-->
+    <string name="show_search_function">Search</string>
+
+    <!--auto power on/off function for settings-->
+    <string name="hardware_version">Hardware version</string>
+    <string name="software_version">Software version</string>
+    <string name="auto_power_settings_title">Auto power on/off</string>
+    <string name="auto_on_title">Auto power on</string>
+    <string name="auto_on_summary_off">Open auto power on</string>
+    <string name="auto_on_time">Auto power on time</string>
+    <string name="auto_off_title">Auto power off</string>
+    <string name="auto_off_summary_off">Open auto power off</string>
+    <string name="auto_off_time">Auto power off time</string> 
+    
     <string name="china_union_net_apn_name">China Unicom NET</string>
     <string name="china_union_wap_apn_name">China Unicom WAP</string>
     <string name="china_union_mms_apn_name">China Unicom MMS</string>
@@ -4546,4 +4627,9 @@ alog [CHAR LIMIT=none] -->
     <string name="supl_not_set">&lt;Not set&gt;</string>
 
     <!-- agps settings end-->  
+        
+    <string name="select_slot_always_ask">Always ask</string>
+
+    <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
+
 </resources>

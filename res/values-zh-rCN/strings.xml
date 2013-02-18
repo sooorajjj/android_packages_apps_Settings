@@ -953,6 +953,79 @@
     <string name="bluetooth_tethering_overflow_error" msgid="6285122039489881969">"无法与 <xliff:g id="MAXCONNECTION">%1$d</xliff:g> 台以上的设备共享网络。"</string>
     <string name="bluetooth_untether_blank" msgid="2871192409329334813">"即将断开与<xliff:g id="DEVICE_NAME">%1$s</xliff:g>的网络共享。"</string>
     <string name="tethering_help_button_text" msgid="656117495547173630">"帮助"</string>
+    <string name="call_settings">"通话设置"</string>
+    <string name="mobile_network_setting">"移动网络设置"</string>
+    <string name="summary_network_settings">"设置网络模式、接入点和运营商等"</string>
+    <string name="summary_call_settings">"设置双卡的语音信箱、通话设置等"</string>
+    <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
+    <string name="multi_sim_settings_title">"双卡设置"</string>
+    <!-- Main settings screen, Multi Sim settings summary for item to go into Multi settings -->
+    <string name="multi_sim_settings_summary">"设置双卡的语音、短消息和数据服务"</string>
+    <!-- Multi SIM settings screen, preferred subscription settings -->
+    <string name="preferred_subs_settings_title">"默认通道设置"</string>
+    <!-- Multi Sim Settings screen, Voice box label -->
+    <string name="voice_title">"语音"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="voice_summary">"默认语音通道"</string>
+
+    <!-- Multi Sim Settings screen, Data box label -->
+    <string name="data_title">"数据"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="data_summary">"默认数据通道"</string>
+    <!-- Multi Sim Settings screen, SMS box label -->
+    <string name="sms_title">"短消息"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="sms_summary">"默认短消息通道"</string>
+    <!-- Multi Sim Name Setting Title -->
+    <string name="title_sim_alias">SIM卡名称</string>
+    <!-- Multi Sim Settings screen, Select Sub label -->
+    <string name="sel_sub_title">"SIM卡配置"</string>
+    <!-- Multi Sim Settings screen, Select Sub Summary label -->
+    <string name="sel_sub_summary">"设置SIM卡名称、网络等"</string>
+    <string name="select_subscription">选择卡槽</string>
+
+
+    <!-- Multi Sim Settings screen, Set DDS progress dialog message -->
+    <string name="set_data_subscription_progress">"正在设置默认数据通道"</string>
+    <!-- Multi Sim Settings screen, Set DDS success message -->
+    <string name="set_dds_success">"成功设置默认数据通道"</string>
+    <!-- Multi Sim Settings screen, Set DDS failure message -->
+    <string name="set_dds_failed">"设置默认数据通道错误，请关闭数据链接后再设置"</string>
+    <!-- Multi Sim Setting screen, countdown timer waiting time -->
+    <string name="countdown_time_title">"倒计时时间"</string>
+    <!-- Multi Sim Setting screen, countdown timer no wait -->
+    <string name="no_wait_time">"从不等待"</string>
+    <!-- Multi Sim Setting screen, countdown timer always wait -->
+    <string name="infinite_wait_time">"一直等待"</string>
+    <!-- Multi Sim Setting screen, countdown timer wait time unit -->
+    <string name="wait_time_unit">"秒"</string>
+    <!-- Multi Sim Select Subscription screen, invalid subscription -->
+    <string name="subscription_invalid">"没有SIM卡，或SIM卡被禁用"</string>
+    <string name="sim_enabler_title">"SIM卡"</string>
+    <string name="sim_enabler">"SIM卡"</string>
+    <string name="sim_enabler_summary">"SIM卡%1$s"</string>
+    <string name="sim_enabled">"已启用"</string>
+    <string name="sim_disabled">"已禁用"</string>
+    <string name="sim_missing">"缺失或错误"</string>
+    <string name="sim_enabler_need_enable_sim">"启用SIM卡，确定？"</string>
+    <string name="sim_enabler_need_disable_sim">"禁用SIM卡，确定？"</string>
+    <string name="sim_enabler_airplane_on">"错误，飞行模式开启中！"</string>
+    <string name="sim_enabler_in_call">"错误，通话中！"</string>
+    <string name="sim_enabler_both_inactive">"错误，不能禁用两路！"</string>
+    <string name="sim_enabler_enabling">"启用中。。。"</string>
+    <string name="sim_enabler_disabling">"禁用中。。。"</string>
+    <string name="sim_naming_title">"SIM卡名称"</string>
+    <string name="sub_activate_success">"启用成功。"</string>
+    <string name="sub_activate_failed">"启用失败。"</string>
+    <string name="sub_deactivate_success">"禁用成功。"</string>
+    <string name="sub_deactivate_failed">"禁用失败。"</string>
+    <string name="sub_deactivate_not_supported">"不支持启用。"</string>
+    <string name="sub_activate_not_supported">"不支持禁用。"</string>
+    <string name="sub_not_changed">"状态没有变化。"</string>
+    <string name="preferred_callback_title">回拨优先</string>
+    <string name="callback_enable_summary">回拨优先已开启</string>
+    <string name="callback_disable_summary">回拨优先已关闭</string>
+    <string name="close_dialog">确定</string>
     <string name="network_settings_title" msgid="7967552516440151852">"移动网络"</string>
     <string name="location_title" msgid="1029961368397484576">"我的位置"</string>
     <string name="location_network_based" msgid="7472814266821714527">"Wi-Fi 和移动网络位置信息"</string>
@@ -1791,6 +1864,12 @@
     <string name="selinux_status_disabled" msgid="924551035552323327">"已停用"</string>
     <string name="selinux_status_permissive" msgid="6004965534713398778">"许可"</string>
     <string name="selinux_status_enforcing" msgid="2252703756208463329">"执行中"</string>
+    <string name="brightness_settings_category">亮度</string>
+    <string name="normal_brightness">正常亮度</string>
+    <string name="enhanced_brightness">动态亮度 </string>
+    <string name="enhanced_brightness_summary">通常在耗电量大的视频模式下使用提升动态影像质量同时降低耗电量。 </string>
+    <string name="cabl_levels_summary">低级电量模式可以节约更多电量，但是屏幕会比预期更暗一些</string>
+    <string name="choose_brightness_settings">选择亮度模式 </string>	
     <string name="user_settings_title" msgid="6151874007858148344">"用户"</string>
     <string name="user_you_section" msgid="6247838798859425408">"您"</string>
     <string name="user_list_title" msgid="8866161687358773982">"其他用户"</string>
@@ -1830,7 +1909,24 @@
     <string name="user_picture_title" msgid="7297782792000291692">"照片 ID"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
+    <!--search function for application settings-->
+    <string name="show_search_function">搜索</string>  
     <string name="apn_PPP_number">PPP 电话号码</string>
+    
+    <!--for key backlight-->
+    <string name="key_backlight_title">按键背光</string>
+    
+    <!--auto power on/off function for settings-->
+    <string name="hardware_version">硬件版本</string>
+    <string name="software_version">软件版本</string>
+    <string name="auto_power_settings_title">"自动开关机"</string>
+    <string name="auto_on_title">自动开机</string>
+    <string name="auto_on_summary_off">开启自动开机</string>
+    <string name="auto_on_time">开机时间</string>
+    <string name="auto_off_title">自动关机</string>
+    <string name="auto_off_summary_off">开启自动关机</string>
+    <string name="auto_off_time">关机时间</string>
+    
     <string name="china_union_net_apn_name">沃3G连接互联网</string>
     <string name="china_union_wap_apn_name">沃3G手机上网</string>
     <string name="china_union_mms_apn_name">联通彩信</string>
@@ -1864,4 +1960,8 @@
     <string name="location_agps_register_network_type_dialog_title">选择网络</string>
     <string name="supl_not_set">"&lt;未设置&gt;"</string>
     <!-- end add by zw 2013.1.10 agps settings end-->
+    
+    <string name="select_slot_always_ask">总是询问</string>
+    <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>
+
 </resources>
