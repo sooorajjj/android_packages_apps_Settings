@@ -54,8 +54,6 @@ import com.android.internal.telephony.msim.Subscription.SubscriptionStatus;
 import com.android.internal.telephony.msim.SubscriptionManager;
 import com.android.internal.telephony.msim.MSimPhoneFactory;
 
-import com.android.qualcomm.qcrilhook.QcRilHook;
-
 import com.android.settings.R;
 
 public class MultiSimSettings extends PreferenceActivity implements DialogInterface.
@@ -66,8 +64,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     private static final String KEY_DATA = "data";
     private static final String KEY_SMS = "sms";
     private static final String KEY_CONFIG_SUB = "config_sub";
-    private static final String TUNE_AWAY = "tune_away";
-    private static final String PRIORITY_SUB = "priority_subscription";
 
     private static final String CONFIG_SUB = "CONFIG_SUB";
 
@@ -78,9 +74,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     static final int EVENT_SUBSCRIPTION_DEACTIVATED = 3;
     static final int EVENT_SET_VOICE_SUBSCRIPTION = 4;
     static final int EVENT_SET_SMS_SUBSCRIPTION = 5;
-    static final int EVENT_SET_PRIORITY_SUBSCRIPTION = 6;
-    static final int EVENT_SET_TUNE_AWAY = 7;
-    static final int EVENT_SET_TUNE_AWAY_DONE = 8;
     protected boolean mIsForeground = false;
     static final int SUBSCRIPTION_ID_0 = 0;
     static final int SUBSCRIPTION_ID_1 = 1;
@@ -99,17 +92,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     CharSequence[] entriesPrompt; // Used in case of prompt option is required.
     CharSequence[] entryValuesPrompt; // Used in case of prompt option is required.
     CharSequence[] summariesPrompt; // Used in case of prompt option is required.
-
-    private QcRilHook mQcRilHook;
-
-    /* tune away initial/old state */
-    private boolean mTuneAwayValue = false;
-
-    /* Priority subscription initial/old state */
-    private int mPrioritySubValue = 0;
-
-    private CheckBoxPreference mTuneAway;
-    private ListPreference mPrioritySub;
 
     SubscriptionManager subManager = SubscriptionManager.getInstance();
     @Override
@@ -136,12 +118,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
             subManager.registerForSubscriptionDeactivated(subId,
                     mHandler, EVENT_SUBSCRIPTION_DEACTIVATED, null);
         }
-
-        mQcRilHook = new QcRilHook();
-        mTuneAway = (CheckBoxPreference) findPreference(TUNE_AWAY);
-        mTuneAway.setOnPreferenceChangeListener(this);
-        mPrioritySub = (ListPreference) findPreference(PRIORITY_SUB);
-        mPrioritySub.setOnPreferenceChangeListener(this);
 
         // Create and Intialize the strings required for MultiSIM
         // Dynamic creation of entries instead of using static array vlues.
@@ -176,18 +152,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         updateMultiSimEntriesForData();
         updateMultiSimEntriesForSms();
         mIsForeground = true;
-        resumeTuneAwayStatus();
-        updateMultiSimEntriesForPrioritySub();
-        resumePrioritySub();
         updateState();
-    }
-
-    protected void updateMultiSimEntriesForPrioritySub() {
-        mPrioritySub.setEntries(entries);
-        mPrioritySub.setEntryValues(entryValues);
-        //Setting default values
-        mPrioritySub.setValue("0");
-        mPrioritySub.setSummary(summaries[0]);
     }
 
     protected void updateMultiSimEntriesForData() {
@@ -320,13 +285,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
             mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_SMS_SUBSCRIPTION));
         }
 
-        if (TUNE_AWAY.equals(key)) {
-            mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_TUNE_AWAY));
-        }
-
-        if (PRIORITY_SUB.equals(key)) {
-            updatePrioritySub(objValue);
-        }
         return true;
     }
 
@@ -380,17 +338,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                 case EVENT_SET_SMS_SUBSCRIPTION:
                     updateSmsSummary();
                     break;
-                case EVENT_SET_TUNE_AWAY:
-                    updateTuneAwayStatus();
-                    break;
-                case EVENT_SET_TUNE_AWAY_DONE:
-                    mTuneAway.setChecked(mTuneAwayValue);
-                    mTuneAway.setSummary(mTuneAwayValue ? "Enable" : "Disable");
-                    break;
-                case EVENT_SET_PRIORITY_SUBSCRIPTION:
-                    mPrioritySub.setValue(Integer.toString(mPrioritySubValue));
-                    mPrioritySub.setSummary(summaries[mPrioritySubValue]);
-                    break;
             }
         }
     };
@@ -440,64 +387,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                .setPositiveButton(android.R.string.yes, this)
                .show()
                .setOnDismissListener(this);
-    }
-
-    private void resumeTuneAwayStatus() {
-        new Thread(new Runnable() {
-            public void run() {
-                boolean tuneAwayValue = mQcRilHook.qcRilGetTuneAway();
-                mTuneAwayValue = tuneAwayValue;
-                Log.e(TAG, "resumeTuneAwayStatus qcRilGetTuneAway value is: " + mTuneAwayValue);
-                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_TUNE_AWAY_DONE));
-            }
-        }).start();
-    }
-
-    private void updateTuneAwayStatus() {
-        new Thread(new Runnable() {
-            public void run() {
-                boolean tuneAwayValue = mTuneAway.isChecked();
-                Log.e(TAG," updateTuneAwayStatus change tuneAwayValue to: " + tuneAwayValue);
-                boolean result = mQcRilHook.qcRilSetTuneAway(tuneAwayValue);
-                if (result) {
-                    mTuneAwayValue = tuneAwayValue;
-                } else {
-                    Log.e(TAG,"setTuneAway is failed, revert to old value: " + mTuneAwayValue);
-                }
-                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_TUNE_AWAY_DONE));
-            }
-        }).start();
-    }
-
-    private void resumePrioritySub() {
-        new Thread(new Runnable() {
-            public void run() {
-                int prioritySubIndex = mQcRilHook.qcRilGetPrioritySub();
-                Log.e(TAG, "resumePrioritySub qcRilGetPrioritySub value is: " + prioritySubIndex);
-                if (prioritySubIndex < mNumPhones) {
-                    mPrioritySubValue = prioritySubIndex;
-                } else {
-                    // Update old value to user
-                }
-                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_PRIORITY_SUBSCRIPTION));
-            }
-        }).start();
-    }
-
-    private void updatePrioritySub(final Object presentPriority) {
-        new Thread(new Runnable() {
-            public void run() {
-                int prioritySubIndex = Integer.parseInt((String) presentPriority);
-                Log.e(TAG, "updatePrioritySub change priority sub to: " + prioritySubIndex);
-                boolean result = mQcRilHook.qcRilSetPrioritySub(prioritySubIndex);
-                if (result) {
-                    mPrioritySubValue = prioritySubIndex;
-                } else {
-                    Log.e(TAG,"Set priority sub failed, revert to old value: " + mPrioritySubValue);
-                }
-                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_PRIORITY_SUBSCRIPTION));
-            }
-        }).start();
     }
 }
 
