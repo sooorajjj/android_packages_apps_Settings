@@ -263,9 +263,9 @@
   </string-array>
   <string-array name="vpn_types_long">
     <item msgid="2732002039459078847">"VPN PPTP"</item>
-    <item msgid="3799752201662127867">"Claves precompartidas de VPN L2TP/IPSec"</item>
+    <item msgid="3799752201662127867">"Claves pre compartidas de VPN L2TP/IPSec"</item>
     <item msgid="4725504331295252103">"VPN L2TP/IPSec con certificados"</item>
-    <item msgid="7526551163264034377">"VPN IPSec con claves precompartidas y autenticación Xauth"</item>
+    <item msgid="7526551163264034377">"VPN IPSec con claves pre compartidas y autenticación Xauth"</item>
     <item msgid="8064740940687465039">"VPN IPSec con certificados y autenticación Xauth"</item>
     <item msgid="4946199982372391490">"VPN IPSec con certificados y autenticación híbrida"</item>
   </string-array>
@@ -277,4 +277,26 @@
     <item msgid="4042143101664725090">"Tiempo de espera agotado"</item>
     <item msgid="7664124146786465092">"Incorrecta"</item>
   </string-array>
+    <string-array name="multi_sim_summaries" >
+        <item>"Suscripción 1"</item>
+        <item>"Suscripción 2"</item>
+    </string-array>
+    <string-array name="multi_sim_entries_voice_without_prompt" >
+        <item>"Suscripción 1"</item>
+        <item>"Suscripción 2"</item>
+    </string-array>
+    <string-array name="multi_sim_entries" >
+        <item>"Suscripción 1"</item>
+        <item>"Suscripción 2"</item>
+    </string-array>
+    <string-array name="multi_sim_entries_voice" >
+        <item>"Suscripción 1"</item>
+        <item>"Suscripción 2"</item>
+        <item>"Apuntar"</item>
+    </string-array>
+    <string-array name="multi_sim_summaries_voice" >
+        <item>"Suscripción 1"</item>
+        <item>"Suscripción 2"</item>
+        <item>"Apuntar Usuario"</item>
+    </string-array>
 </resources>

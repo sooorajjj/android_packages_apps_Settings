@@ -126,7 +126,7 @@
     <string name="bluetooth_connected" msgid="6038755206916626419">"Conectado"</string>
     <string name="bluetooth_connected_no_headset" msgid="2866994875046035609">"Conectado (sin teléfono)"</string>
     <string name="bluetooth_connected_no_a2dp" msgid="4576188601581440337">"Conectado (sin audio multimedia)"</string>
-    <string name="bluetooth_connected_no_headset_no_a2dp" msgid="9195757766755553810">"Conectado (sin tel. ni audio multimedia)"</string>
+    <string name="bluetooth_connected_no_headset_no_a2dp" msgid="9195757766755553810">"Conectado (sin telefono ni audio multimedia)"</string>
     <string name="bluetooth_disconnected" msgid="6557104142667339895">"Desconectado"</string>
     <string name="bluetooth_disconnecting" msgid="8913264760027764974">"Desconectando…"</string>
     <string name="bluetooth_connecting" msgid="8555009514614320497">"Conectando…"</string>
@@ -196,7 +196,7 @@
     <string name="radio_info_gprs_service_label" msgid="2331818110375395364">"Servicio GPRS:"</string>
     <string name="radio_info_roaming_label" msgid="6141505430275138647">"Roaming:"</string>
     <string name="radio_info_imei_label" msgid="1220524224732944192">"IMEI:"</string>
-    <string name="radio_info_call_redirect_label" msgid="1654674226961476872">"Redireccionamiento de llamada:"</string>
+    <string name="radio_info_call_redirect_label" msgid="1654674226961476872">"Re direccionamiento de llamada:"</string>
     <string name="radio_info_ppp_resets_label" msgid="3241667824729310546">"Cantidad de PPP restablecidos desde el reinicio:"</string>
     <string name="radio_info_gsm_disconnects_label" msgid="1683069665736339820">"Desconexiones de GSM:"</string>
     <string name="radio_info_current_network_label" msgid="3256402602440102610">"Red actual:"</string>
@@ -333,8 +333,8 @@
     <string name="lock_settings_picker_title" msgid="1095755849152582712">"Elegir bloqueo pant."</string>
     <string name="backup_lock_settings_picker_title" msgid="8530380598637963916">"Bloqueo alternativo"</string>
     <string name="unlock_set_unlock_launch_picker_title" msgid="2084576942666016993">"Bloqueo de pantalla"</string>
-    <string name="unlock_set_unlock_launch_picker_change_title" msgid="5045866882028324941">"Cambiar pant. de bloq."</string>
-    <string name="unlock_set_unlock_launch_picker_change_summary" msgid="2790960639554590668">"Cambiar/inhab. patrón/PIN/contraseña"</string>
+    <string name="unlock_set_unlock_launch_picker_change_title" msgid="5045866882028324941">"Cambiar pantalla de bloqueo"</string>
+    <string name="unlock_set_unlock_launch_picker_change_summary" msgid="2790960639554590668">"Cambiar o inhabilitar patrón, PIN y contraseña"</string>
     <string name="unlock_set_unlock_launch_picker_enable_summary" msgid="4791110798817242301">"Elige un método para bloquear la pantalla."</string>
     <string name="unlock_backup_info_summary" msgid="108524727803788172">"Si el desbloqueo facial no te reconoce, ¿cómo quieres desbloquear la pantalla?"</string>
     <string name="unlock_set_unlock_off_title" msgid="7117155352183088342">"Ninguna"</string>
@@ -613,7 +613,7 @@
     <string name="display_settings_title" msgid="1708697328627382561">"Pantalla"</string>
     <string name="sound_settings" msgid="5534671337768745343">"Sonido"</string>
     <string name="ringtone_title" msgid="5379026328015343686">"Tono de llamada"</string>
-    <string name="ringtone_summary" msgid="2630023412632683493"></string>
+    <string name="ringtone_summary" msgid="2630023412632683493">""</string>
     <string name="all_volume_title" msgid="4296957391257836961">"Volumen"</string>
     <string name="musicfx_title" msgid="3415566786340790345">"Efectos de la música"</string>
     <string name="ring_volume_title" msgid="7938706566797464165">"Volumen del timbre"</string>
@@ -710,8 +710,8 @@
     <string name="sim_enter_cancel" msgid="6240422158517208036">"Cancelar"</string>
     <string name="device_info_settings" product="tablet" msgid="1119755927536987178">"Estado del tablet"</string>
     <string name="device_info_settings" product="default" msgid="475872867864762157">"Estado del dispositivo"</string>
-    <string name="system_update_settings_list_item_title" msgid="3342887311059985961">"Actualiz. del sistema"</string>
-    <string name="system_update_settings_list_item_summary" msgid="3853057315907710747"></string>
+    <string name="system_update_settings_list_item_title" msgid="3342887311059985961">"Actualización del sistema"</string>
+    <string name="system_update_settings_list_item_summary" msgid="3853057315907710747">""</string>
     <string name="firmware_version" msgid="4801135784886859972">"Versión de Android"</string>
     <string name="model_number" msgid="3765737700545384794">"Número de modelo"</string>
     <string name="fcc_equipment_id" msgid="149114368246356737">"ID del equipo"</string>
@@ -819,7 +819,7 @@
     <string name="apn_auth_type_pap_chap" msgid="9102343063036134541">"PAP o CHAP"</string>
     <string name="apn_type" msgid="469613123902220544">"Tipo de APN"</string>
     <string name="apn_protocol" msgid="3272222921649348640">"Protocolo APN"</string>
-    <string name="apn_roaming_protocol" msgid="3386954381510788422">"Protocolo de APN en itinerancia"</string>
+    <string name="apn_roaming_protocol" msgid="3386954381510788422">"Protocolo de APN en itinerantica"</string>
     <string name="carrier_enabled" msgid="407655861175280806">"Activar/Desactivar el APN"</string>
     <string name="carrier_enabled_summaryOn" msgid="6338915271908057531">"APN activado"</string>
     <string name="carrier_enabled_summaryOff" msgid="4300790190221203756">"APN inhabilitado"</string>
@@ -871,7 +871,7 @@
     <string name="media_format_gesture_prompt" msgid="3109349468816856670">"Extrae tu patrón de desbloqueo"</string>
     <string name="media_format_gesture_explanation" product="nosdcard" msgid="2192044794228379224">"Debes crear tu patrón de desbloqueo para confirmar que deseas borrar el almacenamiento USB."</string>
     <string name="media_format_gesture_explanation" product="default" msgid="6288926293245938415">"Debes crear tu patrón de desbloqueo para confirmar que deseas borrar la tarjeta SD."</string>
-    <string name="call_settings_title" msgid="5188713413939232801">"Config. de llamada"</string>
+    <string name="call_settings_title" msgid="5188713413939232801">"Configuración de llamada"</string>
     <string name="call_settings_summary" msgid="7291195704801002886">"Establecer correo de voz, desvío de llamadas, llamada en espera, identificador de llamadas"</string>
     <string name="tether_settings_title_usb" msgid="6688416425801386511">"Anclaje a red USB"</string>
     <string name="tether_settings_title_wifi" msgid="3277144155960302049">"Zona Wi-Fi portátil"</string>
@@ -963,7 +963,7 @@
     <string name="lockpattern_settings_enable_visible_pattern_title" msgid="2615606088906120711">"Hacer visible el patrón"</string>
     <string name="lockpattern_settings_enable_tactile_feedback_title" msgid="8898518337442601027">"Vibrar al tacto"</string>
     <string name="lockpattern_settings_enable_power_button_instantly_locks" msgid="5735444062633666327">"Bloquear al encender"</string>
-    <string name="lockpattern_settings_choose_lock_pattern" msgid="1652352830005653447">"Conf. patrón de desbloq."</string>
+    <string name="lockpattern_settings_choose_lock_pattern" msgid="1652352830005653447">"Configurar patrón de desbloqueo"</string>
     <string name="lockpattern_settings_change_lock_pattern" msgid="1123908306116495545">"Cambiar patrón de desbloqueo"</string>
     <string name="lockpattern_settings_help_how_to_record" msgid="2614673439060830433">"Cómo se debe extraer un patrón de desbloqueo"</string>
     <string name="lockpattern_too_many_failed_confirmation_attempts_header" msgid="819903817323783498">"¡Demasiados intentos incorrectos!"</string>
@@ -1077,7 +1077,7 @@
     <string name="move_app_failed_dlg_text" msgid="3465267182923054022">"No se pudo mover la aplicación. <xliff:g id="REASON">%1$s</xliff:g>"</string>
     <string name="app_install_location_title" msgid="2068975150026852168">"Ubicación de instalación preferida"</string>
     <string name="app_install_location_summary" msgid="5155453752692959098">"Cambiar la ubicación de instalación preferida para nuevas aplicaciones"</string>
-    <string name="app_disable_dlg_title" msgid="3916469657537695436">"¿Inhabilitar aplic. incorp.?"</string>
+    <string name="app_disable_dlg_title" msgid="3916469657537695436">"¿Inhabilitar aplicación incorporada?"</string>
     <string name="app_disable_dlg_text" msgid="3562567756362627323">"Si inhabilitas una aplicación incorporada, otras aplicaciones podrían funcionar incorrectamente."</string>
     <string name="app_disable_notifications_dlg_title" msgid="7669264654851761857">"¿Desactivar notificaciones?"</string>
     <string name="app_disable_notifications_dlg_text" msgid="5088484670924769845">"Si desactivas las notificaciones de esta aplicación, es posible que no recibas actualizaciones y alertas importantes."</string>
@@ -1121,7 +1121,7 @@
     <string name="language_settings_category" msgid="2288258489940617043">"Configuración de idiomas"</string>
     <string name="keyboard_settings_category" msgid="8275523930352487827">"Teclado y métodos de entrada"</string>
     <string name="phone_language" msgid="8870144109924299673">"Idioma"</string>
-    <string name="phone_language_summary" msgid="3871309445655554211"></string>
+    <string name="phone_language_summary" msgid="3871309445655554211">""</string>
     <string name="auto_replace" msgid="6199184757891937822">"Reemplazar automát."</string>
     <string name="auto_replace_summary" msgid="370288728200084466">"Corregir palabras mal escritas"</string>
     <string name="auto_caps" msgid="6379232078052591265">"Uso de mayúsculas automático"</string>
@@ -1140,7 +1140,7 @@
     <string name="pointer_speed" msgid="1221342330217861616">"Velocidad del puntero"</string>
     <string name="game_controller_settings_category" msgid="8794508575329923718">"Controlador de juegos"</string>
     <string name="vibrate_input_devices" msgid="2599591466928793082">"Usar vibración"</string>
-    <string name="vibrate_input_devices_summary" msgid="4595570516865299153">"Redireccionar la vibración al controlador de juegos cuando se haya establecido una conexión"</string>
+    <string name="vibrate_input_devices_summary" msgid="4595570516865299153">"Re direccionar la vibración al controlador de juegos cuando se haya establecido una conexión"</string>
     <string name="keyboard_layout_dialog_title" msgid="8030087214949381372">"Elegir el diseño de teclado"</string>
     <string name="keyboard_layout_dialog_setup_button" msgid="8514583747236476384">"Configurar diseños de teclado"</string>
     <string name="keyboard_layout_dialog_switch_hint" msgid="3889961090676293795">"Para cambiar, presiona Ctrl+espacio."</string>
@@ -1149,7 +1149,7 @@
     <string name="user_dict_settings_titlebar" msgid="765659257455000490">"Diccionario del usuario"</string>
     <string name="user_dict_single_settings_title" msgid="524997218433540614">"Diccionario personal"</string>
     <string name="user_dict_multiple_settings_title" msgid="3735224433307996276">"Diccionarios personales"</string>
-    <string name="user_dict_settings_summary" msgid="7965571192902870454"></string>
+    <string name="user_dict_settings_summary" msgid="7965571192902870454">""</string>
     <string name="user_dict_settings_add_menu_title" msgid="4056762757149923551">"Agregar"</string>
     <string name="user_dict_settings_add_dialog_title" msgid="4702613990174126482">"Agregar al diccionario"</string>
     <string name="user_dict_settings_add_screen_title" msgid="742580720124344291">"Frase"</string>
@@ -1203,8 +1203,8 @@
     <string name="enable_adb_summary" msgid="4881186971746056635">"Modo de depuración cuando se conecta el USB"</string>
     <string name="keep_screen_on" msgid="1146389631208760344">"Permanecer activo"</string>
     <string name="keep_screen_on_summary" msgid="2173114350754293009">"La pantalla nunca quedará inactiva mientras se realiza la carga"</string>
-    <string name="allow_mock_location" msgid="2787962564578664888">"Permitir ubic. de prueba"</string>
-    <string name="allow_mock_location_summary" msgid="317615105156345626">"Permitir ubic. de prueba"</string>
+    <string name="allow_mock_location" msgid="2787962564578664888">"Permitir ubicación simulada"</string>
+    <string name="allow_mock_location_summary" msgid="317615105156345626">"Permitir ubicación simulada"</string>
     <string name="adb_warning_title" msgid="6234463310896563253">"¿Permitir depuración de USB?"</string>
     <string name="adb_warning_message" msgid="7316799925425402244">"La depuración USB solo está indicada para actividades de desarrollo. Úsala para copiar datos entre tu computadora y el dispositivo, para instalar aplicaciones en el dispositivo sin recibir notificaciones y para leer datos de registro."</string>
     <string name="dev_settings_warning_title" msgid="7244607768088540165">"¿Permitir configuración de desarrollo?"</string>
@@ -1255,7 +1255,7 @@
     <string name="accessibility_service_disable_warning_summary" msgid="625013894287895398">"Si tocas Aceptar, se detendrá <xliff:g id="SERVICE">%1$s</xliff:g>."</string>
     <string name="accessibility_no_services_installed" msgid="7200948194639038807">"No se instaló ningún servicio."</string>
     <string name="accessibility_service_no_apps_title" msgid="5124097563864109821">"¿Necesitas un lector de pantalla?"</string>
-    <string name="accessibility_service_no_apps_message" msgid="7751662416377046539">"TalkBack permite que los usuarios con baja visión y no videntes oigan en voz alta las acciones que realizan. ¿Deseas instalarlo gratis desde Android Market?"</string>
+    <string name="accessibility_service_no_apps_message" msgid="7751662416377046539">"TalkBack permite que los usuarios con baja visión y no videntes oigan en voz alta las acciones que realizan. ¿Deseas instalarlo gratis desde Android Marquet?"</string>
     <string name="accessibility_script_injection_security_warning_summary" msgid="7706858873495386310">"¿Deseas que las aplicaciones instalen los scripts de Google que mejoran el acceso al contenido web de estas?"</string>
     <string name="accessibility_service_default_description" msgid="1072730037861494125">"No se proporcionó ninguna descripción."</string>
     <string name="settings_button" msgid="3006713718908152930">"Configuración"</string>
@@ -1330,7 +1330,7 @@
     <string name="menu_stats_last_unplugged" msgid="5922246077592434526">"Durante la última desconexión para <xliff:g id="UNPLUGGED">%1$s</xliff:g>"</string>
     <string name="menu_stats_total" msgid="8973377864854807854">"Total de usos"</string>
     <string name="menu_stats_refresh" msgid="1676215433344981075">"Actualizar"</string>
-    <string name="process_kernel_label" msgid="3916858646836739323">"SO Android"</string>
+    <string name="process_kernel_label" msgid="3916858646836739323">"Android OS"</string>
     <string name="process_mediaserver_label" msgid="6500382062945689285">"Servidor de medios"</string>
     <string name="voice_input_output_settings" msgid="1336135218350444783">"Entrada y salida de voz"</string>
     <string name="voice_input_output_settings_title" msgid="2442850635048676991">"Configuración entrada y salida de voz"</string>
@@ -1340,17 +1340,17 @@
     <string name="recognizer_title" msgid="3231385184559054457">"Reconocedor de voz"</string>
     <string name="recognizer_settings_title" msgid="432493301215113154">"Búsqueda por voz"</string>
     <string name="recognizer_settings_summary" msgid="4472287934134546902">"Configuraciones para \'<xliff:g id="RECOGNIZER_NAME">%s</xliff:g>\'"</string>
-    <string name="tts_settings" msgid="8186971894801348327">"Configuración de texto a voz"</string>
-    <string name="tts_settings_title" msgid="1237820681016639683">"Salida de texto a voz"</string>
+    <string name="tts_settings" msgid="8186971894801348327">"Configuración de mesaje a voz"</string>
+    <string name="tts_settings_title" msgid="1237820681016639683">"Salida de mesaje de voz"</string>
     <string name="use_default_tts_settings_title" msgid="1577063839539732930">"Usar siempre mi config."</string>
     <string name="use_default_tts_settings_summary" msgid="5916421806783703823">"La configuración predeterminada anula la de la aplicación."</string>
     <string name="tts_default_settings_section" msgid="5787915620218907443">"Configuración predeterminada"</string>
     <string name="tts_default_synth_title" msgid="4755558388333117572">"Motor predeterminado"</string>
-    <string name="tts_default_synth_summary" msgid="6482936537135251690">"Configura el motor de síntesis de voz para utilizarse en textos hablados."</string>
+    <string name="tts_default_synth_summary" msgid="6482936537135251690">"Configura el motor de síntesis de voz para utilizarse en mensages hablados."</string>
     <string name="tts_default_rate_title" msgid="6030550998379310088">"Velocidad de voz"</string>
     <string name="tts_default_rate_summary" msgid="4061815292287182801">"Velocidad en la que se habla el texto"</string>
     <string name="tts_default_pitch_title" msgid="6135942113172488671">"Sonido"</string>
-    <string name="tts_default_pitch_summary" msgid="1328298665182885277">"Afecta el tono del texto hablado"</string>
+    <string name="tts_default_pitch_summary" msgid="1328298665182885277">"Afecta el tono del mesaje hablado"</string>
     <string name="tts_default_lang_title" msgid="8018087612299820556">"Idioma"</string>
     <string name="tts_default_lang_summary" msgid="5219362163902707785">"Establece la voz específica de un idioma para el texto hablado"</string>
     <string name="tts_play_example_title" msgid="7094780383253097230">"Escucha un ejemplo:"</string>
@@ -1392,7 +1392,7 @@
     <string name="credentials_reset_summary" msgid="3369361230171260282">"Eliminar todos los certificados"</string>
     <string name="trusted_credentials" msgid="4266945289534242402">"Credenciales de confianza"</string>
     <string name="trusted_credentials_summary" msgid="6735221351155686632">"Mostrar certificados de CA de confianza"</string>
-    <string name="credentials_install_gesture_prompt" msgid="2207390278112395082">"Crea tu patrón de desbloqueo."</string>
+    <string name="credentials_install_gesture_prompt" msgid="2207390278112395082">"Dibuje el patrón de desbloqueo."</string>
     <string name="credentials_install_gesture_explanation" msgid="7408921172253634829">"Debes crear tu patrón de desbloqueo para confirmar la instalación de las credenciales."</string>
     <string name="credentials_unlock" msgid="385427939577366499"></string>
     <string name="credentials_unlock_hint" msgid="2301301378040499348">"Escribe la contraseña para el almacenamiento de credenciales."</string>
@@ -1421,7 +1421,7 @@
     <string name="bugreport_title" msgid="1009498799922543551">"Iniciar informe de errores"</string>
     <string name="bugreport_message" msgid="1182209569732110590">"Se recopilarán diferentes datos acerca del estado actual de tu dispositivo y se enviarán como un mensaje de correo. Ten paciencia, el informe de errores demorará un tiempo en enviarse luego de ser iniciado."</string>
     <string name="report" msgid="302437572240018342">"Informe"</string>
-    <string name="local_backup_password_title" msgid="3860471654439418822">"Contr. copia segur. escr."</string>
+    <string name="local_backup_password_title" msgid="3860471654439418822">"Contraseña de copia de seguridad"</string>
     <string name="local_backup_password_summary_none" msgid="393503434408227110">"En este momento, las copias de seguridad completas de tu escritorio no se encuentran protegidas."</string>
     <string name="local_backup_password_summary_change" msgid="2731163425081172638">"Toca para cambiar o eliminar la contraseña de las copias de seguridad completas de tu escritorio."</string>
     <string name="local_backup_password_toast_success" msgid="582016086228434290">"Nueva contraseña de copia de seguridad definida"</string>
@@ -1484,7 +1484,7 @@
     <string name="background_data_summary" msgid="8328521479872763452">"Las aplicaciones pueden sincronizar, enviar y recibir datos."</string>
     <string name="background_data_dialog_title" msgid="6059217698124786537">"¿Deseas desactivar los datos de referencia?"</string>
     <string name="background_data_dialog_message" msgid="6981661606680941633">"Si inhabilitas los datos de referencia, aumenta la duración de la batería y se reduce el uso de datos. Algunas aplicaciones tal vez sigan usando la conexión de datos de referencia."</string>
-    <string name="sync_automatically" msgid="1682730255435062059">"Autosincronizar datos de aplic."</string>
+    <string name="sync_automatically" msgid="1682730255435062059">"Auto sincronizar datos de aplic."</string>
     <string name="sync_enabled" msgid="4551148952179416813">"Sincronización activada"</string>
     <string name="sync_disabled" msgid="8511659877596511991">"Sincronización desactivada"</string>
     <string name="sync_error" msgid="5060969083117872149">"Error de sincronización"</string>
@@ -1546,14 +1546,14 @@
     <string name="pointer_location_summary" msgid="840819275172753713">"Superposición de pantalla que muestra los datos de toque actuales"</string>
     <string name="show_touches" msgid="1356420386500834339">"Mostrar toques"</string>
     <string name="show_touches_summary" msgid="6684407913145150041">"Mostrar información visual para toques"</string>
-    <string name="show_screen_updates" msgid="5470814345876056420">"Ver actualiz. superficie"</string>
+    <string name="show_screen_updates" msgid="5470814345876056420">"Ver actualizaciones de superficie"</string>
     <string name="show_screen_updates_summary" msgid="2569622766672785529">"Mostrar superficies de vent. cuando se actualizan"</string>
-    <string name="show_hw_screen_updates" msgid="5036904558145941590">"Ver actualiz. vistas GPU"</string>
+    <string name="show_hw_screen_updates" msgid="5036904558145941590">"Ver actualizaciones de GPU"</string>
     <string name="show_hw_screen_updates_summary" msgid="1115593565980196197">"Mostrar vistas de ventanas procesadas con GPU"</string>
     <string name="disable_overlays" msgid="2074488440505934665">"Desactivar superpos. HW"</string>
     <string name="disable_overlays_summary" msgid="3578941133710758592">"Usar GPU para combinar pantallas"</string>
     <string name="enable_traces_title" msgid="7448835465859512430">"Activar seguimientos"</string>
-    <string name="enable_traces_dialog_title" msgid="5026490474669452929">"Selec. seguim. activados"</string>
+    <string name="enable_traces_dialog_title" msgid="5026490474669452929">"Seleccionar seguimientos activados"</string>
     <string name="enable_traces_summary_none" msgid="1867562808503494163">"No se activó ningún seguimiento."</string>
     <string name="enable_traces_summary_num" msgid="8978230237777454269">"Se activaron <xliff:g id="NUM">%1$d</xliff:g> seguimientos."</string>
     <string name="enable_traces_summary_all" msgid="3950139649125158247">"Se activaron todos los seguimientos."</string>
@@ -1604,7 +1604,7 @@
     <string name="data_usage_enable_mobile" msgid="986782622560157977">"Datos móviles"</string>
     <string name="data_usage_enable_3g" msgid="6304006671869578254">"Datos de 2 GB - 3 GB"</string>
     <string name="data_usage_enable_4g" msgid="3635854097335036738">"Datos de 4 GB"</string>
-    <string name="data_usage_app_settings" msgid="8430240158135453271">"Ver config. de la aplicación"</string>
+    <string name="data_usage_app_settings" msgid="8430240158135453271">"Exibir configuración de la aplicación"</string>
     <string name="data_usage_app_restrict_background" msgid="9149728936265100841">"Restringir los datos de referencia"</string>
     <string name="data_usage_app_restrict_background_summary" msgid="518658001418490405">"Desactivar datos ref. en redes móviles (usará redes no móviles)"</string>
     <string name="data_usage_app_restrict_background_summary_disabled" msgid="7401927377070755054">"Para limitar datos de ref. de esta aplic., limita datos móviles."</string>
@@ -1707,4 +1707,86 @@
     <string name="help_label" msgid="1107174367904110532">"Ayuda"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"Emisiones móviles"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"Selecciona los tipos de alertas de emergencia para mostrar."</string>
+    <string name="set_dds_failed" >Error en el conjunto de suscripciones de datos. Limpie cualquier conexión de datos existente y vuelva a intentarlo.</string>
+    <string name="set_dds_error" >falla en configurar servicio de datos</string>
+    <string name="bluetooth_ftp_remember_choice" >No preguntes otra vez" </string>
+    <string name="data_title" >llamada de datos</string>
+    <string name="bluetooth_dun_acceptance_dialog_text" >%1$s le gustaría utilizar DUN. Permitir acceso a %2$s?</string>
+    <string name="bluetooth_dun_profile_summary_connected" >Conectado al servidor DUN</string>
+    <string name="status_imei_sv" >IMEI SV</string>
+    <string name="sms_summary" >Seleccione la suscripción para enviar SMS</string>
+    <string name="voice_summary" >Seleccione la suscripción para llamadas de voz</string>
+    <string name="wifi_security_wpa2" >WPA2 PSK</string>
+    <string name="wifi_security_short_wpa_wpa2" >WPA/WPA2</string>
+    <string name="set_dds_success" >Configuración suscripción de datos fue exitosa</string>
+    <string name="sel_sub_summary" >Seleccione la suscripción para SUB-1 y SUB-2</string>
+    <string name="voice_title" >Voice/USSD/MMI</string>
+    <string name="bluetooth_map_connection_permission_request" >Conexión de Mapa solicitada</string>
+    <string name="subscription_01_summary" >Establecer opciones para configuraciones de red SUB1</string>
+    <string name="bluetooth_ftp_acceptance_dialog_text" >%1$s le gustaría accesar tus archivos y carpetas. Permitir acceso a %2$s?</string>
+    <string name="bluetooth_profile_dun" >Acceso a la red Dial-Up</string>
+    <string name="wifi_p2p_menu_advanced" >Avanzado</string>
+    <string name="wifi_security_short_psk_generic" >@string/wifi_security_short_wpa_wpa2</string>
+    <string name="bluetooth_dun_request" >DUN solicitar</string>
+    <string name="bluetooth_dun_connection_permission_request" >Dun solicitud de conexión</string>
+    <string name="intent_sender_data_label" ><xliff:g id="data">Data:</xliff:g></string>
+    <string name="wifi_security_wep" >WEP</string>
+    <string name="wifi_security_wpa" >WPA PSK</string>
+    <string name="bluetooth_pbap_connection_permission_request" >Pbap solicitud de conexión</string>
+    <string name="testing_sim_toolkit" >Kit de herramientas SIM</string>
+    <string name="device_additional_status" >Información de estado adicional</string>
+    <string name="service_process_name" ><xliff:g id="process">%1$s</xliff:g></string>
+    <string name="set_data_subscription_progress" >Establecimiento de suscripción de datos en curso</string>
+    <string name="select_subscription" >Seleccione Suscripción</string>
+    <string name="bluetooth_sap_profile_summary_connected" >Conectado al servidor de acceso SIM</string>
+    <string name="bluetooth_dun_profile_summary_not_connected" >No está conectado ao servidor DUN</string>
+    <string name="set_voice_error" >Error al establecer suscripción de voz. Suscripción no está activa.</string>
+    <string name="bluetooth_sap_connection_permission_request" >Solicitud de conexión SAP</string>
+    <string name="wifi_security_eap" >802.1x EAP</string>
+    <string name="font_size_preview_text" >Sirva a este hombre una cerveza y kiwis.</string>
+    <string name="bluetooth_profile_sap" >Acceso SIM</string>
+    <string name="wifi_security_short_eap" >802.1x</string>
+    <string name="multi_sim_settings_title" >Configuración Multi SIM</string>
+    <string name="subscription_02_summary" >Configuración de opciones para la configuración de red SUB2</string>
+    <string name="bluetooth_ftp_connection_permission_request" >Solicitud de conexión FTP</string>
+    <string name="subscription_01_title" >SUB1</string>
+    <string name="sim_pin_attempts" >\nIntentos Restantes :</string>
+    <string name="subscription_02_title" >SUB2</string>
+    <string name="bluetooth_sap_request" >Solicitud SAP</string>
+    <string name="status_esn_number" >ESN</string>
+    <string name="wifi_p2p_menu_create_group" >Crear grupo</string>
+    <string name="sim_change_failed_enable_sim_lock" >No se puede cambiar de SIM/RUIM PIN.\n Permitir SIM/RUIM LOCK.</string>
+    <string name="bluetooth_mas_remember_choice" >No pregunte de novo</string>
+    <string name="bluetooth_sap_profile_summary_use_for" >Usar para Acceso SIM</string>
+    <string name="bluetooth_sap_profile_summary_not_connected" >No se conecta al Servidor de Acceso SIM</string>
+    <string name="debug_intent_sender_label" >Depurar intención de remitente</string>
+    <string name="bluetooth_ftp_request" >Solicitud ftp</string>
+    <string name="data_summary" >Seleccione suscripción para Llamadas de Datos</string>
+    <string name="wifi_security_short_wpa" >WPA</string>
+    <string name="bluetooth_sap_acceptance_dialog_text" >%1$s desea tener acceso a la tarjeta SIM. Dar acceso a %2$s?</string>
+    <string name="wifi_security_wpa_wpa2" >WPA/WPA2 PSK</string>
+    <string name="multi_sim_settings_summary" >Ajustar Configuración Multi SIM para voz, datos y SMS</string>
+    <string name="sel_sub_title" >Configurar subscripiciones</string>
+    <string name="sim_lock_change_not_supported" >No se puede cambiar de SIM/RUIM Lock. \n SIM/RUIM no soportado.</string>
+    <string name="wifi_p2p_menu_remove_group" >Remover grupo</string>
+     <!-- Pantalla de Seguridad y configuración de ubicación, cambie la instrucción para desbloquear  la pantalla si el usuario diseña el patrón incorrecto -->
+    <string name="wifi_security_psk_generic" >@string/wifi_security_wpa_wpa2</string>
+    <string name="wifi_security_short_wep" >WEP</string>
+    <string name="wifi_security_short_wpa2" >WPA2</string>
+    <string name="sim_pin_enabled" >PIN1 activado!</string>
+    <string name="bluetooth_mas_request" >Mensaje de solicitud de acceso</string>
+    <string name="status_imei" >IMEI</string>
+    <string name="sim_absent" >No SIM/RUIM</string>
+    <string name="sync_item_title" ><xliff:g id="authority" example="Calendar">%s</xliff:g></string>
+    <string name="device_additional_status_summary" >Número de teléfono, nivel de señal, IMEI, etc.</string>
+    <string name="bluetooth_dun_profile_summary_use_for" >Uso para acceso a la red Dial-up</string>
+    <string name="service_client_name" ><xliff:g id="client_name">%1$s</xliff:g></string>
+    <string name="sms_title" >SMS</string>
+    <string name="bluetooth_sap_remember_choice" >No pregunte otra vez</string>
+    <string name="bluetooth_enter_pin_msg_hs" >\nIntroducir PIN para enparejar con \u0022<xliff:g id="device_name">%1$s</xliff:g>\u0022. [Alta seguridad Activada: Necesita de una clave de 16 caracteres] </string>
+    <string name="sim_pin_disabled" >PIN1 desactivado!</string>
+    <string name="battery_stats_last_duration" >@string/menu_stats_last_unplugged</string>
+    <string name="set_sms_error" >Error e la configuración de suscripción SMS. Suscripción no está activa.</string>
+    <string name="bluetooth_mas_acceptance_dialog_text" >%1$s Gustaría de accesar tus mensajes? Dar acceso a los %2$s?</string>
+    <string name="bluetooth_dun_remember_choice" >No pregunte otra vez</string>
 </resources>
