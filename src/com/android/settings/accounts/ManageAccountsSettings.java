@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008, 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,11 @@ public class ManageAccountsSettings extends AccountPreferenceBase
 
     private void updatePreferenceIntents(PreferenceScreen prefs) {
         PackageManager pm = getActivity().getPackageManager();
+        int PreferenceCount = prefs.getPreferenceCount();
         for (int i = 0; i < prefs.getPreferenceCount();) {
+            if (i == (PreferenceCount - 2) && mAccountType.equals("com.android.email")) {
+                prefs.removePreference(prefs.getPreference(i));
+            }
             Intent intent = prefs.getPreference(i).getIntent();
             if (intent != null) {
                 ResolveInfo ri = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
