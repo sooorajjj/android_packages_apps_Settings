@@ -39,6 +39,8 @@ import com.android.settings.DreamSettings;
 
 import java.util.ArrayList;
 
+import java.io.*;
+
 public class DisplaySettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener {
     private static final String TAG = "DisplaySettings";
@@ -51,7 +53,10 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_FONT_SIZE = "font_size";
     private static final String KEY_NOTIFICATION_PULSE = "notification_pulse";
     private static final String KEY_SCREEN_SAVER = "screensaver";
-
+    
+     private static final String KEY_HDMI = "hdmi_disable";
+     private CheckBoxPreference mHdmiDisable;
+     
     private CheckBoxPreference mAccelerometer;
     private ListPreference mFontSizePref;
     private CheckBoxPreference mNotificationPulse;
@@ -78,6 +83,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
         mAccelerometer = (CheckBoxPreference) findPreference(KEY_ACCELEROMETER);
         mAccelerometer.setPersistent(false);
+        
         if (RotationPolicy.isRotationLockToggleSupported(getActivity())) {
             // If rotation lock is supported, then we do not provide this option in
             // Display settings.  However, is still available in Accessibility settings.
@@ -115,7 +121,10 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                 Log.e(TAG, Settings.System.NOTIFICATION_LIGHT_PULSE + " not found");
             }
         }
-
+        
+          mHdmiDisable = (CheckBoxPreference) findPreference(KEY_HDMI);
+          mHdmiDisable.setPersistent(false);
+          mHdmiDisable.setChecked(true);
     }
 
     private void updateTimeoutPreferenceDescription(long currentTimeout) {
@@ -263,6 +272,28 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             Settings.System.putInt(getContentResolver(), Settings.System.NOTIFICATION_LIGHT_PULSE,
                     value ? 1 : 0);
             return true;
+        }
+          else if (preference == mHdmiDisable) {
+          try{
+                //Create FileOutputStream 
+               String data01 = "1";
+               String data02 = "0";
+              FileOutputStream output = new FileOutputStream("/sys/devices/platform/hdmi_msm.1/online");
+       
+               boolean value = mHdmiDisable.isChecked();
+                         if(value) {
+                           output.write(data01.getBytes());
+                           Log.e(TAG, "Settings.Displaysetting.Enable =  "+ value ); 
+                           }
+                         else {
+                           output.write(data02.getBytes());
+                           Log.e(TAG, "Settings.Displaysetting.Enable =  "+ value );
+                           } 
+            output.close();
+            }catch(Exception e){
+             Log.e(TAG, "could not set HDMI setting", e);
+             }
+            return true;    
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }

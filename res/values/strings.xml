@@ -4244,7 +4244,7 @@ alog [CHAR LIMIT=none] -->
     <string name="help_url_more_networks" translatable="false"></string>
     <!-- Help URL, Vpn [DO NOT TRANSLATE] -->
     <string name="help_url_vpn" translatable="false"></string>
-    <!-- Help URL, Sound [DO NOT TRANSLATE] -->
+    <!-- Help URL, Sound [DO NOT TRANSLATE] -->       
     <string name="help_url_sound" translatable="false"></string>
     <!-- Help URL, Battery [DO NOT TRANSLATE] -->
     <string name="help_url_battery" translatable="false"></string>
@@ -4265,5 +4265,8 @@ alog [CHAR LIMIT=none] -->
    <string name="summary_storage_manage">SD card device: %1$s</string>
     <string name="external_sd">External SD</string>
     <string name="internal_sd">Internal SD</string>
-	
+	  <!-- Title of the HDMI settings entry in the left top level menu -->
+    <!--string name="hdmi_settings_title">HDMI</string-->   
+    <!-- add HDMI Disable in Display settings -->
+    <string name="hdmi_disable_title">HDMI Enable</string>   
 </resources>
