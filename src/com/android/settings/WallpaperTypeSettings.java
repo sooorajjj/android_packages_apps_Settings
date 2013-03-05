@@ -33,7 +33,14 @@ public class WallpaperTypeSettings extends SettingsPreferenceFragment {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.wallpaper_settings);
+    }
+
+    @Override
+    public void onResume() {
+        // Put populateWallpaperTypes() here,
+        // so can always refresh preference list
         populateWallpaperTypes();
+        super.onResume();
     }
 
     private void populateWallpaperTypes() {
@@ -44,6 +51,9 @@ public class WallpaperTypeSettings extends SettingsPreferenceFragment {
                 PackageManager.MATCH_DEFAULT_ONLY);
 
         final PreferenceScreen parent = getPreferenceScreen();
+        // Remove content in preference list before add operation each time,
+        // to avoid adding same data to preference repeatedly.
+        parent.removeAll();
         parent.setOrderingAsAdded(false);
         // Add Preference items for each of the matching activities
         for (ResolveInfo info : rList) {
