@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008, 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.content.pm.ActivityInfo;
+import android.content.Context;
+
 import java.util.List;
 
 /**
@@ -54,6 +57,7 @@ public class ConfirmLockPattern extends PreferenceActivity {
     public static final String FOOTER_TEXT = PACKAGE + ".ConfirmLockPattern.footer";
     public static final String HEADER_WRONG_TEXT = PACKAGE + ".ConfirmLockPattern.header_wrong";
     public static final String FOOTER_WRONG_TEXT = PACKAGE + ".ConfirmLockPattern.footer_wrong";
+    private static Context mContext;
 
     private enum Stage {
         NeedToUnlock,
@@ -66,6 +70,7 @@ public class ConfirmLockPattern extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         CharSequence msg = getText(R.string.lockpassword_confirm_your_pattern_header);
         showBreadCrumbs(msg, msg);
+        mContext = this;
     }
 
     @Override
@@ -246,6 +251,14 @@ public class ConfirmLockPattern extends PreferenceActivity {
                 = new LockPatternView.OnPatternListener()  {
 
             public void onPatternStart() {
+                if ((mContext.getResources().getConfiguration().orientation) == 1) {
+
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                } else {
+
+                    getActivity()
+                            .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
                 mLockPatternView.removeCallbacks(mClearPatternRunnable);
             }
 
@@ -277,6 +290,7 @@ public class ConfirmLockPattern extends PreferenceActivity {
                         postClearPatternRunnable();
                     }
                 }
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             }
         };
 
