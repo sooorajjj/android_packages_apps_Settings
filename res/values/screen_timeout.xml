@@ -24,4 +24,5 @@
     <string name="screen_timeout_5m">5 minutes</string>
     <string name="screen_timeout_10m">10 minutes</string>
     <string name="screen_timeout_30m">30 minutes</string>
+    <string name="screen_timeout_never">Never</string>
 </resources>
