@@ -104,6 +104,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private static final int MENU_ID_CONNECT = Menu.FIRST + 6;
     private static final int MENU_ID_FORGET = Menu.FIRST + 7;
     private static final int MENU_ID_MODIFY = Menu.FIRST + 8;
+    private static final int MENU_ID_DISCONNECT = Menu.FIRST + 9;
 
     private static final int WIFI_DIALOG_ID = 1;
     private static final int WPS_PBC_DIALOG_ID = 2;
@@ -561,6 +562,10 @@ public class WifiSettings extends SettingsPreferenceFragment
                         && mSelectedAccessPoint.getState() == null) {
                     menu.add(Menu.NONE, MENU_ID_CONNECT, 0, R.string.wifi_menu_connect);
                 }
+                //current connected AP, add a disconnect option to it
+                if (mSelectedAccessPoint.getState() != null ) {
+                    menu.add(Menu.NONE, MENU_ID_DISCONNECT, 0, R.string.wifi_menu_disconnect);
+                }
                 if (mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
 //QUALCOMM_CMCC_START 
                 if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
@@ -607,6 +612,10 @@ public class WifiSettings extends SettingsPreferenceFragment
             }
             case MENU_ID_MODIFY: {
                 showDialog(mSelectedAccessPoint, true);
+                return true;
+            }
+            case MENU_ID_DISCONNECT: {
+                mWifiManager.disconnect();
                 return true;
             }
         }
@@ -1076,8 +1085,13 @@ public class WifiSettings extends SettingsPreferenceFragment
             if (mSelectedAccessPoint != null
                     && !requireKeyStore(mSelectedAccessPoint.getConfig())
                     && mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
-                mWifiManager.connect(mSelectedAccessPoint.networkId,
+                DetailedState state = mSelectedAccessPoint.getState();
+                if(state == null){
+                    mWifiManager.connect(mSelectedAccessPoint.networkId,
                         mConnectListener);
+				 } else {
+					mWifiManager.disconnect();
+				 }
             }
         } else if (config.networkId != INVALID_NETWORK_ID) {
             if (mSelectedAccessPoint != null) {

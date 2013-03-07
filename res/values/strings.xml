@@ -4626,6 +4626,10 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_setting_connect_type_error">There was a problem setting the connect type.</string>
     <string name="msg_wifi_signal_found">Found WLAN signal %s, would you like to use this WLAN network? Using this network will interrupt the data service partially.</string>
     <!-- CMCC WLAN customization end-->
+    <!-- WLAN common customization begin-->
+    <string name="wifi_disconnect">Disconnect</string>
+    <string name="wifi_menu_disconnect">Disconnect from network</string>
+    <!-- WLAN common customization end-->     
 
     <!-- agps settings begin-->
  

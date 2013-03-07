@@ -1985,6 +1985,10 @@
     <string name="wifi_setting_connect_type_error">设置自动连接类型时出现错误。</string>
     <string name="msg_wifi_signal_found">发现 WLAN 信号 %s, 您是否要使用该 WLAN 网络？ 使用该网络将部分中断当前的数据连接。</string>
     <!-- CMCC WLAN customization end-->
+    <!-- WLAN common customization begin-->
+    <string name="wifi_disconnect">断开</string>
+    <string name="wifi_menu_disconnect">断开网络</string> 
+    <!-- WLAN common customization end--> 
     
     <string name="select_slot_always_ask">总是询问</string>
     <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>

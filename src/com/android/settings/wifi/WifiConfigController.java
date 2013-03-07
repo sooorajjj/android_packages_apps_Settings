@@ -251,6 +251,8 @@ public class WifiConfigController implements TextWatcher,
             } else {
                 if (state == null && level != -1) {
                     mConfigUi.setSubmitButton(context.getString(R.string.wifi_connect));
+                } else if (state != null) {
+                    mConfigUi.setSubmitButton(context.getString(R.string.wifi_disconnect));
                 } else {
                     mView.findViewById(R.id.ip_fields).setVisibility(View.GONE);
                 }
