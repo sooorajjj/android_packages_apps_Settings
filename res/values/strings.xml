@@ -2135,6 +2135,11 @@ alog [CHAR LIMIT=none] -->
     <!-- Storage setting.  Summary for PTP checkbox [CHAR LIMIT=NONE]-->
     <string name="usb_label_installer_cd">"Install file-transfer tools"</string>
 
+    <string name="usb_umt_title">Mass Storage</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_umt_summary">Touch can choose mass storage</string>
+
+
     <!-- Section header above list of other users storage [CHAR LIMIT=32] -->
     <string name="storage_other_users">Other users</string>
 
