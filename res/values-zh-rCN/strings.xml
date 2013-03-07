@@ -1973,6 +1973,9 @@
     <string name="wifi_configured_ap_list">已保存的接入点列表</string>
     <string name="wifi_priority_label">优先级</string>
     <string name="wifi_priority_changed">原优先级=<xliff:g id="old_value">%s</xliff:g>,新设定=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="cmcc_default_trust_access_points">默认信任接入点</string>
+    <string name="cmcc_configed_access_points">信任接入点</string>
+    <string name="cmcc_unknown_access_points">未知接入点</string>
     <!-- CMCC WLAN customization end-->
     
     <string name="select_slot_always_ask">总是询问</string>

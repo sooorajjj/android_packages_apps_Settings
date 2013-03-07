@@ -57,6 +57,8 @@ import com.android.settings.R;
 import java.net.InetAddress;
 import java.util.Iterator;
 
+import com.qrd.plugin.feature_query.FeatureQuery;
+
 /**
  * The class for allowing UIs like {@link WifiDialog} and {@link WifiConfigUiBase} to
  * share the logic for controlling buttons, text fields, etc.
@@ -253,7 +255,16 @@ public class WifiConfigController implements TextWatcher,
                     mView.findViewById(R.id.ip_fields).setVisibility(View.GONE);
                 }
                 if (mAccessPoint.networkId != INVALID_NETWORK_ID) {
-                    mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+//QUALCOMM_CMCC_START	
+                    if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+					    if(!AccessPoint.isCmccAp(accessPoint)){
+						    mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+						}
+					}
+//QUALCOMM_CMCC_END
+					else {
+                        mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+                    }
                 }
             }
         }

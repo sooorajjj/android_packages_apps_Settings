@@ -4614,6 +4614,9 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_configured_ap_list">Remembered access point list</string>
     <string name="wifi_priority_label">Priority</string>
     <string name="wifi_priority_changed">Priority old value=<xliff:g id="old_value">%s</xliff:g>,new value=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="cmcc_default_trust_access_points">Default credible access points</string>
+    <string name="cmcc_configed_access_points">Credible access points</string>
+    <string name="cmcc_unknown_access_points">Unknown access points</string>
     <!-- CMCC WLAN customization end-->
 
     <!-- agps settings begin-->

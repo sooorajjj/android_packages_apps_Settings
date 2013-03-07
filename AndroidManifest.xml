@@ -1637,5 +1637,17 @@
             </intent-filter>
         </activity>
 
+<!-- QUALCOMM_CMCC_START   -->	
+        <service android:name=".wifi.cmcc.CmccService" >
+            <intent-filter >
+                <action android:name="com.android.action.wifi.cmccservice" />
+            </intent-filter>
+        </service>
+        <receiver android:name=".wifi.cmcc.CmccMainReceiver">
+             <intent-filter>
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+             </intent-filter>
+        </receiver>
     </application>
 </manifest>
