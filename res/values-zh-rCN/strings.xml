@@ -1600,6 +1600,7 @@
     <string name="device_admin_status" msgid="4252975713178851910">"此管理器已激活，允许应用“<xliff:g id="APP_NAME">%1$s</xliff:g>”执行以下操作："</string>
     <string name="untitled_apn" msgid="1230060359198685513">"未命名"</string>
     <string name="sound_category_sound_title" msgid="1488759370067953996">"常规"</string>
+    <string name="sound_category_calls_title" msgid="3688531959256239012">"来电"</string>
     <string name="sound_category_notification_title" msgid="3502115998790286943">"通知"</string>
     <string name="sound_category_call_ringtone_vibrate_title" msgid="1543777228646645163">"来电铃声和振动"</string>
     <string name="sound_category_system_title" msgid="1480844520622721141">"系统"</string>

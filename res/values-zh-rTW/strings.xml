@@ -1531,6 +1531,7 @@
     <string name="device_admin_status" msgid="4252975713178851910">"這個管理員正在作業中，且允許 <xliff:g id="APP_NAME">%1$s</xliff:g> 應用程式執行以下作業："</string>
     <string name="untitled_apn" msgid="1230060359198685513">"未命名"</string>
     <string name="sound_category_sound_title" msgid="1488759370067953996">"一般"</string>
+    <string name="sound_category_calls_title">"來電"</string>
     <string name="sound_category_notification_title" msgid="3502115998790286943">"通知"</string>
     <string name="sound_category_call_ringtone_vibrate_title" msgid="1543777228646645163">"來電鈴聲與震動"</string>
     <string name="sound_category_system_title" msgid="1480844520622721141">"系統"</string>

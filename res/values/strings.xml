@@ -3693,6 +3693,7 @@ alog [CHAR LIMIT=none] -->
     <string name="untitled_apn">Untitled</string>
 
     <string name="sound_category_sound_title">General</string>
+    <string name="sound_category_calls_title">Incoming calls</string>
     <string name="sound_category_notification_title">Notifications</string>
 
     <!-- Category title for phone call's ringtone and vibration settings in the Sound Setting.
