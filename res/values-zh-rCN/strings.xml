@@ -1962,6 +1962,19 @@
     <string name="supl_not_set">"&lt;未设置&gt;"</string>
     <!-- end add by zw 2013.1.10 agps settings end-->
     
+    <!-- CMCC WLAN customization begin-->
+    <string name="wifi_advanced_gateway">"网关"</string>
+    <string name="wifi_advanced_network_netmask">"网络掩码"</string>
+    <string name="wifi_set_priority_type_title">手动设定接入点的优先级</string>
+    <string name="wifi_set_priority_type_summary">允许手动设定每个接入点的优先级</string>
+    <string name="wifi_set_priority_settings_title">接入点优先级设定</string>
+    <string name="wifi_set_priority_settings_summary">点击设定各接入点的优先级</string>
+    <string name="wifi_priority_settings_label">优先级设定</string>
+    <string name="wifi_configured_ap_list">已保存的接入点列表</string>
+    <string name="wifi_priority_label">优先级</string>
+    <string name="wifi_priority_changed">原优先级=<xliff:g id="old_value">%s</xliff:g>,新设定=<xliff:g id="new_value">%s</xliff:g></string>
+    <!-- CMCC WLAN customization end-->
+    
     <string name="select_slot_always_ask">总是询问</string>
     <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>
 

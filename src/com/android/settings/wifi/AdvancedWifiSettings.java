@@ -16,7 +16,10 @@
 
 package com.android.settings.wifi;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiWatchdogStateMachine;
@@ -34,6 +37,8 @@ import android.widget.Toast;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
+import android.content.BroadcastReceiver;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class AdvancedWifiSettings extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -47,7 +52,17 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_POOR_NETWORK_DETECTION = "wifi_poor_network_detection";
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
 
+//QUALCOMM_CMCC_START 
+    private static final String KEY_CURRENT_GATEWAY = "current_gateway";
+    private static final String KEY_CURRENT_NETMASK = "current_netmask";
+    private static final String KEY_PRIORITY_TYPE = "wifi_priority_type";
+    private static final String KEY_PRIORITY_SETTINGS = "wifi_priority_settings";
+//QUALCOMM_CMCC_END 
     private WifiManager mWifiManager;
+//QUALCOMM_CMCC_START
+    private CheckBoxPreference mPriorityTypePref;
+    private Preference mPrioritySettingPref;
+//QUALCOMM_CMCC_END
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +81,15 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         super.onResume();
         initPreferences();
         refreshWifiInfo();
+//QUALCOMM_CMCC_START         
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+            ContentResolver contentResolver = getContentResolver();
+            if (mPriorityTypePref != null){
+                mPriorityTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                        Settings.System.WIFI_PRIORITY_TYPE, Settings.System.WIFI_PRIORITY_TYPE_DEFAULT) == Settings.System.WIFI_PRIORITY_TYPE_MANUAL);
+            }
+        }
+//QUALCOMM_CMCC_END 
     }
 
     private void initPreferences() {
@@ -123,6 +147,21 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             sleepPolicyPref.setValue(stringValue);
             updateSleepPolicySummary(sleepPolicyPref, stringValue);
         }
+//QUALCOMM_CMCC_START
+        mPriorityTypePref = (CheckBoxPreference)findPreference(KEY_PRIORITY_TYPE);
+        mPrioritySettingPref = findPreference(KEY_PRIORITY_SETTINGS);
+        if(mPriorityTypePref != null && mPrioritySettingPref != null) {
+            if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                mPriorityTypePref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(mPriorityTypePref);
+                getPreferenceScreen().removePreference(mPrioritySettingPref);
+
+            }
+        } else {
+            Log.d(TAG, "Fail to get CMCC Pref");
+        }
+//QUALCOMM_CMCC_END
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -193,6 +232,13 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                 return false;
             }
         }
+//QUALCOMM_CMCC_START
+        else if (key.equals(KEY_PRIORITY_TYPE)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(), Settings.System.WIFI_PRIORITY_TYPE, 
+                    checked ? Settings.System.WIFI_PRIORITY_TYPE_MANUAL : Settings.System.WIFI_PRIORITY_TYPE_DEFAULT);
+        }
+//QUALCOMM_CMCC_END
 
         return true;
     }
@@ -209,6 +255,52 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         String ipAddress = Utils.getWifiIpAddresses(getActivity());
         wifiIpAddressPref.setSummary(ipAddress == null ?
                 getActivity().getString(R.string.status_unavailable) : ipAddress);
+
+//QUALCOMM_CMCC_START
+        Preference wifiGatewayPref = findPreference(KEY_CURRENT_GATEWAY);
+        String gateway = null;
+        Preference wifiNetmaskPref = findPreference(KEY_CURRENT_NETMASK);
+        String netmask = null;
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {  
+            DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
+            if (wifiInfo != null) {
+                if (dhcpInfo != null) {
+                    gateway = ipTransfer(dhcpInfo.gateway);
+                    netmask = ipTransfer(dhcpInfo.netmask);
+                }
+            }
+            if (wifiGatewayPref != null) {
+                wifiGatewayPref.setSummary(gateway == null ?
+                        getString(R.string.status_unavailable) : gateway);
+            }
+            if (wifiNetmaskPref != null) {
+                wifiNetmaskPref.setSummary(netmask == null ?
+                        getString(R.string.status_unavailable) : netmask);
+            }
+        } else {
+            PreferenceScreen screen = getPreferenceScreen();
+            if (screen!=null){
+                if (wifiGatewayPref!=null) {
+                    screen.removePreference(wifiGatewayPref);
+                }
+                if (wifiNetmaskPref!=null) {
+                    screen.removePreference(wifiNetmaskPref);
+                }
+            }
+        }
+//QUALCOMM_CMCC_END
     }
 
+
+//QUALCOMM_CMCC_START	
+    private String ipTransfer(int value){
+        String result = null;
+        if (value!=0) {
+            if (value < 0) value += 0x100000000L;
+            result = String.format("%d.%d.%d.%d",
+                    value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF);
+        }
+        return result;
+    }
+//QUALCOMM_CMCC_END
 }

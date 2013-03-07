@@ -49,6 +49,10 @@ class AccessPoint extends Preference {
     static final int SECURITY_WEP = 1;
     static final int SECURITY_PSK = 2;
     static final int SECURITY_EAP = 3;
+//QUALCOMM_CMCC_START 
+    static final String CMCC_SSID = "CMCC";
+    static final String CMCC_EDU_SSID = "CMCC-EDU";
+//QUALCOMM_CMCC_END
 
     enum PskType {
         UNKNOWN,

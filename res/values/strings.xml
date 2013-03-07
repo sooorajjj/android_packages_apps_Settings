@@ -4602,6 +4602,20 @@ alog [CHAR LIMIT=none] -->
 
     <string name="china_telecom_net_apn_name">CTNET</string>
     <string name="china_telecom_wap_apn_name">CTWAP</string>
+
+    <!-- CMCC WLAN customization begin-->
+    <string name="wifi_advanced_gateway">Gateway</string>
+    <string name="wifi_advanced_network_netmask">Netmask</string>
+    <string name="wifi_set_priority_type_title">Set AP priority manually</string>
+    <string name="wifi_set_priority_type_summary">Allow to set priority for each access point manually</string>
+    <string name="wifi_set_priority_settings_title">AP priority settings</string>
+    <string name="wifi_set_priority_settings_summary">Click to set priority of each access point</string>
+    <string name="wifi_priority_settings_label">Priority settings</string>
+    <string name="wifi_configured_ap_list">Remembered access point list</string>
+    <string name="wifi_priority_label">Priority</string>
+    <string name="wifi_priority_changed">Priority old value=<xliff:g id="old_value">%s</xliff:g>,new value=<xliff:g id="new_value">%s</xliff:g></string>
+    <!-- CMCC WLAN customization end-->
+
     <!-- agps settings begin-->
  
     <string name="location_agps_params_settings_title">AGPS settings</string>
