@@ -263,11 +263,11 @@ public class ApnSettings extends PreferenceActivity implements
             }
 
             //for china mobile
-            if (apn.equals("China Mobile")){
+            if (name.equals("China Mobile")){
                 name = getString(R.string.china_mobile_net_apn_name);
-            }else if (apn.equals("China Mobile MMS")){
+            }else if (name.equals("China Mobile MMS")){
                 name = getString(R.string.china_mobile_mms_apn_name);
-            }else if (apn.equals("China Mobile WAP")){
+            }else if (name.equals("China Mobile WAP")){
                 name = getString(R.string.china_mobile_wap_apn_name);
             }
 
