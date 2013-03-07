@@ -1661,5 +1661,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".wifi.cmcc.WifiGsmDialog"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:launchMode="singleTop"
+                  android:excludeFromRecents="true"
+                  android:theme="@*android:style/Theme.Holo.Dialog.Alert">
+            <intent-filter>
+                <action android:name="android.net.wifi.WIFI_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

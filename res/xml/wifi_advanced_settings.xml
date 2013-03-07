@@ -34,6 +34,13 @@
 	    
 <!-- QUALCOMM_CMCC_START -->
     <ListPreference
+            android:key="gsm_wifi_connect_type"
+            android:title="@string/gsm_to_wifi_connect_type_title"
+            android:persistent="false" 
+            android:entries="@array/wifi_connect_type_entries"
+            android:entryValues="@array/wifi_connect_type_values"
+            />
+    <ListPreference
             android:key="select_in_ssids_type"
             android:title="@string/select_in_ssids_type_title"
             android:persistent="false" 
