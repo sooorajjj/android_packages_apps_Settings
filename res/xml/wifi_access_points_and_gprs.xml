@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/wifi_gprs_settings_title">
+    <PreferenceScreen
+        android:key="wifi_list"
+	    android:title="@string/wifi_list_title" >
+            <intent android:action="android.intent.action.MAIN"
+                android:targetPackage="com.android.settings"
+                android:targetClass="com.android.settings.wifi.WifiSettings" />
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="apn_list"
+	    android:title="@string/apn_list_title" >
+            <intent android:action="android.intent.action.MAIN"
+                android:targetPackage="com.android.settings"
+                android:targetClass="com.android.settings.ApnSettings" />
+    </PreferenceScreen>
+</PreferenceScreen>

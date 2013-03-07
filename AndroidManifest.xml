@@ -1671,5 +1671,20 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name="Settings$WifiGprsSettingsActivity"
+                android:taskAffinity="com.android.settings"
+                android:label="@string/wifi_gprs_settings_title"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.net.wifi.cmcc.PICK_WIFI_NETWORK_AND_GPRS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
+                android:value="com.android.settings.wifi.cmcc.WifiGprsSettings" />
+            <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
+                android:resource="@id/wifi_settings" />
+        </activity>
     </application>
 </manifest>
