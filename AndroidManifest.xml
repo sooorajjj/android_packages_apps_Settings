@@ -1686,5 +1686,16 @@
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
                 android:resource="@id/wifi_settings" />
         </activity>
+        <activity android:name=".wifi.cmcc.ChangeDataConnectionDialog"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:launchMode="singleTop"
+                  android:excludeFromRecents="true"
+                  android:theme="@*android:style/Theme.Holo.Dialog.Alert">
+            <intent-filter>
+                <action android:name="android.net.wifi.cmcc.WIFI_SELECTION_DATA_CONNECTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+<!-- QUALCOMM_CMCC_END   -->        
     </application>
 </manifest>

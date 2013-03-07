@@ -4628,6 +4628,9 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_gprs_settings_title">Network selector</string>
     <string name="wifi_list_title">WLAN</string>
     <string name="apn_list_title">APN</string>
+    <string name="wifi_failover_gprs_title">Change Data Connection</string>
+    <string name="wifi_failover_gprs_summary">WLAN is unavailable, try to connect to mobile network?</string>
+    <string name="wifi_failover_gprs_summary_primary">Do not show this reminder again</string>
     <!-- CMCC WLAN customization end-->
     <!-- WLAN common customization begin-->
     <string name="wifi_disconnect">Disconnect</string>
