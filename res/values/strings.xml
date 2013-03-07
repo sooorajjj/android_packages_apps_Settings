@@ -4508,6 +4508,18 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
+    <string name="apn_PPP_number">PPP phone number</string>
+    <string name="china_union_net_apn_name">China Unicom NET</string>
+    <string name="china_union_wap_apn_name">China Unicom WAP</string>
+    <string name="china_union_mms_apn_name">China Unicom MMS</string>
+    <string name="china_union_supl_apn_name">China Unicom AGPS</string>
+
+    <string name="china_mobile_net_apn_name">China Mobile</string>
+    <string name="china_mobile_wap_apn_name">China Mobile WAP</string>
+    <string name="china_mobile_mms_apn_name">China Mobile MMS</string>
+
+    <string name="china_telecom_net_apn_name">CTNET</string>
+    <string name="china_telecom_wap_apn_name">CTWAP</string>
     <!-- agps settings begin-->
  
     <string name="location_agps_params_settings_title">AGPS settings</string>
