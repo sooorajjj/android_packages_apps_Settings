@@ -4614,9 +4614,14 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_configured_ap_list">Remembered access point list</string>
     <string name="wifi_priority_label">Priority</string>
     <string name="wifi_priority_changed">Priority old value=<xliff:g id="old_value">%s</xliff:g>,new value=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="wifi_auto_connect_type_title">Auto connect type</string>
+    <string name="wifi_auto_connect_type_summary">Specify network connection type</string>
     <string name="cmcc_default_trust_access_points">Default credible access points</string>
     <string name="cmcc_configed_access_points">Credible access points</string>
     <string name="cmcc_unknown_access_points">Unknown access points</string>
+    <string name="select_in_ssids_type_title">Reselection among SSID</string>
+    <string name="confirm_title">Confirm</string>
+    <string name="wifi_signal_found_msg">Current connection signal is weak, would you like to use another WLAN network?</string>
     <!-- CMCC WLAN customization end-->
 
     <!-- agps settings begin-->

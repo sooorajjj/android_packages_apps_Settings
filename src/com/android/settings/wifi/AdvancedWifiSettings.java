@@ -57,11 +57,16 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_CURRENT_NETMASK = "current_netmask";
     private static final String KEY_PRIORITY_TYPE = "wifi_priority_type";
     private static final String KEY_PRIORITY_SETTINGS = "wifi_priority_settings";
+    //set whether settings will auto connect wifi 
+    private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
+    private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
 //QUALCOMM_CMCC_END 
     private WifiManager mWifiManager;
 //QUALCOMM_CMCC_START
     private CheckBoxPreference mPriorityTypePref;
     private Preference mPrioritySettingPref;
+    private CheckBoxPreference mAutoConnectTypePref;
+    private ListPreference mSelectInSsidsTypePref;
 //QUALCOMM_CMCC_END
 
     @Override
@@ -84,6 +89,14 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
 //QUALCOMM_CMCC_START         
         if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
             ContentResolver contentResolver = getContentResolver();
+            if(mAutoConnectTypePref!=null){
+                mAutoConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                        Settings.System.WIFI_AUTO_CONNECT_TYPE, Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO) == Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO);
+            }
+            if (mSelectInSsidsTypePref != null) {
+                int value = Settings.System.getInt(contentResolver, Settings.System.WIFI_SELECT_IN_SSIDS_TYPE, Settings.System.WIFI_SELECT_IN_SSIDS_ASK);
+                mSelectInSsidsTypePref.setValue(String.valueOf(value));
+            }
             if (mPriorityTypePref != null){
                 mPriorityTypePref.setChecked(Settings.System.getInt(contentResolver, 
                         Settings.System.WIFI_PRIORITY_TYPE, Settings.System.WIFI_PRIORITY_TYPE_DEFAULT) == Settings.System.WIFI_PRIORITY_TYPE_MANUAL);
@@ -150,12 +163,18 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
 //QUALCOMM_CMCC_START
         mPriorityTypePref = (CheckBoxPreference)findPreference(KEY_PRIORITY_TYPE);
         mPrioritySettingPref = findPreference(KEY_PRIORITY_SETTINGS);
-        if(mPriorityTypePref != null && mPrioritySettingPref != null) {
+        mAutoConnectTypePref = (CheckBoxPreference)findPreference(KEY_AUTO_CONNECT_TYPE);
+        mSelectInSsidsTypePref = (ListPreference)findPreference(KEY_SELECT_IN_SSIDS_TYPE);
+        if(mPriorityTypePref != null && mPrioritySettingPref != null && mAutoConnectTypePref != null && mSelectInSsidsTypePref != null) {
             if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
                 mPriorityTypePref.setOnPreferenceChangeListener(this);
+                mAutoConnectTypePref.setOnPreferenceChangeListener(this);
+                mSelectInSsidsTypePref.setOnPreferenceChangeListener(this);
             } else {
+                getPreferenceScreen().removePreference(mAutoConnectTypePref);
                 getPreferenceScreen().removePreference(mPriorityTypePref);
                 getPreferenceScreen().removePreference(mPrioritySettingPref);
+                getPreferenceScreen().removePreference(mSelectInSsidsTypePref);
 
             }
         } else {
@@ -233,7 +252,18 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             }
         }
 //QUALCOMM_CMCC_START
-        else if (key.equals(KEY_PRIORITY_TYPE)) {
+		else if (key.equals(KEY_AUTO_CONNECT_TYPE)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(), Settings.System.WIFI_AUTO_CONNECT_TYPE, 
+                    checked ? Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO : Settings.System.WIFI_AUTO_CONNECT_TYPE_MANUAL);
+        } else if(key.equals(KEY_SELECT_IN_SSIDS_TYPE)){
+            try{
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.WIFI_SELECT_IN_SSIDS_TYPE, Integer.parseInt(((String) newValue)));
+            }catch (NumberFormatException e) {
+                return false;
+            }
+        } else if (key.equals(KEY_PRIORITY_TYPE)) {
             boolean checked = ((Boolean) newValue).booleanValue();
             Settings.System.putInt(getContentResolver(), Settings.System.WIFI_PRIORITY_TYPE, 
                     checked ? Settings.System.WIFI_PRIORITY_TYPE_MANUAL : Settings.System.WIFI_PRIORITY_TYPE_DEFAULT);

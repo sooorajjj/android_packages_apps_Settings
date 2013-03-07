@@ -1645,9 +1645,21 @@
         </service>
         <receiver android:name=".wifi.cmcc.CmccMainReceiver">
              <intent-filter>
+                <action android:name="android.net.wifi.RSSI_CHANGED"/>
+                <action android:name="android.net.wifi.SCAN_RESULTS"/>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
              </intent-filter>
         </receiver>
+        <activity android:name=".wifi.cmcc.WifiSelectInSsidsDialog"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+                  android:launchMode="singleTop"
+                  android:excludeFromRecents="true"
+                  android:theme="@*android:style/Theme.Holo.Dialog.Alert">
+            <intent-filter>
+                <action android:name="android.net.wifi.cmcc.WIFI_SELECTION_SSIDS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

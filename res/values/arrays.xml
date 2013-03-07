@@ -881,6 +881,25 @@
         <item>2</item>
     </string-array>
     
+
+    <!-- CMCC WLAN customization begin-->
+    <string-array name="wifi_connect_type_entries">
+        <!-- auto connect to wifi -->
+        <item>Automatically connect</item>
+        <!-- manual connect to wifi -->
+        <item>Manually connect</item>
+        <!-- always notify user when wifi is available -->
+        <item>Always ask</item>
+    </string-array>
+    <string-array name="wifi_connect_type_values">
+        <!-- auto connect to wifi -->
+        <item>0</item>
+        <!-- manual connect to wifi -->
+        <item>1</item>
+        <!-- always notify user when wifi is available -->
+        <item>2</item>
+    </string-array>
+    <!-- CMCC WLAN customization end-->
     <!--for key backlight-->    
     <string-array name="key_backlight_entries">
     <item>Off</item>
