@@ -1831,6 +1831,7 @@
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
 
+    <string name="language_summary">中文 (简体)</string>
     <string name="message_waiting_true">确定</string>
     <string name="message_waiting_false">取消</string>
     <string name="message_callredirect_true">确定</string>
