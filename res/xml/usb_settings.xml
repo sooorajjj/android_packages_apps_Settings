@@ -31,5 +31,13 @@
         android:title="@string/usb_ptp_title"
         android:summary="@string/usb_ptp_summary"
         />
+        
+     <PreferenceScreen android:title="@string/usb_umt_title"
+                 android:key="usb_umt"
+                android:summary="@string/usb_umt_summary" >         
+         <intent 
+                    android:targetPackage="com.android.systemui"
+                    android:targetClass="com.android.systemui.usb.UsbStorageActivity" />
+        </PreferenceScreen>
 
 </PreferenceScreen>

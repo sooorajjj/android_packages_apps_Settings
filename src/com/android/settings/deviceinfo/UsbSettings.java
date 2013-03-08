@@ -150,6 +150,6 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_PTP, true);
             updateToggles(UsbManager.USB_FUNCTION_PTP);
         }
-        return true;
+        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 }
