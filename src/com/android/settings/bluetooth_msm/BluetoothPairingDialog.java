@@ -324,6 +324,8 @@ public final class BluetoothPairingDialog extends AlertActivity implements
                 mOkButton.setEnabled(true);
             } else if (mIsSecurityHigh && s.length() == BLUETOOTH_PIN_MAX_LENGTH) {
                 mOkButton.setEnabled(true);
+            } else {
+                mOkButton.setEnabled(false);
             }
         }
     }
