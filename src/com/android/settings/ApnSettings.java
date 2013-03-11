@@ -188,6 +188,7 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     private void fillList() {
+        if(!hasCard()) return;
         String where = getOperatorNumericSelection();
         Cursor cursor = getContentResolver().query(Telephony.Carriers.CONTENT_URI, new String[] {
                 "_id", "name", "apn", "type"}, where, null,
@@ -365,6 +366,7 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     private void setSelectedApnKey(String key) {
+        Log.v(TAG, "setSelectedApnKey, key = " + key);
         mSelectedKey = key;
         ContentResolver resolver = getContentResolver();
 
@@ -520,5 +522,17 @@ public class ApnSettings extends PreferenceActivity implements
             result.add(mccMncFromSim);
         }
         return result.toArray(new String[2]);
+    }
+
+    private boolean hasCard()
+    {
+      if(!TelephonyManager.getDefault().isMultiSimEnabled())
+      {
+        return TelephonyManager.getDefault().hasIccCard();
+      }
+      else
+      {
+        return MSimTelephonyManager.getDefault().hasIccCard(mSubscription);
+      }
     }
 }
