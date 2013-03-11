@@ -72,10 +72,14 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
     private StorageItemPreference mItemDownloads;
     private StorageItemPreference mItemCache;
     private StorageItemPreference mItemMisc;
+    private PreferenceHeader  mItemCurrentUser;
+    private PreferenceHeader  mItemOtherUser;
     private List<StorageItemPreference> mItemUsers = Lists.newArrayList();
 
     private boolean mUsbConnected;
     private String mUsbFunction;
+
+    private boolean mUSBStorage =  false;
 
     private long mTotalSize;
 
@@ -128,6 +132,8 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
 
         setTitle(volume != null ? volume.getDescription(context)
                 : context.getText(R.string.internal_storage));
+        
+        mUSBStorage = mVolume == null ? false : ("/storage/sdcard1").equals(mVolume.getPath());
     }
 
     private StorageItemPreference buildItem(int titleRes, int colorRes) {
@@ -149,12 +155,9 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
 
         mUsageBarPreference = new UsageBarPreference(context);
         mUsageBarPreference.setOrder(ORDER_USAGE_BAR);
-        addPreference(mUsageBarPreference);
 
         mItemTotal = buildItem(R.string.memory_size, 0);
         mItemAvailable = buildItem(R.string.memory_available, R.color.memory_avail);
-        addPreference(mItemTotal);
-        addPreference(mItemAvailable);
 
         mItemApps = buildItem(R.string.memory_apps_usage, R.color.memory_apps_usage);
         mItemDcim = buildItem(R.string.memory_dcim_usage, R.color.memory_dcim);
@@ -165,57 +168,33 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
 
         mItemCache.setKey(KEY_CACHE);
 
-        boolean showDetails = false;//mVolume == null || mVolume.isPrimary();
-        if(false){
-            if(mVolume == null || mVolume.isPrimary()){
-                showDetails = true;
-            }
-        }else{
-            showDetails = true;//always show details
-        }
-        if (showDetails) {
-            if (showUsers) {
-                addPreference(new PreferenceHeader(context, currentUser.name));
-            }
+        if (showUsers) {
+            mItemCurrentUser = new PreferenceHeader(context, currentUser.name);
+            mItemOtherUser = new PreferenceHeader(context, R.string.storage_other_users);
 
-            addPreference(mItemApps);
-            addPreference(mItemDcim);
-            addPreference(mItemMusic);
-            addPreference(mItemDownloads);
-            addPreference(mItemCache);
-            addPreference(mItemMisc);
-
-            if (showUsers) {
-                addPreference(new PreferenceHeader(context, R.string.storage_other_users));
-
-                int count = 0;
-                for (UserInfo info : otherUsers) {
-                    final int colorRes = count++ % 2 == 0 ? R.color.memory_user_light
-                            : R.color.memory_user_dark;
-                    final StorageItemPreference userPref = new StorageItemPreference(
-                            getContext(), info.name, colorRes, info.id);
-                    mItemUsers.add(userPref);
-                    addPreference(userPref);
-                }
+            int count = 0;
+            for (UserInfo info : otherUsers) {
+                final int colorRes = count++ % 2 == 0 ? R.color.memory_user_light
+                        : R.color.memory_user_dark;
+                final StorageItemPreference userPref = new StorageItemPreference(
+                        getContext(), info.name, colorRes, info.id);
+                mItemUsers.add(userPref);
             }
         }
 
-        final boolean isRemovable = mVolume != null ? mVolume.isRemovable() : false;
-        if (isRemovable) {
-            mMountTogglePreference = new Preference(context);
-            mMountTogglePreference.setTitle(R.string.sd_eject);
-            mMountTogglePreference.setSummary(R.string.sd_eject_summary);
-            addPreference(mMountTogglePreference);
-        }
+        mMountTogglePreference = new Preference(context);
+        mMountTogglePreference.setTitle(R.string.sd_eject);
+        mMountTogglePreference.setSummary(R.string.sd_eject_summary);
 
         // Only allow formatting of primary physical storage
         // TODO: enable for non-primary volumes once MTP is fixed
-        final boolean allowFormat = mVolume != null ? true : false;
-        if (allowFormat) {
-            mFormatPreference = new Preference(context);
+        mFormatPreference = new Preference(context);
+        if (mUSBStorage) {
+            mFormatPreference.setTitle(R.string.usb_format);
+            mFormatPreference.setSummary(R.string.usb_storage_format_summary);
+        } else {
             mFormatPreference.setTitle(R.string.sd_format);
             mFormatPreference.setSummary(R.string.sd_format_summary);
-            addPreference(mFormatPreference);
         }
 
         final IPackageManager pm = ActivityThread.getPackageManager();
@@ -225,21 +204,81 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
                 mStorageLow.setOrder(ORDER_STORAGE_LOW);
                 mStorageLow.setTitle(R.string.storage_low_title);
                 mStorageLow.setSummary(R.string.storage_low_summary);
-                addPreference(mStorageLow);
-            } else if (mStorageLow != null) {
-                removePreference(mStorageLow);
+            } else {
                 mStorageLow = null;
             }
         } catch (RemoteException e) {
         }
     }
 
+    /**
+     * Successive mounts can change the list of visible preferences.
+     * This makes sure all preferences are visible and displayed in the right order.
+     */
+    private void resetPreferences() {
+        removeAll();
+
+        addPreference(mUsageBarPreference);
+
+        addPreference(mItemTotal);
+        addPreference(mItemAvailable);
+        
+        final UserInfo currentUser;
+        try {
+            currentUser = ActivityManagerNative.getDefault().getCurrentUser();
+        } catch (RemoteException e) {
+            throw new RuntimeException("Failed to get current user");
+        }
+
+        final List<UserInfo> otherUsers = getUsersExcluding(currentUser);
+        final boolean showUsers = mVolume == null && otherUsers.size() > 0;
+        
+        boolean showDetails = mVolume == null || mVolume.isPrimary() || mUSBStorage;
+        if (showDetails) {
+            if (showUsers) {
+                addPreference(mItemCurrentUser);
+            }
+        
+            addPreference(mItemApps);
+            addPreference(mItemDcim);
+            addPreference(mItemMusic);
+            addPreference(mItemDownloads);
+            addPreference(mItemCache);
+            addPreference(mItemMisc);
+        
+            if (showUsers) {
+                addPreference(mItemOtherUser);
+        
+                for (StorageItemPreference user : mItemUsers) {
+                    addPreference(user);
+                }
+            }
+        }
+
+        final boolean isRemovable = mVolume != null ? mVolume.isRemovable() : false;
+        if (isRemovable) {
+            addPreference(mMountTogglePreference);
+        }
+
+        final boolean allowFormat = mVolume != null ? (mVolume.isPrimary() || mUSBStorage) : false;
+        if (allowFormat) {
+            addPreference(mFormatPreference);
+        }
+
+        if (mStorageLow != null && mVolume == null) {
+            addPreference(mStorageLow);
+        }
+
+    }
+    
     public StorageVolume getStorageVolume() {
         return mVolume;
     }
 
     private void updatePreferencesFromState() {
         // Only update for physical volumes
+        resetPreferences();
+        
         if (mVolume == null) return;
 
         if (mMountTogglePreference != null) {
@@ -337,7 +376,7 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
     }
 
     public void updateDetails(MeasurementDetails details) {
-        final boolean showDetails = mVolume == null || mVolume.isPrimary();
+        final boolean showDetails = mVolume == null || mVolume.isPrimary() || mUSBStorage;
         if (!showDetails) return;
 
         // Count caches as available space, since system manages them
