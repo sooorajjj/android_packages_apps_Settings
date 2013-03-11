@@ -43,6 +43,7 @@ import android.widget.RemoteViews;
 import com.android.settings.R;
 import com.android.settings.bluetooth.LocalBluetoothAdapter;
 import com.android.settings.bluetooth.LocalBluetoothManager;
+import android.widget.Toast;
 
 /**
  * Provides control of power-related settings from a widget.
@@ -783,6 +784,11 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
             Uri data = intent.getData();
             int buttonId = Integer.parseInt(data.getSchemeSpecificPart());
             if (buttonId == BUTTON_WIFI) {
+			    if (isAirplaneModeOn(context)) {
+                    Toast.makeText(context, R.string.wifi_in_airplane_mode,
+                        Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 sWifiState.toggleState(context);
             } else if (buttonId == BUTTON_BRIGHTNESS) {
                 toggleBrightness(context);
@@ -791,6 +797,11 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
             } else if (buttonId == BUTTON_GPS) {
                 sGpsState.toggleState(context);
             } else if (buttonId == BUTTON_BLUETOOTH) {
+			    if (isAirplaneModeOn(context)) {
+                    Toast.makeText(context, R.string.wifi_in_airplane_mode,
+                        Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 sBluetoothState.toggleState(context);
             }
         } else {
@@ -925,4 +936,18 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
         }
     }
 
+	private boolean isAirplaneModeOn(Context context) {
+		ContentResolver mContentResolver = context.getContentResolver();
+        if (mContentResolver == null) {
+	    	return false;
+	    } else {
+	        String toggleableRadios = Settings.System.getString(mContentResolver,
+                Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
+            boolean istoggleableRadios = !(toggleableRadios != null
+                    && toggleableRadios.contains(Settings.System.RADIO_WIFI)) ;
+			boolean isInAirplan = (android.provider.Settings.System.getInt(mContentResolver,
+		            android.provider.Settings.System.AIRPLANE_MODE_ON, 0) > 0);
+		    return (isInAirplan && istoggleableRadios);
+		}
+    }
 }

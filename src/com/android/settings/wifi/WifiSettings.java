@@ -44,6 +44,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.security.Credentials;
 import android.security.KeyStore;
@@ -81,6 +82,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.qrd.plugin.feature_query.FeatureQuery;
+
 /**
  * Two types of UI are provided here.
  *
@@ -101,6 +104,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private static final int MENU_ID_CONNECT = Menu.FIRST + 6;
     private static final int MENU_ID_FORGET = Menu.FIRST + 7;
     private static final int MENU_ID_MODIFY = Menu.FIRST + 8;
+    private static final int MENU_ID_DISCONNECT = Menu.FIRST + 9;
 
     private static final int WIFI_DIALOG_ID = 1;
     private static final int WPS_PBC_DIALOG_ID = 2;
@@ -174,6 +178,11 @@ public class WifiSettings extends SettingsPreferenceFragment
 
     /* End of "used in Wifi Setup context" */
 
+//QUALCOMM_CMCC_START 
+    private PreferenceCategory mCmccDefaultTrustAP;
+    private PreferenceCategory mCmccConfigedAP;
+    private PreferenceCategory mCmccUnKnownAP;
+//QUALCOMM_CMCC_END
     public WifiSettings() {
         mFilter = new IntentFilter();
         mFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -361,8 +370,17 @@ public class WifiSettings extends SettingsPreferenceFragment
                 }
             }
         }
-
-        addPreferencesFromResource(R.xml.wifi_settings);
+//QUALCOMM_CMCC_START
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            addPreferencesFromResource(R.xml.wifi_sort_settings);
+            mCmccDefaultTrustAP = (PreferenceCategory)findPreference("default_trust_access_points");
+            mCmccConfigedAP = (PreferenceCategory)findPreference("configed_access_points");
+            mCmccUnKnownAP = (PreferenceCategory)findPreference("unknown_access_points");
+        } 
+//QUALCOMM_CMCC_END		
+		else {
+            addPreferencesFromResource(R.xml.wifi_settings);
+        }
 
         if (mSetupWizardMode) {
             getView().setSystemUiVisibility(
@@ -544,9 +562,23 @@ public class WifiSettings extends SettingsPreferenceFragment
                         && mSelectedAccessPoint.getState() == null) {
                     menu.add(Menu.NONE, MENU_ID_CONNECT, 0, R.string.wifi_menu_connect);
                 }
+                //current connected AP, add a disconnect option to it
+                if (mSelectedAccessPoint.getState() != null ) {
+                    menu.add(Menu.NONE, MENU_ID_DISCONNECT, 0, R.string.wifi_menu_disconnect);
+                }
                 if (mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
-                    menu.add(Menu.NONE, MENU_ID_FORGET, 0, R.string.wifi_menu_forget);
+//QUALCOMM_CMCC_START 
+                if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+                    if(!AccessPoint.isCmccAp(mSelectedAccessPoint)){
+                        menu.add(Menu.NONE, MENU_ID_FORGET, 0, R.string.wifi_menu_forget);
+                    }
                     menu.add(Menu.NONE, MENU_ID_MODIFY, 0, R.string.wifi_menu_modify);
+				}
+//QUALCOMM_CMCC_END
+				else {
+					menu.add(Menu.NONE, MENU_ID_FORGET, 0, R.string.wifi_menu_forget);
+					menu.add(Menu.NONE, MENU_ID_MODIFY, 0, R.string.wifi_menu_modify);
+				}
                 }
             }
         }
@@ -580,6 +612,10 @@ public class WifiSettings extends SettingsPreferenceFragment
             }
             case MENU_ID_MODIFY: {
                 showDialog(mSelectedAccessPoint, true);
+                return true;
+            }
+            case MENU_ID_DISCONNECT: {
+                mWifiManager.disconnect();
                 return true;
             }
         }
@@ -724,17 +760,31 @@ public class WifiSettings extends SettingsPreferenceFragment
             case WifiManager.WIFI_STATE_ENABLED:
                 // AccessPoints are automatically sorted with TreeSet.
                 final Collection<AccessPoint> accessPoints = constructAccessPoints();
-                getPreferenceScreen().removeAll();
+                if (!FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+                    getPreferenceScreen().removeAll();
+				}
                 if(accessPoints.size() == 0) {
                     addMessagePreference(R.string.wifi_empty_list_wifi_on);
                 }
-                for (AccessPoint accessPoint : accessPoints) {
-                    getPreferenceScreen().addPreference(accessPoint);
-                }
+                if (!FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+                    for (AccessPoint accessPoint : accessPoints) {
+                        getPreferenceScreen().addPreference(accessPoint);
+                    }
+				}
+                if (accessPoints.isEmpty()){
+					addMessagePreference(R.string.wifi_empty_list_wifi_on);
+				}
                 break;
 
             case WifiManager.WIFI_STATE_ENABLING:
-                getPreferenceScreen().removeAll();
+//QUALCOMM_CMCC_START 
+                if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                    emptyCategory();
+                } else
+//MTK_OP01_PROTECT_END
+                {
+                    getPreferenceScreen().removeAll();
+                }
                 break;
 
             case WifiManager.WIFI_STATE_DISABLING:
@@ -749,7 +799,16 @@ public class WifiSettings extends SettingsPreferenceFragment
 
     private void addMessagePreference(int messageId) {
         if (mEmptyView != null) mEmptyView.setText(messageId);
-        getPreferenceScreen().removeAll();
+//QUALCOMM_CMCC_START 
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            getPreferenceScreen().removePreference(mCmccDefaultTrustAP);
+            getPreferenceScreen().removePreference(mCmccConfigedAP);
+            getPreferenceScreen().removePreference(mCmccUnKnownAP);
+        } else
+//QUALCOMM_CMCC_END 
+        {
+            getPreferenceScreen().removeAll();
+        }
     }
 
     /** Returns sorted list of access points */
@@ -759,14 +818,37 @@ public class WifiSettings extends SettingsPreferenceFragment
          * correct SSID.  Maps SSID -> List of AccessPoints with the given SSID.  */
         Multimap<String, AccessPoint> apMap = new Multimap<String, AccessPoint>();
 
+//QUALCOMM_CMCC_START 
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            emptyCategory();
+        }
+//QUALCOMM_CMCC_END
         final List<WifiConfiguration> configs = mWifiManager.getConfiguredNetworks();
         if (configs != null) {
             for (WifiConfiguration config : configs) {
-                AccessPoint accessPoint = new AccessPoint(getActivity(), config);
-                accessPoint.update(mLastInfo, mLastState);
-                accessPoints.add(accessPoint);
-                apMap.put(accessPoint.ssid, accessPoint);
+                if (config.SSID != null) {
+                    AccessPoint accessPoint = new AccessPoint(getActivity(), config);
+                    accessPoint.update(mLastInfo, mLastState);
+                    accessPoints.add(accessPoint);
+                    apMap.put(accessPoint.ssid, accessPoint);
+//QUALCOMM_CMCC_START 
+	                if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+	                    if(AccessPoint.isCmccAp(accessPoint)){
+	                        mCmccDefaultTrustAP.addPreference(accessPoint);
+	                    } else {
+	                        mCmccConfigedAP.addPreference(accessPoint);
+	                    }
+	                }
+//QUALCOMM_CMCC_END
+                }
             }
+//QUALCOMM_CMCC_START
+            if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                if (mCmccConfigedAP != null && mCmccConfigedAP.getPreferenceCount() == 0) {
+                    getPreferenceScreen().removePreference(mCmccConfigedAP);
+                }
+            }
+//QUALCOMM_CMCC_END
         }
 
         final List<ScanResult> results = mWifiManager.getScanResults();
@@ -787,8 +869,24 @@ public class WifiSettings extends SettingsPreferenceFragment
                     AccessPoint accessPoint = new AccessPoint(getActivity(), result);
                     accessPoints.add(accessPoint);
                     apMap.put(accessPoint.ssid, accessPoint);
+//QUALCOMM_CMCC_START					
+                    if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                        if(AccessPoint.isCmccAp(accessPoint)){
+                            mCmccDefaultTrustAP.addPreference(accessPoint);
+                        } else {
+                            mCmccUnKnownAP.addPreference(accessPoint);
+                        }
+                    }
+//QUALCOMM_CMCC_END
                 }
             }
+//QUALCOMM_CMCC_START
+            if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                if(mCmccUnKnownAP !=null && mCmccUnKnownAP.getPreferenceCount() == 0){
+                    getPreferenceScreen().removePreference(mCmccUnKnownAP);
+                }
+            }
+//QUALCOMM_CMCC_END			
         }
 
         // Pre-sort accessPoints to speed preference insertion
@@ -879,12 +977,21 @@ public class WifiSettings extends SettingsPreferenceFragment
             mLastState = state;
         }
 
-        for (int i = getPreferenceScreen().getPreferenceCount() - 1; i >= 0; --i) {
-            // Maybe there's a WifiConfigPreference
-            Preference preference = getPreferenceScreen().getPreference(i);
-            if (preference instanceof AccessPoint) {
-                final AccessPoint accessPoint = (AccessPoint) preference;
-                accessPoint.update(mLastInfo, mLastState);
+//QUALCOMM_CMCC_START
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            updateAP(mCmccDefaultTrustAP);
+            updateAP(mCmccConfigedAP);
+            updateAP(mCmccUnKnownAP);
+        } else
+//QUALCOMM_CMCC_END
+        {
+            for (int i = getPreferenceScreen().getPreferenceCount() - 1; i >= 0; --i) {
+                // Maybe there's a WifiConfigPreference
+                Preference preference = getPreferenceScreen().getPreference(i);
+                if (preference instanceof AccessPoint) {
+                    final AccessPoint accessPoint = (AccessPoint) preference;
+                    accessPoint.update(mLastInfo, mLastState);
+                }
             }
         }
     }
@@ -978,8 +1085,13 @@ public class WifiSettings extends SettingsPreferenceFragment
             if (mSelectedAccessPoint != null
                     && !requireKeyStore(mSelectedAccessPoint.getConfig())
                     && mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
-                mWifiManager.connect(mSelectedAccessPoint.networkId,
+                DetailedState state = mSelectedAccessPoint.getState();
+                if(state == null){
+                    mWifiManager.connect(mSelectedAccessPoint.networkId,
                         mConnectListener);
+				 } else {
+					mWifiManager.disconnect();
+				 }
             }
         } else if (config.networkId != INVALID_NETWORK_ID) {
             if (mSelectedAccessPoint != null) {
@@ -1024,8 +1136,14 @@ public class WifiSettings extends SettingsPreferenceFragment
         if (mWifiManager.isWifiEnabled()) {
             mScanner.resume();
         }
-
-        getPreferenceScreen().removeAll();
+//QUALCOMM_CMCC_START 
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            emptyCategory();
+        } else
+//QUALCOMM_CMCC_END
+        {
+            getPreferenceScreen().removeAll();
+        }
     }
 
     /**
@@ -1040,7 +1158,15 @@ public class WifiSettings extends SettingsPreferenceFragment
     /* package */ int getAccessPointsCount() {
         final boolean wifiIsEnabled = mWifiManager.isWifiEnabled();
         if (wifiIsEnabled) {
-            return getPreferenceScreen().getPreferenceCount();
+//QUALCOMM_CMCC_START 
+            if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+                return mCmccDefaultTrustAP.getPreferenceCount() + mCmccConfigedAP.getPreferenceCount()
+                    + mCmccUnKnownAP.getPreferenceCount();
+            }else
+//QUALCOMM_CMCC_END
+            {
+                return getPreferenceScreen().getPreferenceCount();
+            }
         } else {
             return 0;
         }
@@ -1111,4 +1237,24 @@ public class WifiSettings extends SettingsPreferenceFragment
         }
     }
 
+//QUALCOMM_CMCC_START	
+    public void updateAP(PreferenceCategory screen){
+        for (int i = screen.getPreferenceCount() - 1; i >= 0; --i) {
+            Preference preference = screen.getPreference(i);
+            if (preference instanceof AccessPoint) {
+                final AccessPoint accessPoint = (AccessPoint) preference;
+                accessPoint.update(mLastInfo, mLastState);
+            }
+        }
+    }
+	
+    public void emptyCategory(){
+        getPreferenceScreen().addPreference(mCmccDefaultTrustAP);
+        getPreferenceScreen().addPreference(mCmccConfigedAP);
+        getPreferenceScreen().addPreference(mCmccUnKnownAP);
+        mCmccDefaultTrustAP.removeAll();
+        mCmccConfigedAP.removeAll();
+        mCmccUnKnownAP.removeAll();
+    }
+//QUALCOMM_CMCC_START
 }

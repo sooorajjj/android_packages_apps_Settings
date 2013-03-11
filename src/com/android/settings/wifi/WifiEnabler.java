@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.android.settings.R;
 import com.android.settings.WirelessSettings;
+import android.content.ContentResolver;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -42,6 +43,7 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
     private final WifiManager mWifiManager;
     private boolean mStateMachineEvent;
     private final IntentFilter mIntentFilter;
+	private ContentResolver mContentResolver;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,6 +51,9 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
                 handleWifiStateChanged(intent.getIntExtra(
                         WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN));
+			 	if (isAirplanEnabled()) {		      
+			      	setSwitchChecked(false);                     
+	        	}
             } else if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
                 if (!mConnected.get()) {
                     handleStateChanged(WifiInfo.getDetailedStateOf((SupplicantState)
@@ -72,12 +77,16 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         // The order matters! We really should not depend on this. :(
         mIntentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		mContentResolver = context.getContentResolver(); 
     }
 
     public void resume() {
         // Wi-Fi state is sticky, so just let the receiver update UI
         mContext.registerReceiver(mReceiver, mIntentFilter);
         mSwitch.setOnCheckedChangeListener(this);
+		if (isAirplanEnabled()) {
+            setSwitchChecked(false);
+        }
     }
 
     public void pause() {
@@ -96,6 +105,9 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         boolean isDisabled = wifiState == WifiManager.WIFI_STATE_DISABLED;
         mSwitch.setChecked(isEnabled);
         mSwitch.setEnabled(isEnabled || isDisabled);
+        if (isAirplanEnabled()) {
+		    setSwitchChecked(false);
+        }
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -108,6 +120,7 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
             // Reset switch to off. No infinite check/listenenr loop.
             buttonView.setChecked(false);
+            mSwitch.setChecked(true);
         }
 
         // Disable tethering if enabling Wifi
@@ -171,5 +184,19 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             }
         }
         */
+    }
+
+	private boolean isAirplanEnabled() {
+        if (mContentResolver == null) {
+	    	return false;
+	    } else {
+	        String toggleableRadios = Settings.System.getString(mContentResolver,
+                Settings.System.AIRPLANE_MODE_TOGGLEABLE_RADIOS);
+            boolean istoggleableRadios = !(toggleableRadios != null
+                    && toggleableRadios.contains(Settings.System.RADIO_WIFI)) ;
+			boolean isInAirplan = (android.provider.Settings.System.getInt(mContentResolver,
+		            android.provider.Settings.System.AIRPLANE_MODE_ON, 0) > 0);
+		    return (isInAirplan && istoggleableRadios);
+		}
     }
 }
