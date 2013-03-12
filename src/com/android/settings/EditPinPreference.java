@@ -76,6 +76,12 @@ class EditPinPreference extends EditTextPreference {
         Dialog dialog = getDialog();
         if (dialog == null || !dialog.isShowing()) {
             showDialog(null);
+            final EditText editText = getEditText();
+            if ((editText != null) && (editText.getText() != null)) {
+                int length = editText.getText().toString().length();
+                // Move cursor to right side.
+                editText.setSelection(length, length);
+            }
         }
     }
 }
