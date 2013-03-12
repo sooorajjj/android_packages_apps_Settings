@@ -2003,4 +2003,6 @@
     <string name="select_slot_always_ask">总是询问</string>
     <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>
 
+    <string name="erase_internal_storage" product="default">格式化内部U盘</string>
+    <string name="erase_internal_storage_description" product="default" >"清除内部U盘中的全部数据，例如音乐或照片"</string>
 </resources>

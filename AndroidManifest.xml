@@ -1697,5 +1697,15 @@
             </intent-filter>
         </activity>
 <!-- QUALCOMM_CMCC_END   -->        
+        <service android:name=".PhoneStorageFormatter"
+                      android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.internal.os.storage.FORMAT_ONLY" />
+                <action android:name="com.android.internal.os.storage.FORMAT_AND_FACTORY_RESET" />
+                <action android:name="com.android.internal.os.storage.FORMAT_ALL_AND_FACTORY_RESET" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
     </application>
 </manifest>

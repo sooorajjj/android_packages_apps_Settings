@@ -4684,5 +4684,6 @@ alog [CHAR LIMIT=none] -->
     <string name="select_slot_always_ask">Always ask</string>
 
     <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
-
+    <string name="erase_internal_storage" product="default">Erase internal U disk</string>
+    <string name="erase_internal_storage_description" product="default">Erase all the data on the Ucard, such as music or photos</string>
 </resources>
