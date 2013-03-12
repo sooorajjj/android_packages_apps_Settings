@@ -352,8 +352,8 @@ public class ApnEditor extends PreferenceActivity
                 mMmsProxy.setEnabled(false);
                 mMmsPort.setEnabled(false);
                 mMmsc.setEnabled(false);
-				mMcc.setEnabled(false);
-				mMnc.setEnabled(false);
+                mMcc.setEnabled(false);
+                mMnc.setEnabled(false);
             }
 
             if (mNewApn) {
@@ -528,9 +528,9 @@ public class ApnEditor extends PreferenceActivity
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
-                if (validateAndSave(false)) {
+              //  if (validateAndSave(false)) {
                     finish();
-                }
+               // }
                 return true;
             }
         }

@@ -188,7 +188,10 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     private void fillList() {
-        if(!hasCard()) return;
+        if(!hasValidCard())
+        {
+          return;
+        }
         String where = getOperatorNumericSelection();
         Cursor cursor = getContentResolver().query(Telephony.Carriers.CONTENT_URI, new String[] {
                 "_id", "name", "apn", "type"}, where, null,
@@ -414,7 +417,7 @@ public class ApnSettings extends PreferenceActivity implements
     private boolean restoreDefaultApn() {
         showDialog(DIALOG_RESTORE_DEFAULTAPN);
         mRestoreDefaultApnMode = true;
-
+        Log.v(TAG, "restoreDefaultApn " );
         if (mRestoreApnUiHandler == null) {
             mRestoreApnUiHandler = new RestoreApnUiHandler();
         }
@@ -514,7 +517,7 @@ public class ApnSettings extends PreferenceActivity implements
             mccMncFromSim = TelephonyManager.getDefault().getSimOperator();
         }
         else
-		{
+        {
          mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
                 TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
        }
@@ -524,15 +527,28 @@ public class ApnSettings extends PreferenceActivity implements
         return result.toArray(new String[2]);
     }
 
-    private boolean hasCard()
+    private boolean hasValidCard()
     {
-      if(!TelephonyManager.getDefault().isMultiSimEnabled())
-      {
-        return TelephonyManager.getDefault().hasIccCard();
+      boolean hasCard = false;
+      String mccMncFromSim = null;
+
+      if(!TelephonyManager.getDefault().isMultiSimEnabled()){
+        hasCard = TelephonyManager.getDefault().hasIccCard();
+        mccMncFromSim = TelephonyManager.getDefault().getSimOperator();
       }
       else
       {
-        return MSimTelephonyManager.getDefault().hasIccCard(mSubscription);
+        hasCard = MSimTelephonyManager.getDefault().hasIccCard(mSubscription);
+        mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
       }
+      Log.d(TAG, "hasValidCard hascard=" + hasCard + ", mccmnc=" + mccMncFromSim);
+      if(hasCard){
+        if(mccMncFromSim != null && mccMncFromSim.length() > 0) {
+          return true;
+        }
+      }
+
+      return false;
     }
 }
