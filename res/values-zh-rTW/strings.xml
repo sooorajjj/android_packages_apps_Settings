@@ -969,6 +969,11 @@
     <string name="location_access_title" msgid="7064108942964081243">"存取我的位置資訊"</string>
     <string name="location_access_summary" msgid="69031404093194341">"允許向您取得許可的應用程式使用您的位置資訊"</string>
     <string name="location_sources_heading" msgid="1278732419851088319">"位置資訊來源"</string>
+    <string name="location_access_google_service_title">"同意記錄位置資訊"</string>
+    <string name="location_access_google_service_text">"允許 Google 的定位服務收集匿名位置資料。有些資料可能儲存在您的裝置中。
+    即使裝置並未執行任何應用程式，我們仍會收集這些匿名資料。"</string>
+    <string name="location_access_google_service_agree">"同意"</string>
+    <string name="location_access_google_service_disagree">"不同意"</string>
     <string name="about_settings" product="tablet" msgid="593457295516533765">"關於平板電腦"</string>
     <string name="about_settings" product="default" msgid="1743378368185371685">"關於手機"</string>
     <string name="about_settings_summary" msgid="3371517697156165959">"查看法律資訊、狀態、軟體版本"</string>
