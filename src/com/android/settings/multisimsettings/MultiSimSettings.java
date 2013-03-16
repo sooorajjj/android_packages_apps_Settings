@@ -224,7 +224,7 @@ public class MultiSimSettings extends PreferenceActivity {
         mCountDown = (CountDownPreference)findPreference(KEY_COUNTDOWN_TIMER);
         mCountDown.updateSummary();
         //Hide the countdown time
-        //this.getPreferenceScreen().removePreference(mCountDown);
+        this.getPreferenceScreen().removePreference(mCountDown);
 
         //do this setting for CU version's
         if(!FeatureQuery.FEATURE_MESSAGE_QUICK_RESPONSE){
