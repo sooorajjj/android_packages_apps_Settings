@@ -215,7 +215,11 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
          if(subscription == ALWAYS_ASK){
              return getResources().getString(R.string.select_slot_always_ask);
          }else{
-             return System.getString(getContentResolver(),System.MULTI_SIM_NAME[subscription]);
+             String name = System.getString(getContentResolver(),System.MULTI_SIM_NAME[subscription]);
+             if(name == null){
+                 name = getResources().getStringArray(R.array.select_slot_items)[subscription];
+             }
+             return name;
          }
     }
 
