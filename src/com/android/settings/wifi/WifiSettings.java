@@ -82,6 +82,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.provider.Settings;
 import com.qrd.plugin.feature_query.FeatureQuery;
 
 /**
@@ -179,6 +180,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     /* End of "used in Wifi Setup context" */
 
 //QUALCOMM_CMCC_START 
+	private boolean isAutoConnect = true;
     private PreferenceCategory mCmccDefaultTrustAP;
     private PreferenceCategory mCmccConfigedAP;
     private PreferenceCategory mCmccUnKnownAP;
@@ -428,6 +430,10 @@ public class WifiSettings extends SettingsPreferenceFragment
         if (mWifiEnabler != null) {
             mWifiEnabler.resume();
         }
+//QUALCOMM_CMCC_START	
+		isAutoConnect = Settings.System.getInt(getActivity().getContentResolver(), Settings.System.WIFI_AUTO_CONNECT_TYPE, 
+			    Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO) == Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO;
+//QUALCOMM_CMCC_END
 
         getActivity().registerReceiver(mReceiver, mFilter);
         if (mKeyStoreNetworkId != INVALID_NETWORK_ID &&
@@ -616,6 +622,13 @@ public class WifiSettings extends SettingsPreferenceFragment
             }
             case MENU_ID_DISCONNECT: {
                 mWifiManager.disconnect();
+//QUALCOMM_CMCC_START 
+				if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+					if (isAutoConnect) {
+				        mWifiManager.reconnect();
+					}
+				}
+//QUALCOMM_CMCC_END 
                 return true;
             }
         }
@@ -1091,6 +1104,13 @@ public class WifiSettings extends SettingsPreferenceFragment
                         mConnectListener);
 				 } else {
 					mWifiManager.disconnect();
+//QUALCOMM_CMCC_START 
+				    if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+					    if (isAutoConnect) {
+				            mWifiManager.reconnect();
+					    }
+				    }
+//QUALCOMM_CMCC_END 
 				 }
             }
         } else if (config.networkId != INVALID_NETWORK_ID) {
@@ -1256,5 +1276,5 @@ public class WifiSettings extends SettingsPreferenceFragment
         mCmccConfigedAP.removeAll();
         mCmccUnKnownAP.removeAll();
     }
-//QUALCOMM_CMCC_START
+//QUALCOMM_CMCC_END
 }

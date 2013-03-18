@@ -46,8 +46,8 @@ public class WifiGsmDialog extends AlertActivity implements DialogInterface.OnCl
         String action = intent.getAction();
         mSsid = intent.getStringExtra(WifiManager.EXTRA_NOTIFICATION_SSID);
         mNetworkId = intent.getIntExtra(WifiManager.EXTRA_NOTIFICATION_NETWORKID, -1);
-        log("WifiNotifyDialog onCreate " + action);
-        if (!action.equals(WifiManager.WIFI_NOTIFICATION_ACTION) || mNetworkId == -1) {
+        log("WifiGsmDialog onCreate " + action);
+		if (!action.equals(WifiManager.WIFI_NOTIFICATION_ACTION) || mNetworkId == -1) {
             Log.e(TAG, "Error: this activity may be started only with intent WIFI_NOTIFICATION_ACTION");
             finish();
         }
@@ -100,7 +100,8 @@ public class WifiGsmDialog extends AlertActivity implements DialogInterface.OnCl
         finish();
     }
 
-    private void onNegative() {    
+    private void onNegative() {
+	    mWm.suspendNotification();
         finish();
     }
 

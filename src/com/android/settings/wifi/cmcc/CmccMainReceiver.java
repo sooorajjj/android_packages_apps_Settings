@@ -175,8 +175,8 @@ public class CmccMainReceiver extends BroadcastReceiver {
         List<ScanResult> results = mWifiManager.getScanResults();
         if (SSID != null && results != null) {
             for (ScanResult result : results) {
-                if (SSID.equals(result.SSID)) {
-                    rssi = result.level;
+                if (SSID.equals("\"" + result.SSID + "\"")) {
+				    rssi = result.level;
                     Log.d(TAG, "getNetworkRssi, SSID:" + result.SSID + ", rssi:" + rssi);
                     break;
                 }
