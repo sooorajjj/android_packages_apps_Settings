@@ -12,6 +12,9 @@
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
      limitations under the License.
+              <intent 
+                    android:targetPackage="com.android.systemui"
+                    android:targetClass="com.android.systemui.usb.UsbStorageActivity" />
 -->
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,12 +35,9 @@
         android:summary="@string/usb_ptp_summary"
         />
         
-     <PreferenceScreen android:title="@string/usb_umt_title"
+     <CheckBoxPreference android:title="@string/usb_umt_title"
                  android:key="usb_umt"
-                android:summary="@string/usb_umt_summary" >         
-         <intent 
-                    android:targetPackage="com.android.systemui"
-                    android:targetClass="com.android.systemui.usb.UsbStorageActivity" />
-        </PreferenceScreen>
+                 android:summary="@string/usb_umt_summary" >         
+        </CheckBoxPreference>
 
 </PreferenceScreen>

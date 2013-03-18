@@ -45,10 +45,13 @@ public class UsbSettings extends SettingsPreferenceFragment {
 
     private static final String KEY_MTP = "usb_mtp";
     private static final String KEY_PTP = "usb_ptp";
+    private static final String KEY_MASS_STORAGE ="usb_umt";
 
     private UsbManager mUsbManager;
     private CheckBoxPreference mMtp;
     private CheckBoxPreference mPtp;
+    private CheckBoxPreference mMassStorage;
+
     private boolean mUsbAccessoryMode;
 
     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
@@ -72,6 +75,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
 
         mMtp = (CheckBoxPreference)root.findPreference(KEY_MTP);
         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
+	 mMassStorage = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
 
         return root;
     }
@@ -105,12 +109,19 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (UsbManager.USB_FUNCTION_MTP.equals(function)) {
             mMtp.setChecked(true);
             mPtp.setChecked(false);
+	     mMassStorage.setChecked(false);
         } else if (UsbManager.USB_FUNCTION_PTP.equals(function)) {
             mMtp.setChecked(false);
+	     mMassStorage.setChecked(false);
             mPtp.setChecked(true);
-        } else  {
+        }else if (UsbManager.USB_FUNCTION_MASS_STORAGE.equals(function)) {
+            mMassStorage.setChecked(true);
+            mPtp.setChecked(false);
+	    mMtp.setChecked(false);
+        }else  {
             mMtp.setChecked(false);
             mPtp.setChecked(false);
+	     mMassStorage.setChecked(false);
         }
 
         if (!mUsbAccessoryMode) {
@@ -118,10 +129,12 @@ public class UsbSettings extends SettingsPreferenceFragment {
             Log.e(TAG, "USB Normal Mode");
             mMtp.setEnabled(true);
             mPtp.setEnabled(true);
+	    mMassStorage.setEnabled(true);
         } else {
             Log.e(TAG, "USB Accessory Mode");
             mMtp.setEnabled(false);
             mPtp.setEnabled(false);
+	     mMassStorage.setEnabled(false);
         }
 
     }
@@ -149,7 +162,10 @@ public class UsbSettings extends SettingsPreferenceFragment {
         } else if (preference == mPtp) {
             mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_PTP, true);
             updateToggles(UsbManager.USB_FUNCTION_PTP);
-        }
+        }else if (preference == mMassStorage) {
+	    mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
+	    updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
+	}
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 }
