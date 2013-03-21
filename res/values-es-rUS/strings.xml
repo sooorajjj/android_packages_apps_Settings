@@ -1789,4 +1789,5 @@
     <string name="set_sms_error" >Error e la configuración de suscripción SMS. Suscripción no está activa.</string>
     <string name="bluetooth_mas_acceptance_dialog_text" >%1$s Gustaría de accesar tus mensajes? Dar acceso a los %2$s?</string>
     <string name="bluetooth_dun_remember_choice" >No pregunte otra vez</string>
+    <string name="hdmi_disable_title">Permitir HDMI</string>
 </resources>

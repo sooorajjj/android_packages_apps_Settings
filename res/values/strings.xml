@@ -4268,5 +4268,5 @@ alog [CHAR LIMIT=none] -->
 	  <!-- Title of the HDMI settings entry in the left top level menu -->
     <!--string name="hdmi_settings_title">HDMI</string-->   
     <!-- add HDMI Disable in Display settings -->
-    <string name="hdmi_disable_title">HDMI Enable</string>   
+    <string name="hdmi_disable_title">Enable HDMI</string>
 </resources>
