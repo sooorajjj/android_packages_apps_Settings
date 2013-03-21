@@ -1830,4 +1830,37 @@
     <string name="user_picture_title" msgid="7297782792000291692">"照片 ID"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
+    
+    <!-- CMCC WLAN customization begin-->
+    <string name="wifi_advanced_gateway">"网关"</string>
+    <string name="wifi_advanced_network_netmask">"网络掩码"</string>
+    <string name="wifi_set_priority_type_title">手动设定接入点的优先级</string>
+    <string name="wifi_set_priority_type_summary">允许手动设定每个接入点的优先级</string>
+    <string name="wifi_set_priority_settings_title">接入点优先级设定</string>
+    <string name="wifi_set_priority_settings_summary">点击设定各接入点的优先级</string>
+    <string name="wifi_priority_settings_label">优先级设定</string>
+    <string name="wifi_configured_ap_list">已保存的接入点列表</string>
+    <string name="wifi_priority_label">优先级</string>
+    <string name="wifi_priority_changed">原优先级=<xliff:g id="old_value">%s</xliff:g>,新设定=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="wifi_auto_connect_type_title">自动连接类型</string>
+    <string name="wifi_auto_connect_type_summary">设置网络连接方式</string>
+    <string name="cmcc_default_trust_access_points">默认信任接入点</string>
+    <string name="cmcc_configed_access_points">信任接入点</string>
+    <string name="cmcc_unknown_access_points">未知接入点</string>
+    <string name="select_in_ssids_type_title">不同 SSID 间重选</string>
+    <string name="confirm_title">确认</string>
+    <string name="wifi_signal_found_msg">当前 WLAN 连接信号较弱,是否切换到其他 WLAN 网络?</string>
+    <string name="gsm_to_wifi_connect_type_title">蜂窝网至 WLAN 重选</string>
+    <string name="wifi_setting_connect_type_error">设置自动连接类型时出现错误。</string>
+    <string name="msg_wifi_signal_found">发现 WLAN 信号 %s, 您是否要使用该 WLAN 网络？ 使用该网络将部分中断当前的数据连接。</string>
+    <string name="wifi_gprs_settings_title">选择网络</string>
+    <string name="wifi_failover_gprs_title">更改数据连接</string>
+    <string name="wifi_failover_gprs_summary">"WLAN不可用，是否使用移动网络？"</string>
+    <string name="wifi_failover_gprs_summary_primary">不再提示</string>
+    <!-- CMCC WLAN customization end-->
+    <!-- WLAN common customization begin-->
+    <string name="wifi_disconnect">断开</string>
+    <string name="wifi_menu_disconnect">断开网络</string> 
+    <!-- WLAN common customization end--> 
+    
 </resources>

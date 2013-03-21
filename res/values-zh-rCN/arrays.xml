@@ -295,4 +295,16 @@
     <item msgid="5077768429488260031">"永不允许"</item>
     <item msgid="1417929597727989746">"始终允许"</item>
   </string-array>
+
+  <!-- CMCC WLAN customization begin-->
+  <string-array name="wifi_connect_type_entries">
+    <!-- auto connect to wifi -->
+    <item>自动连接</item>
+    <!-- manual connect to wifi -->
+    <item>手动连接</item>
+    <!-- always notify user when wifi is available -->
+    <item>总是询问</item>
+  </string-array>
+  <!-- CMCC WLAN customization end-->  
+
 </resources>

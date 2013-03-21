@@ -842,5 +842,8 @@ public class Settings extends PreferenceActivity
     public static class TextToSpeechSettingsActivity extends Settings { /* empty */ }
     public static class AndroidBeamSettingsActivity extends Settings { /* empty */ }
     public static class WifiDisplaySettingsActivity extends Settings { /* empty */ }
+//QUALCOMM_CMCC_START
+    public static class WifiGprsSettingsActivity extends Settings { /* empty */ }
+//QUALCOMM_CMCC_END
     public static class DreamSettingsActivity extends Settings { /* empty */ }
 }
