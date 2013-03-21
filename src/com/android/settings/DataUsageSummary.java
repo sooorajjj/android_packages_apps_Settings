@@ -57,9 +57,11 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -259,6 +261,7 @@ public class DataUsageSummary extends Fragment {
     private boolean mBinding;
 
     private UidDetailProvider mUidDetailProvider;
+    private NetworkStatusChangeIntentReceiver mReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -415,6 +418,13 @@ public class DataUsageSummary extends Fragment {
         // selected network, and binds chart, cycles and detail list.
         updateTabs();
 
+        // Register a broadcast receiver to listen the mobile connectivity
+        // changed.
+        mReceiver = new NetworkStatusChangeIntentReceiver();
+        IntentFilter filter = new IntentFilter(
+                ConnectivityManager.MOBILE_CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver, filter);
+
         // kick off background task to update stats
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -436,6 +446,22 @@ public class DataUsageSummary extends Fragment {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    /**
+     * Receives notifications when enable/disable mobile data.
+     */
+    private class NetworkStatusChangeIntentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String actionStr = intent.getAction();
+            if (ConnectivityManager.MOBILE_CONNECTIVITY_ACTION
+                    .equals(actionStr)) {
+                boolean enabled = intent.getBooleanExtra(ConnectivityManager.EXTRA_ENABLED, false);
+                // Make the DataEnabled button to correct state.
+                mDataEnabled.setChecked(enabled);
+            }
+        }
     }
 
     @Override
@@ -558,6 +584,14 @@ public class DataUsageSummary extends Fragment {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Unregister the broadcast receiver when the fragment is out of
+        // foreground.
+        getActivity().unregisterReceiver(mReceiver);
     }
 
     @Override

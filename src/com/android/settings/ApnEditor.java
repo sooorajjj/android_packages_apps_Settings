@@ -47,6 +47,7 @@ import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.RILConstants;
 import com.android.internal.telephony.TelephonyProperties;
 
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class ApnEditor extends PreferenceActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -60,6 +61,9 @@ public class ApnEditor extends PreferenceActivity
     private final static String KEY_ROAMING_PROTOCOL = "apn_roaming_protocol";
     private final static String KEY_CARRIER_ENABLED = "carrier_enabled";
     private final static String KEY_BEARER = "bearer";
+
+    private final static String PPP_NUMBER = "PPP_number";
+    private final static String CT_NUMERIC = "46003";
 
     private static final int MENU_DELETE = Menu.FIRST;
     private static final int MENU_SAVE = Menu.FIRST + 1;
@@ -85,10 +89,12 @@ public class ApnEditor extends PreferenceActivity
     private ListPreference mRoamingProtocol;
     private CheckBoxPreference mCarrierEnabled;
     private ListPreference mBearer;
+    private EditTextPreference mPPPNum;
 
     private String mCurMnc;
     private String mCurMcc;
     private int mSubscription = 0;
+    private boolean mDisableEditor = false;
 
     private Uri mUri;
     private Cursor mCursor;
@@ -96,10 +102,12 @@ public class ApnEditor extends PreferenceActivity
     private boolean mFirstTime;
     private Resources mRes;
 
+    private static final String ChinaUnionPLMN = "46001";
+
     /**
      * Standard projection for the interesting columns of a normal note.
      */
-    private static final String[] sProjection = new String[] {
+    private static String[] sProjection = new String[] {
             Telephony.Carriers._ID,     // 0
             Telephony.Carriers.NAME,    // 1
             Telephony.Carriers.APN,     // 2
@@ -122,6 +130,30 @@ public class ApnEditor extends PreferenceActivity
             Telephony.Carriers.ROAMING_PROTOCOL // 19
     };
 
+    private static final String[] sProjectionCT = new String[] {
+        Telephony.Carriers._ID,     // 0
+        Telephony.Carriers.NAME,    // 1
+        Telephony.Carriers.APN,     // 2
+        Telephony.Carriers.PROXY,   // 3
+        Telephony.Carriers.PORT,    // 4
+        Telephony.Carriers.USER,    // 5
+        Telephony.Carriers.SERVER,  // 6
+        Telephony.Carriers.PASSWORD, // 7
+        Telephony.Carriers.MMSC, // 8
+        Telephony.Carriers.MCC, // 9
+        Telephony.Carriers.MNC, // 10
+        Telephony.Carriers.NUMERIC, // 11
+        Telephony.Carriers.MMSPROXY,// 12
+        Telephony.Carriers.MMSPORT, // 13
+        Telephony.Carriers.AUTH_TYPE, // 14
+        Telephony.Carriers.TYPE, // 15
+        Telephony.Carriers.PROTOCOL, // 16
+        Telephony.Carriers.CARRIER_ENABLED, // 17
+        Telephony.Carriers.BEARER, // 18
+        Telephony.Carriers.ROAMING_PROTOCOL, // 19
+        PPP_NUMBER                     //20
+    };
+
     private static final int ID_INDEX = 0;
     private static final int NAME_INDEX = 1;
     private static final int APN_INDEX = 2;
@@ -133,6 +165,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int MMSC_INDEX = 8;
     private static final int MCC_INDEX = 9;
     private static final int MNC_INDEX = 10;
+    private static final int NUMERIC_INDEX = 11;
     private static final int MMSPROXY_INDEX = 12;
     private static final int MMSPORT_INDEX = 13;
     private static final int AUTH_TYPE_INDEX = 14;
@@ -141,6 +174,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int CARRIER_ENABLED_INDEX = 17;
     private static final int BEARER_INDEX = 18;
     private static final int ROAMING_PROTOCOL_INDEX = 19;
+    private static final int PPP_NUMBER_INDEX = 20;
 
 
     @Override
@@ -178,10 +212,15 @@ public class ApnEditor extends PreferenceActivity
         mBearer = (ListPreference) findPreference(KEY_BEARER);
         mBearer.setOnPreferenceChangeListener(this);
 
+        mPPPNum = (EditTextPreference) findPreference("apn_PPP_number");
+        mPPPNum.setOnPreferenceChangeListener(this);
+
         mRes = getResources();
 
         final Intent intent = getIntent();
         final String action = intent.getAction();
+        mDisableEditor = intent.getBooleanExtra("DISABLE_EDITOR",false);
+        if (mDisableEditor) getPreferenceScreen().setEnabled(false);
         // Read the subscription received from Phone settings.
         mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
@@ -217,6 +256,9 @@ public class ApnEditor extends PreferenceActivity
             return;
         }
 
+        if (FeatureQuery.FEATURE_SHOW_PPP_DIAL_NUMBER){
+            sProjection = sProjectionCT;
+        }
         mCursor = managedQuery(mUri, sProjection, null, null);
         mCursor.moveToFirst();
 
@@ -241,7 +283,52 @@ public class ApnEditor extends PreferenceActivity
         if (mFirstTime) {
             mFirstTime = false;
             // Fill in all the values from the db in both text editor and summary
-            mName.setText(mCursor.getString(NAME_INDEX));
+            String name = mCursor.getString(NAME_INDEX);
+            String type = mCursor.getString(TYPE_INDEX);
+            String apn = mCursor.getString(APN_INDEX);
+            String operatorNum = null;
+
+            if(TelephonyManager.getDefault().isMultiSimEnabled())
+            {
+              operatorNum = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
+            }
+            else
+            {
+              operatorNum = TelephonyManager.getDefault().getSimOperator();
+            }
+            if (name.contains("ro.")){
+                //for china union
+                if (ChinaUnionPLMN.equals(operatorNum)){
+                    if (type.equals("default")){
+                        if (name.contains("wap")){
+                            name = getString(R.string.china_union_wap_apn_name);
+                        }else{
+                            name = getString(R.string.china_union_net_apn_name);
+                        }
+                    }
+                    if (type.equals("mms")) name = getString(R.string.china_union_mms_apn_name);
+                    if (type.equals("supl")) name = getString(R.string.china_union_supl_apn_name);
+                }
+            }
+
+            //for china telecom
+            if (apn.equals("ctnet")){
+                name = getString(R.string.china_telecom_net_apn_name);
+            }else if (apn.equals("ctwap")){
+                name = getString(R.string.china_telecom_wap_apn_name);
+            }
+
+            //for china mobile
+            if (name.equals("China Mobile")){
+                name = getString(R.string.china_mobile_net_apn_name);
+            }else if (name.equals("China Mobile MMS")){
+                name = getString(R.string.china_mobile_mms_apn_name);
+            }else if (name.equals("China Mobile WAP")){
+                name = getString(R.string.china_mobile_wap_apn_name);
+            }
+
+            mName.setText(name);
             mApn.setText(mCursor.getString(APN_INDEX));
             mProxy.setText(mCursor.getString(PROXY_INDEX));
             mPort.setText(mCursor.getString(PORT_INDEX));
@@ -254,6 +341,21 @@ public class ApnEditor extends PreferenceActivity
             mMcc.setText(mCursor.getString(MCC_INDEX));
             mMnc.setText(mCursor.getString(MNC_INDEX));
             mApnType.setText(mCursor.getString(TYPE_INDEX));
+            if (FeatureQuery.FEATURE_SHOW_PPP_DIAL_NUMBER
+                    && CT_NUMERIC.equals(mCursor.getString(NUMERIC_INDEX))) {
+                mPPPNum.setText(mCursor.getString(PPP_NUMBER_INDEX));
+                mPPPNum.setSummary(checkNull(mPPPNum.getText()));
+            } else {
+                getPreferenceScreen().removePreference(mPPPNum);
+            }
+            if (FeatureQuery.FEATURE_DISABLE_MMSC && CT_NUMERIC.equals(mCursor.getString(NUMERIC_INDEX))) {
+                mMmsProxy.setEnabled(false);
+                mMmsPort.setEnabled(false);
+                mMmsc.setEnabled(false);
+                mMcc.setEnabled(false);
+                mMnc.setEnabled(false);
+            }
+
             if (mNewApn) {
                 // MCC is first 3 chars and then in 2 - 3 chars of MNC
                 if (defaultOperatorNumeric != null && defaultOperatorNumeric.length() > 4) {
@@ -388,6 +490,7 @@ public class ApnEditor extends PreferenceActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
+        if (mDisableEditor) return true;
         // If it's a new APN, then cancel will delete the new entry in onPause
         if (!mNewApn) {
             menu.add(0, MENU_DELETE, 0, R.string.menu_delete)
@@ -425,9 +528,9 @@ public class ApnEditor extends PreferenceActivity
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
-                if (validateAndSave(false)) {
+              //  if (validateAndSave(false)) {
                     finish();
-                }
+               // }
                 return true;
             }
         }
@@ -454,6 +557,11 @@ public class ApnEditor extends PreferenceActivity
         String mcc = checkNotSet(mMcc.getText());
         String mnc = checkNotSet(mMnc.getText());
         int dataSub = 0;
+
+        //not allow to save disable editor,need do nothing and finish
+        if(mDisableEditor){
+            return true;
+        }
 
         if (getErrorMsg() != null && !force) {
             showDialog(ERROR_DIALOG_ID);
@@ -487,6 +595,9 @@ public class ApnEditor extends PreferenceActivity
         values.put(Telephony.Carriers.SERVER, checkNotSet(mServer.getText()));
         values.put(Telephony.Carriers.PASSWORD, checkNotSet(mPassword.getText()));
         values.put(Telephony.Carriers.MMSC, checkNotSet(mMmsc.getText()));
+        if ( FeatureQuery.FEATURE_SHOW_PPP_DIAL_NUMBER ){
+            values.put(PPP_NUMBER, checkNotSet(mPPPNum.getText()));
+        }
 
         String authVal = mAuthType.getValue();
         if (authVal != null) {
