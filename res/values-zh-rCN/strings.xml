@@ -1830,4 +1830,14 @@
     <string name="user_picture_title" msgid="7297782792000291692">"照片 ID"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
+    <string name="apn_PPP_number">PPP 电话号码</string>
+    <string name="china_union_net_apn_name">沃3G连接互联网</string>
+    <string name="china_union_wap_apn_name">沃3G手机上网</string>
+    <string name="china_union_mms_apn_name">联通彩信</string>
+    <string name="china_union_supl_apn_name">联通AGPS</string>
+    <string name="china_mobile_net_apn_name">中国移动因特网设置</string>
+    <string name="china_mobile_wap_apn_name">中国移动WAP设置</string>
+    <string name="china_mobile_mms_apn_name">中国移动彩信设置</string>
+    <string name="china_telecom_net_apn_name">中国电信互联网设置 CTNET</string>
+    <string name="china_telecom_wap_apn_name">中国电信WAP设置 CTWAP</string>
 </resources>
