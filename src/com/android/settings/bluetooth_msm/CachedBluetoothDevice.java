@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2012, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2012-2013 The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -490,14 +490,11 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             Log.e(TAG, "ProfileManager is null");
             return false;
         }
-        boolean isSpecialMappingDev = mLocalAdapter.isHostPatchRequired(mDevice,
-                                   BluetoothAdapter.HOST_PATCH_DONT_REMOVE_SERVICE);
-
-        if (!isSpecialMappingDev) {
-            mProfileManager.updateProfiles(uuids, localUuids, mProfiles, mRemovedProfiles);
-        } else {
-            mProfileManager.addNewProfiles(uuids, localUuids, mProfiles, mRemovedProfiles);
-        }
+        /*Fixes the IOT issue of few UUIDs missing in the SDP updates
+        of few carkits. ProfileManager::addNewProfiles will make sure
+        it only adds the new uuids without clearing the existing profile
+        in the profile cache*/
+        mProfileManager.addNewProfiles(uuids, localUuids, mProfiles, mRemovedProfiles);
 
         if (DEBUG) {
             Log.e(TAG, "updating profiles for " + mDevice.getAliasName());
