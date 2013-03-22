@@ -155,6 +155,7 @@ public class StorageMeasurement {
 
     private final boolean mIsInternal;
     private final boolean mIsPrimary;
+    private boolean mUSBStorage =  false;
 
     private final MeasurementHandler mHandler;
 
@@ -167,6 +168,7 @@ public class StorageMeasurement {
         mVolume = volume;
         mIsInternal = volume == null;
         mIsPrimary = volume != null ? volume.isPrimary() : false;
+        mUSBStorage = mVolume == null ? false : ("/storage/sdcard1").equals(volume.getPath());
 
         // Start the thread that will measure the disk usage.
         final HandlerThread handlerThread = new HandlerThread("MemoryMeasurement");
@@ -412,17 +414,18 @@ public class StorageMeasurement {
             // Measure media types for emulated storage, or for primary physical
             // external volume
             final boolean measureMedia = (mIsInternal && Environment.isExternalStorageEmulated())
-                    || mIsPrimary;
+                    || mIsPrimary || mUSBStorage; 
             if (measureMedia) {
                 for (String type : sMeasureMediaTypes) {
-                    final File path = currentEnv.getExternalStoragePublicDirectory(type);
+                    final File path = mUSBStorage ? Environment.getInternalStoragePublicDirectory(type)
+                                                             : currentEnv.getExternalStoragePublicDirectory(type);
                     final long size = getDirectorySize(imcs, path);
                     details.mediaSize.put(type, size);
                 }
             }
 
             // Measure misc files not counted under media
-            if (mIsInternal || mIsPrimary) {
+            if (mIsInternal || mIsPrimary || mUSBStorage) {
                 final File path = mIsInternal ? currentEnv.getExternalStorageDirectory()
                         : mVolume.getPathFile();
                 details.miscSize = measureMisc(imcs, path);

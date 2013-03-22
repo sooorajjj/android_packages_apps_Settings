@@ -295,6 +295,22 @@
     <item msgid="5077768429488260031">"永不允许"</item>
     <item msgid="1417929597727989746">"始终允许"</item>
   </string-array>
+  
+  <!--for key backlight-->
+  <string-array name="key_backlight_entries">
+  <item>关闭</item>
+  <item>打开</item>
+  </string-array>
+  <string-array name="key_backlight_values">
+  <item>0</item>
+  <item>1</item>
+  </string-array>
+
+  <string-array name="select_slot_items">
+    <item>卡槽1</item>
+    <item>卡槽2</item>
+    <item>总是询问</item>
+  </string-array>
 
   <!-- CMCC WLAN customization begin-->
   <string-array name="wifi_connect_type_entries">

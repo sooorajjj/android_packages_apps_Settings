@@ -115,6 +115,18 @@
                 style="?android:preferenceInformationStyle"
                 android:title="@string/baseband_version"
                 android:summary="@string/device_info_default"/>
+                
+        <!--hardware version  -->
+        <Preference android:key="hardware_version" 
+                style="?android:preferenceInformationStyle"
+                android:title="@string/hardware_version"
+                android:summary="@string/device_info_default"/>
+                
+        <!--software version  -->        
+        <Preference android:key="software_version" 
+               style="?android:preferenceInformationStyle"
+               android:title="@string/software_version"
+               android:summary="@string/device_info_default"/>
         
         <!-- Device Kernel version -->
         <Preference android:key="kernel_version" 

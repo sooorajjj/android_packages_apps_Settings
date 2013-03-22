@@ -16,6 +16,8 @@
 
 package com.android.settings;
 
+import com.qrd.plugin.feature_query.FeatureQuery;
+
 import static android.provider.Settings.System.SCREEN_OFF_TIMEOUT;
 
 import android.app.ActivityManagerNative;
@@ -59,16 +61,23 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_ACCELEROMETER = "accelerometer";
     private static final String KEY_FONT_SIZE = "font_size";
     private static final String KEY_NOTIFICATION_PULSE = "notification_pulse";
+    private static final String KEY_BRIGHTNESS_SETTINGS = "brightness_settings";    //add content adaptive backlight support
+    private static final String KEY_BRIGHTNESS = "brightness";
     private static final String KEY_SCREEN_SAVER = "screensaver";
     private static final String KEY_WIFI_DISPLAY = "wifi_display";
+    private static final String KEY_BACKLIGHT = "key_backlight";   //add new feature:key backlight
 
     private static final int DLG_GLOBAL_CHANGE_WARNING = 1;
 
     private DisplayManager mDisplayManager;
 
+    private BrightnessPreference mBrightnessPreference;    //add content adaptive backlight support
+    private Preference mBrightnessSettingsPreference;
     private CheckBoxPreference mAccelerometer;
     private WarnedListPreference mFontSizePref;
     private CheckBoxPreference mNotificationPulse;
+    private CheckBoxPreference mKeyBacklight;    //add new feature:key backlight
+    private static final int DEFAULT_KEY_BACKLIGHT_MODE = 1;
 
     private final Configuration mCurConfig = new Configuration();
     
@@ -93,6 +102,15 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
         addPreferencesFromResource(R.xml.display_settings);
 
+        //add content adaptive backlight support
+        mBrightnessPreference = (BrightnessPreference) findPreference(KEY_BRIGHTNESS);
+        mBrightnessSettingsPreference = (Preference) findPreference(KEY_BRIGHTNESS_SETTINGS);
+        if (FeatureQuery.FEATURE_SETTINGS_USE_CONTENT_ADAPTIVE_BACKLIGHT) {
+            this.getPreferenceScreen().removePreference(mBrightnessPreference);
+        } else {
+            this.getPreferenceScreen().removePreference(mBrightnessSettingsPreference);
+        }
+        
         mAccelerometer = (CheckBoxPreference) findPreference(KEY_ACCELEROMETER);
         mAccelerometer.setPersistent(false);
         if (RotationPolicy.isRotationLockToggleSupported(getActivity())) {
@@ -115,6 +133,14 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         mScreenTimeoutPreference.setOnPreferenceChangeListener(this);
         disableUnusableTimeouts(mScreenTimeoutPreference);
         updateTimeoutPreferenceDescription(currentTimeout);
+
+        mKeyBacklight = (CheckBoxPreference) findPreference(KEY_BACKLIGHT);//add new feature:key backlight
+        mKeyBacklight.setPersistent(false);
+        if(FeatureQuery.FEATURE_SETTINGS_KEY_BACKLIGHT){
+            mKeyBacklight.setOnPreferenceChangeListener(this);
+        }else{
+            this.getPreferenceScreen().removePreference(mKeyBacklight);
+        }
 
         mFontSizePref = (WarnedListPreference) findPreference(KEY_FONT_SIZE);
         mFontSizePref.setOnPreferenceChangeListener(this);
@@ -250,6 +276,12 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                     DisplayManager.ACTION_WIFI_DISPLAY_STATUS_CHANGED));
             mWifiDisplayStatus = mDisplayManager.getWifiDisplayStatus();
         }
+        
+        if (mKeyBacklight != null) {
+            int keyBacklight = Settings.System.getInt(getContentResolver(), Settings.System.KEY_BACKLIGHT, DEFAULT_KEY_BACKLIGHT_MODE);
+            boolean checked = (keyBacklight == 1);
+            mKeyBacklight.setChecked(checked);
+        }
 
         updateState();
     }
@@ -336,6 +368,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             Settings.System.putInt(getContentResolver(), Settings.System.NOTIFICATION_LIGHT_PULSE,
                     value ? 1 : 0);
             return true;
+        } else if (preference == mBrightnessSettingsPreference) {    //add content adaptive backlight support
+            return false;//the xml reference will have effect now.
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
@@ -355,6 +389,11 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             writeFontSizePreference(objValue);
         }
 
+        if (KEY_BACKLIGHT.equals(key)) {//add new feature:key backlight
+            boolean value = (Boolean) objValue;
+            Settings.System.putInt(getContentResolver(), Settings.System.KEY_BACKLIGHT, value?1:0);
+        }
+ 
         return true;
     }
 

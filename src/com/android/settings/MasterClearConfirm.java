@@ -44,7 +44,9 @@ public class MasterClearConfirm extends Fragment {
 
     private View mContentView;
     private boolean mEraseSdCard;
+    private boolean mErasePhoneStorage;
     private Button mFinalButton;
+    private static final String ACTION_SET_NETWORKTYP_MASTER_CLEAR = "android.intent.action.SET_NETWORKTYPE_MASTER_CLEAR";
 
     /**
      * The user has gone through the multiple confirmation, so now we go ahead
@@ -58,10 +60,17 @@ public class MasterClearConfirm extends Fragment {
                 return;
             }
 
-            if (mEraseSdCard) {
+            if (mEraseSdCard && !mErasePhoneStorage) {
                 Intent intent = new Intent(ExternalStorageFormatter.FORMAT_AND_FACTORY_RESET);
                 intent.setComponent(ExternalStorageFormatter.COMPONENT_NAME);
                 getActivity().startService(intent);
+            }else if (mEraseSdCard && mErasePhoneStorage) {
+                Intent intent = new Intent(PhoneStorageFormatter.FORMAT_ALL_AND_FACTORY_RESET);
+                getActivity().startService(intent);
+            }else if (mErasePhoneStorage && !mEraseSdCard) {
+                Intent intent = new Intent(PhoneStorageFormatter.FORMAT_AND_FACTORY_RESET);
+                getActivity().startService(intent);
+
             } else {
                 getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
                 // Intent handling is asynchronous -- assume it will happen soon.
@@ -91,5 +100,6 @@ public class MasterClearConfirm extends Fragment {
 
         Bundle args = getArguments();
         mEraseSdCard = args != null ? args.getBoolean(MasterClear.ERASE_EXTERNAL_EXTRA) : false;
+        mErasePhoneStorage = args != null ? args.getBoolean(MasterClear.ERASE_INTERNAL_EXTRA) : false;
     }
 }

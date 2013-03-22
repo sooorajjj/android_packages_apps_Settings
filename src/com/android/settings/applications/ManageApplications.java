@@ -58,6 +58,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager; 
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -66,6 +67,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.qrd.plugin.feature_query.FeatureQuery; 
 
 import com.android.internal.app.IMediaContainerService;
 import com.android.internal.content.PackageHelper;
@@ -167,6 +169,8 @@ public class ManageApplications extends Fragment implements
     public static final int SHOW_RUNNING_SERVICES = MENU_OPTIONS_BASE + 6;
     public static final int SHOW_BACKGROUND_PROCESSES = MENU_OPTIONS_BASE + 7;
     public static final int RESET_APP_PREFERENCES = MENU_OPTIONS_BASE + 8;
+    public static final int SHOW_SEARCH_APPLICATIONS = MENU_OPTIONS_BASE + 9;    //add for new feature for cmcc : search applications
+
     // sort order
     private int mSortOrder = SORT_ORDER_ALPHA;
     
@@ -1001,18 +1005,37 @@ public class ManageApplications extends Fragment implements
         mOptionsMenu = menu;
         // note: icons removed for now because the cause the new action
         // bar UI to be very confusing.
-        menu.add(0, SORT_ORDER_ALPHA, 1, R.string.sort_order_alpha)
+        if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH){
+            //add for new feature for cmcc : search applications
+            menu.add(0, SHOW_SEARCH_APPLICATIONS,1,R.string.show_search_function)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+            menu.add(0, SORT_ORDER_ALPHA, 2, R.string.sort_order_alpha)
                 //.setIcon(android.R.drawable.ic_menu_sort_alphabetically)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        menu.add(0, SORT_ORDER_SIZE, 2, R.string.sort_order_size)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            menu.add(0, SORT_ORDER_SIZE, 3, R.string.sort_order_size)
                 //.setIcon(android.R.drawable.ic_menu_sort_by_size)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        menu.add(0, SHOW_RUNNING_SERVICES, 3, R.string.show_running_services)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        menu.add(0, SHOW_BACKGROUND_PROCESSES, 3, R.string.show_background_processes)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        menu.add(0, RESET_APP_PREFERENCES, 4, R.string.reset_app_preferences)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            menu.add(0, SHOW_RUNNING_SERVICES, 4, R.string.show_running_services)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, SHOW_BACKGROUND_PROCESSES, 4, R.string.show_background_processes)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, RESET_APP_PREFERENCES, 5, R.string.reset_app_preferences)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }else{
+            menu.add(0, SORT_ORDER_ALPHA, 1, R.string.sort_order_alpha)
+                    //.setIcon(android.R.drawable.ic_menu_sort_alphabetically)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            menu.add(0, SORT_ORDER_SIZE, 2, R.string.sort_order_size)
+                    //.setIcon(android.R.drawable.ic_menu_sort_by_size)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            menu.add(0, SHOW_RUNNING_SERVICES, 3, R.string.show_running_services)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, SHOW_BACKGROUND_PROCESSES, 3, R.string.show_background_processes)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, RESET_APP_PREFERENCES, 4, R.string.reset_app_preferences)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
         updateOptionsMenu();
     }
     
@@ -1050,12 +1073,16 @@ public class ManageApplications extends Fragment implements
             mOptionsMenu.findItem(SHOW_RUNNING_SERVICES).setVisible(showingBackground);
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(!showingBackground);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(false);
+            if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH)
+                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(false);//add for new feature for cmcc : search applications
         } else {
             mOptionsMenu.findItem(SORT_ORDER_ALPHA).setVisible(mSortOrder != SORT_ORDER_ALPHA);
             mOptionsMenu.findItem(SORT_ORDER_SIZE).setVisible(mSortOrder != SORT_ORDER_SIZE);
             mOptionsMenu.findItem(SHOW_RUNNING_SERVICES).setVisible(false);
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(false);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(true);
+            if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH)
+                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(true);//add for new feature for cmcc : search applications
         }
     }
 
@@ -1174,7 +1201,11 @@ public class ManageApplications extends Fragment implements
             }
         } else if (menuId == RESET_APP_PREFERENCES) {
             buildResetDialog();
-        } else {
+        } 
+        else if(menuId == SHOW_SEARCH_APPLICATIONS){//add for new feature for cmcc : search applications
+            showInputmethod();
+        }
+		else {
             // Handle the home button
             return false;
         }
@@ -1233,4 +1264,15 @@ public class ManageApplications extends Fragment implements
             mContainerService = null;
         }
     };
+
+    //add for new feature for cmcc : search applications
+    private void showInputmethod(){
+        if (mCurTab != null && mCurTab.mListType != LIST_TYPE_RUNNING) {
+            mCurTab.mListView.requestFocus();
+            InputMethodManager imm;
+            imm = ((InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE));
+            imm.showSoftInputUnchecked(0, null);
+        }
+       
+    }
 }
