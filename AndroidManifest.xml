@@ -1626,6 +1626,18 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name="AgpsSettings"
+                android:label="@string/location_agps_params_settings_title"
+                android:configChanges="orientation|keyboardHidden"
+                android:clearTaskOnLaunch="true"
+                >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
         <service android:name=".PhoneStorageFormatter"
                       android:exported="true">
             <intent-filter>
