@@ -31,5 +31,10 @@
         android:title="@string/usb_ptp_title"
         android:summary="@string/usb_ptp_summary"
         />
+        
+     <CheckBoxPreference android:title="@string/usb_umt_title"
+                 android:key="usb_umt"
+                 android:summary="@string/usb_umt_summary" >         
+        </CheckBoxPreference>
 
 </PreferenceScreen>
