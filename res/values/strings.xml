@@ -3341,7 +3341,9 @@ alog [CHAR LIMIT=none] -->
     <string name="power_idle" product="tablet">Tablet idle</string>
     <!-- Label for power consumed when Idle -->
     <string name="power_idle" product="default">Phone idle</string>
-
+    <!-- Label for power temperature -->
+    <string name="power_temperature">Temperature</string>
+	
     <!-- Label for CPU usage time -->
     <string name="usage_type_cpu">CPU total</string>
     <!-- Label for CPU usage in foreground -->
