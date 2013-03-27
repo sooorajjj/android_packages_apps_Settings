@@ -41,6 +41,10 @@ import android.util.Log;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Message;
 import android.os.Handler;
 import android.os.AsyncResult;
@@ -108,10 +112,6 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         mSms.setOnPreferenceChangeListener(this);
         mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
         mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
-        if (isAirplaneModeOn()) {
-            Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
-            mConfigSub.setEnabled(false);
-        }
         for (int subId = 0; subId < SubscriptionManager.NUM_SUBSCRIPTIONS; subId++) {
             subManager.registerForSubscriptionActivated(subId,
                     mHandler, EVENT_SUBSCRIPTION_ACTIVATED, null);
@@ -143,16 +143,44 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         entryValuesPrompt[i] = Integer.toString(i);
         entriesPrompt[i] = getResources().getString(R.string.prompt);
         summariesPrompt[i] = getResources().getString(R.string.prompt_user);
+        IntentFilter intentFilter =
+                    new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        registerReceiver(new AirplaneModeBroadcastReceiver(), intentFilter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (isAirplaneModeOn()) {
+            Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
+            mConfigSub.setEnabled(false);
+        } else {
+            mConfigSub.setEnabled(true);
+        }
         updateMultiSimEntriesForVoice();
         updateMultiSimEntriesForData();
         updateMultiSimEntriesForSms();
         mIsForeground = true;
         updateState();
+    }
+
+    /**
+     * Receiver for Airplane mode changed intent broadcasts.
+     */
+    private class AirplaneModeBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_AIRPLANE_MODE_CHANGED)) {
+                Log.d(TAG, "Airplane mode is: " + isAirplaneModeOn());
+                if (isAirplaneModeOn()) {
+                    Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
+                    mConfigSub.setEnabled(false);
+                } else {
+                    mConfigSub.setEnabled(true);
+                }
+            }
+        }
     }
 
     protected void updateMultiSimEntriesForData() {
