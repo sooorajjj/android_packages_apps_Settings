@@ -38,8 +38,7 @@ import com.android.internal.view.RotationPolicy;
 import com.android.settings.DreamSettings;
 
 import java.util.ArrayList;
-
-import java.io.*;
+import android.os.SystemProperties;
 
 public class DisplaySettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener {
@@ -124,7 +123,9 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         
           mHdmiDisable = (CheckBoxPreference) findPreference(KEY_HDMI);
           mHdmiDisable.setPersistent(false);
-          mHdmiDisable.setChecked(true);
+          boolean  hdmi_Enable = SystemProperties.getBoolean("persist.sys.hdmi.enable", false);
+          Log.e(TAG, "get properties hdmi Ischecked =  "+ hdmi_Enable );
+          mHdmiDisable.setChecked(hdmi_Enable);
     }
 
     private void updateTimeoutPreferenceDescription(long currentTimeout) {
@@ -275,21 +276,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
           else if (preference == mHdmiDisable) {
           try{
-                //Create FileOutputStream 
-               String data01 = "1";
-               String data02 = "0";
-              FileOutputStream output = new FileOutputStream("/sys/devices/platform/hdmi_msm.1/online");
-       
-               boolean value = mHdmiDisable.isChecked();
-                         if(value) {
-                           output.write(data01.getBytes());
-                           Log.e(TAG, "Settings.Displaysetting.Enable =  "+ value ); 
-                           }
-                         else {
-                           output.write(data02.getBytes());
-                           Log.e(TAG, "Settings.Displaysetting.Enable =  "+ value );
-                           } 
-            output.close();
+                           boolean value = mHdmiDisable.isChecked();
+                           SystemProperties.set("persist.sys.hdmi.enable", value? "1":"0");
             }catch(Exception e){
              Log.e(TAG, "could not set HDMI setting", e);
              }
