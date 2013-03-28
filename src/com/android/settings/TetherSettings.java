@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Locale;
 
+
 /*
  * Displays preferences for Tethering.
  */
@@ -107,6 +108,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     /* Stores the package name and the class name of the provisioning app */
     private String[] mProvisionApp;
     private static final int PROVISION_REQUEST = 0;
+
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -546,6 +548,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                 }
             }
         } else if (preference == mCreateNetwork) {
+            WifiApDialog.mShowPassword = false;
             showDialog(DIALOG_AP_SETTINGS);
         }
 
