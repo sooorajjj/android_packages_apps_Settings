@@ -124,7 +124,7 @@ public class WifiConfigController implements TextWatcher,
 
     private final Handler mTextViewChangedHandler;
 
-    private static boolean mPasswdCheckBox;
+    public static boolean mPasswdCheckBox;
     static boolean requireKeyStore(WifiConfiguration config) {
         if (config == null) {
             return false;
@@ -258,7 +258,6 @@ public class WifiConfigController implements TextWatcher,
                 }
             }
         }
-
 
         mConfigUi.setCancelButton(context.getString(R.string.wifi_cancel));
         if (mConfigUi.getSubmitButton() != null) {
