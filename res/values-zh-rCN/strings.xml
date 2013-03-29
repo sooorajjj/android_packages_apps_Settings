@@ -2009,4 +2009,6 @@
 
     <string name="erase_internal_storage" product="default">格式化话机U盘</string>
     <string name="erase_internal_storage_description" product="default" >"清除话机U盘中的全部数据，例如音乐或照片"</string>
+    <string name="enable_save_log">"保存日志"</string>
+    <string name="enable_save_log_summary">"保存日志(需重启话机)"</string>
 </resources>
