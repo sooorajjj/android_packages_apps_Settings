@@ -4692,4 +4692,6 @@ alog [CHAR LIMIT=none] -->
     <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
     <string name="erase_internal_storage" product="default">Erase phone storage</string>
     <string name="erase_internal_storage_description" product="default">Erase all the data on the phone storage, such as music or photos</string>
+    <string name="enable_save_log">Save Log</string>
+    <string name="enable_save_log_summary">Save Log(Reboot).</string>
 </resources>

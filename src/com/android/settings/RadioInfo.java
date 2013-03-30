@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.util.Log;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class RadioInfo extends Activity {
     private final String TAG = "phone";
@@ -341,6 +342,19 @@ public class RadioInfo extends Activity {
         // Get current cell info
         mCellInfoValue = mTelephonyManager.getAllCellInfo();
         Log.d(TAG, "[RadioInfo] onCreate: mCellInfoValue=" + mCellInfoValue);
+		//QUALCOMM_CMCC_START
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+		    radioPowerButton.setEnabled(false);
+			imsRegRequiredButton.setEnabled(false);
+			lteRamDumpButton.setEnabled(false);
+			updateSmscButton.setEnabled(false);
+			refreshSmscButton.setEnabled(false);
+			dnsCheckToggleButton.setEnabled(false);
+			preferredNetworkType.setEnabled(false);
+			smsOverImsButton.setEnabled(false);
+			smsc.setEnabled(false);
+        }
+		//QUALCOMM_CMCC_END
     }
 
     @Override
