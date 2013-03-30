@@ -211,6 +211,10 @@ public class WifiSettings extends SettingsPreferenceFragment
         // Set this flag early, as it's needed by getHelpResource(), which is called by super
         mSetupWizardMode = getActivity().getIntent().getBooleanExtra(EXTRA_IS_FIRST_RUN, false);
 
+        if (FeatureQuery.FEATURE_DISPLAY_USE_WLAN_INSTEAD) {
+            getActivity().setTitle(R.string.wifi_settings_wlan);
+		}
+
         super.onCreate(icicle);
     }
 
@@ -484,7 +488,11 @@ public class WifiSettings extends SettingsPreferenceFragment
                     .setEnabled(wifiIsEnabled)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             if (mP2pSupported) {
-                menu.add(Menu.NONE, MENU_ID_P2P, 0, R.string.wifi_menu_p2p)
+			    String memu_P2P = getString(R.string.wifi_menu_p2p);
+				if (FeatureQuery.FEATURE_DISPLAY_USE_WLAN_INSTEAD) {
+				    memu_P2P = getString(R.string.wifi_menu_p2p_wlan);
+				}
+                menu.add(Menu.NONE, MENU_ID_P2P, 0, memu_P2P)
                         .setEnabled(wifiIsEnabled)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             }
@@ -517,11 +525,15 @@ public class WifiSettings extends SettingsPreferenceFragment
                 showDialog(WPS_PBC_DIALOG_ID);
                 return true;
             case MENU_ID_P2P:
+                int p2pTitleId = R.string.wifi_p2p_settings_title;
+			    if (FeatureQuery.FEATURE_DISPLAY_USE_WLAN_INSTEAD) {
+				    p2pTitleId = R.string.wifi_p2p_settings_wlan_title;
+				}
                 if (getActivity() instanceof PreferenceActivity) {
                     ((PreferenceActivity) getActivity()).startPreferencePanel(
                             WifiP2pSettings.class.getCanonicalName(),
                             null,
-                            R.string.wifi_p2p_settings_title, null,
+                            p2pTitleId, null,
                             this, 0);
                 } else {
                     startFragment(this, WifiP2pSettings.class.getCanonicalName(), -1, null);
@@ -541,11 +553,15 @@ public class WifiSettings extends SettingsPreferenceFragment
                 }
                 return true;
             case MENU_ID_ADVANCED:
+			    int titleId = R.string.wifi_advanced_titlebar;
+			    if (FeatureQuery.FEATURE_DISPLAY_USE_WLAN_INSTEAD) {
+				    titleId = R.string.wifi_advanced_wlan_titlebar;
+				}
                 if (getActivity() instanceof PreferenceActivity) {
                     ((PreferenceActivity) getActivity()).startPreferencePanel(
                             AdvancedWifiSettings.class.getCanonicalName(),
                             null,
-                            R.string.wifi_advanced_titlebar, null,
+                            titleId, null,
                             this, 0);
                 } else {
                     startFragment(this, AdvancedWifiSettings.class.getCanonicalName(), -1, null);
@@ -811,7 +827,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     }
 
     private void addMessagePreference(int messageId) {
-        if (mEmptyView != null) mEmptyView.setText(messageId);
+        if (mEmptyView != null) mEmptyView.setText(WifiManager.replaceAllWiFi(getString(messageId)));
 //QUALCOMM_CMCC_START 
         if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
             getPreferenceScreen().removePreference(mCmccDefaultTrustAP);

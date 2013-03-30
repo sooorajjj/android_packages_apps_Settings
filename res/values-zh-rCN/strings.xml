@@ -2002,6 +2002,9 @@
     <!-- WLAN common customization begin-->
     <string name="wifi_disconnect">断开</string>
     <string name="wifi_menu_disconnect">断开网络</string> 
+    <string name="wifi_advanced_wlan_titlebar">高级 WLAN 设置</string>
+    <string name="wifi_p2p_settings_wlan_title">WLAN 直连</string>
+    <string name="wifi_menu_p2p_wlan">WLAN 直连</string>
     <!-- WLAN common customization end--> 
     
     <string name="select_slot_always_ask">总是询问</string>
