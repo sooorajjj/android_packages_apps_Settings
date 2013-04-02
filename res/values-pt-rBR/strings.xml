@@ -1206,6 +1206,6 @@
     <string name="sound_category_system_title" >Sistema</string>
     <string name="failed_to_open_app_settings_toast" >Falha ao abrir as configurações de <xliff:g id="SPELL_APPLICATION_NAME">%1$s</xliff:g></string>
     <string name="hdmi_disable_title">Permitir HDMI</string>
-    <string name="sim_pin_disabled">"PIN 1 desabilitado!"</string>
-    <string name="sim_pin_enabled">"PIN1 Habilitado!"</string>
+    <string name="sim_pin_disabled">"PIN 1 Desativado!"</string>
+    <string name="sim_pin_enabled">"PIN 1 Ativado!"</string>
 </resources>
