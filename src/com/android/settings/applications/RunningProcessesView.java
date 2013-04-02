@@ -277,6 +277,7 @@ public class RunningProcessesView extends FrameLayout
         }
 
         public boolean isEnabled(int position) {
+            if (position < 0 || position >= mItems.size()) return false;
             return !mItems.get(position).mIsProcess;
         }
 
