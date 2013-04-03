@@ -154,6 +154,8 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
 
         showSecurityFields();
         validate();
+
+        if (mShowPassword)  mPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
     private void validate() {
@@ -175,7 +177,6 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     }
 
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mShowPassword)  mPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
