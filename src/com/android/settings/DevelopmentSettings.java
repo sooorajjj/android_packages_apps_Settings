@@ -95,6 +95,7 @@ public class DevelopmentSettings extends PreferenceFragment
     private static final String HDCP_CHECKING_KEY = "hdcp_checking";
     private static final String HDCP_CHECKING_PROPERTY = "persist.sys.hdcp_checking";
     private static final String ENFORCE_READ_EXTERNAL = "enforce_read_external";
+    private static final String ENABLE_FAST_POWERON = "enable_fast_poweron";
     private static final String LOCAL_BACKUP_PASSWORD = "local_backup_password";
     private static final String HARDWARE_UI_PROPERTY = "persist.sys.ui.hw";
     private static final String MSAA_PROPERTY = "debug.egl.force_msaa";
@@ -153,6 +154,7 @@ public class DevelopmentSettings extends PreferenceFragment
     private CheckBoxPreference mBugreportInPower;
     private CheckBoxPreference mKeepScreenOn;
     private CheckBoxPreference mEnforceReadExternal;
+    private CheckBoxPreference mFastPowerOn;
     private CheckBoxPreference mAllowMockLocation;
     private PreferenceScreen mPassword;
 
@@ -213,6 +215,7 @@ public class DevelopmentSettings extends PreferenceFragment
         mBugreportInPower = findAndInitCheckboxPref(BUGREPORT_IN_POWER_KEY);
         mKeepScreenOn = findAndInitCheckboxPref(KEEP_SCREEN_ON);
         mEnforceReadExternal = findAndInitCheckboxPref(ENFORCE_READ_EXTERNAL);
+        mFastPowerOn = findAndInitCheckboxPref(ENABLE_FAST_POWERON);
         mAllowMockLocation = findAndInitCheckboxPref(ALLOW_MOCK_LOCATION);
         mPassword = (PreferenceScreen) findPreference(LOCAL_BACKUP_PASSWORD);
         mAllPrefs.add(mPassword);
@@ -416,6 +419,8 @@ public class DevelopmentSettings extends PreferenceFragment
         updateCheckBox(mEnforceReadExternal, isPermissionEnforced(READ_EXTERNAL_STORAGE));
         updateCheckBox(mAllowMockLocation, Settings.Secure.getInt(cr,
                 Settings.Secure.ALLOW_MOCK_LOCATION, 0) != 0);
+        updateCheckBox(mFastPowerOn, Settings.System.getInt(cr,
+                Settings.System.ENABLE_FAST_POWERON, 0) != 0);
         updateHdcpValues();
         updatePasswordSummary();
         updateDebuggerOptions();
@@ -1063,6 +1068,10 @@ public class DevelopmentSettings extends PreferenceFragment
             Settings.Secure.putInt(getActivity().getContentResolver(),
                     Settings.Secure.ALLOW_MOCK_LOCATION,
                     mAllowMockLocation.isChecked() ? 1 : 0);
+        } else if (preference == mFastPowerOn) {
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.ENABLE_FAST_POWERON,
+                    mFastPowerOn.isChecked() ? 1 : 0);
         } else if (preference == mDebugAppPref) {
             startActivityForResult(new Intent(getActivity(), AppPicker.class), RESULT_DEBUG_APP);
         } else if (preference == mWaitForDebugger) {
