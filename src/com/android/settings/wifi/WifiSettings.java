@@ -1188,6 +1188,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     /* package */ void onAddNetworkPressed() {
         // No exact access point is selected.
         mSelectedAccessPoint = null;
+        mAccessPointSavedState = null; //if mAccessPointSavedState is not null, sometimes add network will show error dialog
         showDialog(null, true);
     }
 
