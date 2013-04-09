@@ -346,7 +346,11 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
             }
         } else if (mFormatPreference != null) {
             mFormatPreference.setEnabled(true);
-            mFormatPreference.setSummary(mResources.getString(R.string.sd_format_summary));
+            if (mUSBStorage) {
+                mFormatPreference.setSummary(mResources.getString(R.string.usb_storage_format_summary));
+            } else {
+                mFormatPreference.setSummary(mResources.getString(R.string.sd_format_summary));
+            }
         }
     }
 

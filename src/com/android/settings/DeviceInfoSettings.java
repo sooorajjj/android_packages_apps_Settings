@@ -120,10 +120,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                 PROPERTY_EQUIPMENT_ID);
 
         // Remove Baseband version if wifi-only device
-        if (Utils.isWifiOnly(getActivity())
-                || (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
+        //if (Utils.isWifiOnly(getActivity())
+                //|| (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
             getPreferenceScreen().removePreference(findPreference(KEY_BASEBAND_VERSION));
-        }
+        //}
 
         /*
          * Settings is a generic app and should not contain any device-specific

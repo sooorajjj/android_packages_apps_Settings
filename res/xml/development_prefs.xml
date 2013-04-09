@@ -58,6 +58,11 @@
             android:summary="@string/enable_adb_summary"/>
 
         <CheckBoxPreference
+            android:key="enable_save_log"
+            android:title="@string/enable_save_log"
+            android:summary="@string/enable_save_log_summary"/>
+
+        <CheckBoxPreference
             android:key="bugreport_in_power"
             android:title="@string/bugreport_in_power"
             android:summary="@string/bugreport_in_power_summary"/>

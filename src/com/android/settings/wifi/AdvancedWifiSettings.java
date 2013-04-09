@@ -190,8 +190,23 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             Log.d(TAG, "Fail to get CMCC Pref");
         }
 //QUALCOMM_CMCC_END
+
+        replaceWifiToWlan(frequencyPref);
+        replaceWifiToWlan(sleepPolicyPref);
+        String poorNetwok = WifiManager.replaceAllWiFi(poorNetworkDetection.getSummary().toString());
+        poorNetworkDetection.setSummary(poorNetwok);
+
+		suspendOptimizations.setTitle(WifiManager.replaceAllWiFi(suspendOptimizations.getTitle().toString()));		
+		suspendOptimizations.setSummary(WifiManager.replaceAllWiFi(suspendOptimizations.getSummary().toString()));
     }
 
+    private void replaceWifiToWlan(ListPreference preference) {
+        if(null == preference) return ;
+        String prefString = WifiManager.replaceAllWiFi(preference.getTitle().toString());
+        preference.setTitle(prefString);
+        preference.setDialogTitle(prefString);
+    }
+	
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
         if (value != null) {
             String[] values = getResources().getStringArray(R.array.wifi_sleep_policy_values);

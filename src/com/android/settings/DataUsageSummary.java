@@ -151,6 +151,7 @@ import java.util.List;
 import java.util.Locale;
 
 import libcore.util.Objects;
+import android.net.wifi.WifiManager;
 
 /**
  * Panel showing data usage history across various networks, including options
@@ -494,6 +495,8 @@ public class DataUsageSummary extends Fragment {
         split4g.setChecked(isMobilePolicySplit());
 
         final MenuItem showWifi = menu.findItem(R.id.data_usage_menu_show_wifi);
+        String showWifiTittle = WifiManager.replaceAllWiFi(showWifi.getTitle().toString());
+        showWifi.setTitle(showWifiTittle);
         if (hasWifiRadio(context) && hasReadyMobileRadio(context)) {
             showWifi.setVisible(!appDetailMode);
             showWifi.setChecked(mShowWifi);
@@ -696,7 +699,7 @@ public class DataUsageSummary extends Fragment {
      * Build {@link TabSpec} with thin indicator, and empty content.
      */
     private TabSpec buildTabSpec(String tag, int titleRes) {
-        return mTabHost.newTabSpec(tag).setIndicator(getText(titleRes)).setContent(
+        return mTabHost.newTabSpec(tag).setIndicator(WifiManager.replaceAllWiFi((String)getText(titleRes))).setContent(
                 mEmptyTabContent);
     }
 
@@ -2015,9 +2018,11 @@ public class DataUsageSummary extends Fragment {
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(R.string.data_usage_restrict_background_title);
             if (Utils.hasMultipleUsers(context)) {
-                builder.setMessage(R.string.data_usage_restrict_background_multiuser);
+				String message = context.getString(R.string.data_usage_restrict_background_multiuser);
+                builder.setMessage(WifiManager.replaceAllWiFi(message));
             } else {
-                builder.setMessage(R.string.data_usage_restrict_background);
+                String message = context.getString(R.string.data_usage_restrict_background);
+                builder.setMessage(WifiManager.replaceAllWiFi(message));
             }
 
             builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

@@ -319,6 +319,9 @@ public class MSimStatus extends PreferenceActivity {
 
         Preference wifiMacAddressPref = findPreference(KEY_WIFI_MAC_ADDRESS);
 
+        String prefString = WifiManager.replaceAllWiFi(wifiMacAddressPref.getTitle().toString());
+        wifiMacAddressPref.setTitle(prefString);
+
         String macAddress = wifiInfo == null ? null : wifiInfo.getMacAddress();
         wifiMacAddressPref.setSummary(!TextUtils.isEmpty(macAddress) ? macAddress
                 : getString(R.string.status_unavailable));
