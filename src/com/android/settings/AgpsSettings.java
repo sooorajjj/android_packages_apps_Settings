@@ -1,5 +1,5 @@
 /*
- * oasis_zp@hisense add agps settings for developer use only.
+ *  add agps settings for developer use only.
  * developer or tester can change pref agps mode and supl setting here
 */
 package com.android.settings;
@@ -53,7 +53,7 @@ public class AgpsSettings extends PreferenceActivity
             implements SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener {
     static final boolean DEBUG = true;
-    static final String TAG = "AgpsSettings";
+    static final String TAG = "AGPSSettings";
     private static final String MSB = "0";
     private static final String MSA = "1";
 
@@ -78,7 +78,6 @@ public class AgpsSettings extends PreferenceActivity
     private ContentResolver mContentResolver;
     private static final String INTENT_BROADCAST_AGPS_PARAMETERS_CHANGED = "intent_agps_parms_changed";
 
-    //private TelephonyManager mPhone;
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -88,7 +87,7 @@ public class AgpsSettings extends PreferenceActivity
         sNotSet = getResources().getString(R.string.supl_not_set);
         mServer = (EditTextPreference) findPreference("server_addr");
         mPort = (EditTextPreference) findPreference("server_port");
-	dump(null);
+	 dump(null);
         fillUi(false);
     }
     @Override
