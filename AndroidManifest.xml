@@ -138,6 +138,7 @@
 
         <activity android:name="Settings$WifiSettingsActivity"
                 android:taskAffinity=""
+                android:label="@string/wifi_settings"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:excludeFromRecents="true">
             <intent-filter>
