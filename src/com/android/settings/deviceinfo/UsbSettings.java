@@ -46,11 +46,13 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private static final String KEY_MTP = "usb_mtp";
     private static final String KEY_PTP = "usb_ptp";
     private static final String KEY_MASS_STORAGE ="usb_umt";
+    private static final String KEY_USB_CHARGE ="usb_charge";
 
     private UsbManager mUsbManager;
     private CheckBoxPreference mMtp;
     private CheckBoxPreference mPtp;
     private CheckBoxPreference mMassStorage;
+    private CheckBoxPreference mUSBCharge;
 
     private boolean mUsbAccessoryMode;
 
@@ -75,7 +77,8 @@ public class UsbSettings extends SettingsPreferenceFragment {
 
         mMtp = (CheckBoxPreference)root.findPreference(KEY_MTP);
         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
-	    mMassStorage = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
+	 mMassStorage = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
+	 mUSBCharge = (CheckBoxPreference)root.findPreference(KEY_USB_CHARGE);
 
         return root;
     }
@@ -110,31 +113,43 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mMtp.setChecked(true);
             mPtp.setChecked(false);
 	     mMassStorage.setChecked(false);
+	     mUSBCharge.setChecked(false);
         } else if (UsbManager.USB_FUNCTION_PTP.equals(function)) {
+            mPtp.setChecked(true);
             mMtp.setChecked(false);
 	     mMassStorage.setChecked(false);
-            mPtp.setChecked(true);
+	     mUSBCharge.setChecked(false);
         }else if (UsbManager.USB_FUNCTION_MASS_STORAGE.equals(function)) {
             mMassStorage.setChecked(true);
             mPtp.setChecked(false);
 	    mMtp.setChecked(false);
+	    mUSBCharge.setChecked(false);
+        }else if ("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb".equals(function)) {
+             Log.e(TAG, "charge111");
+            mMassStorage.setChecked(false);
+            mPtp.setChecked(false);
+	     mMtp.setChecked(false);
+	     mUSBCharge.setChecked(true);
         }else  {
+            Log.e(TAG, "charge222");
             mMtp.setChecked(false);
             mPtp.setChecked(false);
 	     mMassStorage.setChecked(false);
+	     //mUSBCharge.setChecked(false);
         }
-
         if (!mUsbAccessoryMode) {
             //Enable MTP and PTP switch while USB is not in Accessory Mode, otherwise disable it
             Log.e(TAG, "USB Normal Mode");
             mMtp.setEnabled(true);
             mPtp.setEnabled(true);
 	    mMassStorage.setEnabled(true);
+	    mUSBCharge.setEnabled(true);
         } else {
             Log.e(TAG, "USB Accessory Mode");
             mMtp.setEnabled(false);
             mPtp.setEnabled(false);
 	     mMassStorage.setEnabled(false);
+	     mUSBCharge.setEnabled(false);
         }
 
     }
@@ -165,6 +180,9 @@ public class UsbSettings extends SettingsPreferenceFragment {
         }else if (preference == mMassStorage) {
 	    mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
 	    updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
+	}else if (preference == mUSBCharge) {
+	    mUsbManager.setCurrentFunction("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb", true);
+	    updateToggles("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb");
 	}
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
