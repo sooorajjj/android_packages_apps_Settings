@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.net.wifi.WifiManager;
+import android.telephony.TelephonyManager;
 
 public class CreateShortcut extends LauncherActivity {
 
@@ -28,6 +30,9 @@ public class CreateShortcut extends LauncherActivity {
     protected Intent getTargetIntent() {
         Intent targetIntent = new Intent(Intent.ACTION_MAIN, null);
         targetIntent.addCategory("com.android.settings.SHORTCUT");
+        if(!TelephonyManager.isMultiSimEnabled()){
+            targetIntent.addCategory("com.android.settings.SHORTCUT_SINGLE");
+        }
         targetIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return targetIntent;
     }
@@ -40,7 +45,7 @@ public class CreateShortcut extends LauncherActivity {
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher_settings));
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, itemForPosition(position).label);
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, WifiManager.replaceAllWiFi(itemForPosition(position).label.toString()));
         setResult(RESULT_OK, intent);
         finish();
     }
