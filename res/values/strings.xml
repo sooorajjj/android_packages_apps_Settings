@@ -2143,6 +2143,10 @@ alog [CHAR LIMIT=none] -->
     <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
     <string name="usb_umt_summary">Touch can choose mass storage</string>
 
+    <string name="usb_charge_title">USB Charge</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_charge_summary">Touch can choose usb charge</string>
+
 
     <!-- Section header above list of other users storage [CHAR LIMIT=32] -->
     <string name="storage_other_users">Other users</string>

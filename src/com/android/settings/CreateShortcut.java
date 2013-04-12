@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.net.wifi.WifiManager;
+import android.telephony.TelephonyManager;
 
 public class CreateShortcut extends LauncherActivity {
 
@@ -29,6 +30,9 @@ public class CreateShortcut extends LauncherActivity {
     protected Intent getTargetIntent() {
         Intent targetIntent = new Intent(Intent.ACTION_MAIN, null);
         targetIntent.addCategory("com.android.settings.SHORTCUT");
+        if(!TelephonyManager.isMultiSimEnabled()){
+            targetIntent.addCategory("com.android.settings.SHORTCUT_SINGLE");
+        }
         targetIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return targetIntent;
     }
