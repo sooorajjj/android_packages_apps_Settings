@@ -146,12 +146,12 @@
   </string-array>
   <string-array name="wifi_sleep_policy_entries">
     <item msgid="3269131034472904310">"ทุกครั้ง"</item>
-    <item msgid="844721238536786870">"เมื่อเสียบปลั๊กเท่านั้น"</item>
+    <!--<item msgid="844721238536786870">"เมื่อเสียบปลั๊กเท่านั้น"</item>-->
     <item msgid="2990218920631468642">"ไม่เลย (เพิ่มการใช้งานข้อมูล)"</item>
   </string-array>
   <string-array name="wifi_sleep_policy_entries_wifi_only">
     <item msgid="2124319326282651391">"ทุกครั้ง"</item>
-    <item msgid="7433294150916905997">"เมื่อเสียบปลั๊กเท่านั้น"</item>
+    <!--<item msgid="7433294150916905997">"เมื่อเสียบปลั๊กเท่านั้น"</item>-->
     <item msgid="1390404486722375028">"ไม่เลย"</item>
   </string-array>
   <string-array name="wifi_frequency_band_entries">

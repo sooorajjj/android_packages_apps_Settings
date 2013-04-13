@@ -365,7 +365,7 @@
         <!-- Always keep Wi-Fi on when screen turns off. -->
         <item>Always</item>
         <!-- Keep Wi-Fi on when screen turns off and plugged in.  When on battery, go to sleep when screen turns off. -->
-        <item>Only when plugged in</item>
+        <!--<item>Only when plugged in</item>-->
         <!-- Do not keep Wi-Fi on when screen turns off. -->
         <item>Never (increases data usage)</item>
     </string-array>
@@ -376,7 +376,7 @@
         <!-- Always keep Wi-Fi on when screen turns off. -->
         <item>Always</item>
         <!-- Keep Wi-Fi on when screen turns off and plugged in.  When on battery, go to sleep when screen turns off. -->
-        <item>Only when plugged in</item>
+        <!--<item>Only when plugged in</item>-->
         <!-- Do not keep Wi-Fi on when screen turns off, for Wi-Fi-only devices, no other data connection -->
         <item>Never</item>
     </string-array>
@@ -387,7 +387,7 @@
         <!-- Do not translate. -->
         <item>2</item>
         <!-- Do not translate. -->
-        <item>1</item>
+        <!--<item>1</item>-->
         <!-- Do not translate. -->
         <item>0</item>
     </string-array>

@@ -146,12 +146,12 @@
   </string-array>
   <string-array name="wifi_sleep_policy_entries">
     <item msgid="3269131034472904310">"Sentiasa"</item>
-    <item msgid="844721238536786870">"Hanya apabila dipalamkan"</item>
+    <!--<item msgid="844721238536786870">"Hanya apabila dipalamkan"</item>-->
     <item msgid="2990218920631468642">"Jangan sekali-kali (menaikkan penggunaan data)"</item>
   </string-array>
   <string-array name="wifi_sleep_policy_entries_wifi_only">
     <item msgid="2124319326282651391">"Sentiasa"</item>
-    <item msgid="7433294150916905997">"Hanya apabila dipasang"</item>
+    <!--<item msgid="7433294150916905997">"Hanya apabila dipasang"</item>-->
     <item msgid="1390404486722375028">"Jangan sekali-kali"</item>
   </string-array>
   <string-array name="wifi_frequency_band_entries">
