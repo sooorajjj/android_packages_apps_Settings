@@ -131,15 +131,20 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private void updateTimeoutPreferenceDescription(long currentTimeout) {
         ListPreference preference = mScreenTimeoutPreference;
         String summary;
-        if (currentTimeout < 0) {
+        String never = getResources().getString(R.string.screen_timeout_never);
+        long neverTimeout = -1;
+        if (currentTimeout < neverTimeout) {
             // Unsupported value
             summary = "";
+        } else if (currentTimeout == neverTimeout) {
+            summary = never;
         } else {
             final CharSequence[] entries = preference.getEntries();
             final CharSequence[] values = preference.getEntryValues();
             int best = 0;
             for (int i = 0; i < values.length; i++) {
                 long timeout = Long.parseLong(values[i].toString());
+                if (neverTimeout == timeout) continue;
                 if (currentTimeout >= timeout) {
                     best = i;
                 }
