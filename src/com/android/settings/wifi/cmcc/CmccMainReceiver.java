@@ -25,6 +25,7 @@ public class CmccMainReceiver extends BroadcastReceiver {
 	
     static boolean lastConnected = false;
     static boolean currentConnected = false;
+    static boolean isInSSIDs = false;
     static String lastSsid;
 	/** These values are matched in string arrays -- changes must be kept in sync */
 	static final int SECURITY_NONE = 0;
@@ -92,9 +93,18 @@ public class CmccMainReceiver extends BroadcastReceiver {
                 if (lastConnected && !currentConnected) {             
                     mWifiManager.startScanActive();
                 }
+                if (!currentConnected || lastConnected) {
+                    isInSSIDs = true;
+                }
+                //Log.d(TAG, "---------- isInSSIDs ----------:" + isInSSIDs);
                 Log.d(TAG,"NETWORK_STATE_CHANGED_ACTION, lastConnected=" + lastConnected+", currentConnected=" + currentConnected); 
                 return;
             } else if(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)){
+                Log.d(TAG, "isInSSIDs:" + isInSSIDs);
+                if (isInSSIDs) {
+                    isInSSIDs = false;
+                    return;
+                }
                 if(!lastConnected || currentConnected || lastSsid == null) return;
                 int currentRssi = getNetworkRssi(lastSsid);
                 lastConnected = currentConnected;
