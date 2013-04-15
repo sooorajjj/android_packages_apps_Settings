@@ -4606,6 +4606,7 @@ alog [CHAR LIMIT=none] -->
     <!--auto power on/off function for settings-->
     <string name="hardware_version">Hardware version</string>
     <string name="software_version">Software version</string>
+    <string name="release_date">Release time</string>
     <string name="auto_power_settings_title">Auto power on/off</string>
     <string name="auto_on_title">Auto power on</string>
     <string name="auto_on_summary_off">Open auto power on</string>
