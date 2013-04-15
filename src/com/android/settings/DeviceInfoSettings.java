@@ -31,6 +31,7 @@ import android.preference.PreferenceScreen;
 import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+import android.os.SystemProperties;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -92,6 +93,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         setStringSummary(KEY_BUILD_NUMBER, Build.DISPLAY);
         findPreference(KEY_BUILD_NUMBER).setEnabled(true);
         findPreference(KEY_KERNEL_VERSION).setSummary(getFormattedKernelVersion());
+
+        if (SystemProperties.getInt("ro.cmcc.test", 0) == 1) {
+            getPreferenceScreen().removePreference(findPreference(KEY_BUILD_NUMBER));
+        }
 
         //add hardware and software version
         setStringSummary(KEY_SOFTWARE_VERSION, Build.SOFTWARE_VERSION);
