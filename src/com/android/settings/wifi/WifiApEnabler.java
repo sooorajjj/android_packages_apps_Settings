@@ -180,7 +180,7 @@ public class WifiApEnabler {
     private void handleWifiApStateChanged(int state) {
         switch (state) {
             case WifiManager.WIFI_AP_STATE_ENABLING:
-                mCheckBox.setSummary(R.string.wifi_tether_starting);
+                mCheckBox.setSummary(WifiManager.replaceAllWiFi(mContext.getString(R.string.wifi_tether_starting)));
                 mCheckBox.setEnabled(false);
                 break;
             case WifiManager.WIFI_AP_STATE_ENABLED:

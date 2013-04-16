@@ -34,6 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.settings.R;
+import android.net.wifi.WifiManager;
 
 /**
  * Dialog to configure the SSID and security settings
@@ -124,8 +125,8 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
         setInverseBackgroundForced(true);
 
         Context context = getContext();
-
-        setTitle(R.string.wifi_tether_configure_ap_text);
+        String titleRes = WifiManager.replaceAllWiFi(context.getString(R.string.wifi_tether_configure_ap_text));
+        setTitle(titleRes);
         mView.findViewById(R.id.type).setVisibility(View.VISIBLE);
         mSsid = (TextView) mView.findViewById(R.id.ssid);
         mPassword = (EditText) mView.findViewById(R.id.password);

@@ -71,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 
+import android.net.wifi.WifiManager;
 /**
  * Top-level settings activity to handle single pane and double pane UI layout.
  */
@@ -434,6 +435,9 @@ public class Settings extends PreferenceActivity
             if (id == R.id.operator_settings || id == R.id.manufacturer_settings) {
                 Utils.updateHeaderToSpecificActivityFromMetaDataOrRemove(this, target, header);
             } else if (id == R.id.wifi_settings) {
+                header.title = WifiManager.replaceAllWiFi(getString(R.string.wifi_settings_title));
+                //user title to replace titleRes to show;
+                header.titleRes = 0;
                 // Remove WiFi Settings if WiFi service is not available.
                 if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI)) {
                     target.remove(i);
@@ -867,5 +871,8 @@ public class Settings extends PreferenceActivity
     public static class TextToSpeechSettingsActivity extends Settings { /* empty */ }
     public static class AndroidBeamSettingsActivity extends Settings { /* empty */ }
     public static class WifiDisplaySettingsActivity extends Settings { /* empty */ }
+//QUALCOMM_CMCC_START
+    public static class WifiGprsSettingsActivity extends Settings { /* empty */ }
+//QUALCOMM_CMCC_END
     public static class DreamSettingsActivity extends Settings { /* empty */ }
 }

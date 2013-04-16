@@ -81,12 +81,12 @@ public class WpsDialog extends AlertDialog {
 
         class WpsListener implements WifiManager.WpsListener {
             public void onStartSuccess(String pin) {
+                String showPinDialog = WifiManager.replaceAllWiFi(mContext.getString(R.string.wifi_wps_onstart_pin));
+                String showPbcDialog = WifiManager.replaceAllWiFi(mContext.getString(R.string.wifi_wps_onstart_pbc));
                 if (pin != null) {
-                    updateDialog(DialogState.WPS_START, String.format(
-                            mContext.getString(R.string.wifi_wps_onstart_pin), pin));
+                    updateDialog(DialogState.WPS_START, String.format(showPinDialog, pin));
                 } else {
-                    updateDialog(DialogState.WPS_START, mContext.getString(
-                            R.string.wifi_wps_onstart_pbc));
+                    updateDialog(DialogState.WPS_START, showPbcDialog);
                 }
             }
             public void onCompletion() {

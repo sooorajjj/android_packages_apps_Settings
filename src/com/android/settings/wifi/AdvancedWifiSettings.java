@@ -16,7 +16,10 @@
 
 package com.android.settings.wifi;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiWatchdogStateMachine;
@@ -34,6 +37,8 @@ import android.widget.Toast;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
+import android.content.BroadcastReceiver;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class AdvancedWifiSettings extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -47,7 +52,24 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_POOR_NETWORK_DETECTION = "wifi_poor_network_detection";
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
 
+//QUALCOMM_CMCC_START 
+    private static final String KEY_CURRENT_GATEWAY = "current_gateway";
+    private static final String KEY_CURRENT_NETMASK = "current_netmask";
+    private static final String KEY_PRIORITY_TYPE = "wifi_priority_type";
+    private static final String KEY_PRIORITY_SETTINGS = "wifi_priority_settings";
+    //set whether settings will auto connect wifi 
+    private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
+    private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
+    private static final String KEY_GSM_WIFI_CONNECT_TYPE = "gsm_wifi_connect_type";
+//QUALCOMM_CMCC_END 
     private WifiManager mWifiManager;
+//QUALCOMM_CMCC_START
+    private CheckBoxPreference mPriorityTypePref;
+    private Preference mPrioritySettingPref;
+    private CheckBoxPreference mAutoConnectTypePref;
+    private ListPreference mSelectInSsidsTypePref;
+    private ListPreference mGsmWifiConnectTypePref;
+//QUALCOMM_CMCC_END
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +88,27 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         super.onResume();
         initPreferences();
         refreshWifiInfo();
+//QUALCOMM_CMCC_START         
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+            ContentResolver contentResolver = getContentResolver();
+            if(mAutoConnectTypePref!=null){
+                mAutoConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                        Settings.System.WIFI_AUTO_CONNECT_TYPE, Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO) == Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO);
+            }
+            if(mGsmWifiConnectTypePref!=null){
+                int value = Settings.System.getInt(contentResolver,Settings.System.GSM_WIFI_CONNECT_TYPE, Settings.System.GSM_WIFI_CONNECT_TYPE_AUTO);
+                mGsmWifiConnectTypePref.setValue(String.valueOf(value));
+            }
+            if (mSelectInSsidsTypePref != null) {
+                int value = Settings.System.getInt(contentResolver, Settings.System.WIFI_SELECT_IN_SSIDS_TYPE, Settings.System.WIFI_SELECT_IN_SSIDS_ASK);
+                mSelectInSsidsTypePref.setValue(String.valueOf(value));
+            }
+            if (mPriorityTypePref != null){
+                mPriorityTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                        Settings.System.WIFI_PRIORITY_TYPE, Settings.System.WIFI_PRIORITY_TYPE_DEFAULT) == Settings.System.WIFI_PRIORITY_TYPE_MANUAL);
+            }
+        }
+//QUALCOMM_CMCC_END 
     }
 
     private void initPreferences() {
@@ -123,8 +166,47 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             sleepPolicyPref.setValue(stringValue);
             updateSleepPolicySummary(sleepPolicyPref, stringValue);
         }
+//QUALCOMM_CMCC_START
+        mPriorityTypePref = (CheckBoxPreference)findPreference(KEY_PRIORITY_TYPE);
+        mPrioritySettingPref = findPreference(KEY_PRIORITY_SETTINGS);
+        mAutoConnectTypePref = (CheckBoxPreference)findPreference(KEY_AUTO_CONNECT_TYPE);
+        mSelectInSsidsTypePref = (ListPreference)findPreference(KEY_SELECT_IN_SSIDS_TYPE);
+        mGsmWifiConnectTypePref = (ListPreference)findPreference(KEY_GSM_WIFI_CONNECT_TYPE);
+        if(mPriorityTypePref != null && mPrioritySettingPref != null && mAutoConnectTypePref != null && mSelectInSsidsTypePref != null && mGsmWifiConnectTypePref != null) {
+            if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+                mPriorityTypePref.setOnPreferenceChangeListener(this);
+                mAutoConnectTypePref.setOnPreferenceChangeListener(this);
+                mSelectInSsidsTypePref.setOnPreferenceChangeListener(this);
+				mGsmWifiConnectTypePref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(mAutoConnectTypePref);
+                getPreferenceScreen().removePreference(mPriorityTypePref);
+                getPreferenceScreen().removePreference(mPrioritySettingPref);
+                getPreferenceScreen().removePreference(mSelectInSsidsTypePref);
+				getPreferenceScreen().removePreference(mGsmWifiConnectTypePref);
+
+            }
+        } else {
+            Log.d(TAG, "Fail to get CMCC Pref");
+        }
+//QUALCOMM_CMCC_END
+
+        replaceWifiToWlan(frequencyPref);
+        replaceWifiToWlan(sleepPolicyPref);
+        String poorNetwok = WifiManager.replaceAllWiFi(poorNetworkDetection.getSummary().toString());
+        poorNetworkDetection.setSummary(poorNetwok);
+
+		suspendOptimizations.setTitle(WifiManager.replaceAllWiFi(suspendOptimizations.getTitle().toString()));		
+		suspendOptimizations.setSummary(WifiManager.replaceAllWiFi(suspendOptimizations.getSummary().toString()));
     }
 
+    private void replaceWifiToWlan(ListPreference preference) {
+        if(null == preference) return ;
+        String prefString = WifiManager.replaceAllWiFi(preference.getTitle().toString());
+        preference.setTitle(prefString);
+        preference.setDialogTitle(prefString);
+    }
+	
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
         if (value != null) {
             String[] values = getResources().getStringArray(R.array.wifi_sleep_policy_values);
@@ -193,6 +275,34 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                 return false;
             }
         }
+//QUALCOMM_CMCC_START
+		else if (key.equals(KEY_AUTO_CONNECT_TYPE)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(), Settings.System.WIFI_AUTO_CONNECT_TYPE, 
+                    checked ? Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO : Settings.System.WIFI_AUTO_CONNECT_TYPE_MANUAL);
+        } else if(key.equals(KEY_SELECT_IN_SSIDS_TYPE)){
+            try{
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.WIFI_SELECT_IN_SSIDS_TYPE, Integer.parseInt(((String) newValue)));
+            }catch (NumberFormatException e) {
+                return false;
+            }
+        } else if (key.equals(KEY_PRIORITY_TYPE)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(), Settings.System.WIFI_PRIORITY_TYPE, 
+                    checked ? Settings.System.WIFI_PRIORITY_TYPE_MANUAL : Settings.System.WIFI_PRIORITY_TYPE_DEFAULT);
+        } else if (key.equals(KEY_GSM_WIFI_CONNECT_TYPE)) {
+            Log.d(TAG, "Gsm to Wifi connect type is " + newValue);
+            try {
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.GSM_WIFI_CONNECT_TYPE, Integer.parseInt(((String) newValue)));
+            } catch (NumberFormatException e) {
+                Toast.makeText(getActivity(), R.string.wifi_setting_connect_type_error,
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+//QUALCOMM_CMCC_END
 
         return true;
     }
@@ -209,6 +319,52 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         String ipAddress = Utils.getWifiIpAddresses(getActivity());
         wifiIpAddressPref.setSummary(ipAddress == null ?
                 getActivity().getString(R.string.status_unavailable) : ipAddress);
+
+//QUALCOMM_CMCC_START
+        Preference wifiGatewayPref = findPreference(KEY_CURRENT_GATEWAY);
+        String gateway = null;
+        Preference wifiNetmaskPref = findPreference(KEY_CURRENT_NETMASK);
+        String netmask = null;
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {  
+            DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
+            if (wifiInfo != null) {
+                if (dhcpInfo != null) {
+                    gateway = ipTransfer(dhcpInfo.gateway);
+                    netmask = ipTransfer(dhcpInfo.netmask);
+                }
+            }
+            if (wifiGatewayPref != null) {
+                wifiGatewayPref.setSummary(gateway == null ?
+                        getString(R.string.status_unavailable) : gateway);
+            }
+            if (wifiNetmaskPref != null) {
+                wifiNetmaskPref.setSummary(netmask == null ?
+                        getString(R.string.status_unavailable) : netmask);
+            }
+        } else {
+            PreferenceScreen screen = getPreferenceScreen();
+            if (screen!=null){
+                if (wifiGatewayPref!=null) {
+                    screen.removePreference(wifiGatewayPref);
+                }
+                if (wifiNetmaskPref!=null) {
+                    screen.removePreference(wifiNetmaskPref);
+                }
+            }
+        }
+//QUALCOMM_CMCC_END
     }
 
+
+//QUALCOMM_CMCC_START	
+    private String ipTransfer(int value){
+        String result = null;
+        if (value!=0) {
+            if (value < 0) value += 0x100000000L;
+            result = String.format("%d.%d.%d.%d",
+                    value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF);
+        }
+        return result;
+    }
+//QUALCOMM_CMCC_END
 }

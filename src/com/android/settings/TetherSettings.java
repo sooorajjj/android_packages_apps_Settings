@@ -122,6 +122,10 @@ public class TetherSettings extends SettingsPreferenceFragment
 
         mEnableWifiAp =
                 (CheckBoxPreference) findPreference(ENABLE_WIFI_AP);
+
+        String prefString = WifiManager.replaceAllWiFi(mEnableWifiAp.getTitle().toString());
+        mEnableWifiAp.setTitle(prefString);
+
         Preference wifiApSettings = findPreference(WIFI_AP_SSID_AND_SECURITY);
         mUsbTether = (CheckBoxPreference) findPreference(USB_TETHER_SETTINGS);
         mBluetoothTether = (CheckBoxPreference) findPreference(ENABLE_BLUETOOTH_TETHERING);
@@ -185,6 +189,11 @@ public class TetherSettings extends SettingsPreferenceFragment
                     mWifiConfig.SSID,
                     mSecurityType[index]));
         }
+
+        String prefString = WifiManager.replaceAllWiFi(mCreateNetwork.getTitle().toString());
+        String prefStringSummary = WifiManager.replaceAllWiFi(mCreateNetwork.getSummary().toString());
+        mCreateNetwork.setTitle(prefString);
+        mCreateNetwork.setSummary(prefStringSummary);
     }
 
     private BluetoothProfile.ServiceListener mProfileServiceListener =
