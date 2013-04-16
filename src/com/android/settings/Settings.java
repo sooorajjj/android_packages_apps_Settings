@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2008, 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -816,7 +816,8 @@ public class Settings extends PreferenceActivity
     public static class InputMethodAndLanguageSettingsActivity extends Settings { /* empty */ }
     public static class KeyboardLayoutPickerActivity extends Settings { /* empty */ }
     public static class InputMethodAndSubtypeEnablerActivity extends Settings { /* empty */ }
-    public static class SpellCheckersSettingsActivity extends Settings { /* empty */ }
+    // Extends SubSetting to reuse onNavigateUp when click icon on ActionBar.
+    public static class SpellCheckersSettingsActivity extends SubSettings { /* empty */ }
     public static class LocalePickerActivity extends Settings { /* empty */ }
     public static class UserDictionarySettingsActivity extends Settings { /* empty */ }
     public static class SoundSettingsActivity extends Settings { /* empty */ }
