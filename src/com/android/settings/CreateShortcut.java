@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.net.wifi.WifiManager;
 
 public class CreateShortcut extends LauncherActivity {
 
@@ -40,7 +41,7 @@ public class CreateShortcut extends LauncherActivity {
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher_settings));
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, itemForPosition(position).label);
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, WifiManager.replaceAllWiFi(itemForPosition(position).label.toString()));
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -290,6 +290,18 @@
     <item msgid="4042143101664725090">"超时"</item>
     <item msgid="7664124146786465092">"失败"</item>
   </string-array>
+
+  <!-- CMCC WLAN customization begin-->
+  <string-array name="wifi_connect_type_entries">
+    <!-- auto connect to wifi -->
+    <item>自动连接</item>
+    <!-- manual connect to wifi -->
+    <item>手动连接</item>
+    <!-- always notify user when wifi is available -->
+    <item>总是询问</item>
+  </string-array>
+  <!-- CMCC WLAN customization end-->  
+  
   <string-array name="security_settings_premium_sms_values">
     <item msgid="7389829271787670252">"询问"</item>
     <item msgid="5077768429488260031">"永不允许"</item>

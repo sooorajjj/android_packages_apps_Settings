@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.android.settings.R;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 class AccessPoint extends Preference {
     static final String TAG = "Settings.AccessPoint";
@@ -49,6 +50,10 @@ class AccessPoint extends Preference {
     static final int SECURITY_WEP = 1;
     static final int SECURITY_PSK = 2;
     static final int SECURITY_EAP = 3;
+//QUALCOMM_CMCC_START 
+    static final String CMCC_SSID = "CMCC";
+    static final String CMCC_EDU_SSID = "CMCC-EDU";
+//QUALCOMM_CMCC_END
 
     enum PskType {
         UNKNOWN,
@@ -227,6 +232,18 @@ class AccessPoint extends Preference {
         if (mInfo != null && other.mInfo == null) return -1;
         if (mInfo == null && other.mInfo != null) return 1;
 
+		
+//QUALCOMM_CMCC_START	
+        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
+            if (isCmccAp(this)) {
+                if (!isCmccAp(other)) {
+                    return -1;
+                }
+            } else if (isCmccAp(other)) {
+                return 1;
+            }
+		}
+//QUALCOMM_CMCC_END	
         // Reachable one goes before unreachable one.
         if (mRssi != Integer.MAX_VALUE && other.mRssi == Integer.MAX_VALUE) return -1;
         if (mRssi == Integer.MAX_VALUE && other.mRssi != Integer.MAX_VALUE) return 1;
@@ -395,4 +412,23 @@ class AccessPoint extends Preference {
         mConfig.SSID = AccessPoint.convertToQuotedString(ssid);
         mConfig.allowedKeyManagement.set(KeyMgmt.NONE);
     }
+	
+//QUALCOMM_CMCC_START 
+    static boolean isCmccAp(AccessPoint mAccessPoint){
+        if (mAccessPoint == null) {
+            return false;
+        }
+        //if not CMCC project
+        if (!FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) { 
+            return false;
+        }
+
+        if (CMCC_SSID.equals(mAccessPoint.ssid) || CMCC_EDU_SSID.equals(mAccessPoint.ssid)){
+            if (mAccessPoint.security == AccessPoint.SECURITY_NONE) {
+                return true;
+            }
+        }
+        return false;
+    }
+//QUALCOMM_CMCC_END 
 }

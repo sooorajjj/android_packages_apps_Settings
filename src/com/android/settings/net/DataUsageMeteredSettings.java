@@ -48,6 +48,7 @@ public class DataUsageMeteredSettings extends SettingsPreferenceFragment {
 
     private NetworkPolicyEditor mPolicyEditor;
 
+    private Preference mBody;;
     private PreferenceCategory mMobileCategory;
     private PreferenceCategory mWifiCategory;
     private Preference mWifiDisabled;
@@ -67,6 +68,14 @@ public class DataUsageMeteredSettings extends SettingsPreferenceFragment {
         mMobileCategory = (PreferenceCategory) findPreference("mobile");
         mWifiCategory = (PreferenceCategory) findPreference("wifi");
         mWifiDisabled = findPreference("wifi_disabled");
+        mBody = findPreference("body");
+
+        String preferenceScreenSummary = WifiManager.replaceAllWiFi(mBody.getSummary().toString());
+        String showWifiTittle = WifiManager.replaceAllWiFi(mWifiCategory.getTitle().toString());
+        String WifiDisabledSummary = WifiManager.replaceAllWiFi(mWifiDisabled.getSummary().toString());
+        mBody.setSummary(preferenceScreenSummary);
+        mWifiCategory.setTitle(showWifiTittle);
+        mWifiDisabled.setSummary(WifiDisabledSummary);
 
         updateNetworks(context);
     }
