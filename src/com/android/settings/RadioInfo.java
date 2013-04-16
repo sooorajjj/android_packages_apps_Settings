@@ -74,7 +74,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.util.Log;
-import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class RadioInfo extends Activity {
     private final String TAG = "phone";
@@ -256,7 +255,11 @@ public class RadioInfo extends Activity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        setContentView(R.layout.radio_info);
+        if(SystemProperties.get("ro.cmcc.test", "0").equals("1")){
+            setContentView(R.layout.radio_info_cmcc);
+        }else{
+            setContentView(R.layout.radio_info);
+        }
 
         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
         phone = PhoneFactory.getDefaultPhone();
@@ -291,11 +294,15 @@ public class RadioInfo extends Activity {
         mHttpClientTest = (TextView) findViewById(R.id.httpClientTest);
 
         preferredNetworkType = (Spinner) findViewById(R.id.preferredNetworkType);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
+        if(preferredNetworkType != null){
+            ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
                 android.R.layout.simple_spinner_item, mPreferredNetworkLabels);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        preferredNetworkType.setAdapter(adapter);
-        preferredNetworkType.setOnItemSelectedListener(mPreferredNetworkHandler);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            preferredNetworkType.setAdapter(adapter);
+            preferredNetworkType.setOnItemSelectedListener(mPreferredNetworkHandler);
+            phone.getPreferredNetworkType(
+                mHandler.obtainMessage(EVENT_QUERY_PREFERRED_TYPE_DONE));
+        }
 
         radioPowerButton = (Button) findViewById(R.id.radio_power);
         radioPowerButton.setOnClickListener(mPowerButtonHandler);
@@ -332,8 +339,6 @@ public class RadioInfo extends Activity {
         mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
         mPhoneStateReceiver.notifyPhoneCallState(EVENT_PHONE_STATE_CHANGED);
 
-        phone.getPreferredNetworkType(
-                mHandler.obtainMessage(EVENT_QUERY_PREFERRED_TYPE_DONE));
         phone.getNeighboringCids(
                 mHandler.obtainMessage(EVENT_QUERY_NEIGHBORING_CIDS_DONE));
 
@@ -342,19 +347,6 @@ public class RadioInfo extends Activity {
         // Get current cell info
         mCellInfoValue = mTelephonyManager.getAllCellInfo();
         Log.d(TAG, "[RadioInfo] onCreate: mCellInfoValue=" + mCellInfoValue);
-		//QUALCOMM_CMCC_START
-        if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
-		    radioPowerButton.setEnabled(false);
-			imsRegRequiredButton.setEnabled(false);
-			lteRamDumpButton.setEnabled(false);
-			updateSmscButton.setEnabled(false);
-			refreshSmscButton.setEnabled(false);
-			dnsCheckToggleButton.setEnabled(false);
-			preferredNetworkType.setEnabled(false);
-			smsOverImsButton.setEnabled(false);
-			smsc.setEnabled(false);
-        }
-		//QUALCOMM_CMCC_END
     }
 
     @Override
