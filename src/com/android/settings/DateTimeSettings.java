@@ -29,6 +29,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -42,6 +43,9 @@ import android.widget.TimePicker;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import android.util.Log;
+import android.telephony.TelephonyManager;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class DateTimeSettings extends SettingsPreferenceFragment
         implements OnSharedPreferenceChangeListener,
@@ -60,6 +64,9 @@ public class DateTimeSettings extends SettingsPreferenceFragment
 
     private static final int DIALOG_DATEPICKER = 0;
     private static final int DIALOG_TIMEPICKER = 1;
+
+    private static final boolean isTimeServicesDaemonEnabled =
+            SystemProperties.getBoolean("persist.timed.enable", false);
 
     // have we been launched from the setup wizard?
     protected static final String EXTRA_IS_FIRST_RUN = "firstRun";
@@ -148,6 +155,18 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
 
+        if(FeatureQuery.FEATURE_SETTINGS_AUTO_SYNC_CDMA_TIME){
+            int activePhoneType;
+            // If phone type is CDMA disable the manual time mode & force
+            // auto time mode
+            activePhoneType = TelephonyManager.getDefault().getPhoneType();
+            if (TelephonyManager.PHONE_TYPE_CDMA == activePhoneType &&
+                !isTimeServicesDaemonEnabled) {
+                Log.d("DateTimeSettings", "Disable manual date time settings options");
+                setAutoState(false, true);
+            }
+        }
+		
         ((CheckBoxPreference)mTime24Pref).setChecked(is24Hour());
 
         // Register for time ticks and other reasons for time change
@@ -306,6 +325,23 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     public void onActivityResult(int requestCode, int resultCode,
             Intent data) {
         updateTimeAndDateDisplay(getActivity());
+    }
+
+    /* sets the auto_time preference to true if isEnabled flag is set true otherwise
+    * sets the auto_time preference based on the user selection(autotimeStatus)
+    * passed as argument.
+    */
+    private void setAutoState(boolean isEnabled, boolean autotimeStatus) {
+        if (isEnabled == false) {
+            mAutoTimePref.setChecked(autotimeStatus);
+            mAutoTimePref.setEnabled(isEnabled);
+        }
+        else {
+            Settings.Global.putInt(getContentResolver(),
+            Settings.Global.AUTO_TIME, autotimeStatus ? 1 : 0);
+        }
+        mTimePref.setEnabled(!autotimeStatus);
+        mDatePref.setEnabled(!autotimeStatus);
     }
 
     private void timeUpdated() {

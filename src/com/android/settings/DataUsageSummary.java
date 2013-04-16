@@ -141,6 +141,7 @@ import com.android.settings.widget.ChartDataUsageView;
 import com.android.settings.widget.ChartDataUsageView.DataUsageChartListener;
 import com.android.settings.widget.PieChartView;
 import com.google.android.collect.Lists;
+import android.telephony.MSimTelephonyManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -736,6 +737,10 @@ public class DataUsageSummary extends Fragment {
         } else {
             throw new IllegalStateException("unknown tab: " + currentTab);
         }
+
+        //this view move to parent view.
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled())
+            mDataEnabledView.setVisibility(View.GONE);
 
         // kick off loader for network history
         // TODO: consider chaining two loaders together instead of reloading

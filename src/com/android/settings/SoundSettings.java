@@ -46,9 +46,12 @@ import android.preference.PreferenceScreen;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 
 import java.util.List;
+
+import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 
 public class SoundSettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener {
@@ -69,6 +72,7 @@ public class SoundSettings extends SettingsPreferenceFragment implements
     private static final String KEY_SOUND_SETTINGS = "sound_settings";
     private static final String KEY_LOCK_SOUNDS = "lock_sounds";
     private static final String KEY_RINGTONE = "ringtone";
+    private static final String KEY_MULTISIM_RINGTONE = "multisim_ringtone";
     private static final String KEY_NOTIFICATION_SOUND = "notification_sound";
     private static final String KEY_CATEGORY_CALLS = "category_calls_and_notification";
     private static final String KEY_DOCK_CATEGORY = "dock_category";
@@ -91,6 +95,7 @@ public class SoundSettings extends SettingsPreferenceFragment implements
     private Preference mMusicFx;
     private CheckBoxPreference mLockSounds;
     private Preference mRingtonePreference;
+    private Preference mMultiSimRingtonePreference;
     private Preference mNotificationPreference;
 
     private Runnable mRingtoneLookupRunnable;
@@ -147,8 +152,14 @@ public class SoundSettings extends SettingsPreferenceFragment implements
 
         mVibrateWhenRinging = (CheckBoxPreference) findPreference(KEY_VIBRATE);
         mVibrateWhenRinging.setPersistent(false);
-        mVibrateWhenRinging.setChecked(Settings.System.getInt(resolver,
-                Settings.System.VIBRATE_WHEN_RINGING, 0) != 0);
+        if (MSimTelephonyManager.getDefault().getPhoneCount() > 1) {
+            mVibrateWhenRinging.setChecked(Settings.System.getInt(resolver,
+                    Settings.System.VIBRATE_WHEN_RINGING, 0) != 0 && Settings.System.getInt(resolver,
+                            Settings.System.VIBRATE_WHEN_RINGING2, 0) != 0);
+        } else {
+            mVibrateWhenRinging.setChecked(Settings.System.getInt(resolver,
+                     Settings.System.VIBRATE_WHEN_RINGING, 0) != 0);
+        }
 
         mDtmfTone = (CheckBoxPreference) findPreference(KEY_DTMF_TONE);
         mDtmfTone.setPersistent(false);
@@ -168,6 +179,16 @@ public class SoundSettings extends SettingsPreferenceFragment implements
                 Settings.System.LOCKSCREEN_SOUNDS_ENABLED, 1) != 0);
 
         mRingtonePreference = findPreference(KEY_RINGTONE);
+        mMultiSimRingtonePreference = findPreference(KEY_MULTISIM_RINGTONE);
+        if (TelephonyManager.getDefault().isMultiSimEnabled()) {
+            //if it support multi sim, remove ringtone setting, show multi sim ringtone setting
+            getPreferenceScreen().removePreference(mRingtonePreference);
+            mRingtonePreference = null;
+        } else {
+            //if it is not multi sim, remove multi sim ringtone setting, and show ringtone setting
+            getPreferenceScreen().removePreference(mMultiSimRingtonePreference);
+            mMultiSimRingtonePreference = null;
+        }
         mNotificationPreference = findPreference(KEY_NOTIFICATION_SOUND);
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -253,6 +274,8 @@ public class SoundSettings extends SettingsPreferenceFragment implements
         // Is it a silent ringtone?
         if (ringtoneUri == null) {
             summary = context.getString(com.android.internal.R.string.ringtone_silent);
+        } else if (ringtoneUri.toString().equals("content://settings/system/notification_sound")) {
+            summary = context.getString(com.android.internal.R.string.ringtone_default);
         } else {
             // Fetch the ringtone title from the media provider
             try {
@@ -278,8 +301,16 @@ public class SoundSettings extends SettingsPreferenceFragment implements
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference == mVibrateWhenRinging) {
-            Settings.System.putInt(getContentResolver(), Settings.System.VIBRATE_WHEN_RINGING,
-                    mVibrateWhenRinging.isChecked() ? 1 : 0);
+            if (MSimTelephonyManager.getDefault().getPhoneCount() > 1) {
+                Settings.System.putInt(getContentResolver(), Settings.System.VIBRATE_WHEN_RINGING,
+                        mVibrateWhenRinging.isChecked() ? 1 : 0);
+                Settings.System.putInt(getContentResolver(), Settings.System.VIBRATE_WHEN_RINGING2,
+                        mVibrateWhenRinging.isChecked() ? 1 : 0);
+            } else {
+                Settings.System.putInt(getContentResolver(), Settings.System.VIBRATE_WHEN_RINGING,
+                        mVibrateWhenRinging.isChecked() ? 1 : 0);
+            }
+
         } else if (preference == mDtmfTone) {
             Settings.System.putInt(getContentResolver(), Settings.System.DTMF_TONE_WHEN_DIALING,
                     mDtmfTone.isChecked() ? 1 : 0);
@@ -304,6 +335,11 @@ public class SoundSettings extends SettingsPreferenceFragment implements
         } else if (preference == mMusicFx) {
             // let the framework fire off the intent
             return false;
+        } else if (mMultiSimRingtonePreference != null && preference == mMultiSimRingtonePreference) {
+            Intent intent = mMultiSimRingtonePreference.getIntent();
+            intent.putExtra(MultiSimSettingsConstants.TARGET_PACKAGE, MultiSimSettingsConstants.SOUND_PACKAGE);
+            intent.putExtra(MultiSimSettingsConstants.TARGET_CLASS, MultiSimSettingsConstants.SOUND_CLASS);
+            startActivity(intent);
         } else if (preference == mDockAudioSettings) {
             int dockState = mDockIntent != null
                     ? mDockIntent.getIntExtra(Intent.EXTRA_DOCK_STATE, 0)

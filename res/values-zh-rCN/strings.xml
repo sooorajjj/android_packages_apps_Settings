@@ -756,6 +756,9 @@
     <string name="sim_lock_failed" msgid="5651596916127873626">"无法更改 SIM 卡锁定状态。"\n"PIN 可能不正确。"</string>
     <string name="sim_enter_ok" msgid="6475946836899218919">"确定"</string>
     <string name="sim_enter_cancel" msgid="6240422158517208036">"取消"</string>
+    <string name="sim_pin_attempts">\n剩余次数 :</string>
+    <string name="sim_pin_enabled">"PIN1 已启用"</string>
+    <string name="sim_pin_disabled">PIN1 已停用!</string>
     <string name="device_info_settings" product="tablet" msgid="1119755927536987178">"平板电脑状态"</string>
     <string name="device_info_settings" product="default" msgid="475872867864762157">"手机状态"</string>
     <string name="system_update_settings_list_item_title" msgid="3342887311059985961">"系统更新"</string>
@@ -821,8 +824,10 @@
     <string name="sd_mount_summary" product="nosdcard" msgid="4673411327373419641"></string>
     <string name="sd_mount_summary" product="default" msgid="4673411327373419641"></string>
     <string name="sd_format" product="nosdcard" msgid="2148179271623099054">"格式化 USB 存储设备"</string>
+    <string name="usb_format">"格式化话机U盘"</string>
     <string name="sd_format" product="default" msgid="2576054280507119870">"格式化 SD 卡"</string>
     <string name="sd_format_summary" product="nosdcard" msgid="6331905044907914603">"清除内部 USB 存储设备中的全部数据，例如音乐和照片"</string>
+    <string name="usb_storage_format_summary">"清除话机U盘中的全部数据，例如音乐和照片"</string>
     <string name="sd_format_summary" product="default" msgid="212703692181793109">"清除 SD 卡中的全部数据，例如音乐和照片"</string>
     <string name="memory_clear_cache_title" msgid="5423840272171286191">"是否清除缓存数据？"</string>
     <string name="memory_clear_cache_message" msgid="4550262490807415948">"此操作会清除所有应用的缓存数据。"</string>
@@ -913,14 +918,18 @@
     <string name="master_clear_failed" msgid="7959646179737950703">"“系统清除”服务不可用，因此未执行重置操作。"</string>
     <string name="master_clear_confirm_title" msgid="7572642091599403668">"要重置吗？"</string>
     <string name="media_format_title" product="nosdcard" msgid="3999653431422767156">"格式化 USB 存储设备"</string>
+    <string name="usb_media_format_title">"格式化话机U盘"</string>
     <string name="media_format_title" product="default" msgid="4427528440306787972">"格式化 SD 卡"</string>
     <string name="media_format_summary" product="nosdcard" msgid="776603298628082065">"清除 USB 存储设备中的全部数据"</string>
     <string name="media_format_summary" product="default" msgid="3805714639375830120">"清除 SD 卡上的所有数据"</string>
     <string name="media_format_desc" product="nosdcard" msgid="4557243156946319034">"要清空所有 USB 存储设备吗？如果这样做，您会丢失其中存储的"<b>"全部"</b>"数据！"</string>
+    <string name="usb_media_format_desc">"要清空所有话机U盘吗？如果这样做，您会丢失其中存储的"<b>"全部"</b>"数据！"</string>
     <string name="media_format_desc" product="default" msgid="8764037252319942415">"要清空该 SD 卡吗？如果这样做，您会丢失其中存储的"<b>"全部"</b>"数据！"</string>
     <string name="media_format_button_text" product="nosdcard" msgid="6293669371185352810">"格式化 USB 存储设备"</string>
+    <string name="usb_media_format_button_text">"格式化话机U盘"</string>
     <string name="media_format_button_text" product="default" msgid="6721544380069373626">"格式化 SD 卡"</string>
     <string name="media_format_final_desc" product="nosdcard" msgid="699929778486375913">"要清空 USB 存储设备（此操作会删除其中存储的全部文件）吗？请注意，此操作无法撤消！"</string>
+    <string name="usb_media_format_final_desc">"要清空话机U盘（此操作会删除其中存储的全部文件）吗？请注意，此操作无法撤消！"</string>
     <string name="media_format_final_desc" product="default" msgid="3344525419872744989">"要清空该 SD 卡（此操作会删除其中存储的全部文件）吗？请注意，此操作无法撤消！"</string>
     <string name="media_format_final_button_text" msgid="4881713344315923175">"清除全部内容"</string>
     <string name="media_format_gesture_prompt" msgid="3109349468816856670">"绘制您的解锁图案"</string>
@@ -953,6 +962,79 @@
     <string name="bluetooth_tethering_overflow_error" msgid="6285122039489881969">"无法与 <xliff:g id="MAXCONNECTION">%1$d</xliff:g> 台以上的设备共享网络。"</string>
     <string name="bluetooth_untether_blank" msgid="2871192409329334813">"即将断开与<xliff:g id="DEVICE_NAME">%1$s</xliff:g>的网络共享。"</string>
     <string name="tethering_help_button_text" msgid="656117495547173630">"帮助"</string>
+    <string name="call_settings">"通话设置"</string>
+    <string name="mobile_network_setting">"移动网络设置"</string>
+    <string name="summary_network_settings">"设置网络模式、接入点和运营商等"</string>
+    <string name="summary_call_settings">"设置双卡的语音信箱、通话设置等"</string>
+    <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
+    <string name="multi_sim_settings_title">"双卡设置"</string>
+    <!-- Main settings screen, Multi Sim settings summary for item to go into Multi settings -->
+    <string name="multi_sim_settings_summary">"设置双卡的语音、短消息和数据服务"</string>
+    <!-- Multi SIM settings screen, preferred subscription settings -->
+    <string name="preferred_subs_settings_title">"默认通道设置"</string>
+    <!-- Multi Sim Settings screen, Voice box label -->
+    <string name="voice_title">"语音"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="voice_summary">"默认语音通道"</string>
+
+    <!-- Multi Sim Settings screen, Data box label -->
+    <string name="data_title">"数据"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="data_summary">"默认数据通道"</string>
+    <!-- Multi Sim Settings screen, SMS box label -->
+    <string name="sms_title">"短消息"</string>
+    <!-- Multi Sim Settings screen, Voice Summary label -->
+    <string name="sms_summary">"默认短消息通道"</string>
+    <!-- Multi Sim Name Setting Title -->
+    <string name="title_sim_alias">SIM卡名称</string>
+    <!-- Multi Sim Settings screen, Select Sub label -->
+    <string name="sel_sub_title">"SIM卡配置"</string>
+    <!-- Multi Sim Settings screen, Select Sub Summary label -->
+    <string name="sel_sub_summary">"设置SIM卡名称、网络等"</string>
+    <string name="select_subscription">选择卡槽</string>
+
+
+    <!-- Multi Sim Settings screen, Set DDS progress dialog message -->
+    <string name="set_data_subscription_progress">"正在设置默认数据通道"</string>
+    <!-- Multi Sim Settings screen, Set DDS success message -->
+    <string name="set_dds_success">"成功设置默认数据通道"</string>
+    <!-- Multi Sim Settings screen, Set DDS failure message -->
+    <string name="set_dds_failed">"设置默认数据通道错误，请关闭数据链接后再设置"</string>
+    <!-- Multi Sim Setting screen, countdown timer waiting time -->
+    <string name="countdown_time_title">"倒计时时间"</string>
+    <!-- Multi Sim Setting screen, countdown timer no wait -->
+    <string name="no_wait_time">"从不等待"</string>
+    <!-- Multi Sim Setting screen, countdown timer always wait -->
+    <string name="infinite_wait_time">"一直等待"</string>
+    <!-- Multi Sim Setting screen, countdown timer wait time unit -->
+    <string name="wait_time_unit">"秒"</string>
+    <!-- Multi Sim Select Subscription screen, invalid subscription -->
+    <string name="subscription_invalid">"没有SIM卡，或SIM卡被禁用"</string>
+    <string name="sim_enabler_title">"SIM卡"</string>
+    <string name="sim_enabler">"SIM卡"</string>
+    <string name="sim_enabler_summary">"SIM卡%1$s"</string>
+    <string name="sim_enabled">"已启用"</string>
+    <string name="sim_disabled">"已禁用"</string>
+    <string name="sim_missing">"缺失或错误"</string>
+    <string name="sim_enabler_need_enable_sim">"启用SIM卡，确定？"</string>
+    <string name="sim_enabler_need_disable_sim">"禁用SIM卡，确定？"</string>
+    <string name="sim_enabler_airplane_on">"错误，飞行模式开启中！"</string>
+    <string name="sim_enabler_in_call">"错误，通话中！"</string>
+    <string name="sim_enabler_both_inactive">"错误，不能禁用两路！"</string>
+    <string name="sim_enabler_enabling">"启用中。。。"</string>
+    <string name="sim_enabler_disabling">"禁用中。。。"</string>
+    <string name="sim_naming_title">"SIM卡名称"</string>
+    <string name="sub_activate_success">"启用成功。"</string>
+    <string name="sub_activate_failed">"启用失败。"</string>
+    <string name="sub_deactivate_success">"禁用成功。"</string>
+    <string name="sub_deactivate_failed">"禁用失败。"</string>
+    <string name="sub_deactivate_not_supported">"不支持启用。"</string>
+    <string name="sub_activate_not_supported">"不支持禁用。"</string>
+    <string name="sub_not_changed">"状态没有变化。"</string>
+    <string name="preferred_callback_title">回拨优先</string>
+    <string name="callback_enable_summary">回拨优先已开启</string>
+    <string name="callback_disable_summary">回拨优先已关闭</string>
+    <string name="close_dialog">确定</string>
     <string name="network_settings_title" msgid="7967552516440151852">"移动网络"</string>
     <string name="location_title" msgid="1029961368397484576">"我的位置"</string>
     <string name="location_network_based" msgid="7472814266821714527">"Wi-Fi 和移动网络位置信息"</string>
@@ -1527,6 +1609,7 @@
     <string name="device_admin_status" msgid="4252975713178851910">"此管理器已激活，允许应用“<xliff:g id="APP_NAME">%1$s</xliff:g>”执行以下操作："</string>
     <string name="untitled_apn" msgid="1230060359198685513">"未命名"</string>
     <string name="sound_category_sound_title" msgid="1488759370067953996">"常规"</string>
+    <string name="sound_category_calls_title" msgid="3688531959256239012">"来电"</string>
     <string name="sound_category_notification_title" msgid="3502115998790286943">"通知"</string>
     <string name="sound_category_call_ringtone_vibrate_title" msgid="1543777228646645163">"来电铃声和振动"</string>
     <string name="sound_category_system_title" msgid="1480844520622721141">"系统"</string>
@@ -1791,6 +1874,12 @@
     <string name="selinux_status_disabled" msgid="924551035552323327">"已停用"</string>
     <string name="selinux_status_permissive" msgid="6004965534713398778">"许可"</string>
     <string name="selinux_status_enforcing" msgid="2252703756208463329">"执行中"</string>
+    <string name="brightness_settings_category">亮度</string>
+    <string name="normal_brightness">正常亮度</string>
+    <string name="enhanced_brightness">动态亮度 </string>
+    <string name="enhanced_brightness_summary">通常在耗电量大的视频模式下使用提升动态影像质量同时降低耗电量。 </string>
+    <string name="cabl_levels_summary">低级电量模式可以节约更多电量，但是屏幕会比预期更暗一些</string>
+    <string name="choose_brightness_settings">选择亮度模式 </string>	
     <string name="user_settings_title" msgid="6151874007858148344">"用户"</string>
     <string name="user_you_section" msgid="6247838798859425408">"您"</string>
     <string name="user_list_title" msgid="8866161687358773982">"其他用户"</string>
@@ -1830,4 +1919,32 @@
     <string name="user_picture_title" msgid="7297782792000291692">"照片 ID"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
+    <!--search function for application settings-->
+    <string name="show_search_function">搜索</string>  
+    <string name="apn_PPP_number">PPP 电话号码</string>
+    
+    <!--for key backlight-->
+    <string name="key_backlight_title">按键背光</string>
+    
+    <!--auto power on/off function for settings-->
+    <string name="hardware_version">硬件版本</string>
+    <string name="software_version">软件版本</string>
+    <string name="release_date">发布时间</string>
+    <string name="auto_power_settings_title">"自动开关机"</string>
+    <string name="auto_on_title">自动开机</string>
+    <string name="auto_on_summary_off">开启自动开机</string>
+    <string name="auto_on_time">开机时间</string>
+    <string name="auto_off_title">自动关机</string>
+    <string name="auto_off_summary_off">开启自动关机</string>
+    <string name="auto_off_time">关机时间</string>
+    
+    
+    <string name="select_slot_always_ask">总是询问</string>
+    <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>
+
+    <string name="erase_internal_storage" product="default">格式化话机U盘</string>
+    <string name="erase_internal_storage_description" product="default" >"清除话机U盘中的全部数据，例如音乐或照片"</string>
+    <!-- password for factoryReset-->
+    <string name="unlock_master_clear">"输入密码恢复出厂设置"</string>
+    <string name="unlock_master_clear_error">"密码错误，\n无法恢复出厂设置！"</string>
 </resources>

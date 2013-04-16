@@ -37,6 +37,8 @@ public class CheckBoxAndSettingsPreference extends CheckBoxPreference {
     private ImageView mSettingsButton;
     private Intent mSettingsIntent;
 
+    private Callbacks mCallbacks ;
+
     public CheckBoxAndSettingsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setLayoutResource(R.layout.preference_inputmethod);
@@ -52,6 +54,9 @@ public class CheckBoxAndSettingsPreference extends CheckBoxPreference {
                     @Override
                     public void onClick(View arg0) {
                         onCheckBoxClicked();
+                        if(null != mCallbacks){
+                             mCallbacks.onCheckBoxClicked();
+                        }
                     }
                 });
 
@@ -63,6 +68,9 @@ public class CheckBoxAndSettingsPreference extends CheckBoxPreference {
                     @Override
                     public void onClick(View clickedView) {
                         onSettingsButtonClicked();
+                        if(null != mCallbacks){
+                            mCallbacks.onSettingsButtonClicked(clickedView);
+                        }
                     }
                 });
         enableSettingsButton();
@@ -113,5 +121,14 @@ public class CheckBoxAndSettingsPreference extends CheckBoxPreference {
         if (mSummaryText != null) {
             mSummaryText.setEnabled(true);
         }
+    }
+
+    public void setCallbacks(Callbacks callbacks){
+        mCallbacks = callbacks;
+    }
+
+    public interface Callbacks {
+        public void onCheckBoxClicked();
+        public void onSettingsButtonClicked(View arg0);
     }
 }

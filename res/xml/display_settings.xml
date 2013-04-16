@@ -24,6 +24,16 @@
                 android:dialogTitle="@string/brightness" />
 
         <PreferenceScreen
+		    android:persistent="false"
+		    android:key="brightness_settings"
+		    android:title="@string/brightness">
+		    <intent
+			    android:action="android.intent.action.MAIN"
+			    android:targetPackage="com.android.settings"
+			    android:targetClass="com.android.settings.BrightnessSettings" />
+	    </PreferenceScreen>
+
+        <PreferenceScreen
                 android:key="wallpaper"
                 android:title="@string/wallpaper_settings_title"
                 android:fragment="com.android.settings.WallpaperTypeSettings" />
@@ -44,6 +54,10 @@
                 android:key="screensaver"
                 android:title="@string/screensaver_settings_title"
                 android:fragment="com.android.settings.DreamSettings" />
+
+        <CheckBoxPreference
+                android:key="key_backlight"
+                android:title="@string/key_backlight_title"/>
 
         <com.android.settings.WarnedListPreference
                 android:key="font_size"

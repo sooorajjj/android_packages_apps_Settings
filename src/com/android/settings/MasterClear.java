@@ -56,11 +56,14 @@ public class MasterClear extends Fragment {
     private static final int KEYGUARD_REQUEST = 55;
 
     static final String ERASE_EXTERNAL_EXTRA = "erase_sd";
+    static final String ERASE_INTERNAL_EXTRA = "erase_in";
 
     private View mContentView;
     private Button mInitiateButton;
     private View mExternalStorageContainer;
+    private View mPhoneStorageContainer;
     private CheckBox mExternalStorage;
+    private CheckBox mPhoneStorage;
 
     /**
      * Keyguard validation is run using the standard {@link ConfirmLockPattern}
@@ -98,6 +101,7 @@ public class MasterClear extends Fragment {
         preference.setFragment(MasterClearConfirm.class.getName());
         preference.setTitle(R.string.master_clear_confirm_title);
         preference.getExtras().putBoolean(ERASE_EXTERNAL_EXTRA, mExternalStorage.isChecked());
+        preference.getExtras().putBoolean(ERASE_INTERNAL_EXTRA, mPhoneStorage.isChecked());
         ((PreferenceActivity) getActivity()).onPreferenceStartFragment(null, preference);
     }
 
@@ -131,7 +135,21 @@ public class MasterClear extends Fragment {
         mInitiateButton = (Button) mContentView.findViewById(R.id.initiate_master_clear);
         mInitiateButton.setOnClickListener(mInitiateListener);
         mExternalStorageContainer = mContentView.findViewById(R.id.erase_external_container);
+        mPhoneStorageContainer = mContentView.findViewById(R.id.erase_internal_container);
         mExternalStorage = (CheckBox) mContentView.findViewById(R.id.erase_external);
+        mPhoneStorage = (CheckBox) mContentView.findViewById(R.id.erase_internal);
+
+        //add for SD card remove for factory reset
+        String statusSD = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(statusSD)                
+        || Environment.MEDIA_MOUNTED_READ_ONLY.equals(statusSD))
+        {
+             mExternalStorageContainer.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+             mExternalStorageContainer.setVisibility(View.GONE);
+        }
 
         /*
          * If the external storage is emulated, it will be erased with a factory
@@ -162,6 +180,24 @@ public class MasterClear extends Fragment {
                     mExternalStorage.toggle();
                 }
             });
+        }
+
+        //add for master clear U disk
+        String status = Environment.getInternalStorageState();  
+        
+        if (Environment.MEDIA_MOUNTED.equals(status)                
+        || Environment.MEDIA_MOUNTED_READ_ONLY.equals(status)) {
+        
+            mPhoneStorageContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPhoneStorage.toggle();
+                }
+            });
+            
+        } else {
+            mPhoneStorageContainer.setVisibility(View.GONE);
+            mPhoneStorage.setChecked(false);
         }
 
         loadAccountList();
