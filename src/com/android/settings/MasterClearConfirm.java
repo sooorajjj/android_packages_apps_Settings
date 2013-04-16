@@ -187,7 +187,7 @@ public class MasterClearConfirm extends Fragment {
         mErasePhoneStorage = args != null ? args.getBoolean(MasterClear.ERASE_INTERNAL_EXTRA) : false;
 
         mLockPatternUtils = new LockPatternUtils(getActivity());
-        if ( SystemProperties.get("ro.cta.test", "").equals("0")) {
+        if ( SystemProperties.get("ro.cta.test", "").equals("1")) {
             ctsTestFlg = true;
         } else {
             ctsTestFlg = false;
