@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2007, 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.pm.ActivityInfo;
+import android.content.Context;
+
 /**
  * If the user has a lock pattern set already, makes them confirm the existing one.
  *
@@ -59,6 +62,7 @@ public class ChooseLockPattern extends PreferenceActivity {
      * result.
      */
     static final int RESULT_FINISHED = RESULT_FIRST_USER;
+    private static Context mContext;
 
     @Override
     public Intent getIntent() {
@@ -72,6 +76,7 @@ public class ChooseLockPattern extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         // requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        mContext = this;
         CharSequence msg = getText(R.string.lockpassword_choose_your_pattern_header);
         showBreadCrumbs(msg, msg);
     }
@@ -137,6 +142,13 @@ public class ChooseLockPattern extends PreferenceActivity {
                 new LockPatternView.OnPatternListener() {
 
                 public void onPatternStart() {
+                        if ((mContext.getResources().getConfiguration().orientation) == 1) {
+                            getActivity().setRequestedOrientation(
+                                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        } else {
+                            getActivity().setRequestedOrientation(
+                                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                        }
                     mLockPatternView.removeCallbacks(mClearPatternRunnable);
                     patternInProgress();
                 }
@@ -165,6 +177,8 @@ public class ChooseLockPattern extends PreferenceActivity {
                         throw new IllegalStateException("Unexpected stage " + mUiStage + " when "
                                 + "entering the pattern.");
                     }
+                        getActivity().setRequestedOrientation(
+                                ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                 }
 
                 public void onPatternCellAdded(List<Cell> pattern) {
