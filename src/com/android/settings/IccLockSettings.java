@@ -33,6 +33,7 @@ import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.qualcomm.internal.telephony.MSimPhoneFactory;
+import android.telephony.MSimTelephonyManager;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneFactory;
 import com.android.internal.telephony.CommandException;
@@ -181,18 +182,42 @@ public class IccLockSettings extends PreferenceActivity
 
         // Don't need any changes to be remembered
         getPreferenceScreen().setPersistent(false);
-
-        Intent intent = getIntent();
-        int subscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
-                MSimPhoneFactory.getDefaultSubscription());
-        // Use the right phone based on the subscription selected.
-        mPhone = MSimPhoneFactory.getPhone(subscription);
+        
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()){
+            Intent intent = getIntent();
+            int subscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY, MSimPhoneFactory.getDefaultSubscription());
+            // Use the right phone based on the subscription selected.
+            mPhone = MSimPhoneFactory.getPhone(subscription);
+        } else {
+            mPhone = PhoneFactory.getDefaultPhone();
+        }
         mRes = getResources();
         updatePreferences();
     }
 
     private void updatePreferences() {
-        mPinToggle.setChecked(mPhone.getIccCard().getIccLockEnabled());
+        TelephonyManager tm = TelephonyManager.getDefault();
+        int simState;
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+            int subscription = getIntent().getIntExtra(
+                    SelectSubscription.SUBSCRIPTION_KEY,
+                    MSimPhoneFactory.getDefaultSubscription());
+            simState = MSimTelephonyManager.getDefault().getSimState(subscription);
+        } else {
+            simState = tm.getSimState();
+        }
+        // Set both preference disabled if the sim state can not be recognized
+        if (TelephonyManager.SIM_STATE_ABSENT == simState
+                || TelephonyManager.SIM_STATE_UNKNOWN == simState
+                || TelephonyManager.SIM_STATE_DEACTIVATED == simState) {
+            mPinToggle.setChecked(false);
+            mPinDialog.setEnabled(false);
+            mPinToggle.setEnabled(false);
+        } else {
+            mPinToggle.setChecked(mPhone.getIccCard().getIccLockEnabled());
+            mPinToggle.setEnabled(true);
+            mPinDialog.setEnabled(true);
+        }
     }
 
     @Override

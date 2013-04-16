@@ -286,7 +286,7 @@ public class MSimSubscriptionStatus extends PreferenceActivity {
             } else {
                 setSummaryText(KEY_ROAMING_STATE, mRes.getString(R.string.radioInfo_roaming_not));
             }
-            setSummaryText(KEY_OPERATOR_NAME, mServiceState.getOperatorAlphaLong());
+            setSummaryText(KEY_OPERATOR_NAME, mTelephonyManager.getNetworkName(mSub));
         }
     }
 

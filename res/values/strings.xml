@@ -2071,10 +2071,14 @@ alog [CHAR LIMIT=none] -->
     <string name="sd_mount_summary" product="default"></string>
     <!-- SD card & phone storage settings item title that will result in the phone formatting the USB storage.   [CHAR LIMIT=25] -->
     <string name="sd_format" product="nosdcard">Erase USB storage</string>
+    <!-- USB storage & phone storage settings item title that will result in the phone formatting the USB storage.   [CHAR LIMIT=25] -->
+    <string name="usb_format">Erase phone storage</string>
     <!-- SD card & phone storage settings item title that will result in the phone formatting the SD card.   [CHAR LIMIT=25] -->
     <string name="sd_format" product="default">Erase SD card</string>
     <!-- SD card & phone storage settings item title that will result in the phone unmounting the SD card.   [CHAR LIMIT=80] -->
     <string name="sd_format_summary" product="nosdcard">Erases all data on the internal USB storage, such as music and photos</string>
+    <!-- USB storage & phone storage settings item title that will result in the phone unmounting the USB storage.   [CHAR LIMIT=80] -->
+    <string name="usb_storage_format_summary">Erases all data on the phone storage, such as music and photos</string>
     <!-- SD card & phone storage settings item title that will result in the phone unmounting the SD card.   [CHAR LIMIT=80] -->
     <string name="sd_format_summary" product="default">Erases all data on the SD card, such as music and photos</string>
     <!-- SD card status when it is mounted as read only. Will be appended to size, starts with an unbreakable space -->
@@ -2134,6 +2138,15 @@ alog [CHAR LIMIT=none] -->
     <string name="usb_ptp_summary">Lets you transfer photos using camera software, and transfer any files on computers that don\'t support MTP</string>
     <!-- Storage setting.  Summary for PTP checkbox [CHAR LIMIT=NONE]-->
     <string name="usb_label_installer_cd">"Install file-transfer tools"</string>
+
+    <string name="usb_umt_title">Mass Storage</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_umt_summary">Touch can choose mass storage</string>
+
+    <string name="usb_charge_title">USB Charge</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_charge_summary">Touch can choose usb charge</string>
+
 
     <!-- Section header above list of other users storage [CHAR LIMIT=32] -->
     <string name="storage_other_users">Other users</string>
@@ -2268,6 +2281,8 @@ alog [CHAR LIMIT=none] -->
     <!-- Media Format -->
     <!-- SD card & phone storage settings screen, setting option name under Internal phone storage heading [CHAR LIMIT=25] -->
     <string name="media_format_title" product="nosdcard">Erase USB storage</string>
+    <!-- USB storage card & phone storage settings screen, setting option name under Internal phone storage heading [CHAR LIMIT=25] -->
+    <string name="usb_media_format_title" >Erase phone storage</string>
     <!-- SD card & phone storage settings screen, setting option name under Internal phone storage heading -->
     <string name="media_format_title" product="default">Erase SD card</string>
     <!-- SD card & phone storage settings screen, setting option summary text under Internal phone storage heading [CHAR LIMIT=30] -->
@@ -2276,14 +2291,20 @@ alog [CHAR LIMIT=none] -->
     <string name="media_format_summary" product="default">Erases all data on the SD card</string>
     <!-- SD card & phone storage settings screen, message on screen after user selects Factory data reset [CHAR LIMIT=NONE] -->
     <string name="media_format_desc" product="nosdcard">Erase all USB storage? You will lose <b>all</b> stored data!</string>
+    <!-- USB storage & phone storage settings screen, message on screen after user selects Factory data reset [CHAR LIMIT=NONE] -->
+    <string name="usb_media_format_desc">Erase all phone storage? You will lose <b>all</b> stored data!</string>
     <!-- SD card & phone storage settings screen, message on screen after user selects Factory data reset [CHAR LIMIT=NONE] -->
     <string name="media_format_desc" product="default">Erase the SD card? You will lose <b>all</b> data on the card!</string>
     <!-- SD card & phone storage settings screen, button on screen after user selects Factory data reset [CHAR LIMIT=25] -->
     <string name="media_format_button_text" product="nosdcard">Erase USB storage</string>
+    <!-- USB storage & phone storage settings screen, button on screen after user selects Factory data reset [CHAR LIMIT=25] -->
+    <string name="usb_media_format_button_text" >Erase phone storage</string>
     <!-- SD card & phone storage settings screen, button on screen after user selects Factory data reset -->
     <string name="media_format_button_text" product="default">Erase SD card</string>
     <!-- SD card & phone storage settings screen, message on screen after user selects Format media button [CHAR LIMIT=NONE] -->
     <string name="media_format_final_desc" product="nosdcard">Erase the USB storage, deleting all files stored there? You can\'t reverse this action!</string>
+    <!-- USB storage & phone storage settings screen, message on screen after user selects Format media button [CHAR LIMIT=NONE] -->
+    <string name="usb_media_format_final_desc">Erase the phone storage, deleting all files stored there? You can\'t reverse this action!</string>
     <!-- SD card & phone storage settings screen, message on screen after user selects Format media button [CHAR LIMIT=NONE] -->
     <string name="media_format_final_desc" product="default">Erase the SD card, deleting all files stored there? You can\'t reverse this action!</string>
     <!-- SD card & phone storage settings screen, button on screen after user selects Format media button -->
@@ -3693,6 +3714,7 @@ alog [CHAR LIMIT=none] -->
     <string name="untitled_apn">Untitled</string>
 
     <string name="sound_category_sound_title">General</string>
+    <string name="sound_category_calls_title">Incoming calls</string>
     <string name="sound_category_notification_title">Notifications</string>
 
     <!-- Category title for phone call's ringtone and vibration settings in the Sound Setting.
@@ -4338,7 +4360,8 @@ alog [CHAR LIMIT=none] -->
     <string name="select_subscription">Select Subscription</string>
 
     <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
-    <string name="multi_sim_settings_title">Multi Sim Settings</string>
+    <string name="multi_sim_settings_title">Dual SIM settings</string>
+    <string name="multi_sim_settings_title_Multi">Multi Sim Settings</string>
     <!-- Main settings screen, Multi Sim settings summary for item to go into Multi settings -->
     <string name="multi_sim_settings_summary">Set up Multi Sim Settings for Voice, Data and SMS</string>
 
@@ -4353,7 +4376,7 @@ alog [CHAR LIMIT=none] -->
     <string name="data_summary">Select Subscription for Data Call</string>
 
     <!-- Multi Sim Settings screen, SMS box label -->
-    <string name="sms_title">SMS </string>
+    <string name="sms_title">Messaging</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="sms_summary">Select the Subscription for Sending SMS</string>
 
@@ -4546,4 +4569,134 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
+    <string name="apn_PPP_number">PPP phone number</string>
+    
+    <!-- for multisim settings -->
+    <string name="mobile_network_setting">Mobile network settings</string>
+    <string name="call_settings">Call settings</string>
+    <!-- Multi SIM settings screen, preferred subscription settings -->
+    <string name="preferred_subs_settings_title">Preferred SIM settings</string>
+    <!-- Multi Sim Setting screen, countdown timer waiting time -->
+    <string name="countdown_time_title">Count down time</string>
+    <!-- Multi Sim Setting screen, countdown timer no wait -->
+    <string name="no_wait_time">no wait</string>
+    <!-- Multi Sim Setting screen, countdown timer always wait -->
+    <string name="infinite_wait_time">always wait</string>
+    <!-- Multi Sim Setting screen, countdown timer wait time unit -->
+    <string name="wait_time_unit">s</string>
+    <!-- Multi Sim Select Subscription screen, invalid subscription -->
+    <string name="subscription_invalid">Card Absent Or Disabled</string>
+    <!-- Dual Sim Setting screen,  item title to preferred callback setting -->
+    <string name="preferred_callback_title">Preferred callback</string>
+    <!-- Dual Sim Settings screen, callback enable summary label -->
+    <string name="callback_enable_summary">Preferred callback is ON</string>
+    <!-- Dual Sim Settings screen, callback disable summary label -->
+    <string name="callback_disable_summary">Preferred callback is OFF</string>
+    <string name="close_dialog">OK</string>
+    <string name="sim_naming_title">SIM Card Naming</string>
+    <string name="summary_network_settings">Set options for mobile networks, APNs</string>
+    <string name="summary_call_settings">Set voice mail, call options for dual SIMs</string>
+    <string name="sim_enabler_title">SIM card</string>
+    <string name="sim_enabler">SIM card</string>
+    <string name="sim_enabler_summary">SIM is %1$s</string>
+    <string name="sim_enabled">enabled</string>
+    <string name="sim_disabled">disabled</string>
+    <string name="sim_missing">missing or error</string>
+    <string name="sim_enabler_need_enable_sim">Will enable it, are you sure?</string>
+    <string name="sim_enabler_need_disable_sim">Will disable it, are you sure?</string>
+    <string name="sim_enabler_airplane_on">ERROR, airplane mode is on!</string>
+    <string name="sim_enabler_in_call">ERROR, in call!</string>
+    <string name="sim_enabler_both_inactive">"Error, can't disable both at the same time!"</string>
+    <string name="sim_enabler_enabling">Enabling</string>
+    <string name="sim_enabler_disabling">Disabling</string>
+    <string name="sub_activate_success">Activate success.</string>
+    <string name="sub_activate_failed">Activate failed</string>
+    <string name="sub_deactivate_success">Deactivate success</string>
+    <string name="sub_deactivate_failed">Deactivate failed</string>
+    <string name="sub_deactivate_not_supported">Deactivate not supported</string>
+    <string name="sub_activate_not_supported">Activate not supported</string>
+    <string name="sub_not_changed">State not changed</string>
+    <string name="title_sim_alias">Alias name</string>
+<!-- for brightness adjusting -->
+    <string name="normal_brightness_title">Brightness Adjusting</string>
+    <string name="normal_brightness_summary">Brightness Adjusting ,normal brightness handling</string>
+    <string name="enhanced_brightness_title">Enhanced Brightness Adjusting</string>
+    <string name="enhanced_brightness_summary">It is usually used to improve video quality and save more power when playing video clips. </string>
+    <string name="cabl_levels_summary">A lower level means more power is saved, but could
+                cause the screen to be dimmer than expected</string>
+    <string name="brightness_settings_category">Brightness </string>
+    <string name="normal_brightness">Normal Brightness</string>
+    <string name="enhanced_brightness">Dynamic Brightness </string>
+    <string name="choose_brightness_settings">Choose Brightness Settings </string>
+    
+    <!--for key backlight-->
+    <string name="key_backlight_title">Key backlight</string>
+    
+    <!-- for internal storage -->
+    <string name="summary_storage_manage">SD card device: %1$s</string>
+    <string name="external_sd">External SD</string>
+    <string name="internal_sd">Internal SD</string>
+    <!--search function for application settings-->
+    <string name="show_search_function">Search</string>
+
+    <string name="unlock_master_clear">Please input password for master clear </string>
+    <string name="unlock_master_clear_error">Password is incorrect, \ncannot clear phone data!</string>	
+    <!--auto power on/off function for settings-->
+    <string name="hardware_version">Hardware version</string>
+    <string name="software_version">Software version</string>
+    <string name="release_date">Release time</string>
+    <string name="auto_power_settings_title">Auto power on/off</string>
+    <string name="auto_on_title">Auto power on</string>
+    <string name="auto_on_summary_off">Open auto power on</string>
+    <string name="auto_on_time">Auto power on time</string>
+    <string name="auto_off_title">Auto power off</string>
+    <string name="auto_off_summary_off">Open auto power off</string>
+    <string name="auto_off_time">Auto power off time</string> 
+    
+    <string name="china_union_net_apn_name">China Unicom NET</string>
+    <string name="china_union_wap_apn_name">China Unicom WAP</string>
+    <string name="china_union_mms_apn_name">China Unicom MMS</string>
+    <string name="china_union_supl_apn_name">China Unicom AGPS</string>
+
+    <string name="china_mobile_net_apn_name">China Mobile</string>
+    <string name="china_mobile_wap_apn_name">China Mobile WAP</string>
+    <string name="china_mobile_mms_apn_name">China Mobile MMS</string>
+
+    <string name="china_telecom_net_apn_name">CTNET</string>
+    <string name="china_telecom_wap_apn_name">CTWAP</string>
+
+    <!-- agps settings begin-->
+ 
+    <string name="location_agps_params_settings_title">AGPS settings</string>
+    <string name="location_agps_supl_settings">SUPL settings</string>
+    <string name="location_agps_supl_server_addr">Server address</string>
+    <string name="location_agps_supl_server_port">Server port</string>
+    <string name="location_agps_pref_si_title">Prefered mode</string>
+    <string name="location_agps_si_mode">AGPS SI mode</string>
+    <string name="location_agps_si_mode_summary">Choose prefered AGPS method</string>
+    <string name="location_agps_si_mode_dialog_title">AGPS method</string>
+    <string name="location_agps_pref_apn_title">Prefered apn</string>
+    <string name="location_agps_apn_type">Apn types</string>
+    <string name="location_agps_apn_summary">Choose prefered apn type</string>
+    <string name="location_agps_apn_choose_dialog_title">Apn types</string>    
+    <string name="location_agps_pref_reset_type_title">Prefered reset type</string>
+    <string name="location_agps_reset_type">Reset types</string>
+    <string name="location_agps_reset_type_summary">Choose prefered reset type</string>
+    <string name="location_agps_reset_type_choose_dialog_title">Reset types</string>
+    <string name="location_agps_pref_network_title">Prefer network</string>
+    <string name="location_agps_register_network_type">Access network type</string>
+    <string name="location_agps_register_network_type_summary">Choose access network to enable AGPS...</string>
+    <string name="location_agps_register_network_type_dialog_title">Select network</string>
+    <string name="location_agps_roaming_help">Warning：Choose ALL NETWORK to open AGPS may loss of telephone charges when roaming！</string>
+    <string name="supl_not_set">&lt;Not set&gt;</string>
+
+    <!-- agps settings end-->  
+        
+    <string name="select_slot_always_ask">Always ask</string>
+
+    <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
+    <string name="erase_internal_storage" product="default">Erase phone storage</string>
+    <string name="erase_internal_storage_description" product="default">Erase all the data on the phone storage, such as music or photos</string>
+    <string name="enable_save_log">Save Log</string>
+    <string name="enable_save_log_summary">Save Log(Reboot).</string>
 </resources>

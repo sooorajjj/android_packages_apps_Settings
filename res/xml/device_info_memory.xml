@@ -18,5 +18,8 @@
         android:title="@string/storage_settings_title">
 
 <!-- Preference categories are dynamically created based on the list of available storage volumes -->
+ <Preference android:key="storage_mgr">
+       <intent android:action="com.qualcomm.action.STORAGE" />
+ </Preference>
 
 </PreferenceScreen>

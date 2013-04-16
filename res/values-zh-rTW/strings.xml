@@ -1531,6 +1531,7 @@
     <string name="device_admin_status" msgid="4252975713178851910">"這個管理員正在作業中，且允許 <xliff:g id="APP_NAME">%1$s</xliff:g> 應用程式執行以下作業："</string>
     <string name="untitled_apn" msgid="1230060359198685513">"未命名"</string>
     <string name="sound_category_sound_title" msgid="1488759370067953996">"一般"</string>
+    <string name="sound_category_calls_title">"來電"</string>
     <string name="sound_category_notification_title" msgid="3502115998790286943">"通知"</string>
     <string name="sound_category_call_ringtone_vibrate_title" msgid="1543777228646645163">"來電鈴聲與震動"</string>
     <string name="sound_category_system_title" msgid="1480844520622721141">"系統"</string>
@@ -1791,6 +1792,50 @@
     <string name="backup_pw_set_button_text" msgid="2387480910044648795">"設定備份密碼"</string>
     <string name="backup_pw_cancel_button_text" msgid="8845630125391744615">"取消"</string>
     <string name="percentage" msgid="5866131581207788624">"<xliff:g id="NUMBER">%d</xliff:g>%%"</string>
+    <string name="sel_sub_title">"SIM卡配置"</string>
+    <string name="sel_sub_summary">"設置SIM卡名稱、網絡等"</string>
+    <string name="multi_sim_settings_title">"雙卡設置"</string>
+    <string name="voice_title">"語音"</string>
+    <string name="voice_summary">"默認語音通道"</string>
+    <string name="data_title">"數據"</string>
+    <string name="sms_title">"簡訊"</string>
+
+    <!-- Translate Chinese to traditional Chinese-->
+    <string name="mobile_network_setting">"移動網絡設置"</string>
+    <string name="call_settings">"通話設置"</string>
+
+    <string name="preferred_subs_settings_title">"默認通道設置"</string>
+    <string name="countdown_time_title">"倒計時時間"</string>
+    <string name="preferred_callback_title">"回撥優先"</string>
+    <string name="callback_enable_summary">"回撥優先已開啟"</string>
+    <string name="callback_disable_summary">"回撥優先已關閉"</string>
+    <string name="close_dialog">"確定"</string>
+    <string name="summary_network_settings">"設置網絡模式、接入點和運營商等"</string>
+    <string name="summary_call_settings">"設置雙卡的語音信箱、通話設置等"</string>
+    <string name="title_sim_alias">"SIM卡名稱"</string>
+    <string name="sim_enabler_title">"SIM 卡"</string>
+    <string name="sim_enabler">"SIM 卡"</string>
+    <string name="sim_enabler_summary">"SIM 卡 %1$s"</string>
+    <string name="sim_enabled">"已啟用"</string>
+    <string name="sim_disabled">"已禁用"</string>
+    <string name="sim_missing">"缺失或錯誤"</string>
+    <string name="sim_enabler_need_enable_sim">"啟用SIM卡，確定？"</string>
+    <string name="sim_enabler_need_disable_sim">"禁用SIM卡，確定？"</string>
+    <string name="sim_enabler_airplane_on">"錯誤，飛行模式開啟中！"</string>
+    <string name="sim_enabler_in_call">"錯誤，通話中！"</string>
+    <string name="sim_enabler_both_inactive">"錯誤，不能禁用兩路！"</string>
+    <string name="sim_enabler_enabling">"啟用中。。。"</string>
+    <string name="sim_enabler_disabling">"禁用中。。。"</string>
+    <string name="sim_naming_title">"SIM卡名稱"</string>
+    <string name="sub_activate_success">"啟用成功。"</string>
+    <string name="sub_activate_failed">"啟用失敗。"</string>
+    <string name="sub_deactivate_success">"禁用成功。"</string>
+    <string name="sub_deactivate_failed">"禁用失敗。"</string>
+    <string name="brightness_settings_category">"亮度"</string>
+    <string name="normal_brightness">"正常亮度"</string>
+    <string name="enhanced_brightness">"動態亮度"</string>
+    <string name="enhanced_brightness_summary">"通常在耗電量大的視頻模式下使用提升動態影像質量同時降低耗電量。"</string>
+    <string name="cabl_levels_summary">"低級電量模式可以節約更多電量，但是屏幕會比預期更暗一些。"</string>
     <string name="additional_system_update_settings_list_item_title" msgid="214987609894661992">"其他系統更新"</string>
     <string name="selinux_status_disabled" msgid="924551035552323327">"已停用"</string>
     <string name="selinux_status_permissive" msgid="6004965534713398778">"許可"</string>
@@ -1834,4 +1879,7 @@
     <string name="user_picture_title" msgid="7297782792000291692">"相片 ID"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"區域廣播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"選取要顯示的緊急警示類型。"</string>
+    <!--search function for application settings-->
+    <string name="show_search_function">搜索</string>  
+    <string name="slot_name">卡槽 <xliff:g id="sub">%d</xliff:g></string>
 </resources>

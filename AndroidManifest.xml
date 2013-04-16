@@ -71,7 +71,22 @@
             android:hardwareAccelerated="true"
             android:supportsRtl="true">
 
+   <uses-library  android:name="com.qrd.plugin.feature_query"
+                   android:required="false" />
+       
         <!-- Settings -->
+       
+      <!-- brightness Settings Controls -->
+        <activity android:name=".BrightnessSettings" android:label="@string/brightness"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:icon="@drawable/ic_settings_brightness">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.android.settings.BRIGHTNESS_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+           
+            </intent-filter>
+        </activity>
 
         <activity android:name="Settings"
                 android:label="@string/settings_label_launcher"
@@ -132,6 +147,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.wifi.WifiSettings" />
@@ -274,6 +290,7 @@
                 <action android:name="android.settings.BLUETOOTH_SETTINGS" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
@@ -314,6 +331,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.TetherSettings" />
@@ -371,6 +389,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.vpn2.VpnSettings" />
@@ -563,6 +582,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.SoundSettings" />
@@ -592,11 +612,60 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.DisplaySettings" />
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
                 android:resource="@id/display_settings" />
+        </activity>
+
+        <!-- Multi Sim (Subscription) Settings change base on android original source-->
+        <activity android:name=".multisimsettings.MultiSimSettings"
+                android:label="@string/multi_sim_settings_title"
+                android:process="com.android.phone"
+                android:configChanges="orientation|screenSize"
+                android:clearTaskOnLaunch="true"
+                android:parentActivityName="Settings">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.android.settings.MULTI_SIM_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- MultiSimSettings should be found by 'Voice Dialer'. -->
+                <category android:name="android.intent.category.VOICE_LAUNCH" />
+                <category android:name="com.android.settings.SHORTCUT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim (Subscription) Settings Widget for Tab Layout-->
+        <activity android:name=".multisimsettings.MultiSimSettingTab"
+                android:label="@string/mobile_network_setting"
+                android:process="com.android.phone"
+                android:configChanges="orientation|screenSize"
+                android:parentActivityName=".multisimsettings.MultiSimSettings">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim Configuration in Tab Layout -->
+        <activity android:name=".multisimsettings.MultiSimConfiguration"
+                android:label="@string/multi_sim_settings_title"
+                android:process="com.android.phone">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim Sound Setting Preference -->
+        <activity android:name=".multisimsettings.MultiSimSoundSettings"
+                android:label="@string/multi_sim_settings_title">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <!-- Keep compatibility with old shortcuts. -->
@@ -620,8 +689,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="com.android.settings.MULTI_SIM_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
+                <!-- This Activity is not used, so it should not be found by 'Voice Dialer'. -->
+                <!-- <category android:name="android.intent.category.VOICE_LAUNCH" /> -->
+                <!-- not display this shortcut on the widget shortcut -->
+                <!-- <category android:name="com.android.settings.SHORTCUT" /> -->
             </intent-filter>
         </activity>
 
@@ -674,6 +745,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.applications.ManageApplications" />
@@ -793,6 +865,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.LocationSettings" />
@@ -931,6 +1004,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.AccessibilitySettings" />
@@ -1389,6 +1463,7 @@
                 <action android:name="android.intent.action.POWER_USAGE_SUMMARY" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.fuelgauge.PowerUsageSummary" />
@@ -1500,6 +1575,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.DataUsageSummary" />
@@ -1526,6 +1602,7 @@
                 <action android:name="android.settings.DREAM_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="com.android.settings.SHORTCUT_SINGLE" />
             </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.DreamSettings" />
@@ -1563,6 +1640,16 @@
             </intent-filter>
         </receiver>
 
+
+        <service android:name=".PhoneStorageFormatter"
+                      android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.internal.os.storage.FORMAT_ONLY" />
+                <action android:name="com.android.internal.os.storage.FORMAT_AND_FACTORY_RESET" />
+                <action android:name="com.android.internal.os.storage.FORMAT_ALL_AND_FACTORY_RESET" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
 
 <!-- QUALCOMM_CMCC_START   -->	
         <service android:name=".wifi.cmcc.CmccService" >
@@ -1623,6 +1710,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-<!-- QUALCOMM_CMCC_END   -->        
+<!-- QUALCOMM_CMCC_END   --> 
     </application>
 </manifest>

@@ -23,6 +23,7 @@ import android.os.storage.StorageVolume;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.internal.os.storage.ExternalStorageFormatter;
 
@@ -41,10 +42,14 @@ public class MediaFormat extends Activity {
     private LayoutInflater mInflater;
 
     private View mInitialView;
+    private TextView  mFormatTextView;
     private Button mInitiateButton;
 
     private View mFinalView;
+    private TextView  mFinalTextView;
     private Button mFinalButton;
+
+    private StorageVolume mStorageVolume;
 
     /**
      * The user has gone through the multiple confirmation, so now we go ahead
@@ -59,9 +64,7 @@ public class MediaFormat extends Activity {
                 Intent intent = new Intent(ExternalStorageFormatter.FORMAT_ONLY);
                 intent.setComponent(ExternalStorageFormatter.COMPONENT_NAME);
                 // Transfer the storage volume to the new intent
-                final StorageVolume storageVolume = getIntent().getParcelableExtra(
-                        StorageVolume.EXTRA_STORAGE_VOLUME);
-                intent.putExtra(StorageVolume.EXTRA_STORAGE_VOLUME, storageVolume);
+                intent.putExtra(mStorageVolume.EXTRA_STORAGE_VOLUME, mStorageVolume);
                 startService(intent);
                 finish();
             }
@@ -119,6 +122,10 @@ public class MediaFormat extends Activity {
             mFinalButton =
                     (Button) mFinalView.findViewById(R.id.execute_media_format);
             mFinalButton.setOnClickListener(mFinalClickListener);
+            if (("/storage/sdcard1").equals(mStorageVolume.getPath())) {
+                mFinalTextView = (TextView) mFinalView.findViewById(R.id.text_media_format_final);
+                mFinalTextView.setText(R.string.usb_media_format_final_desc);
+            }
         }
 
         setContentView(mFinalView);
@@ -137,11 +144,19 @@ public class MediaFormat extends Activity {
      * to change contents.
      */
     private void establishInitialState() {
+        mStorageVolume = getIntent().getParcelableExtra(
+                StorageVolume.EXTRA_STORAGE_VOLUME);
         if (mInitialView == null) {
             mInitialView = mInflater.inflate(R.layout.media_format_primary, null);
             mInitiateButton =
                     (Button) mInitialView.findViewById(R.id.initiate_media_format);
             mInitiateButton.setOnClickListener(mInitiateListener);
+            if (("/storage/sdcard1").equals(mStorageVolume.getPath())) {
+                setTitle(R.string.usb_media_format_title);
+                mFormatTextView = (TextView) mInitialView.findViewById(R.id.text_media_format);
+                mFormatTextView.setText(R.string.usb_media_format_desc);
+                mInitiateButton.setText(R.string.usb_media_format_button_text);
+            }
         }
 
         setContentView(mInitialView);

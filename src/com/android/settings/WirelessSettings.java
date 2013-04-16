@@ -38,6 +38,7 @@ import android.widget.Switch;
 
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 import com.android.settings.nfc.NfcEnabler;
 import com.android.settings.NsdEnabler;
 
@@ -104,8 +105,15 @@ public class WirelessSettings extends SettingsPreferenceFragment {
         mAirplaneModePreference = (CheckBoxPreference) findPreference(KEY_TOGGLE_AIRPLANE);
 
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
-            findPreference(KEY_MOBILE_NETWORK_SETTINGS).getIntent().setClassName(
-                    "com.android.phone", "com.android.phone.MSimMobileNetworkSettings");
+            findPreference(KEY_MOBILE_NETWORK_SETTINGS)
+                    .getIntent()
+                    .setClassName("com.android.settings",
+                            "com.android.settings.multisimsettings.MultiSimSettingTab");
+            findPreference(KEY_MOBILE_NETWORK_SETTINGS).getIntent().putExtra(
+                    MultiSimSettingsConstants.TARGET_PACKAGE, "com.android.phone");
+            findPreference(KEY_MOBILE_NETWORK_SETTINGS).getIntent().putExtra(
+                    MultiSimSettingsConstants.TARGET_CLASS,
+                    "com.android.phone.MSimMobileNetworkSubSettings");
         }
 
         CheckBoxPreference nfc = (CheckBoxPreference) findPreference(KEY_TOGGLE_NFC);

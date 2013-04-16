@@ -37,8 +37,10 @@ import android.os.storage.IMountService;
 import android.os.storage.StorageEventListener;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.Menu;
@@ -53,6 +55,7 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 /**
  * Panel showing storage usage on disk for known {@link StorageVolume} returned
@@ -61,6 +64,7 @@ import java.util.List;
 public class Memory extends SettingsPreferenceFragment {
     private static final String TAG = "MemorySettings";
 
+    private static final String STORAGE_MGR_KEY = "storage_mgr";    //add new feature:storage manager
     private static final String TAG_CONFIRM_CLEAR_CACHE = "confirmClearCache";
 
     private static final int DLG_CONFIRM_UNMOUNT = 1;
@@ -78,6 +82,9 @@ public class Memory extends SettingsPreferenceFragment {
     private UsbManager mUsbManager;
 
     private ArrayList<StorageVolumePreferenceCategory> mCategories = Lists.newArrayList();
+
+    private String internalStr;    //add new feature:storage manager
+    private String externalStr;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -102,6 +109,26 @@ public class Memory extends SettingsPreferenceFragment {
         }
 
         setHasOptionsMenu(true);
+		
+        //add internal storage
+        if(FeatureQuery.FEATURE_SETTINGS_STORAGE_MANAGER){
+            Utils.updatePreferenceToSpecificActivityOrRemove(getActivity(), (PreferenceGroup)getPreferenceScreen(),
+                    STORAGE_MGR_KEY,
+                    Utils.UPDATE_PREFERENCE_FLAG_SET_TITLE_TO_MATCHING_ACTIVITY);
+            internalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.internal_sd));
+            externalStr = getResources().getString(R.string.summary_storage_manage,getResources().getString(R.string.external_sd));
+        }
+        else{
+            this.getPreferenceScreen().removePreference(findPreference(STORAGE_MGR_KEY));
+        }
+    }
+
+    //add new feature:storage manager
+    private void updateSDMountStatus(){
+        Preference strageManager = findPreference(STORAGE_MGR_KEY);
+        if(strageManager != null){
+            strageManager.setSummary("1".equals(SystemProperties.get("persist.sys.emmcsdcard.enabled")) ? internalStr:externalStr);
+        }
     }
 
     private void addCategory(StorageVolumePreferenceCategory category) {
@@ -131,6 +158,10 @@ public class Memory extends SettingsPreferenceFragment {
 
         for (StorageVolumePreferenceCategory category : mCategories) {
             category.onResume();
+        }
+
+        if(FeatureQuery.FEATURE_SETTINGS_STORAGE_MANAGER){
+            updateSDMountStatus();    //add new feature:storage manager
         }
     }
 

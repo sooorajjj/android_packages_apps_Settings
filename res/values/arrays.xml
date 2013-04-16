@@ -830,6 +830,34 @@
         <!-- Do not translate. -->
         <item>1</item>
     </string-array>
+
+    <string-array name="cabl_level_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    
+    <!--for key backlight-->    
+    <string-array name="key_backlight_entries">
+    <item>Off</item>
+    <item>On</item>
+    <item>Automatic brightness</item>
+    </string-array>
+    
+    <string-array name="key_backlight_values">
+    <item>0</item>
+    <item>1</item>						
+    <item>2</item>
+    </string-array>
+ 
+
+    <!-- Used in choose preferred subscription-->
+    <string-array name="select_slot_items">
+        <item>SLOT1</item>
+        <item>SLOT2</item>
+        <item>Always ask</item>
+    </string-array>
+    
     <!-- CMCC WLAN customization begin-->
     <string-array name="wifi_connect_type_entries">
         <!-- auto connect to wifi -->
@@ -848,4 +876,5 @@
         <item>2</item>
     </string-array>
     <!-- CMCC WLAN customization end-->
+	
 </resources>
