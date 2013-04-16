@@ -47,6 +47,9 @@ public class SyncSettings extends AccountPreferenceBase
     private SettingsDialogFragment mDialogFragment;
     private CheckBoxPreference mAutoSyncPreference;
 
+    private static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
+    private static final String ACCOUNT_TYPE_SIM = "com.android.sim";
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -152,7 +155,7 @@ public class SyncSettings extends AccountPreferenceBase
                 }
             }
 
-            if (showAccount) {
+            if (showAccount && !account.type.equals(ACCOUNT_TYPE_PHONE) && !account.type.equals(ACCOUNT_TYPE_SIM)) {
                 final Drawable icon = getDrawableForType(account.type);
                 final AccountPreference preference =
                         new AccountPreference(getActivity(), account, icon, auths, true);

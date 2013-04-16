@@ -158,8 +158,15 @@ public class MasterClear extends Fragment {
          * others. Likewise, if it's non-removable storage, it could potentially have been
          * encrypted, and will also need to be wiped.
          */
-        boolean isExtStorageEmulated = Environment.isExternalStorageEmulated();
-        if (isExtStorageEmulated
+        /*
+         *unfortunately,isExternalStorageEmulated() just read feature from storage_list.xml
+         *it don't check whether the storage is mounted
+         *even there is no sd card,it also try to format it which cause factory reset fail
+         */
+        //boolean isExtStorageEmulated = Environment.isExternalStorageEmulated();
+        boolean isExtStorageMounted =  Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+
+        if (!isExtStorageMounted
                 || (!Environment.isExternalStorageRemovable() && isExtStorageEncrypted())) {
             mExternalStorageContainer.setVisibility(View.GONE);
 
@@ -171,7 +178,7 @@ public class MasterClear extends Fragment {
 
             // If it's not emulated, it is on a separate partition but it means we're doing
             // a force wipe due to encryption.
-            mExternalStorage.setChecked(!isExtStorageEmulated);
+            mExternalStorage.setChecked(isExtStorageMounted);
         } else {
             mExternalStorageContainer.setOnClickListener(new View.OnClickListener() {
 
@@ -233,6 +240,11 @@ public class MasterClear extends Fragment {
         for (int i=0; i<N; i++) {
             Account account = accounts[i];
             AuthenticatorDescription desc = null;
+            if ((account != null) && (account.type.equals("com.android.sim")
+                    || account.type.equals("com.android.localphone"))){
+                //Do not display SIM & Phone account
+                continue;
+            }
             for (int j=0; j<M; j++) {
                 if (account.type.equals(descs[j].type)) {
                     desc = descs[j];
