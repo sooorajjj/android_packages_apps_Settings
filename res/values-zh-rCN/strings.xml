@@ -1936,6 +1936,7 @@
     <!--auto power on/off function for settings-->
     <string name="hardware_version">硬件版本</string>
     <string name="software_version">软件版本</string>
+    <string name="release_date">发布时间</string>
     <string name="auto_power_settings_title">"自动开关机"</string>
     <string name="auto_on_title">自动开机</string>
     <string name="auto_on_summary_off">开启自动开机</string>
@@ -2020,4 +2021,7 @@
     <string name="erase_internal_storage_description" product="default" >"清除话机U盘中的全部数据，例如音乐或照片"</string>
     <string name="enable_save_log">"保存日志"</string>
     <string name="enable_save_log_summary">"保存日志(需重启话机)"</string>
+    <!-- password for factoryReset-->
+    <string name="unlock_master_clear">"输入密码恢复出厂设置"</string>
+    <string name="unlock_master_clear_error">"密码错误，\n无法恢复出厂设置！"</string>
 </resources>
