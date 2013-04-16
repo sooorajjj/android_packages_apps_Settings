@@ -1051,7 +1051,7 @@
     <string name="location_street_level" product="default" msgid="4617445745492014203">"允许应用使用您手机上的 GPS 定位您的位置"</string>
     <string name="assisted_gps" msgid="4649317129586736885">"使用增强型 GPS"</string>
     <string name="assisted_gps_enabled" msgid="8751899609589792803">"使用服务器来辅助 GPS（取消选中可降低网络使用率）"</string>
-    <string name="assisted_gps_disabled" msgid="6982698333968010748">"使用服务器来辅助 GPS（取消选中可提高 GPS 性能）"</string>
+    <string name="assisted_gps_disabled" msgid="6982698333968010748">"使用服务器来辅助 GPS（选中可提高 GPS 性能）"</string>
     <string name="use_location_title" msgid="5206937465504979977">"位置和 Google 搜索"</string>
     <string name="use_location_summary" msgid="3978805802386162520">"允许 Google 使用您的位置信息改善搜索结果和其他服务"</string>
     <string name="location_access_title" msgid="7064108942964081243">"允许访问我的位置信息"</string>
