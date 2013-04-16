@@ -34,6 +34,9 @@ import android.widget.RelativeLayout;
 public class ApnPreference extends Preference implements
         CompoundButton.OnCheckedChangeListener, OnClickListener {
     final static String TAG = "ApnPreference";
+    private boolean mIsDefaultApn;
+    private int mSubscription;
+    private boolean mClickable = false;
 
     /**
      * @param context
@@ -85,6 +88,8 @@ public class ApnPreference extends Preference implements
 
                 mProtectFromCheckedChange = true;
                 rb.setChecked(isChecked);
+                if(!mClickable)rb.setChecked(mClickable); //if mClickable is false, cancel the apn which was checked..
+                rb.setEnabled(mClickable);
                 mProtectFromCheckedChange = false;
             } else {
                 rb.setVisibility(View.GONE);
@@ -101,6 +106,7 @@ public class ApnPreference extends Preference implements
 
     private void init() {
         setLayoutResource(R.layout.apn_preference_layout);
+        mIsDefaultApn = false;
     }
 
     public boolean isChecked() {
@@ -136,7 +142,10 @@ public class ApnPreference extends Preference implements
             if (context != null) {
                 int pos = Integer.parseInt(getKey());
                 Uri url = ContentUris.withAppendedId(Telephony.Carriers.CONTENT_URI, pos);
-                context.startActivity(new Intent(Intent.ACTION_EDIT, url));
+                Intent intent = new Intent(Intent.ACTION_EDIT, url);
+                intent.putExtra(SelectSubscription.SUBSCRIPTION_KEY,mSubscription);
+                intent.putExtra("DISABLE_EDITOR",mIsDefaultApn);
+                context.startActivity(intent);
             }
         }
     }
@@ -147,5 +156,15 @@ public class ApnPreference extends Preference implements
 
     public boolean getSelectable() {
         return mSelectable;
+    }
+
+    public void setClickable(boolean clickable){
+        mClickable = clickable;
+    }
+    public void setIsDefault(boolean isDefault){
+        mIsDefaultApn = isDefault;
+    }
+    public void setSubscription(int subscription){
+        mSubscription = subscription;
     }
 }

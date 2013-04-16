@@ -43,13 +43,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.telephony.TelephonyManager;
 
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.internal.telephony.MSimConstants;
 
 import java.util.ArrayList;
+
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class ApnSettings extends PreferenceActivity implements
         Preference.OnPreferenceChangeListener {
@@ -60,6 +64,9 @@ public class ApnSettings extends PreferenceActivity implements
         "content://telephony/carriers/restore";
     public static final String PREFERRED_APN_URI =
         "content://telephony/carriers/preferapn";
+    public static final String PREFERRED_APN_URI1 =
+        "content://telephony/carriers/preferapn1";
+    public static final String APN_ID1 = "apn_id1";
     public static final String OPERATOR_NUMERIC_EXTRA = "operator";
 
     public static final String APN_ID = "apn_id";
@@ -79,6 +86,11 @@ public class ApnSettings extends PreferenceActivity implements
 
     private static final Uri DEFAULTAPN_URI = Uri.parse(RESTORE_CARRIERS_URI);
     private static final Uri PREFERAPN_URI = Uri.parse(PREFERRED_APN_URI);
+    private static final Uri PREFERAPN_URI1 = Uri.parse(PREFERRED_APN_URI1);
+    public static final int SUBSCRIPTION_ID_0 = 0;
+    public static final int SUBSCRIPTION_ID_1 = 1;
+
+    private static final String CHINA_UNION_PLMN = "46001";
 
     private static boolean mRestoreDefaultApnMode;
 
@@ -88,6 +100,7 @@ public class ApnSettings extends PreferenceActivity implements
 
     private int mSubscription = 0;
     private String mSelectedKey;
+    private String mSelectedKey1;
 
     private boolean mUseNvOperatorForEhrpd = SystemProperties.getBoolean(
             "persist.radio.use_nv_for_ehrpd", false);
@@ -128,6 +141,7 @@ public class ApnSettings extends PreferenceActivity implements
 
         addPreferencesFromResource(R.xml.apn_settings);
         getListView().setItemsCanFocus(true);
+        if (TelephonyManager.isMultiSimEnabled())
         mSubscription = getIntent().getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
         Log.d(TAG, "onCreate received sub :" + mSubscription);
@@ -151,7 +165,7 @@ public class ApnSettings extends PreferenceActivity implements
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
+        if (TelephonyManager.isMultiSimEnabled())
         mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
         Log.d(TAG, "onNewIntent received sub :" + mSubscription);
@@ -174,6 +188,10 @@ public class ApnSettings extends PreferenceActivity implements
     }
 
     private void fillList() {
+        if(!hasValidCard())
+        {
+          return;
+        }
         String where = getOperatorNumericSelection();
         Cursor cursor = getContentResolver().query(Telephony.Carriers.CONTENT_URI, new String[] {
                 "_id", "name", "apn", "type"}, where, null,
@@ -182,17 +200,80 @@ public class ApnSettings extends PreferenceActivity implements
         PreferenceGroup apnList = (PreferenceGroup) findPreference("apn_list");
         apnList.removeAll();
 
+        ArrayList<String> apnKeyList = new ArrayList<String>();
         ArrayList<Preference> mmsApnList = new ArrayList<Preference>();
 
-        mSelectedKey = getSelectedApnKey();
+         if(mSubscription==SUBSCRIPTION_ID_0)
+             mSelectedKey = getSelectedApnKey();
+         else if(mSubscription==SUBSCRIPTION_ID_1)
+             mSelectedKey = getSelectedApnKey1();
+
+        int defaultSub = TelephonyManager.getDefault().isMultiSimEnabled() ? MSimTelephonyManager.getDefault().getPreferredDataSubscription() : MSimConstants.DEFAULT_SUBSCRIPTION;
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             String name = cursor.getString(NAME_INDEX);
             String apn = cursor.getString(APN_INDEX);
             String key = cursor.getString(ID_INDEX);
             String type = cursor.getString(TYPES_INDEX);
+            String operatorNum = null;
+
+            if(TelephonyManager.getDefault().isMultiSimEnabled())
+            {
+              operatorNum = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
+            }
+            else
+            {
+              operatorNum = TelephonyManager.getDefault().getSimOperator();
+            }
+
+            //remove AGPS for china union
+            if( FeatureQuery.FEATURE_HIDE_CHINAUNION_SUPL && CHINA_UNION_PLMN.equals(operatorNum)
+                    && type.equals("supl") ){
+                cursor.moveToNext();
+                continue;
+            }
+
+            if(type.equals("dm")){
+                cursor.moveToNext();
+                continue;
+            }
+
+            apnKeyList.add(key);
 
             ApnPreference pref = new ApnPreference(this);
+            pref.setSubscription(mSubscription);
+
+            if (name.contains("ro.")){
+                //for china union
+                if (CHINA_UNION_PLMN.equals(operatorNum)){
+                    if (type.equals("default")){
+                        if (name.contains("wap")){
+                            name = getString(R.string.china_union_wap_apn_name);
+                        }else{
+                            name = getString(R.string.china_union_net_apn_name);
+                        }
+                    }
+                    if (type.equals("mms")) name = getString(R.string.china_union_mms_apn_name);
+                    if (type.equals("supl")) name = getString(R.string.china_union_supl_apn_name);
+                    pref.setIsDefault(true);
+                }
+            }
+            //for china telecom
+            if (apn.equals("ctnet")){
+                name = getString(R.string.china_telecom_net_apn_name);
+            }else if (apn.equals("ctwap")){
+                name = getString(R.string.china_telecom_wap_apn_name);
+            }
+
+            //for china mobile
+            if (name.equals("China Mobile")){
+                name = getString(R.string.china_mobile_net_apn_name);
+            }else if (name.equals("China Mobile MMS")){
+                name = getString(R.string.china_mobile_mms_apn_name);
+            }else if (name.equals("China Mobile WAP")){
+                name = getString(R.string.china_mobile_wap_apn_name);
+            }
 
             pref.setKey(key);
             pref.setTitle(name);
@@ -203,8 +284,11 @@ public class ApnSettings extends PreferenceActivity implements
             boolean selectable = ((type == null) || !type.equals("mms"));
             pref.setSelectable(selectable);
             if (selectable) {
+                pref.setClickable(defaultSub == mSubscription);
+                if(defaultSub == mSubscription){
                 if ((mSelectedKey != null) && mSelectedKey.equals(key)) {
                     pref.setChecked();
+                    }
                 }
                 apnList.addPreference(pref);
             } else {
@@ -216,6 +300,14 @@ public class ApnSettings extends PreferenceActivity implements
 
         for (Preference preference : mmsApnList) {
             apnList.addPreference(preference);
+        }
+
+        //if mSelectedKey not in current slot's apn list, reset mSelectedKey and save it in preference,
+        //and then refresh the page of apnlist.
+        if(defaultSub == mSubscription && !"-1".equals(mSelectedKey)
+                && null != mSelectedKey && !apnKeyList.contains(mSelectedKey)){
+            setSelectedApnKey("-1");
+            fillList();
         }
     }
 
@@ -255,7 +347,9 @@ public class ApnSettings extends PreferenceActivity implements
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         int pos = Integer.parseInt(preference.getKey());
         Uri url = ContentUris.withAppendedId(Telephony.Carriers.CONTENT_URI, pos);
-        startActivity(new Intent(Intent.ACTION_EDIT, url));
+        Intent intent = new Intent(Intent.ACTION_EDIT, url);
+        intent.putExtra(SelectSubscription.SUBSCRIPTION_KEY,mSubscription);
+        startActivity(intent);
         return true;
     }
 
@@ -264,19 +358,34 @@ public class ApnSettings extends PreferenceActivity implements
                 + ", newValue - " + newValue + ", newValue type - "
                 + newValue.getClass());
         if (newValue instanceof String) {
-            setSelectedApnKey((String) newValue);
+            if(mSubscription==SUBSCRIPTION_ID_0){
+                setSelectedApnKey((String) newValue);
+            }else if(mSubscription==SUBSCRIPTION_ID_1){
+                setSelectedApnKey1((String) newValue);
+            }
         }
 
         return true;
     }
 
     private void setSelectedApnKey(String key) {
+        Log.v(TAG, "setSelectedApnKey, key = " + key);
         mSelectedKey = key;
         ContentResolver resolver = getContentResolver();
 
         ContentValues values = new ContentValues();
         values.put(APN_ID, mSelectedKey);
         resolver.update(PREFERAPN_URI, values, null, null);
+    }
+
+    private void setSelectedApnKey1(String key) {
+        Log.v(TAG, "setSelectedApnKey1, key = " + key);
+        mSelectedKey1 = key;
+        ContentResolver resolver = getContentResolver();
+
+        ContentValues values = new ContentValues();
+        values.put(APN_ID1, mSelectedKey1);
+        resolver.update(PREFERAPN_URI1, values, null, null);
     }
 
     private String getSelectedApnKey() {
@@ -292,10 +401,23 @@ public class ApnSettings extends PreferenceActivity implements
         return key;
     }
 
+    private String getSelectedApnKey1() {
+        String key = null;
+
+        Cursor cursor = getContentResolver().query(PREFERAPN_URI1, new String[] {"_id"},
+                null, null, Telephony.Carriers.DEFAULT_SORT_ORDER);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            key = cursor.getString(ID_INDEX);
+        }
+        cursor.close();
+        return key;
+    }
+
     private boolean restoreDefaultApn() {
         showDialog(DIALOG_RESTORE_DEFAULTAPN);
         mRestoreDefaultApnMode = true;
-
+        Log.v(TAG, "restoreDefaultApn " );
         if (mRestoreApnUiHandler == null) {
             mRestoreApnUiHandler = new RestoreApnUiHandler();
         }
@@ -383,17 +505,50 @@ public class ApnSettings extends PreferenceActivity implements
 
     private String[] getOperatorNumeric() {
         ArrayList<String> result = new ArrayList<String>();
+        String mccMncFromSim = null;
         if (mUseNvOperatorForEhrpd) {
             String mccMncForEhrpd = SystemProperties.get("ro.cdma.home.operator.numeric", null);
             if (mccMncForEhrpd != null && mccMncForEhrpd.length() > 0) {
                 result.add(mccMncForEhrpd);
             }
         }
-        String mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
+        if(!TelephonyManager.getDefault().isMultiSimEnabled())
+        {
+            mccMncFromSim = TelephonyManager.getDefault().getSimOperator();
+        }
+        else
+        {
+         mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
                 TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
+       }
         if (mccMncFromSim != null && mccMncFromSim.length() > 0) {
             result.add(mccMncFromSim);
         }
         return result.toArray(new String[2]);
+    }
+
+    private boolean hasValidCard()
+    {
+      boolean hasCard = false;
+      String mccMncFromSim = null;
+
+      if(!TelephonyManager.getDefault().isMultiSimEnabled()){
+        hasCard = TelephonyManager.getDefault().hasIccCard();
+        mccMncFromSim = TelephonyManager.getDefault().getSimOperator();
+      }
+      else
+      {
+        hasCard = MSimTelephonyManager.getDefault().hasIccCard(mSubscription);
+        mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC, mSubscription, null);
+      }
+      Log.d(TAG, "hasValidCard hascard=" + hasCard + ", mccmnc=" + mccMncFromSim);
+      if(hasCard){
+        if(mccMncFromSim != null && mccMncFromSim.length() > 0) {
+          return true;
+        }
+      }
+
+      return false;
     }
 }
