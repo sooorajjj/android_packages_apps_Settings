@@ -83,9 +83,6 @@ public class AccountSyncSettings extends AccountPreferenceBase {
                 new ArrayList<SyncStateCheckBoxPreference>();
     private ArrayList<SyncAdapterType> mInvisibleAdapters = Lists.newArrayList();
 
-    private static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
-    private static final String ACCOUNT_TYPE_SIM = "com.android.sim";
-
     @Override
     public Dialog onCreateDialog(final int id) {
         Dialog dialog = null;
@@ -236,14 +233,12 @@ public class AccountSyncSettings extends AccountPreferenceBase {
         MenuItem syncCancel = menu.add(0, MENU_SYNC_CANCEL_ID, 0,
                 getString(R.string.sync_menu_sync_cancel))
                 .setIcon(com.android.internal.R.drawable.ic_menu_close_clear_cancel);
-        if(!mAccount.type.equals(ACCOUNT_TYPE_PHONE) && !mAccount.type.equals(ACCOUNT_TYPE_SIM)){
-            MenuItem removeAccount = menu.add(0, MENU_REMOVE_ACCOUNT_ID, 0,
+        MenuItem removeAccount = menu.add(0, MENU_REMOVE_ACCOUNT_ID, 0,
                 getString(R.string.remove_account_label))
                 .setIcon(R.drawable.ic_menu_delete_holo_dark);
 
-            removeAccount.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER |
+        removeAccount.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER |
                 MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        }
         syncNow.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER |
                 MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         syncCancel.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER |
