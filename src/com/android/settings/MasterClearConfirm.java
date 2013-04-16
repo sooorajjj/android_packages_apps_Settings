@@ -109,54 +109,54 @@ public class MasterClearConfirm extends Fragment {
                                         }
                                          *///delete the adjust , use the default password-000000, need to modify later
                                     if (password.equals("000000")) {
-										pwdChk = true;
-									}else{
-									    pwdChk = false;
-									}
-                                    } catch (FileNotFoundException ex) {
-                                        if (password.equals("000000")) {
-                                            pwdChk = true;
-                                        } else {
-                                            pwdChk = false;
-                                        }
-                                    } catch (IOException ex) {
-                                        if (password.equals("000000")) {
-                                            pwdChk = true;
-                                        } else {
-                                            pwdChk = false;
-                                        }
-                                    } catch (Exception ex) {
-                                        if (password.equals("000000")) {
-                                            pwdChk = true;
-                                        } else {
-                                            pwdChk = false;
-                                        }
+                                        pwdChk = true;
+                                    }else{
+                                        pwdChk = false;
                                     }
-	
-                                    if (pwdChk) {
-                                        getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
+                                } catch (FileNotFoundException ex) {
+                                    if (password.equals("000000")) {
+                                        pwdChk = true;
                                     } else {
-                                        Toast.makeText(getActivity(), R.string.unlock_master_clear_error,
-                                                Toast.LENGTH_LONG).show();
+                                        pwdChk = false;
+                                    }
+                                } catch (IOException ex) {
+                                    if (password.equals("000000")) {
+                                        pwdChk = true;
+                                    } else {
+                                        pwdChk = false;
+                                    }
+                                } catch (Exception ex) {
+                                    if (password.equals("000000")) {
+                                        pwdChk = true;
+                                    } else {
+                                        pwdChk = false;
                                     }
                                 }
-                            }
-                            ).show();
-            }else{
-            if (mEraseSdCard && !mErasePhoneStorage) {
-                Intent intent = new Intent(ExternalStorageFormatter.FORMAT_AND_FACTORY_RESET);
-                intent.setComponent(ExternalStorageFormatter.COMPONENT_NAME);
-                getActivity().startService(intent);
-            }else if (mEraseSdCard && mErasePhoneStorage) {
-                Intent intent = new Intent(PhoneStorageFormatter.FORMAT_ALL_AND_FACTORY_RESET);
-                getActivity().startService(intent);
-            }else if (mErasePhoneStorage && !mEraseSdCard) {
-                Intent intent = new Intent(PhoneStorageFormatter.FORMAT_AND_FACTORY_RESET);
-                getActivity().startService(intent);
 
-            } else {
-                getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
-                // Intent handling is asynchronous -- assume it will happen soon.
+                                if (pwdChk) {
+                                    getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
+                                } else {
+                                    Toast.makeText(getActivity(), R.string.unlock_master_clear_error,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                        ).show();
+            }else{
+                if (mEraseSdCard && !mErasePhoneStorage) {
+                    Intent intent = new Intent(ExternalStorageFormatter.FORMAT_AND_FACTORY_RESET);
+                    intent.setComponent(ExternalStorageFormatter.COMPONENT_NAME);
+                    getActivity().startService(intent);
+                }else if (mEraseSdCard && mErasePhoneStorage) {
+                    Intent intent = new Intent(PhoneStorageFormatter.FORMAT_ALL_AND_FACTORY_RESET);
+                    getActivity().startService(intent);
+                }else if (mErasePhoneStorage && !mEraseSdCard) {
+                    Intent intent = new Intent(PhoneStorageFormatter.FORMAT_AND_FACTORY_RESET);
+                    getActivity().startService(intent);
+
+                } else {
+                    getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
+                    // Intent handling is asynchronous -- assume it will happen soon.
                 }
             }
         }
