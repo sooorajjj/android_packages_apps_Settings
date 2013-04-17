@@ -230,16 +230,22 @@ public class SecuritySettings extends SettingsPreferenceFragment
                 } else {
                     // Disable SIM lock if sim card is missing or unknown
                     removeLock = false;
+                    break;
+                }
+            }
+            if (!mIsPrimary || removeLock) {
+                root.removePreference(root.findPreference(KEY_SIM_LOCK));
+            }
+            if(!removeLock){
+                for (int i = 0; i < numPhones; i++) {
                     if ((tm.getSimState(i) == TelephonyManager.SIM_STATE_ABSENT)
                             || (tm.getSimState(i) == TelephonyManager.SIM_STATE_UNKNOWN)) {
                         disableLock = true;
                     } else {
                         disableLock = false;
+                        break;
                     }
                 }
-            }
-            if (!mIsPrimary || removeLock) {
-                root.removePreference(root.findPreference(KEY_SIM_LOCK));
             }
             if (disableLock) {
                 if (root.findPreference(KEY_SIM_LOCK) != null) {
