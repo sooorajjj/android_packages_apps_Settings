@@ -91,6 +91,9 @@ public class LocationSettings extends SettingsPreferenceFragment
         mGps = (CheckBoxPreference) root.findPreference(KEY_LOCATION_GPS);
         mAssistedGps = (CheckBoxPreference) root.findPreference(KEY_ASSISTED_GPS);
 
+        String mNetworkSummary = android.net.wifi.WifiManager.replaceAllWiFi(mNetwork.getTitle().toString());
+        mNetwork.setTitle(mNetworkSummary);
+
         mLocationAccess.setOnPreferenceChangeListener(this);
         return root;
     }
