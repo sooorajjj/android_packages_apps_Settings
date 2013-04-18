@@ -549,7 +549,7 @@
     <string name="wifi_menu_wps_pbc" msgid="2668564692207863017">"WPS 按鈕"</string>
     <string name="wifi_menu_more_options" msgid="2448097861752719396">"更多選項"</string>
     <string name="wifi_menu_wps_pin" msgid="6426448256268695933">"輸入 WPS 個人識別碼"</string>
-    <string name="wifi_menu_p2p" msgid="2575893749303670353">"WiFi Direct"</string>
+    <string name="wifi_menu_p2p" msgid="2575893749303670353">"WiFi 直接連接"</string>
     <string name="wifi_menu_scan" msgid="1470911530412095868">"掃描"</string>
     <string name="wifi_menu_advanced" msgid="7522252991919573664">"進階"</string>
     <string name="wifi_menu_connect" msgid="4996220309848349408">"連線至網路"</string>
