@@ -143,6 +143,8 @@ public class RadioInfo extends Activity {
     private boolean mMwiValue = false;
     private boolean mCfiValue = false;
     private List<CellInfo> mCellInfoValue;
+    // define the mPreferredNetworkLabels
+    private String[] mPreferredNetworkLabels = null;
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
         @Override
@@ -232,7 +234,9 @@ public class RadioInfo extends Activity {
                 case EVENT_QUERY_SMSC_DONE:
                     ar= (AsyncResult) msg.obj;
                     if (ar.exception != null) {
-                        smsc.setText("refresh error");
+
+                        // get the smsc_refresh_error from string.xml file.
+                        smsc.setText(getResources().getString(R.string.smsc_refresh_error));
                     } else {
                         smsc.setText((String)ar.result);
                     }
@@ -241,7 +245,9 @@ public class RadioInfo extends Activity {
                     updateSmscButton.setEnabled(true);
                     ar= (AsyncResult) msg.obj;
                     if (ar.exception != null) {
-                        smsc.setText("update error");
+
+                        // get the smsc_update_error from string.xml file.
+                        smsc.setText(getResources().getString(R.string.smsc_update_error));
                     }
                     break;
                 default:
@@ -288,7 +294,8 @@ public class RadioInfo extends Activity {
         mPingIpAddr = (TextView) findViewById(R.id.pingIpAddr);
         mPingHostname = (TextView) findViewById(R.id.pingHostname);
         mHttpClientTest = (TextView) findViewById(R.id.httpClientTest);
-
+        // get the preferred network type from stringarray
+        mPreferredNetworkLabels = getApplicationContext().getResources().getStringArray(R.array.preferred_network);
         preferredNetworkType = (Spinner) findViewById(R.id.preferredNetworkType);
         ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
                 android.R.layout.simple_spinner_item, mPreferredNetworkLabels);
@@ -438,8 +445,9 @@ public class RadioInfo extends Activity {
     }
 
     private void updateDnsCheckState() {
-        dnsCheckState.setText(phone.isDnsCheckDisabled() ?
-                "0.0.0.0 allowed" :"0.0.0.0 not allowed");
+
+        // get the dnscheckstate from string.xml.
+        dnsCheckState.setText(phone.isDnsCheckDisabled() ?getResources().getString(R.string.dns_allowed):getResources().getString(R.string.dns_not_allowed));
     }
 
     private final void
@@ -543,12 +551,16 @@ public class RadioInfo extends Activity {
 
     private final void
     updateMessageWaiting() {
-        mMwi.setText(String.valueOf(mMwiValue));
+        // mMwi.setText(String.valueOf(mMwiValue));
+        // get the message waiting from string.xml
+        mMwi.setText(mMwiValue ? getResources().getString(R.string.message_waiting_true):getResources().getString(R.string.message_waiting_false));
     }
 
     private final void
     updateCallRedirect() {
-        mCfi.setText(String.valueOf(mCfiValue));
+        // mCfi.setText(String.valueOf(mCfiValue));
+        // get the message call redirect from string.xml
+       mCfi.setText(mMwiValue ? getResources().getString(R.string.message_callredirect_true):getResources().getString(R.string.message_callredirect_false));
     }
 
 
@@ -1057,18 +1069,4 @@ public class RadioInfo extends Activity {
         }
     };
 
-    private String[] mPreferredNetworkLabels = {
-            "WCDMA preferred",
-            "GSM only",
-            "WCDMA only",
-            "GSM auto (PRL)",
-            "CDMA auto (PRL)",
-            "CDMA only",
-            "EvDo only",
-            "GSM/CDMA auto (PRL)",
-            "LTE/CDMA auto (PRL)",
-            "LTE/GSM auto (PRL)",
-            "LTE/GSM/CDMA auto (PRL)",
-            "LTE only",
-            "Unknown"};
 }
