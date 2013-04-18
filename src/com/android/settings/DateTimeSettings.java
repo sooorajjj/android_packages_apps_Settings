@@ -110,7 +110,18 @@ public class DateTimeSettings extends SettingsPreferenceFragment
             getPreferenceScreen().removePreference(mTime24Pref);
             getPreferenceScreen().removePreference(mDateFormat);
         }
+        // Set initial date to ListPreference mDateFormat's value.
+        updateDateFormatList();
+        mTimePref.setEnabled(!autoTimeEnabled);
+        mDatePref.setEnabled(!autoTimeEnabled);
+        mTimeZone.setEnabled(!autoTimeZoneEnabled);
+    }
 
+   /*
+    * Upate ListPreference mDateFormat, set inner entries's value equal current year.
+    * Not only for initial, also for every new date set to system date.
+    */
+    private void updateDateFormatList() {
         String [] dateFormats = getResources().getStringArray(R.array.date_format_values);
         String [] formattedDates = new String[dateFormats.length];
         String currentFormat = getDateFormat();
@@ -135,10 +146,6 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         mDateFormat.setEntries(formattedDates);
         mDateFormat.setEntryValues(R.array.date_format_values);
         mDateFormat.setValue(currentFormat);
-
-        mTimePref.setEnabled(!autoTimeEnabled);
-        mDatePref.setEnabled(!autoTimeEnabled);
-        mTimeZone.setEnabled(!autoTimeZoneEnabled);
     }
 
     @Override
@@ -181,6 +188,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         mDatePref.setSummary(shortDateFormat.format(now.getTime()));
         mDateFormat.setSummary(shortDateFormat.format(dummyDate));
         mTime24Pref.setSummary(DateFormat.getTimeFormat(getActivity()).format(dummyDate));
+        // Update ListPreference mDateFormat's value after setting new date.
+        updateDateFormatList();
     }
 
     @Override
