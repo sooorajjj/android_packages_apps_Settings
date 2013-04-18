@@ -102,14 +102,16 @@ public class Memory extends SettingsPreferenceFragment {
         addCategory(StorageVolumePreferenceCategory.buildForInternal(context));
 
         final StorageVolume[] storageVolumes = mStorageManager.getVolumeList();
-        for (StorageVolume volume : storageVolumes) {
-            if (!volume.isEmulated()) {
-                addCategory(StorageVolumePreferenceCategory.buildForPhysical(context, volume));
-            }
-        }
+        int length = storageVolumes.length;
+        for(int i=length-1; i>=0; i--){
+               StorageVolume storageVolume = storageVolumes[i];
+               if (!storageVolume.isEmulated()) {
+                   addCategory(StorageVolumePreferenceCategory.buildForPhysical(context, storageVolume));
+               }
+           }
 
         setHasOptionsMenu(true);
-		
+
         //add internal storage
         if(FeatureQuery.FEATURE_SETTINGS_STORAGE_MANAGER){
             Utils.updatePreferenceToSpecificActivityOrRemove(getActivity(), (PreferenceGroup)getPreferenceScreen(),
