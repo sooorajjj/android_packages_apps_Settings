@@ -91,11 +91,32 @@
                     android:text="@string/credentials_password_too_short"
                     android:layout_marginBottom="10sp"/>
 
-            <CheckBox android:id="@+id/show_password"
-                    style="?android:attr/textAppearanceSmall"
+            <!-- There is a fascinating bug, When we have an activity running in the background,
+                 and we switch locales, and we switch back to the application, everything updates...
+                 EXCEPT checkboxes and radio buttons that have an 'android:id' attribute set.
+                 The problem is in 'CompoundButton.onSaveInstanceState()' method.
+                 It calls 'setFreezesText(true)'.
+                 So, We can remove 'setFreezesText(true)' from 'CompoundButton.onSaveInstanceState()',
+                 but it's too risky and not logical.
+                 And we have some workarounds:
+                 1. Make our own MyCheckBox extends CheckBox, and Override onSaveInstanceState(),
+                    but base on our code, there's too much to change. So I didn't adopt this method.
+                 2. As I did below, I change a checkbox(with text) to a checkbox(without text)
+                    and a textview.
+            -->
+            <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/wifi_show_password" />
+                    android:orientation="horizontal">
+                    <CheckBox android:id="@+id/show_password"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    <TextView
+                            style="?android:attr/textAppearanceSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/wifi_show_password"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
