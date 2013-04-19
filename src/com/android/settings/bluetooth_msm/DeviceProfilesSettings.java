@@ -29,6 +29,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -50,6 +51,7 @@ import java.util.HashMap;
 public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         implements CachedBluetoothDevice.Callback, Preference.OnPreferenceChangeListener {
     private static final String TAG = "DeviceProfilesSettings";
+    private static final int BLUETOOTH_NAME_MAX_LENGTH_BYTES = 248;
 
     private static final String KEY_RENAME_DEVICE = "rename_device";
     private static final String KEY_PROFILE_CONTAINER = "profile_container";
@@ -175,6 +177,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
             finish();
         refresh();
         EditText et = mDeviceNamePref.getEditText();
+        et.setFilters(new InputFilter[] { new Utf8ByteLengthFilter(BLUETOOTH_NAME_MAX_LENGTH_BYTES)});
         if (et != null) {
             et.addTextChangedListener(mRenameDeviceNamePref);
             Dialog d = mDeviceNamePref.getDialog();

@@ -93,6 +93,8 @@ public class Settings extends PreferenceActivity
 
     private static final String SAVE_KEY_CURRENT_HEADER = "com.android.settings.CURRENT_HEADER";
     private static final String SAVE_KEY_PARENT_HEADER = "com.android.settings.PARENT_HEADER";
+    private static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
+    private static final String ACCOUNT_TYPE_SIM = "com.android.sim";
 
     private String mFragmentClass;
     private int mTopLevelHeaderId;
@@ -544,7 +546,10 @@ public class Settings extends PreferenceActivity
                             label.toString());
                 }
             }
-            accountHeaders.add(accHeader);
+            //If the account type is Phone or SIM.It will dismiss
+            if (!accountType.equals(ACCOUNT_TYPE_PHONE) && !accountType.equals(ACCOUNT_TYPE_SIM)) {
+                accountHeaders.add(accHeader);
+            }
         }
 
         // Sort by label

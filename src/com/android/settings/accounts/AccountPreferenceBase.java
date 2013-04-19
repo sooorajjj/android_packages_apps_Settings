@@ -49,6 +49,8 @@ class AccountPreferenceBase extends SettingsPreferenceFragment
     protected static final String TAG = "AccountSettings";
     public static final String AUTHORITIES_FILTER_KEY = "authorities";
     public static final String ACCOUNT_TYPES_FILTER_KEY = "account_types";
+    public static final String ACCOUNT_TYPE_SIM = "com.android.sim";
+    public static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
     private final Handler mHandler = new Handler();
     private Object mStatusChangeListenerHandle;
     private HashMap<String, ArrayList<String>> mAccountTypeToAuthorities = null;
@@ -147,7 +149,9 @@ class AccountPreferenceBase extends SettingsPreferenceFragment
             AuthenticatorDescription desc = null;
             try {
                 desc = mAuthenticatorHelper.getAccountTypeDescription(accountType);
-                if (desc != null && desc.accountPreferencesId != 0) {
+                if (desc != null && desc.accountPreferencesId != 0 &&
+                !ACCOUNT_TYPE_PHONE.equals(accountType) &&
+                !ACCOUNT_TYPE_SIM.equals(accountType)) {
                     Context authContext = getActivity().createPackageContext(desc.packageName, 0);
                     prefs = getPreferenceManager().inflateFromResource(authContext,
                             desc.accountPreferencesId, parent);
