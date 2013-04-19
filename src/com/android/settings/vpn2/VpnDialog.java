@@ -200,8 +200,14 @@ class VpnDialog extends AlertDialog implements TextWatcher,
 
     @Override
     public void onClick(View showOptions) {
-        showOptions.setVisibility(View.GONE);
-        mView.findViewById(R.id.options).setVisibility(View.VISIBLE);
+        // Not let advance option checkbox gone.
+        // If checkbox is checked show advance view else let advance view gone.
+        // showOptions.setVisibility(View.GONE);
+        if (((CheckBox)showOptions).isChecked()) {
+            mView.findViewById(R.id.options).setVisibility(View.VISIBLE);
+        } else {
+            mView.findViewById(R.id.options).setVisibility(View.GONE);
+        }
     }
 
     @Override
