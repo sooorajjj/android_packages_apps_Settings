@@ -35,6 +35,8 @@ import android.widget.TextView;
 
 import com.android.settings.R;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Dialog to configure the SSID and security settings
  * for Access Point operation
@@ -49,6 +51,8 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     public static final int OPEN_INDEX = 0;
     public static final int WPA_INDEX = 1;
     public static final int WPA2_INDEX = 2;
+
+    private static final int SSID_MAX_LEN = 32;
 
     private View mView;
     private TextView mSsid;
@@ -178,6 +182,18 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     }
 
     public void afterTextChanged(Editable editable) {
+        int length = 0;
+        if (0 < editable.length()) {
+            try {
+                byte[] ssid = editable.toString().getBytes("UTF-8");
+                length = ssid.length;
+            } catch (UnsupportedEncodingException e) {
+            }
+            // here we only need to deal with ssid input event.
+            if (editable.length() != length && SSID_MAX_LEN < length) {
+                editable = editable.delete(editable.length() - 1, editable.length());
+            }
+        }
         validate();
     }
 
