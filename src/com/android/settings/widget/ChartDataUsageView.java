@@ -68,6 +68,9 @@ public class ChartDataUsageView extends ChartView {
     /** Current maximum value of {@link #mVert}. */
     private long mVertMax;
 
+    private static ChartSweepView mSweepmLimiStatic;
+    private static boolean mIsSweepDone = true;
+
     public interface DataUsageChartListener {
         public void onInspectRangeChanged();
         public void onWarningChanged();
@@ -116,6 +119,7 @@ public class ChartDataUsageView extends ChartView {
         mSweepRight = (ChartSweepView) findViewById(R.id.sweep_right);
         mSweepLimit = (ChartSweepView) findViewById(R.id.sweep_limit);
         mSweepWarning = (ChartSweepView) findViewById(R.id.sweep_warning);
+        mSweepmLimiStatic = mSweepLimit;
 
         // prevent sweeps from crossing each other
         mSweepLeft.setValidRangeDynamic(null, mSweepRight);
@@ -327,6 +331,7 @@ public class ChartDataUsageView extends ChartView {
         @Override
         public void onSweep(ChartSweepView sweep, boolean sweepDone) {
             if (sweepDone) {
+                mIsSweepDone = true;
                 clearUpdateAxisDelayed(sweep);
                 updateEstimateVisible();
 
@@ -336,6 +341,7 @@ public class ChartDataUsageView extends ChartView {
                     mListener.onLimitChanged();
                 }
             } else {
+                mIsSweepDone = false;
                 // while moving, kick off delayed grow/shrink axis updates
                 sendUpdateAxisDelayed(sweep, false);
             }
@@ -599,6 +605,7 @@ public class ChartDataUsageView extends ChartView {
 
         private static final Object sSpanSize = new Object();
         private static final Object sSpanUnit = new Object();
+        private static final Object sSpace = new Object();
 
         @Override
         public long buildLabel(Resources res, SpannableStringBuilder builder, long value) {
@@ -627,6 +634,16 @@ public class ChartDataUsageView extends ChartView {
 
             setText(builder, sSpanSize, size, "^1");
             setText(builder, sSpanUnit, unit, "^2");
+
+            if (mIsSweepDone) {
+                if ((mSweepmLimiStatic.getValue() <= 0)
+                        && (TextUtils.indexOf(builder, "\n") > -1)) {
+                    setText(builder, sSpace, "/", "\n");
+                } else if ((mSweepmLimiStatic.getValue() > 0)
+                        && (TextUtils.indexOf(builder, "/")) > -1) {
+                    setText(builder, sSpace, "\n", "/");
+                }
+            }
 
             return (long) resultRounded;
         }
