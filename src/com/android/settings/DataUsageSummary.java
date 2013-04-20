@@ -467,7 +467,7 @@ public class DataUsageSummary extends Fragment {
         split4g.setChecked(isMobilePolicySplit());
 
         final MenuItem showWifi = menu.findItem(R.id.data_usage_menu_show_wifi);
-        if (hasWifiRadio(context) && hasReadyMobileRadio(context)) {
+        if (hasWifiRadio(context)) {
             showWifi.setVisible(!appDetailMode);
             showWifi.setChecked(mShowWifi);
         } else {
