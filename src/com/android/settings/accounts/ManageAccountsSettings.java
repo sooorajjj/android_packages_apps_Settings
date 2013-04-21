@@ -300,6 +300,8 @@ public class ManageAccountsSettings extends AccountPreferenceBase
         }
 
         mErrorInfoView.setVisibility(anySyncFailed ? View.VISIBLE : View.GONE);
+        // If we find the state of sync is update, we need invalidate the option menu.
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override
