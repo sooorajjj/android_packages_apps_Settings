@@ -622,7 +622,8 @@
                 <action android:name="com.android.settings.MULTI_SIM_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
+                <!-- not display this shortcut on the widget shortcut -->
+                <!-- <category android:name="com.android.settings.SHORTCUT" /> -->
             </intent-filter>
         </activity>
 
