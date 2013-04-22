@@ -259,6 +259,8 @@ public class WifiConfigController implements TextWatcher,
             }
         }
 
+        if (mPasswdCheckBox) mPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+
         mConfigUi.setCancelButton(context.getString(R.string.wifi_cancel));
         if (mConfigUi.getSubmitButton() != null) {
             enableSubmitIfAppropriate();
@@ -733,7 +735,6 @@ public class WifiConfigController implements TextWatcher,
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         // work done in afterTextChanged
-        if (mPasswdCheckBox) mPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
     @Override
