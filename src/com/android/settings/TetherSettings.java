@@ -588,7 +588,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                     mWifiManager.setWifiApConfiguration(mWifiConfig);
                 }
                 int index = WifiApDialog.getSecurityTypeIndex(mWifiConfig);
-                mCreateNetwork.setSummary(String.format(getActivity().getString(CONFIG_SUBTEXT),
+                mCreateNetwork.setSummary(String.format(WifiManager.replaceAllWiFi(getActivity().getString(CONFIG_SUBTEXT)),
                         mWifiConfig.SSID,
                         mSecurityType[index]));
             }
