@@ -18,15 +18,19 @@ package com.android.settings;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.SystemProperties;
@@ -49,8 +53,9 @@ import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class DateTimeSettings extends SettingsPreferenceFragment
         implements OnSharedPreferenceChangeListener,
-                TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
-
+                TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener ,
+                DialogInterface.OnClickListener,OnCancelListener {
+    private static final String TAG = "DateTimeSettings";
     private static final String HOURS_12 = "12";
     private static final String HOURS_24 = "24";
 
@@ -59,19 +64,25 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     private Calendar mDummyDate;
 
     private static final String KEY_DATE_FORMAT = "date_format";
-    private static final String KEY_AUTO_TIME = "auto_time";
+    private static final String KEY_AUTO_TIME = "auto_time_list";
     private static final String KEY_AUTO_TIME_ZONE = "auto_zone";
 
     private static final int DIALOG_DATEPICKER = 0;
     private static final int DIALOG_TIMEPICKER = 1;
+	
+    // add for GPS time sync feature
+    private static final int DIALOG_GPS_CONFIRM = 2;
+    private static final int AUTO_TIME_NETWORK_INDEX = 0;
+    private static final int AUTO_TIME_GPS_INDEX = 1;
+    private static final int AUTO_TIME_OFF_INDEX = 2;
 
     private static final boolean isTimeServicesDaemonEnabled =
             SystemProperties.getBoolean("persist.timed.enable", false);
 
     // have we been launched from the setup wizard?
     protected static final String EXTRA_IS_FIRST_RUN = "firstRun";
-
-    private CheckBoxPreference mAutoTimePref;
+    // add GPS time Sync feature
+    private ListPreference mAutoTimePref;
     private Preference mTimePref;
     private Preference mTime24Pref;
     private CheckBoxPreference mAutoTimeZonePref;
@@ -91,14 +102,22 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     private void initUI() {
         boolean autoTimeEnabled = getAutoState(Settings.Global.AUTO_TIME);
         boolean autoTimeZoneEnabled = getAutoState(Settings.Global.AUTO_TIME_ZONE);
-
+        boolean autoTimeGpsEnabled = getAutoState(Settings.System.AUTO_TIME_GPS);
         Intent intent = getActivity().getIntent();
         boolean isFirstRun = intent.getBooleanExtra(EXTRA_IS_FIRST_RUN, false);
 
         mDummyDate = Calendar.getInstance();
+        // add for initiliase auto time listpref 
+        mAutoTimePref = (ListPreference) findPreference(KEY_AUTO_TIME);
+        if (autoTimeEnabled) {
+            mAutoTimePref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
+        } else if (autoTimeGpsEnabled) {
+            mAutoTimePref.setValueIndex(AUTO_TIME_GPS_INDEX);
+        } else {
+            mAutoTimePref.setValueIndex(AUTO_TIME_OFF_INDEX);
+        }
+        mAutoTimePref.setSummary(mAutoTimePref.getValue());
 
-        mAutoTimePref = (CheckBoxPreference) findPreference(KEY_AUTO_TIME);
-        mAutoTimePref.setChecked(autoTimeEnabled);
         mAutoTimeZonePref = (CheckBoxPreference) findPreference(KEY_AUTO_TIME_ZONE);
         // Override auto-timezone if it's a wifi-only device or if we're still in setup wizard.
         // TODO: Remove the wifiOnly test when auto-timezone is implemented based on wifi-location.
@@ -143,8 +162,10 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         mDateFormat.setEntryValues(R.array.date_format_values);
         mDateFormat.setValue(currentFormat);
 
-        mTimePref.setEnabled(!autoTimeEnabled);
-        mDatePref.setEnabled(!autoTimeEnabled);
+        boolean autoEnabled = autoTimeEnabled || autoTimeGpsEnabled;
+
+        mTimePref.setEnabled(!autoEnabled);
+        mDatePref.setEnabled(!autoEnabled);
         mTimeZone.setEnabled(!autoTimeZoneEnabled);
     }
 
@@ -166,7 +187,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                 setAutoState(false, true);
             }
         }
-		
+
         ((CheckBoxPreference)mTime24Pref).setChecked(is24Hour());
 
         // Register for time ticks and other reasons for time change
@@ -177,6 +198,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         getActivity().registerReceiver(mIntentReceiver, filter, null, null);
 
         updateTimeAndDateDisplay(getActivity());
+        // update DateFormat
+        updateDateFormatEntries();
     }
 
     @Override
@@ -201,6 +224,23 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         mDateFormat.setSummary(shortDateFormat.format(dummyDate));
         mTime24Pref.setSummary(DateFormat.getTimeFormat(getActivity()).format(dummyDate));
     }
+	
+    private void updateDateFormatEntries(){
+    	String [] dateFormats = getResources().getStringArray(R.array.date_format_values);
+        String [] formattedDates = new String[dateFormats.length];
+        for (int i = 0; i < formattedDates.length; i++) {
+            String formatted =
+                    DateFormat.getDateFormatForSetting(getActivity(), dateFormats[i])
+                    .format(mDummyDate.getTime());
+            if (dateFormats[i].length() == 0) {
+                formattedDates[i] = getResources().
+                    getString(R.string.normal_date_format, formatted);
+            } else {
+                formattedDates[i] = formatted;
+            }
+        }
+        mDateFormat.setEntries(formattedDates);
+    }	
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
@@ -208,6 +248,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         if (activity != null) {
             setDate(activity, year, month, day);
             updateTimeAndDateDisplay(activity);
+            updateDateFormatEntries();
         }
     }
 
@@ -233,9 +274,24 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                     Settings.System.DATE_FORMAT, format);
             updateTimeAndDateDisplay(getActivity());
         } else if (key.equals(KEY_AUTO_TIME)) {
-            boolean autoEnabled = preferences.getBoolean(key, true);
-            Settings.Global.putInt(getContentResolver(), Settings.Global.AUTO_TIME,
-                    autoEnabled ? 1 : 0);
+            String value = mAutoTimePref.getValue();
+            int index = mAutoTimePref.findIndexOfValue(value);
+            mAutoTimePref.setSummary(value);
+            boolean autoEnabled = true;
+
+            if (index == AUTO_TIME_NETWORK_INDEX) {
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.AUTO_TIME, 1);
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.AUTO_TIME_GPS, 0);
+            } else if (index == AUTO_TIME_GPS_INDEX) {
+                showDialog(DIALOG_GPS_CONFIRM);
+                setOnCancelListener(this);
+            } else {
+                Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME,0);
+                Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME_GPS,0);
+                autoEnabled = false;
+            }
             mTimePref.setEnabled(!autoEnabled);
             mDatePref.setEnabled(!autoEnabled);
         } else if (key.equals(KEY_AUTO_TIME_ZONE)) {
@@ -269,6 +325,22 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                     calendar.get(Calendar.HOUR_OF_DAY),
                     calendar.get(Calendar.MINUTE),
                     DateFormat.is24HourFormat(getActivity()));
+            break;
+        }
+        case DIALOG_GPS_CONFIRM: {
+            int msg;
+            if (Settings.Secure.isLocationProviderEnabled(getContentResolver(),
+                    LocationManager.GPS_PROVIDER)) {
+                msg = R.string.gps_time_sync_attention_gps_on;
+            } else {
+                msg = R.string.gps_time_sync_attention_gps_off;
+            }
+            d = new AlertDialog.Builder(getActivity()).setMessage(
+                    getActivity().getResources().getString(msg)).setTitle(
+                    R.string.proxy_error).setIcon(
+                    android.R.drawable.ic_dialog_alert).setPositiveButton(
+                    android.R.string.yes, this).setNegativeButton(
+                    android.R.string.no, this).create();
             break;
         }
         default:
@@ -333,7 +405,6 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     */
     private void setAutoState(boolean isEnabled, boolean autotimeStatus) {
         if (isEnabled == false) {
-            mAutoTimePref.setChecked(autotimeStatus);
             mAutoTimePref.setEnabled(isEnabled);
         }
         else {
@@ -443,7 +514,49 @@ public class DateTimeSettings extends SettingsPreferenceFragment
             final Activity activity = getActivity();
             if (activity != null) {
                 updateTimeAndDateDisplay(activity);
+                updateDateFormatEntries();
             }
         }
     };
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
+            Log.d(TAG, "Enable GPS time sync");
+            boolean gpsEnabled = Settings.Secure.isLocationProviderEnabled(
+                    getContentResolver(), LocationManager.GPS_PROVIDER);
+            if (!gpsEnabled) {
+                Settings.Secure.setLocationProviderEnabled(
+                        getContentResolver(), LocationManager.GPS_PROVIDER,
+                        true);
+            }
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.AUTO_TIME, 0);
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.AUTO_TIME_GPS, 1);
+        } else if (which == DialogInterface.BUTTON_NEGATIVE) {
+            Log.d(TAG, "DialogInterface.BUTTON_NEGATIVE");
+            reSetAutoTimePref();
+        }
+    }
+
+    private void reSetAutoTimePref() {
+        Log.d(TAG, "reset AutoTimePref as cancel the selection");
+        boolean autoTimeEnabled = getAutoState(Settings.System.AUTO_TIME);
+        boolean autoTimeGpsEnabled = getAutoState(Settings.System.AUTO_TIME_GPS);
+        if (autoTimeEnabled) {
+            mAutoTimePref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
+        } else if (autoTimeGpsEnabled) {
+            mAutoTimePref.setValueIndex(AUTO_TIME_GPS_INDEX);
+        } else {
+            mAutoTimePref.setValueIndex(AUTO_TIME_OFF_INDEX);
+        }
+        mAutoTimePref.setSummary(mAutoTimePref.getValue());
+    }
+
+    @Override
+    public void onCancel(DialogInterface arg0) {
+        Log.d(TAG, "onCancel Dialog");
+        reSetAutoTimePref();
+    }
 }

@@ -2024,4 +2024,7 @@
     <!-- password for factoryReset-->
     <string name="unlock_master_clear">"输入密码恢复出厂设置"</string>
     <string name="unlock_master_clear_error">"密码错误，\n无法恢复出厂设置！"</string>
+    
+    <string name="gps_time_sync_attention_gps_on">使用 GPS 提供时间，必须要等待 GPS 定位成功。GPS 定位最多需要一分钟。\n\n确定要使用 GPS 提供时间吗？</string>
+    <string name="gps_time_sync_attention_gps_off">使用 GPS 提供时间，必须要先启用 GPS，并等待 GPS 定位成功。GPS 定位最多需要一分钟。如果 GPS 信号弱，可能会定位失败。\n\n确定现在要启用 GPS 并使用 GPS 提供时间吗？</string>  
 </resources>
