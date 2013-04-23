@@ -35,11 +35,14 @@ import android.util.Log;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
+import android.content.ComponentName;
+import android.preference.Preference.OnPreferenceClickListener;
 
 /**
  * USB storage settings.
  */
-public class UsbSettings extends SettingsPreferenceFragment {
+public class UsbSettings extends SettingsPreferenceFragment
+    implements OnPreferenceClickListener{
 
     private static final String TAG = "UsbSettings";
 
@@ -55,6 +58,9 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private CheckBoxPreference mUSBCharge;
 
     private boolean mUsbAccessoryMode;
+
+    static final ComponentName USB_STORAGE = new ComponentName("com.android.systemui",
+            "com.android.systemui.usb.UsbStorageActivity");
 
     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
         public void onReceive(Context content, Intent intent) {
@@ -77,8 +83,9 @@ public class UsbSettings extends SettingsPreferenceFragment {
 
         mMtp = (CheckBoxPreference)root.findPreference(KEY_MTP);
         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
-	 mMassStorage = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
-	 mUSBCharge = (CheckBoxPreference)root.findPreference(KEY_USB_CHARGE);
+        mMassStorage = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
+        mMassStorage.setOnPreferenceClickListener(this);
+        mUSBCharge = (CheckBoxPreference)root.findPreference(KEY_USB_CHARGE);
 
         return root;
     }
@@ -112,44 +119,44 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (UsbManager.USB_FUNCTION_MTP.equals(function)) {
             mMtp.setChecked(true);
             mPtp.setChecked(false);
-	     mMassStorage.setChecked(false);
-	     mUSBCharge.setChecked(false);
+            mMassStorage.setChecked(false);
+            mUSBCharge.setChecked(false);
         } else if (UsbManager.USB_FUNCTION_PTP.equals(function)) {
             mPtp.setChecked(true);
             mMtp.setChecked(false);
-	     mMassStorage.setChecked(false);
-	     mUSBCharge.setChecked(false);
+            mMassStorage.setChecked(false);
+            mUSBCharge.setChecked(false);
         }else if (UsbManager.USB_FUNCTION_MASS_STORAGE.equals(function)) {
             mMassStorage.setChecked(true);
             mPtp.setChecked(false);
-	    mMtp.setChecked(false);
-	    mUSBCharge.setChecked(false);
+            mMtp.setChecked(false);
+            mUSBCharge.setChecked(false);
         }else if ("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb".equals(function)) {
-             Log.e(TAG, "charge111");
+            Log.e(TAG, "charge111");
             mMassStorage.setChecked(false);
             mPtp.setChecked(false);
-	     mMtp.setChecked(false);
-	     mUSBCharge.setChecked(true);
+            mMtp.setChecked(false);
+            mUSBCharge.setChecked(true);
         }else  {
             Log.e(TAG, "charge222");
             mMtp.setChecked(false);
             mPtp.setChecked(false);
-	     mMassStorage.setChecked(false);
-	     //mUSBCharge.setChecked(false);
+            mMassStorage.setChecked(false);
+            //mUSBCharge.setChecked(false);
         }
         if (!mUsbAccessoryMode) {
             //Enable MTP and PTP switch while USB is not in Accessory Mode, otherwise disable it
             Log.e(TAG, "USB Normal Mode");
             mMtp.setEnabled(true);
             mPtp.setEnabled(true);
-	    mMassStorage.setEnabled(true);
-	    mUSBCharge.setEnabled(true);
+            mMassStorage.setEnabled(true);
+            mUSBCharge.setEnabled(true);
         } else {
             Log.e(TAG, "USB Accessory Mode");
             mMtp.setEnabled(false);
             mPtp.setEnabled(false);
-	     mMassStorage.setEnabled(false);
-	     mUSBCharge.setEnabled(false);
+            mMassStorage.setEnabled(false);
+            mUSBCharge.setEnabled(false);
         }
 
     }
@@ -177,13 +184,26 @@ public class UsbSettings extends SettingsPreferenceFragment {
         } else if (preference == mPtp) {
             mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_PTP, true);
             updateToggles(UsbManager.USB_FUNCTION_PTP);
-        }else if (preference == mMassStorage) {
-	    mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
-	    updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
-	}else if (preference == mUSBCharge) {
-	    mUsbManager.setCurrentFunction("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb", true);
-	    updateToggles("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb");
-	}
+        }else if (preference == mMassStorage) {//move to onPreferenceClick
+            //mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
+            //updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
+        }else if (preference == mUSBCharge) {
+            mUsbManager.setCurrentFunction("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb", true);
+            updateToggles("diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb");
+        }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        if (preference == mMassStorage) {
+            mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
+            updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
+            Intent intent = new Intent();
+            intent.setComponent(USB_STORAGE);
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
 }
