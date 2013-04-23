@@ -31,6 +31,7 @@ import android.preference.PreferenceScreen;
 import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+import android.os.SystemProperties;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -63,8 +64,13 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
     private static final String KEY_FIRMWARE_VERSION = "firmware_version";
     private static final String KEY_UPDATE_SETTING = "additional_system_update_settings";
     private static final String KEY_EQUIPMENT_ID = "fcc_equipment_id";
+    private static final String KEY_HARDWARE_VERSION = "hardware_version";  //add hardware and software version
+    private static final String KEY_SOFTWARE_VERSION = "software_version";
     private static final String PROPERTY_EQUIPMENT_ID = "ro.ril.fccid";
     private static final String KEY_STATUS = "status_info";
+    private static final String KEY_RELEASE_TIME = "release_date";
+    private static final String PROPERTY_RELEASE_TIME = "ro.build.date";
+    private static final String PROPERTY_RELEASE_TIME2 = "ro.release.time";
 
     static final int TAPS_TO_BE_A_DEVELOPER = 7;
 
@@ -88,6 +94,14 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         findPreference(KEY_BUILD_NUMBER).setEnabled(true);
         findPreference(KEY_KERNEL_VERSION).setSummary(getFormattedKernelVersion());
 
+        if (SystemProperties.getInt("ro.cmcc.test", 0) == 1) {
+            getPreferenceScreen().removePreference(findPreference(KEY_BUILD_NUMBER));
+        }
+
+        //add hardware and software version
+        setStringSummary(KEY_SOFTWARE_VERSION, Build.SOFTWARE_VERSION);
+        setStringSummary(KEY_HARDWARE_VERSION, Build.HARDWARE_VERSION);
+
         if (!SELinux.isSELinuxEnabled()) {
             String status = getResources().getString(R.string.selinux_status_disabled);
             setStringSummary(KEY_SELINUX_STATUS, status);
@@ -105,6 +119,13 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         removePreferenceIfPropertyMissing(getPreferenceScreen(), KEY_SELINUX_STATUS,
                 PROPERTY_SELINUX_STATUS);
 
+        String releaseTime = SystemProperties.get(PROPERTY_RELEASE_TIME2,"");
+        if(releaseTime.isEmpty()){
+            setValueSummary(KEY_RELEASE_TIME, PROPERTY_RELEASE_TIME);
+        }else{
+            setValueSummary(KEY_RELEASE_TIME, PROPERTY_RELEASE_TIME2);
+        }
+
         // Remove Safety information preference if PROPERTY_URL_SAFETYLEGAL is not set
         removePreferenceIfPropertyMissing(getPreferenceScreen(), "safetylegal",
                 PROPERTY_URL_SAFETYLEGAL);
@@ -114,10 +135,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                 PROPERTY_EQUIPMENT_ID);
 
         // Remove Baseband version if wifi-only device
-        if (Utils.isWifiOnly(getActivity())
-                || (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
+        //if (Utils.isWifiOnly(getActivity())
+                //|| (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
             getPreferenceScreen().removePreference(findPreference(KEY_BASEBAND_VERSION));
-        }
+        //}
 
         /*
          * Settings is a generic app and should not contain any device-specific
