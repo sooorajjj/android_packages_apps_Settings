@@ -1924,6 +1924,8 @@
     <string name="smsc_refresh_error">刷新错误</string>
     <string name="dns_allowed">0.0.0.0 允许</string>
     <string name="dns_not_allowed">0.0.0.0 不允许</string>
+    <!-- Title for input language selection screen -->
+    <string name="language_selection_title">"输入语言"</string>
     <string name="screencolor_save">保存</string>
     <string name="screencolor_cancel">取消</string>
     <string name="previous_str">以前</string>
