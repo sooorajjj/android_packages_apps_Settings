@@ -853,6 +853,12 @@
     <string name="usb_mtp_summary" msgid="4617321473211391236">"让您可以在 Windows 上传输媒体文件，或在 Mac 上使用 Android 文件传输应用来传输文件（请参见 www.android.com/filetransfer）"</string>
     <string name="usb_ptp_title" msgid="3852760810622389620">"相机 (PTP)"</string>
     <string name="usb_ptp_summary" msgid="7673397474756664929">"让您可以使用相机软件传输照片，并在不支持 MTP 的计算机上传输任何文件"</string>
+    <string name="usb_umt_title">大容量存储</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_umt_summary">选择进入大容量存储</string>
+    <string name="usb_charge_title">USB充电</string>
+    <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
+    <string name="usb_charge_summary">选择进入USB充电</string>
     <string name="usb_label_installer_cd" msgid="4331173824920630215">"安装文件传输工具"</string>
     <string name="storage_other_users" msgid="808708845102611856">"其他用户"</string>
     <string name="battery_status_title" msgid="9159414319574976203">"电池状态"</string>
