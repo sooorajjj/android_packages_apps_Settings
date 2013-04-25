@@ -53,6 +53,7 @@ import android.text.TextUtils;
 import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -800,6 +801,13 @@ public class Settings extends PreferenceActivity
         mAuthenticatorHelper.updateAuthDescriptions(this);
         mAuthenticatorHelper.onAccountsUpdated(this, accounts);
         invalidateHeaders();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Let the system ignore the menu key when the activity is foreground.
+        return false;
     }
 
     /*
