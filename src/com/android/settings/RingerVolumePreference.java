@@ -55,6 +55,7 @@ import android.widget.TextView;
 public class RingerVolumePreference extends VolumePreference {
     private static final String TAG = "RingerVolumePreference";
     private static final int MSG_RINGER_MODE_CHANGED = 101;
+    private static final int MSG_VOLUME_CHANGED = 102;
 
     private SeekBarVolumizer [] mSeekBarVolumizer;
 
@@ -185,12 +186,17 @@ public class RingerVolumePreference extends VolumePreference {
         if (mRingModeChangedReceiver == null) {
             final IntentFilter filter = new IntentFilter();
             filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
+            filter.addAction(AudioManager.VOLUME_CHANGED_ACTION);
             mRingModeChangedReceiver = new BroadcastReceiver() {
                 public void onReceive(Context context, Intent intent) {
                     final String action = intent.getAction();
                     if (AudioManager.RINGER_MODE_CHANGED_ACTION.equals(action)) {
                         mHandler.sendMessage(mHandler.obtainMessage(MSG_RINGER_MODE_CHANGED, intent
                                 .getIntExtra(AudioManager.EXTRA_RINGER_MODE, -1), 0));
+                    } else if (AudioManager.VOLUME_CHANGED_ACTION.equals(action)) {
+                        mHandler.sendMessage(mHandler.obtainMessage(MSG_VOLUME_CHANGED, intent
+                                .getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_TYPE, -1), intent
+                                .getIntExtra(AudioManager.EXTRA_VOLUME_STREAM_VALUE, 0)));
                     }
                 }
             };
