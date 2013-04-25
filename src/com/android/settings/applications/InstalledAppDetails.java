@@ -564,6 +564,10 @@ public class InstalledAppDetails extends Fragment
     public void onResume() {
         super.onResume();
         
+        // refresh the checkBox's text by get the resource from xml file
+        if (mNotificationSwitch != null) {
+            mNotificationSwitch.setText(R.string.app_notifications_switch_label);
+        }
         mSession.resume();
         if (!refreshUi()) {
             setIntentAndFinish(true, true);
