@@ -37,12 +37,11 @@
             android:imeOptions="flagNoFullscreen">
     <requestFocus />
   </EditText>
-  <GridLayout android:id="@+id/user_dictionary_add_word_grid"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_marginStart="8dip"
-              android:layout_marginEnd="8dip"
-              android:columnCount="2">
+  <LinearLayout android:id="@+id/user_dictionary_add_word_linear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip">
     <TextView android:id="@+id/user_dictionary_add_shortcut_label"
               style="?android:attr/textAppearanceSmall"
               android:layout_width="wrap_content"
@@ -51,13 +50,21 @@
               android:text="@string/user_dict_settings_add_shortcut_option_name" />
     <EditText android:id="@+id/user_dictionary_add_shortcut"
               android:maxLength="@integer/maximum_user_dictionary_word_length"
-              android:layout_width="wrap_content"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
               android:layout_gravity="fill_horizontal|center_vertical"
               android:layout_marginStart="8dip"
               android:layout_marginBottom="8dip"
               android:layout_marginTop="8dip"
               android:inputType="textNoSuggestions"
               android:imeOptions="flagNoFullscreen" />
+    </LinearLayout>
+  <GridLayout android:id="@+id/user_dictionary_add_word_grid"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="8dip"
+              android:layout_marginRight="8dip"
+              android:columnCount="2">
     <TextView android:id="@+id/user_dictionary_add_locale_label"
               style="?android:attr/textAppearanceSmall"
               android:layout_width="wrap_content"
