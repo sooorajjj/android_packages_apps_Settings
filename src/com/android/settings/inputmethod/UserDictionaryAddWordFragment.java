@@ -117,6 +117,9 @@ public class UserDictionaryAddWordFragment extends Fragment
         // We are being hidden: commit changes to the user dictionary, unless we were deleting it
         if (!mIsDeleting) {
             mContents.apply(getActivity(), null);
+            // After commit the changes and save the values in databases, it should be in edit mode,
+            // and update the variables for used after resume the activity.
+            mContents.updateValues(getActivity());
         }
     }
 
