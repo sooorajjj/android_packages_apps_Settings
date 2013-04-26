@@ -158,6 +158,20 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
         validate();
     }
 
+    @Override
+    public Bundle onSaveInstanceState() {
+        Bundle state = super.onSaveInstanceState();
+        state.putInt("PWD_VISIBLE_FLAG", mPassword.getInputType());
+        return state;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int type = savedInstanceState.getInt("PWD_VISIBLE_FLAG");
+        mPassword.setInputType(type);
+    }
+
     private void validate() {
         if ((mSsid != null && mSsid.length() == 0) ||
                    (((mSecurityTypeIndex == WPA_INDEX) || (mSecurityTypeIndex == WPA2_INDEX))&&
