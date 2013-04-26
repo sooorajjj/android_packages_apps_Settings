@@ -146,12 +146,12 @@
   </string-array>
   <string-array name="wifi_sleep_policy_entries">
     <item msgid="3269131034472904310">"Завжди"</item>
-    <item msgid="844721238536786870">"Лише в підключеному стані"</item>
+    <!--<item msgid="844721238536786870">"Лише в підключеному стані"</item>-->
     <item msgid="2990218920631468642">"Ніколи (збільшує використання даних)"</item>
   </string-array>
   <string-array name="wifi_sleep_policy_entries_wifi_only">
     <item msgid="2124319326282651391">"Завжди"</item>
-    <item msgid="7433294150916905997">"Лише в підключеному стані"</item>
+    <!--<item msgid="7433294150916905997">"Лише в підключеному стані"</item>-->
     <item msgid="1390404486722375028">"Ніколи"</item>
   </string-array>
   <string-array name="wifi_frequency_band_entries">

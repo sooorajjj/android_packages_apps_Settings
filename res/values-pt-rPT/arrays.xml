@@ -146,12 +146,12 @@
   </string-array>
   <string-array name="wifi_sleep_policy_entries">
     <item msgid="3269131034472904310">"Sempre"</item>
-    <item msgid="844721238536786870">"Apenas quando estiver ligado"</item>
+    <!--<item msgid="844721238536786870">"Apenas quando estiver ligado"</item>-->
     <item msgid="2990218920631468642">"Nunca (aumenta a utilização de dados)"</item>
   </string-array>
   <string-array name="wifi_sleep_policy_entries_wifi_only">
     <item msgid="2124319326282651391">"Sempre"</item>
-    <item msgid="7433294150916905997">"Apenas quando estiver ligado"</item>
+    <!--<item msgid="7433294150916905997">"Apenas quando estiver ligado"</item>-->
     <item msgid="1390404486722375028">"Nunca"</item>
   </string-array>
   <string-array name="wifi_frequency_band_entries">
