@@ -514,7 +514,13 @@ public class DataUsageSummary extends Fragment {
             case R.id.data_usage_menu_restrict_background: {
                 final boolean restrictBackground = !item.isChecked();
                 if (restrictBackground) {
-                    ConfirmRestrictFragment.show(this);
+                    // check whether mobile data is limited
+                    if (hasLimitedNetworks()) {
+                        ConfirmRestrictFragment.show(this);
+                    } else {
+                        DeniedRestrictFragment.show(this);
+                        setRestrictBackground(false);
+                    }
                 } else {
                     // no confirmation to drop restriction
                     setRestrictBackground(false);
