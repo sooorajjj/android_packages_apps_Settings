@@ -1648,7 +1648,8 @@ public class DataUsageSummary extends Fragment {
         private static final String EXTRA_LIMIT_BYTES = "limitBytes";
 
         public static void show(DataUsageSummary parent) {
-            if (!parent.isAdded()) return;
+            if (null == parent || !parent.isAdded())
+                return;
 
             final Resources res = parent.getResources();
             final CharSequence message;
