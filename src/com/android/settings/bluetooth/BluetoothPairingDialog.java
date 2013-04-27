@@ -58,6 +58,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     private String mPairingKey;
     private EditText mPairingView;
     private Button mOkButton;
+    public static boolean mEntryPinFlag = false;
 
     /**
      * Dismiss the dialog if the bond state changes to bonded or none,
@@ -311,6 +312,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
                     return;
                 }
                 mDevice.setPin(pinBytes);
+                mEntryPinFlag = true;
                 break;
 
             case BluetoothDevice.PAIRING_VARIANT_PASSKEY:
