@@ -347,6 +347,7 @@ public class DataUsageSummary extends Fragment {
             mDataEnabled = new Switch(inflater.getContext());
             mDataEnabledView = inflatePreference(inflater, mNetworkSwitches, mDataEnabled);
             mDataEnabled.setOnCheckedChangeListener(mDataEnabledListener);
+            mDataEnabledView.setClickable(true);
             mNetworkSwitches.addView(mDataEnabledView);
 
             mDisableAtLimit = new CheckBox(inflater.getContext());
