@@ -1049,7 +1049,7 @@
     <string name="location_gps" msgid="8392461023569708478">"GPS 卫星定位"</string>
     <string name="location_street_level" product="tablet" msgid="1669562198260860802">"允许应用使用您平板电脑上的 GPS 定位您的位置"</string>
     <string name="location_street_level" product="default" msgid="4617445745492014203">"允许应用使用您手机上的 GPS 定位您的位置"</string>
-    <string name="assisted_gps" msgid="4649317129586736885">"使用增强型 GPS"</string>
+    <string name="assisted_gps" msgid="4649317129586736885">"使用增强型 A-GPS"</string>
     <string name="assisted_gps_enabled" msgid="8751899609589792803">"使用服务器来辅助 GPS（取消选中可降低网络使用率）"</string>
     <string name="assisted_gps_disabled" msgid="6982698333968010748">"使用服务器来辅助 GPS（选中可提高 GPS 性能）"</string>
     <string name="use_location_title" msgid="5206937465504979977">"位置和 Google 搜索"</string>
@@ -2024,4 +2024,7 @@
     <!-- password for factoryReset-->
     <string name="unlock_master_clear">"输入密码恢复出厂设置"</string>
     <string name="unlock_master_clear_error">"密码错误，\n无法恢复出厂设置！"</string>
+    
+    <string name="gps_time_sync_attention_gps_on">使用 GPS 提供时间，必须要等待 GPS 定位成功。GPS 定位最多需要一分钟。\n\n确定要使用 GPS 提供时间吗？</string>
+    <string name="gps_time_sync_attention_gps_off">使用 GPS 提供时间，必须要先启用 GPS，并等待 GPS 定位成功。GPS 定位最多需要一分钟。如果 GPS 信号弱，可能会定位失败。\n\n确定现在要启用 GPS 并使用 GPS 提供时间吗？</string>  
 </resources>

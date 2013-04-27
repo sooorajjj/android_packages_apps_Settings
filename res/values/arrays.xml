@@ -920,5 +920,10 @@
         <item>Always ask</item>
     </string-array>
 
-	
+    <!-- For auto time sync values -->
+    <string-array name="auto_time_entries">
+    	<item>Use network-provided time</item>
+    	<item>Use GPS-provided time</item>
+    	<item>Off</item>
+    </string-array>
 </resources>
