@@ -64,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import android.os.BatteryManager;
 
 /**
  * Displays a list of apps and subsystems that consume power, ordered by how much power was
@@ -112,7 +111,6 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
 
     // How much the apps together have left WIFI running.
     private long mAppWifiRunning;
-	private double mTemperature = 30;
 
     /** Queue for fetching name and icon for an application */
     private ArrayList<BatterySipper> mRequestQueue = new ArrayList<BatterySipper>();
@@ -131,8 +129,6 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
                 String batterySummary = context.getResources().getString(
                         R.string.power_usage_level_and_status, batteryLevel, batteryStatus);
                 mBatteryStatusPref.setTitle(batterySummary);
-				mTemperature = (intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0))/10;
-				
             }
         }
     };
@@ -416,12 +412,7 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
             sipper.percent = percentOfTotal;
             pref.setTitle(sipper.name);
             pref.setOrder(Integer.MAX_VALUE - (int) sipper.getSortValue()); // Invert the order
-            if(sipper.name.equals(getActivity().getString(R.string.power_temperature)))
-			{
-				pref.setPercent(mTemperature, mTemperature);
-			}
-            else
-				pref.setPercent(percentOfMax, percentOfTotal);
+            pref.setPercent(percentOfMax, percentOfTotal);
             if (sipper.uidObj != null) {
                 pref.setKey(Integer.toString(sipper.uidObj.getUid()));
             }
@@ -717,15 +708,6 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
                     / 1000 * 100.0 / signalTimeMs;
         }
     }
-	
-    private void addTemperature(long uSecNow) {
-        long signalTimeMs = 0;
-		Log.i(TAG, "Battery Temperature=" + mTemperature);
-        BatterySipper bs =
-                addEntry(getActivity().getString(R.string.power_temperature), DrainType.CELL,
-                        signalTimeMs, R.drawable.ic_settings_cell_standby, 0);
-
-    }
 
     private void aggregateSippers(BatterySipper bs, List<BatterySipper> from, String tag) {
         for (int i=0; i<from.size(); i++) {
@@ -846,7 +828,6 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
         addWiFiUsage(uSecNow);
         addBluetoothUsage(uSecNow);
         addIdleUsage(uSecNow); // Not including cellular idle power
-        addTemperature(uSecNow);
         // Don't compute radio usage if it's a wifi-only device
         if (!com.android.settings.Utils.isWifiOnly(getActivity())) {
             addRadioUsage(uSecNow);
@@ -857,10 +838,6 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
             double power) {
         if (power > mMaxPower) mMaxPower = power;
         mTotalPower += power;
-
-        if(label.equals(getActivity().getString(R.string.power_temperature)))
-			power = mTemperature;
-		
         BatterySipper bs = new BatterySipper(getActivity(), mRequestQueue, mHandler,
                 label, drainType, iconId, null, new double[] {power});
         bs.usageTime = time;
