@@ -274,6 +274,12 @@ public class TextToSpeechSettings extends SettingsPreferenceFragment implements
             // The engine is guaranteed to have been initialized here
             // because this preference is not enabled otherwise.
             mTts.speak(sample, TextToSpeech.QUEUE_FLUSH, null);
+        } else if (mTts != null) {
+            // Current locale is not supported, so sample string is null.
+            // Need speak English sample string as default.
+            mTts.setLanguage(Locale.US);
+            mTts.speak(getActivity().getResources().getStringArray(
+                    R.array.tts_demo_strings)[0], TextToSpeech.QUEUE_FLUSH, null);
         } else {
             // TODO: Display an error here to the user.
             Log.e(TAG, "Did not have a sample string for the requested language");
