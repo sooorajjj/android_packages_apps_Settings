@@ -324,4 +324,10 @@
     <item>总是询问</item>
   </string-array>
 
+  <!-- For auto time sync values -->
+  <string-array name="auto_time_entries">
+    <item>使用网络提供时间</item>
+    <item>使用GPS提供时间</item>
+    <item>关闭</item>
+  </string-array>
 </resources>
