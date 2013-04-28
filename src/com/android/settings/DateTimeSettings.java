@@ -64,7 +64,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     private Calendar mDummyDate;
 
     private static final String KEY_DATE_FORMAT = "date_format";
-    private static final String KEY_AUTO_TIME = "auto_time_list";
+    private static final String KEY_AUTO_TIME = "auto_time";
+	private static final String KEY_AUTO_TIME_LIST = "auto_time_list";
     private static final String KEY_AUTO_TIME_ZONE = "auto_zone";
 
     private static final int DIALOG_DATEPICKER = 0;
@@ -82,7 +83,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     // have we been launched from the setup wizard?
     protected static final String EXTRA_IS_FIRST_RUN = "firstRun";
     // add GPS time Sync feature
-    private ListPreference mAutoTimePref;
+    private CheckBoxPreference mAutoTimePref;
+    private ListPreference mAutoTimeListPref;
     private Preference mTimePref;
     private Preference mTime24Pref;
     private CheckBoxPreference mAutoTimeZonePref;
@@ -107,16 +109,23 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         boolean isFirstRun = intent.getBooleanExtra(EXTRA_IS_FIRST_RUN, false);
 
         mDummyDate = Calendar.getInstance();
+        mAutoTimePref = (CheckBoxPreference) findPreference(KEY_AUTO_TIME);
+        mAutoTimePref.setChecked(autoTimeEnabled);
         // add for initiliase auto time listpref 
-        mAutoTimePref = (ListPreference) findPreference(KEY_AUTO_TIME);
+        mAutoTimeListPref = (ListPreference) findPreference(KEY_AUTO_TIME_LIST);
         if (autoTimeEnabled) {
-            mAutoTimePref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
         } else if (autoTimeGpsEnabled) {
-            mAutoTimePref.setValueIndex(AUTO_TIME_GPS_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_GPS_INDEX);
         } else {
-            mAutoTimePref.setValueIndex(AUTO_TIME_OFF_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_OFF_INDEX);
         }
-        mAutoTimePref.setSummary(mAutoTimePref.getValue());
+        mAutoTimeListPref.setSummary(mAutoTimeListPref.getValue());
+        if(FeatureQuery.FEATURE_SETTINGS_AUTO_TIME_GPS){
+            getPreferenceScreen().removePreference(mAutoTimePref);
+        }else{
+            getPreferenceScreen().removePreference(mAutoTimeListPref);
+        }
 
         mAutoTimeZonePref = (CheckBoxPreference) findPreference(KEY_AUTO_TIME_ZONE);
         // Override auto-timezone if it's a wifi-only device or if we're still in setup wizard.
@@ -274,9 +283,15 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                     Settings.System.DATE_FORMAT, format);
             updateTimeAndDateDisplay(getActivity());
         } else if (key.equals(KEY_AUTO_TIME)) {
-            String value = mAutoTimePref.getValue();
-            int index = mAutoTimePref.findIndexOfValue(value);
-            mAutoTimePref.setSummary(value);
+            boolean autoEnabled = preferences.getBoolean(key, true);
+            Settings.Global.putInt(getContentResolver(), Settings.Global.AUTO_TIME,
+                    autoEnabled ? 1 : 0);
+            mTimePref.setEnabled(!autoEnabled);
+            mDatePref.setEnabled(!autoEnabled);
+        } else if (key.equals(KEY_AUTO_TIME_LIST)) {
+            String value = mAutoTimeListPref.getValue();
+            int index = mAutoTimeListPref.findIndexOfValue(value);
+            mAutoTimeListPref.setSummary(value);
             boolean autoEnabled = true;
 
             if (index == AUTO_TIME_NETWORK_INDEX) {
@@ -405,7 +420,12 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     */
     private void setAutoState(boolean isEnabled, boolean autotimeStatus) {
         if (isEnabled == false) {
-            mAutoTimePref.setEnabled(isEnabled);
+            if(FeatureQuery.FEATURE_SETTINGS_AUTO_TIME_GPS){
+                mAutoTimeListPref.setEnabled(isEnabled);
+            }else{
+                mAutoTimePref.setChecked(autotimeStatus);
+                mAutoTimePref.setEnabled(isEnabled);
+            }
         }
         else {
             Settings.Global.putInt(getContentResolver(),
@@ -541,17 +561,17 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     }
 
     private void reSetAutoTimePref() {
-        Log.d(TAG, "reset AutoTimePref as cancel the selection");
+        Log.d(TAG, "reset AutoTimeListPref as cancel the selection");
         boolean autoTimeEnabled = getAutoState(Settings.System.AUTO_TIME);
         boolean autoTimeGpsEnabled = getAutoState(Settings.System.AUTO_TIME_GPS);
         if (autoTimeEnabled) {
-            mAutoTimePref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
         } else if (autoTimeGpsEnabled) {
-            mAutoTimePref.setValueIndex(AUTO_TIME_GPS_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_GPS_INDEX);
         } else {
-            mAutoTimePref.setValueIndex(AUTO_TIME_OFF_INDEX);
+            mAutoTimeListPref.setValueIndex(AUTO_TIME_OFF_INDEX);
         }
-        mAutoTimePref.setSummary(mAutoTimePref.getValue());
+        mAutoTimeListPref.setSummary(mAutoTimeListPref.getValue());
     }
 
     @Override

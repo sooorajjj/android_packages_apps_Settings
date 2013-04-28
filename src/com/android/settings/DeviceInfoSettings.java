@@ -332,9 +332,9 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         //return m.group(1) + "\n" +                 // 3.0.31-g6fb96c9
             //m.group(2) + " " + m.group(3) + "\n" + // x@y.com #1
             //m.group(4);                            // Thu Jun 28 11:02:39 PDT 2012
-            
+
         String kernelversion = (new StringBuilder(m.group(1))).toString();
-        kernelversion = kernelversion.substring(0, 5);                       
+        kernelversion = kernelversion.substring(0, 5);
         return kernelversion;
     }
 

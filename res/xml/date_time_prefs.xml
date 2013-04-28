@@ -16,11 +16,11 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         android:title="@string/date_and_time">
-    <!--CheckBoxPreference android:key="auto_time"
+    <CheckBoxPreference android:key="auto_time"
         android:title="@string/date_time_auto"
         android:summaryOn="@string/date_time_auto_summaryOn"
         android:summaryOff="@string/date_time_auto_summaryOff"
-        /-->
+        />
     <ListPreference
         android:key="auto_time_list"
         android:title="@string/date_time_auto"
