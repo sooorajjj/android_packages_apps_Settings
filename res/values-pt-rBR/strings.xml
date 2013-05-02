@@ -422,7 +422,7 @@
     <string name="vpn_password" >Senha</string>
     <string name="vpn_create" >Adicionar perfil de VPN</string>
     <string name="vibrate_when_ringing_title" >Vibrar ao tocar</string>
-    <string name="filter_apps_third_party" >Descarregados</string>
+    <string name="filter_apps_third_party" >Baixados</string>
     <string name="language_keyboard_settings_title" >Idioma e entrada</string>
     <string name="bluetooth_tether_checkbox_text" >Tethering Bluetooth</string>
     <string name="testing" >Testando</string>
@@ -753,7 +753,7 @@
     <string name="data_usage_app_restrict_dialog_title" >Restringir dados de segundo plano?</string>
     <string name="wifi_wps_onstart_pin" >Insira o pin <xliff:g id="NUMBER">%1$s</xliff:g> em seu roteador Wi-Fi. A configuração pode levar até dois minutos para ser concluída.</string>
     <string name="bluetooth_enable_alphanumeric_pin" >O PIN contém letras ou símbolos</string>
-    <string name="master_clear_title" >Configuração original</string>
+    <string name="master_clear_title" >"Restaurar configurações de fábrica"</string>
     <string name="wifi_p2p_cancel_connect_title" >Cancelar convite?</string>
     <string name="wifi_quick_toggle_title" >Wi-Fi</string>
     <string name="battery_sugg_wifi" >Desativar rede Wi-Fi quando não estiver em uso ou disponível</string>
