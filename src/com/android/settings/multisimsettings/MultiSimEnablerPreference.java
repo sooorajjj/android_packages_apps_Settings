@@ -332,7 +332,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     }
 
     private void updateTitle(){
-        String alpha = MSimTelephonyManager.getDefault().getSimOperatorName(mSubscriptionId);
+        String alpha = MSimTelephonyManager.from(mContext).getSimOperatorName(mSubscriptionId);
         String slotInfoStr = mContext.getString(R.string.slot_name, mSubscriptionId + 1);
 
         logd("updateTitle alpha="+alpha
