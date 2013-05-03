@@ -32,4 +32,6 @@
 
     <!-- Whether User management screen is available -->
     <bool name="enable_user_management">false</bool>
+
+    <bool name="has_msim_settings">false</bool>
 </resources>
