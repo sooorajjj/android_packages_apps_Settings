@@ -126,7 +126,7 @@
 
     <!-- Application Settings -->
     <header
-        android:fragment="com.android.settings.applications.ManageApplications"
+        android:fragment="com.android.settings.ApplicationSettings"
         android:icon="@drawable/ic_settings_applications"
         android:title="@string/applications_settings"
         android:id="@+id/application_settings" />
