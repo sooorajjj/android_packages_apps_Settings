@@ -2389,6 +2389,13 @@ alog [CHAR LIMIT=none] -->
     <!-- [CHAR LIMIT=45] Section heading for location sources -->
     <string name="location_sources_heading">Location sources</string>
 
+    <!-- [CHAR LIMIT=none] Title for Google service location consent -->
+    <string name="location_access_google_service_title">Location consent</string>
+    <!-- [CHAR LIMIT=none] Text for Google service location consent -->
+    <string name="location_access_google_service_text">Allow Google\'s location service to collect anonymous location data.
+    Some data may be stored on your device. Collection may occur even when no apps are running.</string>
+    <string name="location_access_google_service_agree">Agree</string>
+    <string name="location_access_google_service_disagree">Disagree</string>
     <!-- About --> <skip />
     <!-- Main settings screen, setting title for the user to go into the About phone screen -->
     <string name="about_settings" product="tablet">About tablet</string>
