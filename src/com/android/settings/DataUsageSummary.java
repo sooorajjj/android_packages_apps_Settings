@@ -185,6 +185,10 @@ public class DataUsageSummary extends Fragment {
     private static final int LOADER_CHART_DATA = 2;
     private static final int LOADER_SUMMARY = 3;
 
+    // Set input max value as 102400000, so NumberPicker can compare with
+    // integer
+    private static final int INPUT_MAX_VALUE = (int) (Math.pow(10, 5) * 1024);
+
     private INetworkManagementService mNetworkService;
     private INetworkStatsService mStatsService;
     private NetworkPolicyManager mPolicyManager;
@@ -846,7 +850,16 @@ public class DataUsageSummary extends Fragment {
 
     private void setPolicyLimitBytes(long limitBytes) {
         if (LOGD) Log.d(TAG, "setPolicyLimitBytes()");
-        mPolicyEditor.setPolicyLimitBytes(mTemplate, limitBytes);
+
+        // if sweep up the limit bar, the maximum number is Long.MAX_VALUE.
+        // It is bigger than INPUT_MAX_VALUE that is the maximum number of input
+        // number in dialog.
+        // This may lead to the display is not properly in dialog.
+        // So,it is necessary to process the maximum number is
+        // INPUT_MAX_VALUE when sweep up the limit bar.
+        mPolicyEditor.setPolicyLimitBytes(mTemplate,
+                limitBytes <= (INPUT_MAX_VALUE * MB_IN_BYTES) ? limitBytes
+                        : (INPUT_MAX_VALUE * MB_IN_BYTES));
         updatePolicy(false);
     }
 
@@ -1802,7 +1815,7 @@ public class DataUsageSummary extends Fragment {
             if (limitBytes != LIMIT_DISABLED) {
                 bytesPicker.setMaxValue((int) (limitBytes / MB_IN_BYTES) - 1);
             } else {
-                bytesPicker.setMaxValue(Integer.MAX_VALUE);
+                bytesPicker.setMaxValue(INPUT_MAX_VALUE);
             }
             bytesPicker.setValue((int) (warningBytes / MB_IN_BYTES));
             bytesPicker.setWrapSelectorWheel(false);
@@ -1861,7 +1874,7 @@ public class DataUsageSummary extends Fragment {
             final long warningBytes = editor.getPolicyWarningBytes(template);
             final long limitBytes = editor.getPolicyLimitBytes(template);
 
-            bytesPicker.setMaxValue(Integer.MAX_VALUE);
+            bytesPicker.setMaxValue(INPUT_MAX_VALUE);
             if (warningBytes != WARNING_DISABLED && limitBytes > 0) {
                 bytesPicker.setMinValue((int) (warningBytes / MB_IN_BYTES) + 1);
             } else {
