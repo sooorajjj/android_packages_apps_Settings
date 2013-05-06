@@ -1208,4 +1208,7 @@
     <string name="hdmi_disable_title">Permitir HDMI</string>
     <string name="sim_pin_disabled">"PIN 1 Desativado!"</string>
     <string name="sim_pin_enabled">"PIN 1 Ativado!"</string>
+    <string name="summary_storage_manage">Dispositivo de cartão SD: %1$s</string>
+    <string name="external_sd">SD externo</string>
+    <string name="internal_sd">SD interno</string>
 </resources>
