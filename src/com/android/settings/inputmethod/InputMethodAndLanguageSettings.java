@@ -251,6 +251,12 @@ public class InputMethodAndLanguageSettings extends SettingsPreferenceFragment
                 if (localeString.length() > 1) {
                     localeString = Character.toUpperCase(localeString.charAt(0))
                             + localeString.substring(1);
+                    // Chinese(China)/Chinese(TaiWan) is unreasonable. So change
+                    // them to Chinese(complex)/Chinese(simplified)
+                    if (conf.locale.equals(conf.locale.SIMPLIFIED_CHINESE)
+                            || conf.locale.equals(conf.locale.TAIWAN)) {
+                        localeString = getString(R.string.language_summary);
+                    }
                     mLanguagePref.setSummary(localeString);
                 }
             }
