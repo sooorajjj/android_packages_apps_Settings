@@ -381,7 +381,7 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
         hist.setOrder(-1);
         mAppListGroup.addPreference(hist);
         
-        if (mPowerProfile.getAveragePower(PowerProfile.POWER_SCREEN_FULL) < 0) {
+        if (mPowerProfile.getAveragePower(PowerProfile.POWER_SCREEN_FULL) < 10) {
             addNotAvailableMessage();
             return;
         }
