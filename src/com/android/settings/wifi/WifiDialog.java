@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Spinner;
 
 class WifiDialog extends AlertDialog implements WifiConfigUiBase {
     static final int BUTTON_SUBMIT = DialogInterface.BUTTON_POSITIVE;
@@ -35,6 +36,7 @@ class WifiDialog extends AlertDialog implements WifiConfigUiBase {
 
     private View mView;
     private WifiConfigController mController;
+    private Spinner mSpinner;
 
     public WifiDialog(Context context, DialogInterface.OnClickListener listener,
             AccessPoint accessPoint, boolean edit) {
@@ -53,6 +55,8 @@ class WifiDialog extends AlertDialog implements WifiConfigUiBase {
     protected void onCreate(Bundle savedInstanceState) {
         mView = getLayoutInflater().inflate(R.layout.wifi_dialog, null);
         setView(mView);
+        mSpinner = (Spinner)mView.findViewById(R.id.security);
+
         setInverseBackgroundForced(true);
         mController = new WifiConfigController(this, mView, mAccessPoint, mEdit);
         super.onCreate(savedInstanceState);
@@ -94,5 +98,9 @@ class WifiDialog extends AlertDialog implements WifiConfigUiBase {
     @Override
     public void setCancelButton(CharSequence text) {
         setButton(BUTTON_NEGATIVE, text, mListener);
+    }
+
+    public void dismissPop(){
+        mSpinner.dismissPop();
     }
 }

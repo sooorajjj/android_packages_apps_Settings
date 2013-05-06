@@ -29,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -1110,6 +1111,15 @@ public class WifiSettings extends SettingsPreferenceFragment
                 title.setMinimumHeight((int) (parentHeight * titleHeight));
             }
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // If the PopupWindow is shown when rotate screen, dismiss it.
+        if (mDialog != null && mDialog.isShowing()) {
+            mDialog.dismissPop();
         }
     }
 
