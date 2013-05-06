@@ -86,6 +86,9 @@ public class DevelopmentSettings extends PreferenceFragment
      */
     public static final String PREF_SHOW = "show";
 
+    private static final String TAG = "DevelopmentSettings";
+    private static final boolean LOCAL_LOG = false;
+
     private static final String ENABLE_ADB = "enable_adb";
     private static final String KEEP_SCREEN_ON = "keep_screen_on";
     private static final String ALLOW_MOCK_LOCATION = "allow_mock_location";
@@ -318,6 +321,8 @@ public class DevelopmentSettings extends PreferenceFragment
                 R.dimen.action_bar_switch_padding);
         mEnabledSwitch.setPadding(0, 0, padding, 0);
         mEnabledSwitch.setOnCheckedChangeListener(this);
+        mEnabledSwitch.setEnabled(false);
+        setPrefsEnabledState(false);
     }
 
     @Override
@@ -377,9 +382,10 @@ public class DevelopmentSettings extends PreferenceFragment
         mLastEnabledState = Settings.Global.getInt(cr,
                 Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
         mEnabledSwitch.setChecked(mLastEnabledState);
-        setPrefsEnabledState(mLastEnabledState);
+        mEnabledSwitch.setEnabled(!Utils.isMonkeyRunning());
+        setPrefsEnabledState(!Utils.isMonkeyRunning() && mLastEnabledState);
 
-        if (mHaveDebugSettings && !mLastEnabledState) {
+        if (mHaveDebugSettings && !mLastEnabledState && !Utils.isMonkeyRunning()) {
             // Overall debugging is disabled, but there are some debug
             // settings that are enabled.  This is an invalid state.  Switch
             // to debug settings being enabled, so the user knows there is
@@ -962,6 +968,14 @@ public class DevelopmentSettings extends PreferenceFragment
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (LOCAL_LOG) {
+            Log.d(TAG,
+                    "develeopment settings onCheckedChanged, is monkey running:"
+                            + Utils.isMonkeyRunning());
+        }
+        if (Utils.isMonkeyRunning()) {
+            return;
+        }
         if (buttonView == mEnabledSwitch) {
             if (isChecked != mLastEnabledState) {
                 if (isChecked) {
@@ -1003,6 +1017,10 @@ public class DevelopmentSettings extends PreferenceFragment
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 
+        if (LOCAL_LOG) {
+            Log.d(TAG, "develeopment settings onPreferenceTreeClick[" + preference.getKey()
+                    + "], is monkey running:" + Utils.isMonkeyRunning());
+        }
         if (Utils.isMonkeyRunning()) {
             return false;
         }
