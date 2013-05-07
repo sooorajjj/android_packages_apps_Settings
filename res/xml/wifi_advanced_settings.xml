@@ -33,6 +33,11 @@
             />
 	    
 <!-- QUALCOMM_CMCC_START -->
+    <CheckBoxPreference
+            android:key="wifi_gsm_connect_type"
+            android:title="@string/wifi_to_gsm_connect_type_title"
+            android:persistent="false"
+            />
     <ListPreference
             android:key="gsm_wifi_connect_type"
             android:title="@string/gsm_to_wifi_connect_type_title"
