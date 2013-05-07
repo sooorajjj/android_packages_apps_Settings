@@ -60,6 +60,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     //set whether settings will auto connect wifi 
     private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
     private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
+    private static final String KEY_WIFI_GSM_CONNECT_TYPE = "wifi_gsm_connect_type";
     private static final String KEY_GSM_WIFI_CONNECT_TYPE = "gsm_wifi_connect_type";
 //QUALCOMM_CMCC_END 
     private WifiManager mWifiManager;
@@ -67,6 +68,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private CheckBoxPreference mPriorityTypePref;
     private Preference mPrioritySettingPref;
     private CheckBoxPreference mAutoConnectTypePref;
+    private CheckBoxPreference mWifiGsmConnectTypePref;
     private ListPreference mSelectInSsidsTypePref;
     private ListPreference mGsmWifiConnectTypePref;
 //QUALCOMM_CMCC_END
@@ -91,9 +93,13 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
 //QUALCOMM_CMCC_START         
         if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
             ContentResolver contentResolver = getContentResolver();
-            if(mAutoConnectTypePref!=null){
+            if(mAutoConnectTypePref != null) {
                 mAutoConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
                         Settings.System.WIFI_AUTO_CONNECT_TYPE, Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO) == Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO);
+            }
+			if(mWifiGsmConnectTypePref != null) {
+                mWifiGsmConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                        Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_ASK) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
             }
             if(mGsmWifiConnectTypePref!=null){
                 int value = Settings.System.getInt(contentResolver,Settings.System.GSM_WIFI_CONNECT_TYPE, Settings.System.GSM_WIFI_CONNECT_TYPE_AUTO);
@@ -172,19 +178,22 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         mAutoConnectTypePref = (CheckBoxPreference)findPreference(KEY_AUTO_CONNECT_TYPE);
         mSelectInSsidsTypePref = (ListPreference)findPreference(KEY_SELECT_IN_SSIDS_TYPE);
         mGsmWifiConnectTypePref = (ListPreference)findPreference(KEY_GSM_WIFI_CONNECT_TYPE);
-        if(mPriorityTypePref != null && mPrioritySettingPref != null && mAutoConnectTypePref != null && mSelectInSsidsTypePref != null && mGsmWifiConnectTypePref != null) {
+        mWifiGsmConnectTypePref = (CheckBoxPreference)findPreference(KEY_WIFI_GSM_CONNECT_TYPE);		
+        if(mPriorityTypePref != null && mPrioritySettingPref != null && mAutoConnectTypePref != null && 
+			    mSelectInSsidsTypePref != null && mGsmWifiConnectTypePref != null && mWifiGsmConnectTypePref != null) {
             if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
                 mPriorityTypePref.setOnPreferenceChangeListener(this);
                 mAutoConnectTypePref.setOnPreferenceChangeListener(this);
                 mSelectInSsidsTypePref.setOnPreferenceChangeListener(this);
+				mWifiGsmConnectTypePref.setOnPreferenceChangeListener(this);
 				mGsmWifiConnectTypePref.setOnPreferenceChangeListener(this);
             } else {
                 getPreferenceScreen().removePreference(mAutoConnectTypePref);
                 getPreferenceScreen().removePreference(mPriorityTypePref);
                 getPreferenceScreen().removePreference(mPrioritySettingPref);
                 getPreferenceScreen().removePreference(mSelectInSsidsTypePref);
+				getPreferenceScreen().removePreference(mWifiGsmConnectTypePref);
 				getPreferenceScreen().removePreference(mGsmWifiConnectTypePref);
-
             }
         } else {
             Log.d(TAG, "Fail to get CMCC Pref");
@@ -301,6 +310,11 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                         Toast.LENGTH_SHORT).show();
                 return false;
             }
+        } else if (key.equals(KEY_WIFI_GSM_CONNECT_TYPE)) {
+            Log.d(TAG, "Wifi to Gsm connect type is " + newValue);
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(), Settings.System.WIFI_GSM_CONNECT_TYPE, 
+                    checked ? Settings.System.WIFI_GSM_CONNECT_TYPE_ASK : Settings.System.WIFI_GSM_CONNECT_TYPE_AUTO);
         }
 //QUALCOMM_CMCC_END
 
