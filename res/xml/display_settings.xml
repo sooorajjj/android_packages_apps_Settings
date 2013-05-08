@@ -23,6 +23,21 @@
                 android:title="@string/brightness"
                 android:dialogTitle="@string/brightness" />
 
+        <CheckBoxPreference
+            android:key="cabl_brightness"
+            android:title="@string/enhanced_brightness"
+            android:summary= "@string/enhanced_brightness_summary"/>
+
+        <PreferenceScreen
+            android:persistent="false"
+            android:key="screencolor_settings"
+            android:title="@string/screencolor">
+            <intent
+                android:action="android.intent.action.MAIN"
+                android:targetPackage="com.android.settings"
+                android:targetClass="com.android.settings.ScreenColorSettings" />
+        </PreferenceScreen>
+
         <PreferenceScreen
                 android:key="wallpaper"
                 android:title="@string/wallpaper_settings_title"

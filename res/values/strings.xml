@@ -1831,6 +1831,7 @@ alog [CHAR LIMIT=none] -->
     <string name="accelerometer_summary_off" product="default">Switch orientation automatically when rotating phone</string>
     <!-- Sound & display settings screen, setting option name to change brightness -->
     <string name="brightness">Brightness</string>
+    <string name="screencolor">Screen Color</string>
     <!-- Sound & display settings screen, setting option summary to change brightness -->
     <string name="brightness_summary">Adjust the brightness of the screen</string>
     <!-- Sound & display settings screen, setting option name to change screen timeout -->
@@ -4524,4 +4525,20 @@ alog [CHAR LIMIT=none] -->
     <string name="smsc_refresh_error">refresh error</string>
     <string name="dns_allowed">0.0.0.0 allowed</string>
     <string name="dns_not_allowed">0.0.0.0 not allowed</string>
+
+    <!-- modify for usb settings end  -->
+    <string name="enhanced_brightness_summary">It is usually used to improve video quality and save more power when playing video clips. </string>
+    <string name="enhanced_brightness">Dynamic Brightness </string>
+    <string name="screencolor_save">Save</string>
+    <string name="screencolor_cancel">Cancel</string>
+    <string name="previous_str">Previous</string>
+    <string name="new_str">New</string>
+    <string name="restore_preview">View default picture</string>
+    <string name="selectnewfile_menu">View new picture from Gallery</string>
+    <string name="selectfile_menu">View picture from Gallery</string>
+    <string name="restore_default_str">Reset</string>
+    <string name="hue_str">Hue: <xliff:g id="hue_value">%1$s</xliff:g></string>
+    <string name="saturation_str">Saturation: <xliff:g id="saturation_value">%1$s</xliff:g></string>
+    <string name="contrast_str">Contrast: <xliff:g id="contrast_value">%1$s</xliff:g></string>
+    <string name="intensity_str">Intensity: <xliff:g id="intensity_str_value">%1$s</xliff:g></string>
 </resources>

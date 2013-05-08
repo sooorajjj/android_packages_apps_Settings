@@ -71,7 +71,11 @@
             android:hardwareAccelerated="true"
             android:supportsRtl="true">
 
-        <!-- Settings -->
+      <!-- screen color Settings Controls -->
+        <activity android:name=".ScreenColorSettings" android:label="@string/screencolor"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="nosensor">
+        </activity>
 
         <activity android:name="Settings"
                 android:label="@string/settings_label_launcher"
