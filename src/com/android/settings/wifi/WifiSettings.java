@@ -120,6 +120,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private WifiManager.ActionListener mForgetListener;
     private boolean mP2pSupported;
 
+    private static SupplicantState wpa_state;
 
     private WifiEnabler mWifiEnabler;
     // An access point being editted is stored here.
@@ -716,6 +717,33 @@ public class WifiSettings extends SettingsPreferenceFragment
         }
     }
 
+    private void enableNetwork() {
+        final List<WifiConfiguration> configs = mWifiManager.getConfiguredNetworks();
+        if (configs != null) {
+            for (WifiConfiguration config : configs) {
+                mWifiManager.enableNetwork(config.networkId, false);
+            }
+        }
+    }
+
+    private void keyDetect() {
+         if (wpa_state.equals(SupplicantState.KEYFAIL)){
+            int id = -1;
+            final List<WifiConfiguration> configs = mWifiManager.getConfiguredNetworks();
+            if (configs != null) {
+               for (WifiConfiguration config : configs) {
+                   id = config.networkId;
+               }
+            }
+            if (id != -1) {
+               mWifiManager.forget(mChannel, id, mForgetListener);
+               showDialog(mSelectedAccessPoint, false);
+               enableNetwork();
+            }
+         }
+
+    }
+
     private void handleEvent(Context context, Intent intent) {
         String action = intent.getAction();
         if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
@@ -724,7 +752,7 @@ public class WifiSettings extends SettingsPreferenceFragment
         } else if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action) ||
                 WifiManager.CONFIGURED_NETWORKS_CHANGED_ACTION.equals(action) ||
                 WifiManager.LINK_CONFIGURATION_CHANGED_ACTION.equals(action)) {
-                updateAccessPoints();
+            updateAccessPoints();
         } else if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
             //Ignore supplicant state changes when network is connected
             //TODO: we should deprecate SUPPLICANT_STATE_CHANGED_ACTION and
@@ -734,6 +762,9 @@ public class WifiSettings extends SettingsPreferenceFragment
             //to get more fine grained information.
             SupplicantState state = (SupplicantState) intent.getParcelableExtra(
                     WifiManager.EXTRA_NEW_STATE);
+            if (state != null)
+               wpa_state = state;
+            keyDetect();
             if (!mConnected.get() && SupplicantState.isHandshakeState(state)) {
                 updateConnectionState(WifiInfo.getDetailedStateOf(state));
             } else {
