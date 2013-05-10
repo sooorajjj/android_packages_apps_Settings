@@ -16,21 +16,21 @@
 
 package com.android.settings.deviceinfo;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentQueryMap;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemProperties;
+import android.os.storage.StorageEventListener;
+import android.os.storage.StorageManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
-import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
@@ -41,26 +41,54 @@ import com.android.settings.Utils;
  */
 public class UsbSettings extends SettingsPreferenceFragment {
 
+    private static final boolean FEATURE_ADD_USB_MODE = true;
+
+    private static final boolean DEBUG = true;
     private static final String TAG = "UsbSettings";
 
     private static final String KEY_MTP = "usb_mtp";
     private static final String KEY_PTP = "usb_ptp";
+    private static final String KEY_SDCARD = "usb_sdcard";
+    private static final String KEY_CHARGING = "usb_charging";
+
+    // We could not know what's the usb charge mode config of each device, which
+    // may be defined in some sh source file. So here use a hard code for reference,
+    // you should modify this value according to device usb init config.
+    private static final String USB_FUNCTION_CHARGING =
+            "diag,serial_smd,serial_tty,rmnet_bam,mass_storage";
 
     private UsbManager mUsbManager;
     private CheckBoxPreference mMtp;
     private CheckBoxPreference mPtp;
-    private boolean mUsbAccessoryMode;
+    private CheckBoxPreference mSDCard;
+    private CheckBoxPreference mCharging;
+
+    private StorageManager mStorageManager = null;
 
     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
         public void onReceive(Context content, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UsbManager.ACTION_USB_STATE)) {
-               mUsbAccessoryMode = intent.getBooleanExtra(UsbManager.USB_FUNCTION_ACCESSORY, false);
-               Log.e(TAG, "UsbAccessoryMode " + mUsbAccessoryMode);
+                boolean connected = intent.getExtras().getBoolean(UsbManager.USB_CONNECTED);
+                if (!connected) {
+                    finish();
+                    return;
+                } else {
+                    updateUsbFunctionState();
+                }
             }
-            updateToggles(mUsbManager.getDefaultFunction());
         }
     };
+
+    private void updateUsbFunctionState() {
+        String functions = SystemProperties.get("persist.sys.usb.config", "");
+        if (functions.contains(USB_FUNCTION_CHARGING)) {
+            updateToggles(null);
+        } else {
+            updateToggles(mUsbManager.getDefaultFunction());
+        }
+        getPreferenceScreen().setEnabled(true);
+    }
 
     private PreferenceScreen createPreferenceHierarchy() {
         PreferenceScreen root = getPreferenceScreen();
@@ -70,22 +98,66 @@ public class UsbSettings extends SettingsPreferenceFragment {
         addPreferencesFromResource(R.xml.usb_settings);
         root = getPreferenceScreen();
 
-        mMtp = (CheckBoxPreference)root.findPreference(KEY_MTP);
-        mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
+        mMtp = (CheckBoxPreference) root.findPreference(KEY_MTP);
+        mPtp = (CheckBoxPreference) root.findPreference(KEY_PTP);
+        mSDCard = (CheckBoxPreference) root.findPreference(KEY_SDCARD);
+        mCharging = (CheckBoxPreference) root.findPreference(KEY_CHARGING);
 
+        if (!FEATURE_ADD_USB_MODE) {
+            root.removePreference(mSDCard);
+            root.removePreference(mCharging);
+        }
         return root;
     }
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        mStorageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        if (mStorageManager == null) {
+            Log.w(TAG, "Failed to get StorageManager");
+        }
     }
+
+    private StorageEventListener mStorageListener = new StorageEventListener() {
+        @Override
+        public void onStorageStateChanged(String path, String oldState,
+                String newState) {
+            if (DEBUG)
+                Log.i(TAG, "onStorageStateChanged path= " + path
+                        + " oldState = " + oldState + " newState= " + newState);
+            final boolean isExternalPath = (Environment.getExternalStorageDirectory().getPath()
+                    .equals(path));
+            if (newState.equals(Environment.MEDIA_SHARED)) {
+                if (isExternalPath) {
+                    Toast.makeText(getActivity(), R.string.external_storage_turn_on,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.internal_storage_turn_on,
+                            Toast.LENGTH_SHORT).show();
+                }
+            } else if (oldState.equals(Environment.MEDIA_SHARED)
+                    && newState.equals(Environment.MEDIA_UNMOUNTED)) {
+                if (isExternalPath) {
+                    Toast.makeText(getActivity(), R.string.external_storage_turn_off,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.internal_storage_turn_off,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            updateUsbFunctionState();
+        }
+    };
 
     @Override
     public void onPause() {
         super.onPause();
         getActivity().unregisterReceiver(mStateReceiver);
+        if (mStorageManager != null) {
+            mStorageManager.unregisterListener(mStorageListener);
+        }
     }
 
     @Override
@@ -99,31 +171,34 @@ public class UsbSettings extends SettingsPreferenceFragment {
         // ACTION_USB_STATE is sticky so this will call updateToggles
         getActivity().registerReceiver(mStateReceiver,
                 new IntentFilter(UsbManager.ACTION_USB_STATE));
+        if (mStorageManager != null) {
+            mStorageManager.registerListener(mStorageListener);
+        }
+        updateUsbFunctionState();
     }
 
     private void updateToggles(String function) {
         if (UsbManager.USB_FUNCTION_MTP.equals(function)) {
             mMtp.setChecked(true);
             mPtp.setChecked(false);
+            mSDCard.setChecked(false);
+            mCharging.setChecked(false);
         } else if (UsbManager.USB_FUNCTION_PTP.equals(function)) {
             mMtp.setChecked(false);
             mPtp.setChecked(true);
-        } else  {
+            mSDCard.setChecked(false);
+            mCharging.setChecked(false);
+        } else if (UsbManager.USB_FUNCTION_MASS_STORAGE.equals(function)) {
             mMtp.setChecked(false);
             mPtp.setChecked(false);
-        }
-
-        if (!mUsbAccessoryMode) {
-            //Enable MTP and PTP switch while USB is not in Accessory Mode, otherwise disable it
-            Log.e(TAG, "USB Normal Mode");
-            mMtp.setEnabled(true);
-            mPtp.setEnabled(true);
+            mSDCard.setChecked(true);
+            mCharging.setChecked(false);
         } else {
-            Log.e(TAG, "USB Accessory Mode");
-            mMtp.setEnabled(false);
-            mPtp.setEnabled(false);
+            mMtp.setChecked(false);
+            mPtp.setChecked(false);
+            mSDCard.setChecked(false);
+            mCharging.setChecked(true);
         }
-
     }
 
     @Override
@@ -137,7 +212,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
         // temporary hack - using check boxes as radio buttons
         // don't allow unchecking them
         if (preference instanceof CheckBoxPreference) {
-            CheckBoxPreference checkBox = (CheckBoxPreference)preference;
+            CheckBoxPreference checkBox = (CheckBoxPreference) preference;
             if (!checkBox.isChecked()) {
                 checkBox.setChecked(true);
                 return true;
@@ -149,7 +224,14 @@ public class UsbSettings extends SettingsPreferenceFragment {
         } else if (preference == mPtp) {
             mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_PTP, true);
             updateToggles(UsbManager.USB_FUNCTION_PTP);
+        } else if (preference == mSDCard) {
+            mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MASS_STORAGE, true);
+            updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
+        } else if (preference == mCharging) {
+            mUsbManager.setCurrentFunction(USB_FUNCTION_CHARGING, true);
+            updateToggles(null);
         }
+        getPreferenceScreen().setEnabled(false);
         return true;
     }
 }

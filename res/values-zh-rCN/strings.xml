@@ -1853,4 +1853,15 @@
     <string name="selectnewfile_menu">从图库选择文件预览</string>
     <string name="selectfile_menu">从图库选择文件预览</string>
     <string name="restore_preview">恢复默认预览图片</string>
+
+    <!-- modify for usb settings start -->
+    <string name="usb_sdcard_title">挂载SD 卡</string>
+    <string name="usb_sdcard_summary">"让您在 Windows 上传输SD 卡上的媒体文件"</string>
+    <string name="usb_charging_title">充电</string>
+    <string name="usb_charging_summary">使手机只处于充电状态</string>
+    <string name="internal_storage_turn_on">"内部存储器已打开"</string>
+    <string name="internal_storage_turn_off">"内部存储器已关闭"</string>
+    <string name="external_storage_turn_on">"外部存储器已打开"</string>
+    <string name="external_storage_turn_off">"外部存储器已关闭"</string>
+    <!-- modify for usb settings end  -->
 </resources>
