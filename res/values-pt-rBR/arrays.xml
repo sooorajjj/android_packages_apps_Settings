@@ -28,15 +28,14 @@
         <item>"VPN IPSec com autenticação de certificados e Xauth"</item>
         <item>"VPN IPSec com certificados e autenticação híbrida"</item>
     </string-array>
-    <string-array name="screen_timeout_entries" >
-        <item>"15 segundos"</item>
-        <item>"30 segundos"</item>
-        <item>"1 minuto"</item>
-        <item>"2 minutos"</item>
-        <item>"5 minutos"</item>
-        <item>"10 minutos"</item>
-        <item>"30 minutos"</item>
-    </string-array>
+    <string name="screen_timeout_15s">"15 segundos"</string>
+    <string name="screen_timeout_30s">"30 segundos"</string>
+    <string name="screen_timeout_1m">"1 minuto"</string>
+    <string name="screen_timeout_2m">"2 minutos"</string>
+    <string name="screen_timeout_5m">"5 minutos"</string>
+    <string name="screen_timeout_10m">"10 minutos"</string>
+    <string name="screen_timeout_30m">"30 minutos"</string>
+    <string name="screen_timeout_never">"Nunca"</string>
     <string-array name="entries_font_size" >
         <item>"Pequeno"</item>
         <item>"Normal"</item>
