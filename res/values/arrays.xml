@@ -53,7 +53,7 @@
     </string-array>
 
     <!-- Display settings.  The delay in inactivity before the screen is turned off. These are shown in a list dialog. -->
-    <string-array name="screen_timeout_entries">
+    <string-array name="screen_timeout_entries" translatable="false">
         <item>@string/screen_timeout_15s</item>
         <item>@string/screen_timeout_30s</item>
         <item>@string/screen_timeout_1m</item>
