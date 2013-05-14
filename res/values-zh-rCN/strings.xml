@@ -1698,6 +1698,7 @@
     <string name="data_usage_tab_wifi" msgid="1728851922959017766">"Wi-Fi"</string>
     <string name="data_usage_tab_ethernet" msgid="7298064366282319911">"以太网"</string>
     <string name="data_usage_tab_mobile" msgid="454140350007299045">"移动"</string>
+    <string name="data_usage_tab_slot" >"卡</string>
     <string name="data_usage_tab_4g" msgid="1301978716067512235">"4G"</string>
     <string name="data_usage_tab_3g" msgid="6092169523081538718">"2G-3G"</string>
     <string name="data_usage_list_mobile" msgid="5588685410495019866">"移动网络"</string>
