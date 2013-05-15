@@ -29,6 +29,17 @@
         android:title="@string/wifi_settings_title"
         android:icon="@drawable/ic_settings_wireless" />
 
+    <!-- MobileData -->
+    <header
+        android:id="@+id/mobiledata_settings"
+        android:icon="@drawable/stat_notify_mobile_data"
+        android:title="@string/data_usage_enable_mobile">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.android.phone"
+            android:targetClass="com.android.phone.MSimMobileNetworkSubSettings" />
+    </header>
+
     <!-- Bluetooth -->
     <header
         android:id="@+id/bluetooth_settings"
@@ -62,15 +73,26 @@
     <header android:id="@+id/device_section"
         android:title="@string/header_category_device" />
 
-    <!-- Multi Sim Settings - this is in the settings process -->
+    <!-- Multi Sim Settings - this is in the settings process
     <header
         android:id="@+id/multi_sim_settings"
         android:icon="@drawable/ic_settings_sim"
-        android:title="@string/multi_sim_settings_title">
+        android:title="@string/multi_sim_settings_title_Multi">
         <intent
             android:action="android.intent.action.MAIN"
             android:targetPackage="com.android.settings"
             android:targetClass="com.android.settings.MultiSimSettings" />
+    </header>
+    -->
+    <!-- Multi Sim Settings - this is in the settings process -->
+    <header
+        android:id="@+id/multi_sim_settings"
+        android:icon="@drawable/ic_settings_sim_display"
+        android:title="@string/multi_sim_settings_title">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.android.settings"
+            android:targetClass="com.android.settings.multisimsettings.MultiSimSettings" />
     </header>
 
     <!-- Sound -->
