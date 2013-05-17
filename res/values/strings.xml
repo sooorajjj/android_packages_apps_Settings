@@ -2762,6 +2762,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Manage applications, title for dialog when killing persistent apps-->
     <!-- Manage applications, text for Move button when move is in progress -->
     <string name="moving">Moving</string>
+    <string name="no_sdcard">Couldn\'t move app.No SD Card</string>
 
     <!-- Manage applications, text for move error messages -->
     <string name="insufficient_storage">Not enough storage space.</string>

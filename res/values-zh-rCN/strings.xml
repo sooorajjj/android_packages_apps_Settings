@@ -1212,6 +1212,7 @@
     <string name="move_app_to_sdcard" product="nosdcard" msgid="4350451696315265420">"移至 USB 存储设备"</string>
     <string name="move_app_to_sdcard" product="default" msgid="1143379049903056407">"移至 SD 卡"</string>
     <string name="moving" msgid="6431016143218876491">"正在移动"</string>
+    <string name="no_sdcard">"无法移动应用程序。没有 SD 卡。"</string>
     <string name="insufficient_storage" msgid="481763122991093080">"存储空间不足。"</string>
     <string name="does_not_exist" msgid="3476487214886606748">"应用不存在。"</string>
     <string name="app_forward_locked" msgid="6331564656683790866">"应用受版权保护。"</string>

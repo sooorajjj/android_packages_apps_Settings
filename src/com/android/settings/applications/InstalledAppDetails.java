@@ -169,6 +169,7 @@ public class InstalledAppDetails extends Fragment
     private CharSequence mComputingStr;
     
     // Dialog identifiers used in showDialog
+    private static int moveFlags=0;
     private static final int DLG_BASE = 0;
     private static final int DLG_CLEAR_DATA = DLG_BASE + 1;
     private static final int DLG_FACTORY_RESET = DLG_BASE + 2;
@@ -1123,6 +1124,9 @@ public class InstalledAppDetails extends Fragment
                 case DLG_MOVE_FAILED:
                     CharSequence msg = getActivity().getString(R.string.move_app_failed_dlg_text,
                             getOwner().getMoveErrMsg(moveErrorCode));
+                if (moveFlags == PackageManager.MOVE_EXTERNAL_MEDIA
+                        && !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                    msg = getString(R.string.no_sdcard);
                     return new AlertDialog.Builder(getActivity())
                     .setTitle(getActivity().getText(R.string.move_app_failed_dlg_title))
                     .setIconAttribute(android.R.attr.alertDialogIcon)
@@ -1342,7 +1346,7 @@ public class InstalledAppDetails extends Fragment
             if (mPackageMoveObserver == null) {
                 mPackageMoveObserver = new PackageMoveObserver();
             }
-            int moveFlags = (mAppEntry.info.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0 ?
+            moveFlags = (mAppEntry.info.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0 ?
                     PackageManager.MOVE_INTERNAL : PackageManager.MOVE_EXTERNAL_MEDIA;
             mMoveInProgress = true;
             refreshButtons();
