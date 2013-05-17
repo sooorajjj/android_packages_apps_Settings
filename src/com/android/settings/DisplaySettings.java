@@ -386,6 +386,12 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             }
         }
         if (KEY_FONT_SIZE.equals(key)) {
+            synchronized (this) {
+                try {
+                    wait(200);
+                } catch (InterruptedException e) {
+                }
+            }
             writeFontSizePreference(objValue);
         }
 
