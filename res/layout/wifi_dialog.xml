@@ -142,7 +142,8 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
+            <LinearLayout android:id="@+id/l_password"
+                        android:visibility="visible"
                        style="@style/wifi_item" >
                 <TextView
                         style="@style/wifi_item_label"
@@ -154,7 +155,8 @@
                         android:password="true" />
             </LinearLayout>
 
-            <LinearLayout
+            <LinearLayout android:id="@+id/l_show_password"
+                        android:visibility="visible"
                     style="@style/wifi_item" >
                 <!--  Dummy to enable right-justification of checkbox -->
                 <TextView
