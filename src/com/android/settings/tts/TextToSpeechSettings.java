@@ -149,6 +149,24 @@ public class TextToSpeechSettings extends SettingsPreferenceFragment implements
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if ((mDefaultRatePref != null) && (mDefaultRatePref.getDialog() != null)) {
+            mDefaultRatePref.getDialog().dismiss();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        // If TtsEngines isEmpty, don't need stay in
+        // this tts Setting screen, so finish it.
+        if (mEnginesHelper.getEngines().isEmpty()) {
+            finish();
+        }
+        super.onResume();
+    }
+
     private void initSettings() {
         final ContentResolver resolver = getContentResolver();
 
@@ -193,18 +211,19 @@ public class TextToSpeechSettings extends SettingsPreferenceFragment implements
 
         if (TextUtils.isEmpty(currentEngine)) currentEngine = mTts.getDefaultEngine();
 
-        Locale currentLocale = mTts.getLanguage();
-
+        final String localeString = mEnginesHelper.getLocalePrefForEngine(
+                currentEngine);
         // TODO: This is currently a hidden private API. The intent extras
         // and the intent action should be made public if we intend to make this
         // a public API. We fall back to using a canned set of strings if this
         // doesn't work.
         Intent intent = new Intent(TextToSpeech.Engine.ACTION_GET_SAMPLE_TEXT);
 
-        if (currentLocale != null) {
-            intent.putExtra("language", currentLocale.getLanguage());
-            intent.putExtra("country", currentLocale.getCountry());
-            intent.putExtra("variant", currentLocale.getVariant());
+        if (localeString != null) {
+            final String[] locale = TtsEngines.parseLocalePref(localeString);
+            intent.putExtra("language", locale[0]);
+            intent.putExtra("country", locale[1]);
+            intent.putExtra("variant", locale[2]);
         }
         intent.setPackage(currentEngine);
 
@@ -274,6 +293,12 @@ public class TextToSpeechSettings extends SettingsPreferenceFragment implements
             // The engine is guaranteed to have been initialized here
             // because this preference is not enabled otherwise.
             mTts.speak(sample, TextToSpeech.QUEUE_FLUSH, null);
+        } else if (mTts != null) {
+            // Current locale is not supported, so sample string is null.
+            // Need speak English sample string as default.
+            mTts.setLanguage(Locale.US);
+            mTts.speak(getActivity().getResources().getStringArray(
+                    R.array.tts_demo_strings)[0], TextToSpeech.QUEUE_FLUSH, null);
         } else {
             // TODO: Display an error here to the user.
             Log.e(TAG, "Did not have a sample string for the requested language");
@@ -291,6 +316,9 @@ public class TextToSpeechSettings extends SettingsPreferenceFragment implements
                     mTts.setSpeechRate(mDefaultRate / 100.0f);
                 }
                 if (DBG) Log.d(TAG, "TTS default rate changed, now " + mDefaultRate);
+                if (mTts != null && mTts.isSpeaking()) {
+                    getSampleText();
+                }
             } catch (NumberFormatException e) {
                 Log.e(TAG, "could not persist default TTS rate setting", e);
             }
