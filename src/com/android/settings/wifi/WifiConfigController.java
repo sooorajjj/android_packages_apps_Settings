@@ -100,7 +100,6 @@ public class WifiConfigController implements TextWatcher,
     public static final int WIFI_EAP_METHOD_TLS  = 1;
     public static final int WIFI_EAP_METHOD_TTLS = 2;
     public static final int WIFI_EAP_METHOD_PWD  = 3;
-    public static final int WIFI_EAP_METHOD_SIM  = 4;
 
     private static final String TAG = "WifiConfigController";
 
@@ -357,11 +356,9 @@ public class WifiConfigController implements TextWatcher,
                 break;
 
             case AccessPoint.SECURITY_EAP:
-
+                config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
+                config.allowedKeyManagement.set(KeyMgmt.IEEE8021X);
                 config.eap.setValue((String) mEapMethodSpinner.getSelectedItem());
-
-                if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_SIM) config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
-                else config.allowedKeyManagement.set(KeyMgmt.IEEE8021X);
 
                 config.phase2.setValue((mPhase2Spinner.getSelectedItemPosition() == 0) ? "" :
                         PHASE2_PREFIX + mPhase2Spinner.getSelectedItem());
@@ -384,10 +381,6 @@ public class WifiConfigController implements TextWatcher,
                 if (mPasswordView.length() != 0) {
                     config.password.setValue(mPasswordView.getText().toString());
                 }
-
-                config.pin.setValue("1234");
-                config.pcsc.setValue(" ");
-
                 break;
 
             default:
@@ -578,31 +571,17 @@ public class WifiConfigController implements TextWatcher,
 
         mView.findViewById(R.id.l_method).setVisibility(View.VISIBLE);
         mView.findViewById(R.id.l_identity).setVisibility(View.VISIBLE);
-        mView.findViewById(R.id.l_password).setVisibility(View.VISIBLE);
-        mView.findViewById(R.id.l_show_password).setVisibility(View.VISIBLE);
 
         if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_PWD){
             mView.findViewById(R.id.l_phase2).setVisibility(View.GONE);
             mView.findViewById(R.id.l_ca_cert).setVisibility(View.GONE);
             mView.findViewById(R.id.l_user_cert).setVisibility(View.GONE);
             mView.findViewById(R.id.l_anonymous).setVisibility(View.GONE);
-        } else if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_SIM) {
-            mView.findViewById(R.id.l_phase2).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_ca_cert).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_user_cert).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_anonymous).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_identity).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_password).setVisibility(View.GONE);
-            mView.findViewById(R.id.l_show_password).setVisibility(View.GONE);
-
         } else {
             mView.findViewById(R.id.l_phase2).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.l_ca_cert).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.l_user_cert).setVisibility(View.VISIBLE);
             mView.findViewById(R.id.l_anonymous).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.l_identity).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.l_password).setVisibility(View.VISIBLE);
-            mView.findViewById(R.id.l_show_password).setVisibility(View.VISIBLE);
         }
     }
 
