@@ -4269,4 +4269,9 @@ alog [CHAR LIMIT=none] -->
     <!--string name="hdmi_settings_title">HDMI</string-->   
     <!-- add HDMI Disable in Display settings -->
     <string name="hdmi_disable_title">Enable HDMI</string>
+    <string name="wifi_eap_method_peap">PEAP</string>
+    <string name="wifi_eap_method_tls">TLS</string>
+    <string name="wifi_eap_method_ttls">TTLS</string>
+    <string name="wifi_eap_method_pwd">PWD</string>
+    <string name="wifi_eap_method_sim">SIM</string>
 </resources>

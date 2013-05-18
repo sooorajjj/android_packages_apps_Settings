@@ -14,12 +14,10 @@
         <item>"Nenhum"</item>
         <item>"Manual"</item>
     </string-array>
-    <string-array name="wifi_eap_method" >
-        <item>"PEAP"</item>
-        <item>"TLS"</item>
-        <item>"TTLS"</item>
-        <item>"PWD"</item>
-    </string-array>
+        <string name="wifi_eap_method_peap">"PEAP"</string>
+        <string name="wifi_eap_method_tls">"TLS"</string>
+        <string name="wifi_eap_method_ttls">"TTLS"</string>
+        <string name="wifi_eap_method_pwd">"PWD"</string>
     <string-array name="vpn_types_long" >
         <item>"VPN PPTP"</item>
         <item>"L2TP/IPSec VPN com chaves pré-compartilhadas"</item>

@@ -113,12 +113,10 @@
     <!-- no translation found for wifi_security_no_eap:0 (2084555984818107151) -->
     <!-- no translation found for wifi_security_no_eap:1 (397579322683471524) -->
     <!-- no translation found for wifi_security_no_eap:2 (1968820975358150484) -->
-  <string-array name="wifi_eap_method">
-    <item msgid="1160193392455075561">"PEAP"</item>
-    <item msgid="7981731051382306293">"TLS"</item>
-    <item msgid="2892994535305020162">"TTLS"</item>
-    <item msgid="435667726254379514">"PWD"</item>
-  </string-array>
+    <string name="wifi_eap_method_peap">"PEAP"</string>
+    <string name="wifi_eap_method_tls">"TLS"</string>
+    <string name="wifi_eap_method_ttls">"TTLS"</string>
+    <string name="wifi_eap_method_pwd">"PWD"</string>
   <string-array name="wifi_p2p_wps_setup">
     <item msgid="5085064298144493867">"Pritisnite gumb"</item>
     <item msgid="1624323946324499595">"PIN iz enakovredne naprave"</item>
