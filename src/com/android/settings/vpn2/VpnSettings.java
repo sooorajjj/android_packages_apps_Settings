@@ -85,6 +85,7 @@ public class VpnSettings extends SettingsPreferenceFragment implements
     @Override
     public void onCreate(Bundle savedState) {
         super.onCreate(savedState);
+        Log.e(TAG, "onCreate");
 
         setHasOptionsMenu(true);
         addPreferencesFromResource(R.xml.vpn_settings2);

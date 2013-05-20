@@ -90,6 +90,8 @@ public class Memory extends SettingsPreferenceFragment {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        Log.e(TAG, "onCreate");
+
         final Context context = getActivity();
 
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);

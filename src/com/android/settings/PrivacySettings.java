@@ -30,6 +30,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.util.Log;
 
 /**
  * Gesture lock pattern settings.
@@ -57,6 +58,7 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.privacy_settings);
         final PreferenceScreen screen = getPreferenceScreen();
+        Log.e("PrivacySettings", "onCreate");
 
         mBackupManager = IBackupManager.Stub.asInterface(
                 ServiceManager.getService(Context.BACKUP_SERVICE));

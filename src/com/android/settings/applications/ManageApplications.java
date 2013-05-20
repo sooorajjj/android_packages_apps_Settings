@@ -81,6 +81,9 @@ import com.android.settings.Utils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import android.widget.SearchView;
+import android.app.SearchManager;
+import android.widget.SearchView.OnSuggestionListener;
 
 final class CanBeOnSdCardChecker {
     final IPackageManager mPm;
@@ -136,10 +139,10 @@ interface AppClickListener {
  */
 public class ManageApplications extends Fragment implements
         AppClickListener, DialogInterface.OnClickListener,
-        DialogInterface.OnDismissListener {
+        DialogInterface.OnDismissListener, OnSuggestionListener {
 
     static final String TAG = "ManageApplications";
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     private static final String EXTRA_SORT_ORDER = "sortOrder";
     private static final String EXTRA_SHOW_BACKGROUND = "showBackground";
@@ -175,6 +178,8 @@ public class ManageApplications extends Fragment implements
     private int mSortOrder = SORT_ORDER_ALPHA;
     
     private ApplicationsState mApplicationsState;
+    private MenuItem mSearchMenu;
+    private SearchView mSearchView;
 
     public static class TabInfo implements OnItemClickListener {
         public final ManageApplications mOwner;
@@ -811,6 +816,7 @@ public class ManageApplications extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate");
 
         setHasOptionsMenu(true);
 
@@ -999,6 +1005,22 @@ public class ManageApplications extends Fragment implements
         pa.startPreferencePanel(InstalledAppDetails.class.getName(), args,
                 R.string.application_info_label, null, this, INSTALLED_APP_DETAILS);
     }
+
+    
+    private final SearchView.OnQueryTextListener mOnQueryText
+            = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            // Event not handled.  Let the search do the default action.
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            mSearchMenu.collapseActionView();
+            return true; // Event handled.
+        }
+    };
     
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -1007,8 +1029,19 @@ public class ManageApplications extends Fragment implements
         // bar UI to be very confusing.
         if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH){
             //add for new feature for cmcc : search applications
-            menu.add(0, SHOW_SEARCH_APPLICATIONS,1,R.string.show_search_function)
-                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            inflater.inflate(R.menu.app_search, menu);
+            //menu.add(0, SHOW_SEARCH_APPLICATIONS,1,R.string.show_search_function)
+                        //.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+            mSearchMenu = menu.findItem(R.id.search_view);
+            mSearchView = (SearchView) mSearchMenu.getActionView();
+            if (mSearchView != null) {
+                SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+                mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+                mSearchView.setQueryRefinementEnabled(true);
+                mSearchView.setOnQueryTextListener(mOnQueryText);
+                mSearchView.setOnSuggestionListener(this);
+            }
 
             menu.add(0, SORT_ORDER_ALPHA, 2, R.string.sort_order_alpha)
                 //.setIcon(android.R.drawable.ic_menu_sort_alphabetically)
@@ -1074,7 +1107,8 @@ public class ManageApplications extends Fragment implements
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(!showingBackground);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(false);
             if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH)
-                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(false);//add for new feature for cmcc : search applications
+                if(mSearchMenu != null)
+                    mSearchMenu.setVisible(false);//add for new feature for cmcc : search applications
         } else {
             mOptionsMenu.findItem(SORT_ORDER_ALPHA).setVisible(mSortOrder != SORT_ORDER_ALPHA);
             mOptionsMenu.findItem(SORT_ORDER_SIZE).setVisible(mSortOrder != SORT_ORDER_SIZE);
@@ -1082,7 +1116,8 @@ public class ManageApplications extends Fragment implements
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(false);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(true);
             if(FeatureQuery.FEATURE_SETTINGS_APPLICATIONS_SEARCH)
-                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(true);//add for new feature for cmcc : search applications
+                if(mSearchMenu != null)
+                    mSearchMenu.setVisible(true);//add for new feature for cmcc : search applications
         }
     }
 
@@ -1203,7 +1238,7 @@ public class ManageApplications extends Fragment implements
             buildResetDialog();
         } 
         else if(menuId == SHOW_SEARCH_APPLICATIONS){//add for new feature for cmcc : search applications
-            showInputmethod();
+            //showInputmethod();
         }
 		else {
             // Handle the home button
@@ -1274,5 +1309,16 @@ public class ManageApplications extends Fragment implements
             imm.showSoftInputUnchecked(0, null);
         }
        
+    }
+
+    @Override
+    public boolean onSuggestionSelect(int position) {
+        return false;
+    }
+
+    @Override
+    public boolean onSuggestionClick(int position) {
+        mSearchMenu.collapseActionView();
+        return false;
     }
 }

@@ -146,6 +146,7 @@ public class ZonePicker extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanseState) {
         super.onActivityCreated(savedInstanseState);
+        Log.e(TAG, "onCreate");
 
         final Activity activity = getActivity();
         mTimezoneSortedAdapter = constructTimezoneAdapter(activity, false);

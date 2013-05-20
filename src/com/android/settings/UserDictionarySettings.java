@@ -82,6 +82,8 @@ public class UserDictionarySettings extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        Log.e(TAG, "onCreate");
     }
 
     @Override
