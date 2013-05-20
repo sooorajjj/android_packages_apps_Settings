@@ -2007,4 +2007,12 @@
     <string name="device_additional_status">状态消息</string>
     <string name="gps_time_sync_attention_gps_on">使用 GPS 提供时间，必须要等待 GPS 定位成功。GPS 定位最多需要一分钟。\n\n确定要使用 GPS 提供时间吗？</string>
     <string name="gps_time_sync_attention_gps_off">使用 GPS 提供时间，必须要先启用 GPS，并等待 GPS 定位成功。GPS 定位最多需要一分钟。如果 GPS 信号弱，可能会定位失败。\n\n确定现在要启用 GPS 并使用 GPS 提供时间吗？</string>  
+    <!-- Activity label of BluetoothFtpPermissionActivity, also used as Strings in the permission dialog [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_request">"Ftp 请求"</string>
+    <!-- Bluetooth FTP permission Alert Activity text [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_acceptance_dialog_text">"%1$s想访问您的文件系统。要向%2$s授予访问权限吗？"</string>
+    <!-- Bluetooth FTP permission Alert Activity checkbox text [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_remember_choice">"下次不再询问"</string>
+    <!-- Activity label of BluetoothPermissionActivity for FTP [CHAR LIMIT=none]-->
+    <string name="bluetooth_ftp_connection_permission_request">Ftp连接请求</string>
 </resources>
