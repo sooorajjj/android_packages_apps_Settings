@@ -348,8 +348,17 @@ public class ChartSweepView extends View {
         return mAxis;
     }
 
+
+    public void setMaxValue(long max) {
+        mMaxValue = max;
+    }
+
     public void setValue(long value) {
-        mValue = value;
+        if (mMaxValue != -1 && value > mMaxValue) {
+           mValue = mMaxValue;
+        } else {
+           mValue = value;
+        }
         invalidateLabel();
     }
 
