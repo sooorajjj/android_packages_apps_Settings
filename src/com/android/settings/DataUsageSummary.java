@@ -1908,8 +1908,7 @@ public class DataUsageSummary extends Fragment {
             /** set limit sweep and warning sweep max value*/
             bytesPicker.setMaxValue(LIMIT_MAX_SIZE);
             if (warningBytes != WARNING_DISABLED && limitBytes > 0) {
-                final int minMB = (int) (warningBytes / MB_IN_BYTES) + 1;
-                bytesPicker.setMinValue(minMB > 0 ? minMB : 0);
+                bytesPicker.setMinValue((int) (warningBytes / MB_IN_BYTES) + 1);
             } else {
                 bytesPicker.setMinValue(0);
             }
