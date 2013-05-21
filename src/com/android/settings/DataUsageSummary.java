@@ -1899,7 +1899,8 @@ public class DataUsageSummary extends Fragment {
 
             bytesPicker.setMaxValue(Integer.MAX_VALUE);
             if (warningBytes != WARNING_DISABLED && limitBytes > 0) {
-                bytesPicker.setMinValue((int) (warningBytes / MB_IN_BYTES) + 1);
+                final int minMB = (int) (warningBytes / MB_IN_BYTES) + 1;
+                bytesPicker.setMinValue(minMB > 0 ? minMB : 0);
             } else {
                 bytesPicker.setMinValue(0);
             }
