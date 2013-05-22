@@ -143,8 +143,6 @@ public class AccountSyncSettings extends AccountPreferenceBase {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
-        Log.e(TAG, "onCreate");
 
         setHasOptionsMenu(true);
     }

@@ -50,7 +50,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Locale;
-import android.util.Log;
 
 /*
  * Displays preferences for Tethering.
@@ -113,7 +112,6 @@ public class TetherSettings extends SettingsPreferenceFragment
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         addPreferencesFromResource(R.xml.tether_prefs);
-        Log.e(TAG, "onCreate");
 
         final Activity activity = getActivity();
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();

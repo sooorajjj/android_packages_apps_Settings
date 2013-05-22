@@ -137,8 +137,6 @@ public class SoundSettings extends SettingsPreferenceFragment implements
         ContentResolver resolver = getContentResolver();
         int activePhoneType = TelephonyManager.getDefault().getCurrentPhoneType();
 
-        Log.e(TAG, "onCreate");
-
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         addPreferencesFromResource(R.xml.sound_settings);
