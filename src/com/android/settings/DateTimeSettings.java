@@ -41,6 +41,7 @@ import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.format.DateFormat;
+import android.text.format.Time;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
@@ -330,6 +331,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
+                setDateRange((DatePickerDialog)d);
             break;
         }
         case DIALOG_TIMEPICKER: {
@@ -392,6 +394,21 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         }
     }
     */
+
+    private void setDateRange(DatePickerDialog dialog) {
+        if (dialog != null) {
+            Time minTime = new Time();
+            Time maxTime = new Time();
+            minTime.set(0, 0, 0, 1, 0, 1970);// 1970/1/1
+            maxTime.set(59, 59, 23, 31, 11, 2037);// 2037/12/31
+            long maxDate = maxTime.toMillis(false);
+            maxDate = maxDate + 999;// in millsec
+            long minDate = minTime.toMillis(false);
+            dialog.getDatePicker().setMinDate(minDate);
+            dialog.getDatePicker().setMaxDate(maxDate);
+        }
+    }
+    
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference == mDatePref) {
