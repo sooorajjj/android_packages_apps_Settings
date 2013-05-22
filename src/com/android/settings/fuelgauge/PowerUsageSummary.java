@@ -72,7 +72,7 @@ import android.net.wifi.WifiManager;
  */
 public class PowerUsageSummary extends PreferenceFragment implements Runnable {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String TAG = "PowerUsageSummary";
 
@@ -137,6 +137,8 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        Log.e(TAG, "onCreate");
 
         if (icicle != null) {
             mStats = sStatsXfer;

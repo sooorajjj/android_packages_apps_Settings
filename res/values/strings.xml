@@ -2131,11 +2131,11 @@ alog [CHAR LIMIT=none] -->
     <!-- Storage setting.  Title for MTP checkbox [CHAR LIMIT=30]-->
     <string name="usb_mtp_title">Media device (MTP)</string>
     <!-- Storage setting.  Summary for MTP checkbox [CHAR LIMIT=NONE]-->
-    <string name="usb_mtp_summary">Lets you transfer media files on Windows, or using Android File Transfer on Mac (see www.android.com/filetransfer)</string>
+    <string name="usb_mtp_summary">Let you transfer media files on Windows, or using Android File Transfer on Mac (see www.android.com/filetransfer)</string>
     <!-- Storage setting.  Title for PTP checkbox [CHAR LIMIT=30]-->
     <string name="usb_ptp_title">Camera (PTP)</string>
     <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
-    <string name="usb_ptp_summary">Lets you transfer photos using camera software, and transfer any files on computers that don\'t support MTP</string>
+    <string name="usb_ptp_summary">Let you transfer photos using camera software, and transfer any files on computers that don\'t support MTP</string>
     <!-- Storage setting.  Summary for PTP checkbox [CHAR LIMIT=NONE]-->
     <string name="usb_label_installer_cd">"Install file-transfer tools"</string>
 
@@ -2762,6 +2762,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Manage applications, title for dialog when killing persistent apps-->
     <!-- Manage applications, text for Move button when move is in progress -->
     <string name="moving">Moving</string>
+    <string name="no_sdcard">Couldn\'t move app.No SD Card</string>
 
     <!-- Manage applications, text for move error messages -->
     <string name="insufficient_storage">Not enough storage space.</string>

@@ -41,6 +41,7 @@ import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.format.DateFormat;
+import android.text.format.Time;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
@@ -104,7 +105,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     private void initUI() {
         boolean autoTimeEnabled = getAutoState(Settings.Global.AUTO_TIME);
         boolean autoTimeZoneEnabled = getAutoState(Settings.Global.AUTO_TIME_ZONE);
-        boolean autoTimeGpsEnabled = getAutoState(Settings.System.AUTO_TIME_GPS);
+        boolean autoTimeGpsEnabled = getAutoGPSState(Settings.System.AUTO_TIME_GPS);
         Intent intent = getActivity().getIntent();
         boolean isFirstRun = intent.getBooleanExtra(EXTRA_IS_FIRST_RUN, false);
 
@@ -295,15 +296,15 @@ public class DateTimeSettings extends SettingsPreferenceFragment
             boolean autoEnabled = true;
 
             if (index == AUTO_TIME_NETWORK_INDEX) {
-                Settings.System.putInt(getContentResolver(),
-                        Settings.System.AUTO_TIME, 1);
+                Settings.Global.putInt(getContentResolver(),
+                        Settings.Global.AUTO_TIME, 1);
                 Settings.System.putInt(getContentResolver(),
                         Settings.System.AUTO_TIME_GPS, 0);
             } else if (index == AUTO_TIME_GPS_INDEX) {
                 showDialog(DIALOG_GPS_CONFIRM);
                 setOnCancelListener(this);
             } else {
-                Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME,0);
+                Settings.Global.putInt(getContentResolver(), Settings.Global.AUTO_TIME,0);
                 Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME_GPS,0);
                 autoEnabled = false;
             }
@@ -330,6 +331,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
+                setDateRange((DatePickerDialog)d);
             break;
         }
         case DIALOG_TIMEPICKER: {
@@ -392,6 +394,21 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         }
     }
     */
+
+    private void setDateRange(DatePickerDialog dialog) {
+        if (dialog != null) {
+            Time minTime = new Time();
+            Time maxTime = new Time();
+            minTime.set(0, 0, 0, 1, 0, 1970);// 1970/1/1
+            maxTime.set(59, 59, 23, 31, 11, 2037);// 2037/12/31
+            long maxDate = maxTime.toMillis(false);
+            maxDate = maxDate + 999;// in millsec
+            long minDate = minTime.toMillis(false);
+            dialog.getDatePicker().setMinDate(minDate);
+            dialog.getDatePicker().setMaxDate(maxDate);
+        }
+    }
+    
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference == mDatePref) {
@@ -460,6 +477,14 @@ public class DateTimeSettings extends SettingsPreferenceFragment
     private boolean getAutoState(String name) {
         try {
             return Settings.Global.getInt(getContentResolver(), name) > 0;
+        } catch (SettingNotFoundException snfe) {
+            return false;
+        }
+    }
+    
+    private boolean getAutoGPSState(String name) {
+        try {
+            return Settings.System.getInt(getContentResolver(), name) > 0;
         } catch (SettingNotFoundException snfe) {
             return false;
         }
@@ -550,8 +575,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
                         getContentResolver(), LocationManager.GPS_PROVIDER,
                         true);
             }
-            Settings.System.putInt(getContentResolver(),
-                    Settings.System.AUTO_TIME, 0);
+            Settings.Global.putInt(getContentResolver(),
+                    Settings.Global.AUTO_TIME, 0);
             Settings.System.putInt(getContentResolver(),
                     Settings.System.AUTO_TIME_GPS, 1);
         } else if (which == DialogInterface.BUTTON_NEGATIVE) {
@@ -562,8 +587,8 @@ public class DateTimeSettings extends SettingsPreferenceFragment
 
     private void reSetAutoTimePref() {
         Log.d(TAG, "reset AutoTimeListPref as cancel the selection");
-        boolean autoTimeEnabled = getAutoState(Settings.System.AUTO_TIME);
-        boolean autoTimeGpsEnabled = getAutoState(Settings.System.AUTO_TIME_GPS);
+        boolean autoTimeEnabled = getAutoState(Settings.Global.AUTO_TIME);
+        boolean autoTimeGpsEnabled = getAutoGPSState(Settings.System.AUTO_TIME_GPS);
         if (autoTimeEnabled) {
             mAutoTimeListPref.setValueIndex(AUTO_TIME_NETWORK_INDEX);
         } else if (autoTimeGpsEnabled) {

@@ -99,7 +99,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             }
 			if(mWifiGsmConnectTypePref != null) {
                 mWifiGsmConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
-                        Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_ASK) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
+                        Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_AUTO) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
             }
             if(mGsmWifiConnectTypePref!=null){
                 int value = Settings.System.getInt(contentResolver,Settings.System.GSM_WIFI_CONNECT_TYPE, Settings.System.GSM_WIFI_CONNECT_TYPE_AUTO);
