@@ -95,8 +95,7 @@ public class ChartSweepView extends View {
     private static final int LARGE_WIDTH = 1024;
 
     private long mDragInterval = 1;
-  
-    private long mMaxValue = -1;
+
     public interface OnSweepListener {
         public void onSweep(ChartSweepView sweep, boolean sweepDone);
         public void requestEdit(ChartSweepView sweep);
@@ -349,17 +348,8 @@ public class ChartSweepView extends View {
         return mAxis;
     }
 
-
-    public void setMaxValue(long max) {
-        mMaxValue = max;
-    }
-
     public void setValue(long value) {
-        if (mMaxValue != -1 && value > mMaxValue) {
-           mValue = mMaxValue;
-        } else {
-           mValue = value;
-        }
+        mValue = value;
         invalidateLabel();
     }
 

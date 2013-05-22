@@ -189,9 +189,6 @@ public class DataUsageSummary extends Fragment {
     private static final int LOADER_CHART_DATA = 2;
     private static final int LOADER_SUMMARY = 3;
 
-    /** set limit sweep and warning sweep max value */
-    private static final int LIMIT_MAX_SIZE = 1022976; //999 * 1024
-    private static final int WARNING_MAX_SIZE = 921600; //900 * 1024
     private INetworkManagementService mNetworkService;
     private INetworkStatsService mStatsService;
     private NetworkPolicyManager mPolicyManager;
@@ -1839,16 +1836,9 @@ public class DataUsageSummary extends Fragment {
 
             bytesPicker.setMinValue(0);
             if (limitBytes != LIMIT_DISABLED) {
-                /// when sweep warning and limit at the same time if their previous
-                ///   value is 0 , will happen
-                if (limitBytes == 0) {
-                    bytesPicker.setMaxValue(0);
-                } else {
-                    bytesPicker.setMaxValue((int) (limitBytes / MB_IN_BYTES) - 1);
-                }
+                bytesPicker.setMaxValue((int) (limitBytes / MB_IN_BYTES) - 1);
             } else {
-                /** set limit sweep and warning sweep max value*/
-                bytesPicker.setMaxValue(WARNING_MAX_SIZE);
+                bytesPicker.setMaxValue(Integer.MAX_VALUE);
             }
             bytesPicker.setValue((int) (warningBytes / MB_IN_BYTES));
             bytesPicker.setWrapSelectorWheel(false);
@@ -1907,10 +1897,10 @@ public class DataUsageSummary extends Fragment {
             final long warningBytes = editor.getPolicyWarningBytes(template);
             final long limitBytes = editor.getPolicyLimitBytes(template);
 
-            /** set limit sweep and warning sweep max value*/
-            bytesPicker.setMaxValue(LIMIT_MAX_SIZE);
+            bytesPicker.setMaxValue(Integer.MAX_VALUE);
             if (warningBytes != WARNING_DISABLED && limitBytes > 0) {
-                bytesPicker.setMinValue((int) (warningBytes / MB_IN_BYTES) + 1);
+                final int minMB = (int) (warningBytes / MB_IN_BYTES) + 1;
+                bytesPicker.setMinValue(minMB > 0 ? minMB : 0);
             } else {
                 bytesPicker.setMinValue(0);
             }

@@ -68,9 +68,6 @@ public class ChartDataUsageView extends ChartView {
     /** Current maximum value of {@link #mVert}. */
     private long mVertMax;
 
-    /** set limit sweep and warning sweep max value*/
-    private static final long LIMIT_MAX_SIZE = 1072668082176l;//999l * 1024 * 1024 * 1024
-    private static final long WARNING_MAX_SIZE = 966367641600l;//900l * 1024 * 1024 * 1024
     public interface DataUsageChartListener {
         public void onInspectRangeChanged();
         public void onWarningChanged();
@@ -119,9 +116,6 @@ public class ChartDataUsageView extends ChartView {
         mSweepRight = (ChartSweepView) findViewById(R.id.sweep_right);
         mSweepLimit = (ChartSweepView) findViewById(R.id.sweep_limit);
         mSweepWarning = (ChartSweepView) findViewById(R.id.sweep_warning);
-        /** set limit sweep and warning sweep max value */
-        mSweepWarning.setMaxValue(WARNING_MAX_SIZE);
-        mSweepLimit.setMaxValue(LIMIT_MAX_SIZE);
 
         // prevent sweeps from crossing each other
         mSweepLeft.setValidRangeDynamic(null, mSweepRight);
