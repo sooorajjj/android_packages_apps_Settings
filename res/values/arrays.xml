@@ -833,7 +833,8 @@
         <!-- Do not translate. -->
         <item>1</item>
     </string-array>
-   <string-array name="preferred_network">
+
+    <string-array name="preferred_network">
     <item>WCDMA preferred</item>
     <item>GSM only</item>
     <item>WCDMA only</item>
@@ -848,5 +849,18 @@
     <item>LTE only</item>
     <item>LTE/WCDMA</item>
     <item>Unknown</item>
+    </string-array>
+
+    <!-- Used in choose preferred subscription-->
+    <string-array name="select_slot_items">
+        <item>SIM1</item>
+        <item>SIM2</item>
+        <item>Always ask</item>
+    </string-array>
+
+    <!-- Used in TestingSetting phone info -->
+    <string-array name="select_slot_phone_info">
+        <item>SIM1</item>
+        <item>SIM2</item>
    </string-array>
 </resources>

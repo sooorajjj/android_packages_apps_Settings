@@ -70,6 +70,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 
 /**
  * Top-level settings activity to handle single pane and double pane UI layout.
@@ -104,6 +105,7 @@ public class Settings extends PreferenceActivity
     private int[] SETTINGS_FOR_RESTRICTED = {
             R.id.wireless_section,
             R.id.wifi_settings,
+            R.id.mobiledata_settings,
             R.id.bluetooth_settings,
             R.id.data_usage_settings,
             R.id.wireless_settings,
@@ -593,6 +595,7 @@ public class Settings extends PreferenceActivity
 
         private final WifiEnabler mWifiEnabler;
         private final BluetoothEnabler mBluetoothEnabler;
+        private final DataEnabler mDataEnabler;
         private AuthenticatorHelper mAuthHelper;
 
         private static class HeaderViewHolder {
@@ -607,7 +610,8 @@ public class Settings extends PreferenceActivity
         static int getHeaderType(Header header) {
             if (header.fragment == null && header.intent == null) {
                 return HEADER_TYPE_CATEGORY;
-            } else if (header.id == R.id.wifi_settings || header.id == R.id.bluetooth_settings) {
+            } else if (header.id == R.id.wifi_settings || header.id == R.id.bluetooth_settings
+                    || header.id == R.id.mobiledata_settings) {
                 return HEADER_TYPE_SWITCH;
             } else {
                 return HEADER_TYPE_NORMAL;
@@ -651,6 +655,7 @@ public class Settings extends PreferenceActivity
             // Switches inflated from their layouts. Must be done before adapter is set in super
             mWifiEnabler = new WifiEnabler(context, new Switch(context));
             mBluetoothEnabler = new BluetoothEnabler(context, new Switch(context));
+            mDataEnabler = new DataEnabler(context, new Switch(context));
         }
 
         @Override
@@ -707,8 +712,18 @@ public class Settings extends PreferenceActivity
                     // Would need a different treatment if the main menu had more switches
                     if (header.id == R.id.wifi_settings) {
                         mWifiEnabler.setSwitch(holder.switch_);
-                    } else {
+                    } else if(header.id == R.id.bluetooth_settings){
                         mBluetoothEnabler.setSwitch(holder.switch_);
+                    } else if(header.id == R.id.mobiledata_settings){
+                        mDataEnabler.setSwitch(holder.switch_);
+                        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+                            header.intent.setClassName("com.android.settings",
+                                    "com.android.settings.multisimsettings.MultiSimSettingTab");
+                            header.intent.putExtra(MultiSimSettingsConstants.TARGET_PACKAGE,
+                                    "com.android.phone");
+                            header.intent.putExtra(MultiSimSettingsConstants.TARGET_CLASS,
+                                    "com.android.phone.MSimMobileNetworkSubSettings");
+                        }
                     }
                     // No break, fall through on purpose to update common fields
 
@@ -745,11 +760,13 @@ public class Settings extends PreferenceActivity
         public void resume() {
             mWifiEnabler.resume();
             mBluetoothEnabler.resume();
+            mDataEnabler.resume();
         }
 
         public void pause() {
             mWifiEnabler.pause();
             mBluetoothEnabler.pause();
+            mDataEnabler.pause();
         }
     }
 
