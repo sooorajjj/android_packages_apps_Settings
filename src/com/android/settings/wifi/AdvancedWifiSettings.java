@@ -98,9 +98,14 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                         Settings.System.WIFI_AUTO_CONNECT_TYPE, Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO) == Settings.System.WIFI_AUTO_CONNECT_TYPE_AUTO);
             }
 			if(mWifiGsmConnectTypePref != null) {
-                mWifiGsmConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
-                        Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_ASK) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
-            }
+				if (FeatureQuery.FEATURE_CTS_TEST_SUPPORT) {
+                    mWifiGsmConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                            Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_AUTO) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
+                } else {
+                    mWifiGsmConnectTypePref.setChecked(Settings.System.getInt(contentResolver, 
+                            Settings.System.WIFI_GSM_CONNECT_TYPE, Settings.System.WIFI_GSM_CONNECT_TYPE_ASK) == Settings.System.WIFI_GSM_CONNECT_TYPE_ASK);
+				}
+			}
             if(mGsmWifiConnectTypePref!=null){
                 int value = Settings.System.getInt(contentResolver,Settings.System.GSM_WIFI_CONNECT_TYPE, Settings.System.GSM_WIFI_CONNECT_TYPE_AUTO);
                 mGsmWifiConnectTypePref.setValue(String.valueOf(value));
