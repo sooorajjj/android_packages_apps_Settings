@@ -2038,4 +2038,6 @@
     <string name="bluetooth_ftp_remember_choice">"下次不再询问"</string>
     <!-- Activity label of BluetoothPermissionActivity for FTP [CHAR LIMIT=none]-->
     <string name="bluetooth_ftp_connection_permission_request">Ftp连接请求</string>
+    
+    <string name="invalid_alias">"SIM卡名称包含无效字符，请重试!"</string>
 </resources>

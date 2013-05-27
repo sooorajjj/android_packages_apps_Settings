@@ -4707,4 +4707,5 @@ alog [CHAR LIMIT=none] -->
     <!-- GPS time sync -->
     <string name="gps_time_sync_attention_gps_on">It will take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal.\n\nAre you sure to use GPS provided time?</string>
     <string name="gps_time_sync_attention_gps_off">To use GPS provided time, you must enable GPS first. It then take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal. \n\nAre you sure to enable GPS now and wait for GPS provided time?</string>
+    <string name="invalid_alias">"The alias name contains invalid characters,please try again!"</string>
 </resources>
