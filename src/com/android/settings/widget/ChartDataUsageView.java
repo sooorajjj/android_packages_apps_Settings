@@ -49,6 +49,7 @@ public class ChartDataUsageView extends ChartView {
 
     private static final int MSG_UPDATE_AXIS = 100;
     private static final long DELAY_MILLIS = 250;
+    private static final int INPUT_MAX_VALUE = (int)(Math.pow(10,5) * 1024);
 
     private static final boolean LIMIT_SWEEPS_TO_VALID_DATA = false;
 
@@ -243,6 +244,8 @@ public class ChartDataUsageView extends ChartView {
         final long maxVisible = Math.max(maxSeries, maxSweep) * 12 / 10;
         final long maxDefault = Math.max(maxVisible, 50 * MB_IN_BYTES);
         newMax = Math.max(maxDefault, newMax);
+        // Set the sweep max value as INPUT_MAX_VALUE MB
+        newMax = Math.min(newMax, INPUT_MAX_VALUE * MB_IN_BYTES);
 
         // only invalidate when vertMax actually changed
         if (newMax != mVertMax) {
