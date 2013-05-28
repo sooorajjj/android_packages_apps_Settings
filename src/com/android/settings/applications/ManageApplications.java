@@ -916,8 +916,10 @@ public class ManageApplications extends Fragment implements
         mTextView.addTextChangedListener(new TextWatcher() {			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				//textview.setText(edittext.getText());
-				mCurTab.mApplications.setFilterPrefix(mTextView.getText().toString());
+                        //textview.setText(edittext.getText());
+                        if(null!=mCurTab && (null!=mCurTab.mApplications)){
+                            mCurTab.mApplications.setFilterPrefix((null==mTextView.getText())?"":mTextView.getText().toString());
+                        }
 			}
 			
 			@Override
