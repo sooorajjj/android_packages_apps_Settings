@@ -308,17 +308,17 @@
 
     <!-- Match this with the constants in WifiDialog. --> <skip />
     <!-- Wi-Fi settings.  The type of EAP method a Wi-Fi network has. -->
-    <string-array name="wifi_eap_method">
+    <string-array name="wifi_eap_method" translatable="false">
         <!-- Do not translate. -->
-        <item>PEAP</item>
+        <item>@string/wifi_eap_method_peap</item>
         <!-- Do not translate. -->
-        <item>TLS</item>
+        <item>@string/wifi_eap_method_tls</item>
         <!-- Do not translate. -->
-        <item>TTLS</item>
+        <item>@string/wifi_eap_method_ttls</item>
         <!-- Do not translate. -->
-        <item>PWD</item>
+        <item>@string/wifi_eap_method_pwd</item>
         <!-- Do not translate. -->
-        <item>SIM</item>
+        <item>@string/wifi_eap_method_sim</item>
     </string-array>
 
    <!-- Wi-Fi WPS setup for p2p connections.  -->
