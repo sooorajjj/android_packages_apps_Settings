@@ -250,12 +250,12 @@ public class CmccMainReceiver extends BroadcastReceiver {
             return SECURITY_EAP;
         }
 // WAPI+++
-//        if (config.allowedKeyManagement.get(KeyMgmt.WAPI_PSK)) {
-//            return SECURITY_WAPI_PSK;
-//        }
-//        if (config.allowedKeyManagement.get(KeyMgmt.WAPI_CERT)) {
-//            return SECURITY_WAPI_CERT;
-//        }
+        if (config.allowedKeyManagement.get(KeyMgmt.WAPI_PSK)) {
+            return SECURITY_WAPI_PSK;
+        }
+        if (config.allowedKeyManagement.get(KeyMgmt.WAPI_CERT)) {
+            return SECURITY_WAPI_CERT;
+        }
 // WAPI--
         return (config.wepKeys[0] != null) ? SECURITY_WEP : SECURITY_NONE;
     }

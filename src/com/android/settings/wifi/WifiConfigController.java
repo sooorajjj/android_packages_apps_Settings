@@ -51,7 +51,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
+// WAPI+++
+import android.util.Log;
+import java.io.File;
+import java.util.ArrayList;
+// WAPI---
 import com.android.settings.ProxySelector;
 import com.android.settings.R;
 
@@ -69,11 +73,31 @@ public class WifiConfigController implements TextWatcher,
     private static final String KEYSTORE_SPACE = WifiConfiguration.KEYSTORE_URI;
 
     private static final String PHASE2_PREFIX = "auth=";
-
+// WAPI+++
+    private static final String DEFAULT_CERTIFICATE_PATH =
+                "/data/wapi_certificate";
+// WAPI---
     private final WifiConfigUiBase mConfigUi;
     private final View mView;
     private final AccessPoint mAccessPoint;
+//WAPI+++
+    private Spinner mWapiKeyTypeSpinner;
+    private Spinner mCertificateSpinner;
+    private Spinner mCfgCertificateSpinner;
+    //save the path of certificate files
+    private ArrayList<String> mCerPathString;
 
+    private String mCertificateUser;
+    private String mCertificateAs;
+    private String mCertificateUserPath;
+    private String mCertificateAsPath;
+
+    private TextView mCertificateText;
+
+    private boolean mCert_Set = false;
+    private int mCert_Cnt = 0;
+
+// WAPI---
     private boolean mEdit;
 
     private TextView mSsidView;
@@ -165,7 +189,12 @@ public class WifiConfigController implements TextWatcher,
 
         if (mAccessPoint == null) { // new network
             mConfigUi.setTitle(R.string.wifi_add_network);
-
+//WAPI++
+//	    Log.e(TAG, " ############# WifiDialog.java->showSecurityFields() Disabling WAPI PSK and CERT MENU ######### ");
+            mView.findViewById(R.id.cfg_wapi_key_type_spinner).setVisibility(View.GONE);
+	    mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.GONE);
+	    mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.GONE);
+//WAPI++
             mSsidView = (TextView) mView.findViewById(R.id.ssid);
             mSsidView.addTextChangedListener(this);
             mSecuritySpinner = ((Spinner) mView.findViewById(R.id.security));
@@ -181,6 +210,10 @@ public class WifiConfigController implements TextWatcher,
                 mSecuritySpinner.setAdapter(adapter);
             } else {
                 mView.findViewById(R.id.type).setVisibility(View.VISIBLE);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
+                        R.layout.wifi_setup_custom_list_item_2, android.R.id.text1,
+                        context.getResources().getStringArray(R.array.wifi_security));
+                mSecuritySpinner.setAdapter(adapter);
             }
 
             showIpConfigFields();
@@ -367,7 +400,28 @@ public class WifiConfigController implements TextWatcher,
                     }
                 }
                 break;
+// WAPI++
+            case AccessPoint.SECURITY_WAPI_PSK:
+                config.allowedKeyManagement.set(KeyMgmt.WAPI_PSK);
+                if (mPasswordView.length() != 0) {
+                    String password = mPasswordView.getText().toString();
+                    if (password.matches("[0-9A-Fa-f]{64}")) {
+                        config.wapiPsk = password;
+                    } else {
+                        config.wapiPsk = '"' + password + '"';
+                    }
+                    config.wapiPskType = mWapiKeyTypeSpinner.getSelectedItemPosition();
 
+				}
+		        break;
+
+		    case AccessPoint.SECURITY_WAPI_CERT:
+			    config.allowedKeyManagement.set(KeyMgmt.WAPI_CERT);
+		        config.wapiASCert = mCertificateAs;
+		        config.wapiUserCert = mCertificateUser;
+
+                        break;
+// WAPI++
             case AccessPoint.SECURITY_EAP:
                 config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
                 config.allowedKeyManagement.set(KeyMgmt.IEEE8021X);
@@ -399,7 +453,9 @@ public class WifiConfigController implements TextWatcher,
             default:
                     return null;
         }
-
+// WAPI
+        Log.e(TAG, "==========> Setting IP fields");
+// WAPI
         config.proxySettings = mProxySettings;
         config.ipAssignment = mIpAssignment;
         config.linkProperties = new LinkProperties(mLinkProperties);
@@ -530,19 +586,68 @@ public class WifiConfigController implements TextWatcher,
         }
         if (mAccessPointSecurity == AccessPoint.SECURITY_NONE) {
             mView.findViewById(R.id.security_fields).setVisibility(View.GONE);
+            mView.findViewById(R.id.cfg_wapi_key_type_spinner).setVisibility(View.GONE);
+            mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.GONE);
+            mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.GONE);
             return;
         }
         mView.findViewById(R.id.security_fields).setVisibility(View.VISIBLE);
 
-        if (mPasswordView == null) {
-            mPasswordView = (TextView) mView.findViewById(R.id.password);
-            mPasswordView.addTextChangedListener(this);
-                ((CheckBox) mView.findViewById(R.id.show_password)).setOnCheckedChangeListener(this);
-
-            if (mAccessPoint != null && mAccessPoint.networkId != INVALID_NETWORK_ID) {
-                mPasswordView.setHint(R.string.wifi_unchanged);
+		// Log.e(TAG, " ############# WifiDialog.java->showSecurityFields() ######### Security:" + mSecurity);
+		//WAPI+++	
+		if (mAccessPointSecurity != AccessPoint.SECURITY_WAPI_CERT) {
+			//WAPI++ // Temp need to check this one...
+			if (mPasswordView == null) {
+				mPasswordView = (TextView) mView.findViewById(R.id.password);
+				mPasswordView.addTextChangedListener(this);
+				((CheckBox) mView.findViewById(R.id.show_password)).setOnCheckedChangeListener(this);
+				//WAPI+++
+				mWapiKeyTypeSpinner = (Spinner) mView.findViewById(R.id.cfg_wapi_key_type_spinner);
+				//WAPI++++
+				if (mAccessPoint != null && mAccessPoint.networkId != INVALID_NETWORK_ID) {
+					mPasswordView.setHint(R.string.wifi_unchanged);
+				}
             }
-        }
+
+		}
+
+		//WAPI+++
+		if (mAccessPointSecurity == AccessPoint.SECURITY_WAPI_PSK) {
+			mView.findViewById(R.id.password).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.password_text).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.show_password).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.cfg_wapi_key_type_spinner).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.GONE);
+			mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.GONE);
+		} else if (mAccessPointSecurity == AccessPoint.SECURITY_WAPI_CERT) {
+// 		Log.e(TAG, " ############# WifiConfigController.java->showSecurityFields() WAPI-PSK: OFF WAPI-CERT:ON ######### ");
+
+//    		mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.VISIBLE);
+//		      mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.VISIBLE);
+            mView.findViewById(R.id.password).setVisibility(View.GONE);
+            mView.findViewById(R.id.password_text).setVisibility(View.GONE);
+            mView.findViewById(R.id.show_password).setVisibility(View.GONE);
+            mView.findViewById(R.id.cfg_wapi_key_type_spinner).setVisibility(View.GONE);
+
+			mCertificateText = (TextView) mView.findViewById(R.id.wapi_certificate_text);
+			mCertificateSpinner = (Spinner) mView.findViewById(R.id.wapi_certificate_spinner);
+//		      mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.VISIBLE);
+//		      mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.VISIBLE);
+			mCertificateSpinner.setOnItemSelectedListener(this);
+			setCertificateSpinnerAdapter();
+			mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.VISIBLE);
+		} else if((mAccessPointSecurity != AccessPoint.SECURITY_WAPI_PSK) &&
+			    (mAccessPointSecurity != AccessPoint.SECURITY_WAPI_CERT)) {
+// 		       Log.e(TAG, " ############# WifiConfigController.java->showSecurityFields() WAPI-PSK: OFF WAPI-CERT:OFF ######### ");
+			mView.findViewById(R.id.password).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.password_text).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.show_password).setVisibility(View.VISIBLE);
+			mView.findViewById(R.id.cfg_wapi_key_type_spinner).setVisibility(View.GONE);
+			mView.findViewById(R.id.wapi_certificate_text).setVisibility(View.GONE);
+			mView.findViewById(R.id.wapi_certificate_spinner).setVisibility(View.GONE);
+		}
+//WAPI--
 
         if (mAccessPointSecurity != AccessPoint.SECURITY_EAP) {
             mView.findViewById(R.id.eap).setVisibility(View.GONE);
@@ -726,6 +831,48 @@ public class WifiConfigController implements TextWatcher,
             }
         }
     }
+//WAPI++
+    private void setCertificateSpinnerAdapter() {
+        final Context context = mConfigUi.getContext();
+        File certificateList [];
+        ArrayList<String> cerString= new ArrayList<String>();
+        mCerPathString =  new ArrayList<String>();
+        int i;
+        mCert_Set = false;
+	mCert_Cnt = 0;
+        // find all certificate
+        File certificatePath = new File(DEFAULT_CERTIFICATE_PATH);
+        try{
+                if (!certificatePath.isDirectory()){
+                        Log.e(TAG, " WifiConfigController.java->setCertificateSpinnerAdapter(), No Install Directory Present !! ");
+			return;
+                }else{
+                        // build string array
+                        certificateList = certificatePath.listFiles();
+			mCert_Cnt = certificateList.length;
+			for(i=0; i < certificateList.length; i++){
+                            if(certificateList[i].isDirectory()){
+                                File ASCertFile = new File(certificateList[i].getAbsoluteFile()  + "/as.cer");
+                                File UserCertFile = new File(certificateList[i].getAbsoluteFile()  + "/user.cer");
+				if(ASCertFile.exists() && UserCertFile.exists()){
+                                    cerString.add(certificateList[i].getName());
+                                    mCerPathString.add(certificateList[i].getAbsoluteFile().toString());
+				}
+                            }
+                        }
+		        mCert_Set = true;
+                        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context,
+                                        android.R.layout.simple_spinner_item,
+                                        (String [])cerString.toArray(new String[0]));
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        mCertificateSpinner.setAdapter(adapter);
+
+		}
+        }catch (Exception e){
+//                setMessage(e.toString());
+        }
+    }
+//WAPI++
 
     public boolean isEdit() {
         return mEdit;
@@ -759,11 +906,37 @@ public class WifiConfigController implements TextWatcher,
             showSecurityFields();
         } else if (parent == mProxySettingsSpinner) {
             showProxyFields();
-        } else {
+//WAPI++
+       } else if(parent == mCertificateSpinner) {
+	    int cert_sel = mCertificateSpinner.getSelectedItemPosition();
+	    Log.e(TAG, " ############# WifiConfigController.java->onItemSelected() Cert_selected: " + cert_sel);
+	    if(cert_sel >= 0 && cert_sel < mCert_Cnt)
+                handleCertificateChange(cert_sel);
+//WAPI++
+	    }else {
             showIpConfigFields();
         }
-        enableSubmitIfAppropriate();
+		if(parent != mCertificateSpinner)
+            enableSubmitIfAppropriate();
     }
+//WAPI++
+    private void handleCertificateChange(int Certificate) {
+
+        try{
+            String[] string = (String[])mCerPathString.toArray(new String[0]);
+            mCertificateUser = "\"" + string[Certificate] + "/user.cer" + "\"";
+//   	    Log.e(TAG, " ############# WifiConfigController.java->handleCertificateChange(): User: " + mCertificateUser);
+	    mCertificateUserPath = string[Certificate] + "/user.cer";
+// 	    Log.e(TAG, " ############# WifiConfigController.java->handleCertificateChange(): User_Path: " + mCertificateUserPath);
+	    mCertificateAs = "\"" + string[Certificate] + "/as.cer" + "\"";
+//   	    Log.e(TAG, " ############# WifiConfigController.java->handleCertificateChange(): AS: " + mCertificateAs);
+	    mCertificateAsPath = string[Certificate] + "/as.cer";
+//   	    Log.e(TAG, " ############# WifiConfigController.java->handleCertificateChange(): AS_Path: " + mCertificateAsPath);
+	}catch (Exception e){
+//            setMessage(e.toString());
+        }
+    }
+//WAPI++
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {

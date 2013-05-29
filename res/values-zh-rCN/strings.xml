@@ -616,6 +616,35 @@
     <string name="wifi_and_mobile_skipped_message" product="default" msgid="3324261421359832263">"警告：手机无法验证您的软件是否是最新版本。"</string>
     <string name="wifi_connect_failed_message" product="tablet" msgid="6904081070290941807">"平板电脑无法连接到此 Wi-Fi 网络。"</string>
     <string name="wifi_connect_failed_message" product="default" msgid="3894921379368046855">"手机无法连接到此 Wi-Fi 网络。"</string>
+    <!-- WAPI start -->
+    <string name="wifi_wapi_certification_dont_exist">输入的网络密码有误，请重试。</string>
+    <string name="please_type_passphrase">无线密码</string>
+    <string name="wifi_certificate">证书</string>
+    <string name="wifi_wapi_cert_mgmt_titlebar">WAPI 证书管理</string>
+    <string name="wifi_wapi_cert_install">安装 WAPI 证书</string>
+    <string name="wifi_wapi_cert_install_button">安装</string>
+    <string name="wifi_wapi_cert_uninstall_button">卸载</string>
+    <string name="wifi_wapi_cert_cancel_button">取消</string>
+    <string name="wifi_wapi_cert_uninstall">卸载 WAPI 证书</string>
+    <string name="wifi_wapi_cert_create_subdir">新建目录</string>
+    <string name="wifi_wapi_cert_delet_subdir">选择一个合适的证书</string>
+    <string name="wifi_wapi_as_cert">AS 证书</string>
+    <string name="wifi_wapi_user_cert">用户证书</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_name_is_empty">请输入您要创建目录的名称!</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_exist">此目录名已存在，请输入其他名称</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_create_fail">创建目录失败</string>
+    <string name="wifi_wapi_cert_mgmt_as_name_is_empty">请输入as证书文件名</string>
+    <string name="wifi_wapi_cert_mgmt_as_dont_exist">SD卡内没有找到AS证书, 请检查!</string>
+    <string name="wifi_wapi_cert_mgmt_as_format_is_wrong">as证书格式错误! 请安装正确的证书</string>
+    <string name="wifi_wapi_cert_mgmt_user_format_is_wrong">用户证书格式错误! 请安装正确的证书</string>
+    <string name="wifi_wapi_cert_mgmt_user_name_is_empty">请输入用户证书文件名称</string>
+    <string name="wifi_wapi_cert_mgmt_user_dont_exist">请输入用户证书文件名称</string>
+    <string name="wifi_context_menu_connect">连接网络</string>
+    <string name="wifi_context_menu_forget">不保存</string>
+    <string name="wifi_context_menu_change_password">更改密码</string>
+    <string name="wifi_context_menu_change_wapi_certificate">更换 WAPI 证书</string>
+    <string name="wifi_wapi_no_cert_file">未安装WAPI证书或已卸载</string>
+    <!-- WAPI end -->
     <string name="wifi_advanced_titlebar" msgid="1627063574532930090">"高级 Wi-Fi 设置"</string>
     <string name="wifi_setting_frequency_band_title" msgid="7493768705046080060">"Wi-Fi 频带"</string>
     <string name="wifi_setting_frequency_band_summary" msgid="3250740757118009784">"指定操作的频率范围"</string>
