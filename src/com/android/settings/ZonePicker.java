@@ -65,6 +65,8 @@ public class ZonePicker extends ListFragment {
 
     private static final int HOURS_1 = 60 * 60000;
 
+    private static final String SAVE_SORT_TZ = "sort_tz";
+
     private static final int MENU_TIMEZONE = Menu.FIRST+1;
     private static final int MENU_ALPHABETICAL = Menu.FIRST;
 
@@ -152,8 +154,19 @@ public class ZonePicker extends ListFragment {
         mAlphabeticalAdapter = constructTimezoneAdapter(activity, true);
 
         // Sets the adapter
-        setSorting(true);
+        boolean sortbyTZ = true;
+        if (savedInstanseState != null
+                && savedInstanseState.containsKey(SAVE_SORT_TZ)) {
+            sortbyTZ = savedInstanseState.getBoolean(SAVE_SORT_TZ);
+        }
+        setSorting(sortbyTZ);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVE_SORT_TZ, mSortedByTimezone);
     }
 
     @Override

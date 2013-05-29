@@ -1212,6 +1212,7 @@
     <string name="move_app_to_sdcard" product="nosdcard" msgid="4350451696315265420">"移至 USB 存储设备"</string>
     <string name="move_app_to_sdcard" product="default" msgid="1143379049903056407">"移至 SD 卡"</string>
     <string name="moving" msgid="6431016143218876491">"正在移动"</string>
+    <string name="no_sdcard">"无法移动应用程序。没有 SD 卡。"</string>
     <string name="insufficient_storage" msgid="481763122991093080">"存储空间不足。"</string>
     <string name="does_not_exist" msgid="3476487214886606748">"应用不存在。"</string>
     <string name="app_forward_locked" msgid="6331564656683790866">"应用受版权保护。"</string>
@@ -1999,6 +2000,7 @@
     <string name="confirm_title">确认</string>
     <string name="wifi_signal_found_msg">当前 WLAN 连接信号较弱,是否切换到其他 WLAN 网络?</string>
     <string name="gsm_to_wifi_connect_type_title">蜂窝网至 WLAN 重选</string>
+    <string name="wifi_to_gsm_connect_type_title">WLAN 至蜂窝网重选提示</string>
     <string name="wifi_setting_connect_type_error">设置自动连接类型时出现错误。</string>
     <string name="msg_wifi_signal_found">发现 WLAN 信号 %s, 您是否要使用该 WLAN 网络？ 使用该网络将部分中断当前的数据连接。</string>
     <string name="wifi_gprs_settings_title">选择网络</string>
@@ -2028,4 +2030,14 @@
     <string name="device_additional_status">状态消息</string>
     <string name="gps_time_sync_attention_gps_on">使用 GPS 提供时间，必须要等待 GPS 定位成功。GPS 定位最多需要一分钟。\n\n确定要使用 GPS 提供时间吗？</string>
     <string name="gps_time_sync_attention_gps_off">使用 GPS 提供时间，必须要先启用 GPS，并等待 GPS 定位成功。GPS 定位最多需要一分钟。如果 GPS 信号弱，可能会定位失败。\n\n确定现在要启用 GPS 并使用 GPS 提供时间吗？</string>  
+    <!-- Activity label of BluetoothFtpPermissionActivity, also used as Strings in the permission dialog [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_request">"Ftp 请求"</string>
+    <!-- Bluetooth FTP permission Alert Activity text [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_acceptance_dialog_text">"%1$s想访问您的文件系统。要向%2$s授予访问权限吗？"</string>
+    <!-- Bluetooth FTP permission Alert Activity checkbox text [CHAR LIMIT=none] -->
+    <string name="bluetooth_ftp_remember_choice">"下次不再询问"</string>
+    <!-- Activity label of BluetoothPermissionActivity for FTP [CHAR LIMIT=none]-->
+    <string name="bluetooth_ftp_connection_permission_request">Ftp连接请求</string>
+    
+    <string name="invalid_alias">"SIM卡名称包含无效字符，请重试!"</string>
 </resources>

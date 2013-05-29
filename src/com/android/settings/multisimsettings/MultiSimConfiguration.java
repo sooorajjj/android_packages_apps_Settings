@@ -58,6 +58,7 @@ import com.qualcomm.internal.telephony.SubscriptionManager;
 import com.android.internal.telephony.TelephonyIntents;
 import com.qualcomm.internal.telephony.CardSubscriptionManager;
 import com.android.settings.R;
+import android.widget.Toast;
 
 public class MultiSimConfiguration extends PreferenceActivity implements TextWatcher{
     private static final String LOG_TAG = "MultiSimConfiguration";
@@ -82,6 +83,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private EditTextPreference mNamePreference;
     private int mChangeStartPos;
     private int mChangeCount;
+    private Context mContext;
 
     private IntentFilter mIntentFilter = new IntentFilter(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
 
@@ -101,6 +103,13 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         public boolean onPreferenceChange(Preference preference, Object value) {
             Log.i(LOG_TAG, "onPreferenceChange " + value);
             String multiSimName = (String)value;
+
+            if(multiSimName.contains("%")){
+                Toast.makeText(mContext, R.string.invalid_alias, 
+                                  Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
             System.putString(getContentResolver(),
                     System.MULTI_SIM_NAME[mSubscription], multiSimName);
             mNamePreference.setSummary(multiSimName);
@@ -144,6 +153,8 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
 
         Intent intent = getIntent();
         mSubscription = intent.getIntExtra(SUBSCRIPTION_KEY, 0);
+
+        mContext = this;
 
         mSubscriptionManager = SubscriptionManager.getInstance();
 

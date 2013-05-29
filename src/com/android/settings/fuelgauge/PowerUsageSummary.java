@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import android.net.wifi.WifiManager;
 
 /**
  * Displays a list of apps and subsystems that consume power, ordered by how much power was
@@ -71,7 +72,7 @@ import java.util.Map;
  */
 public class PowerUsageSummary extends PreferenceFragment implements Runnable {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String TAG = "PowerUsageSummary";
 
@@ -136,6 +137,8 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        Log.e(TAG, "onCreate");
 
         if (icicle != null) {
             mStats = sStatsXfer;
@@ -410,7 +413,7 @@ public class PowerUsageSummary extends PreferenceFragment implements Runnable {
             PowerGaugePreference pref = new PowerGaugePreference(getActivity(), sipper.getIcon(), sipper);
             final double percentOfMax = (sipper.getSortValue() * 100) / mMaxPower;
             sipper.percent = percentOfTotal;
-            pref.setTitle(sipper.name);
+            pref.setTitle(WifiManager.replaceAllWiFi(sipper.name));
             pref.setOrder(Integer.MAX_VALUE - (int) sipper.getSortValue()); // Invert the order
             pref.setPercent(percentOfMax, percentOfTotal);
             if (sipper.uidObj != null) {

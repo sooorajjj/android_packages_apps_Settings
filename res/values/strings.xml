@@ -2131,11 +2131,11 @@ alog [CHAR LIMIT=none] -->
     <!-- Storage setting.  Title for MTP checkbox [CHAR LIMIT=30]-->
     <string name="usb_mtp_title">Media device (MTP)</string>
     <!-- Storage setting.  Summary for MTP checkbox [CHAR LIMIT=NONE]-->
-    <string name="usb_mtp_summary">Lets you transfer media files on Windows, or using Android File Transfer on Mac (see www.android.com/filetransfer)</string>
+    <string name="usb_mtp_summary">Let you transfer media files on Windows, or using Android File Transfer on Mac (see www.android.com/filetransfer)</string>
     <!-- Storage setting.  Title for PTP checkbox [CHAR LIMIT=30]-->
     <string name="usb_ptp_title">Camera (PTP)</string>
     <!-- Storage setting.  Label for installer CD [CHAR LIMIT=30]-->
-    <string name="usb_ptp_summary">Lets you transfer photos using camera software, and transfer any files on computers that don\'t support MTP</string>
+    <string name="usb_ptp_summary">Let you transfer photos using camera software, and transfer any files on computers that don\'t support MTP</string>
     <!-- Storage setting.  Summary for PTP checkbox [CHAR LIMIT=NONE]-->
     <string name="usb_label_installer_cd">"Install file-transfer tools"</string>
 
@@ -2762,6 +2762,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Manage applications, title for dialog when killing persistent apps-->
     <!-- Manage applications, text for Move button when move is in progress -->
     <string name="moving">Moving</string>
+    <string name="no_sdcard">Couldn\'t move app.No SD Card</string>
 
     <!-- Manage applications, text for move error messages -->
     <string name="insufficient_storage">Not enough storage space.</string>
@@ -4649,6 +4650,7 @@ alog [CHAR LIMIT=none] -->
     <string name="confirm_title">Confirm</string>
     <string name="wifi_signal_found_msg">Current connection signal is weak, would you like to use another WLAN network?</string>
     <string name="gsm_to_wifi_connect_type_title">Cellular->WLAN</string>
+    <string name="wifi_to_gsm_connect_type_title">WLAN->Cellular hint</string>
     <string name="wifi_setting_connect_type_error">There was a problem setting the connect type.</string>
     <string name="msg_wifi_signal_found">Found WLAN signal %s, would you like to use this WLAN network? Using this network will interrupt the data service partially.</string>
     <string name="wifi_gprs_settings_title">Network selector</string>
@@ -4705,4 +4707,5 @@ alog [CHAR LIMIT=none] -->
     <!-- GPS time sync -->
     <string name="gps_time_sync_attention_gps_on">It will take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal.\n\nAre you sure to use GPS provided time?</string>
     <string name="gps_time_sync_attention_gps_off">To use GPS provided time, you must enable GPS first. It then take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal. \n\nAre you sure to enable GPS now and wait for GPS provided time?</string>
+    <string name="invalid_alias">"The alias name contains invalid characters,please try again!"</string>
 </resources>

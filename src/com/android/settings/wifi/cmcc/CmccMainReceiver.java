@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
 import com.qrd.plugin.feature_query.FeatureQuery;
+import android.telephony.TelephonyManager;
+import android.content.pm.PackageManager;
+import android.content.ComponentName;
 
 public class CmccMainReceiver extends BroadcastReceiver {
 	
@@ -63,6 +66,13 @@ public class CmccMainReceiver extends BroadcastReceiver {
 	                startCmccService(context);
 	            }
 	        } else if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+                if (!TelephonyManager.isMultiSimEnabled())
+                {
+                   PackageManager pm = context.getPackageManager();
+                   pm.setComponentEnabledSetting(new ComponentName("com.android.phone",
+                                                 "com.android.phone.MSimMobileNetworkSettings"),
+                                                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                }
 	            startCmccService(context);
 				return;
 	        } 

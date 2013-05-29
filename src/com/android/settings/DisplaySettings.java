@@ -190,8 +190,13 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                         best = i;
                     }
                 }
-                summary = preference.getContext().getString(R.string.screen_timeout_summary,
-                        entries[best]);
+                if(currentTimeout == 0){
+                    preference.setSummary(entries[best]);
+                    return;
+                }else{
+                    summary = preference.getContext().getString(R.string.screen_timeout_summary,
+                            entries[best]);
+                }
             }
         }
         preference.setSummary(summary);
@@ -386,6 +391,12 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             }
         }
         if (KEY_FONT_SIZE.equals(key)) {
+            synchronized (this) {
+                try {
+                    wait(200);
+                } catch (InterruptedException e) {
+                }
+            }
             writeFontSizePreference(objValue);
         }
 

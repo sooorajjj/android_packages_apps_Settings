@@ -269,7 +269,7 @@ public class PhoneStorageFormatter extends ExternalStorageFormatter
         }else {
             if (Environment.MEDIA_MOUNTED.equals(status)
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(status)) {
-                updateProgressDialog(R.string.progress_unmounting);
+                updateProgressDialog(R.string.progress_unmounting_phone);
                 IMountService mountService = getMountService();
                 String extStoragePath = Environment.getInternalStorageDirectory().toString();
                 try {
@@ -280,7 +280,7 @@ public class PhoneStorageFormatter extends ExternalStorageFormatter
             } else if (Environment.MEDIA_NOFS.equals(status)
                         || Environment.MEDIA_UNMOUNTED.equals(status)
                         || Environment.MEDIA_UNMOUNTABLE.equals(status)) {
-                updateProgressDialog(R.string.progress_erasing);
+                updateProgressDialog(R.string.progress_erasing_phone);
                 final IMountService mountService = getMountService();
                 final String extStoragePath = Environment.getInternalStorageDirectory().toString();
 
