@@ -124,6 +124,7 @@ public class WifiConfigController implements TextWatcher,
 
     private final Handler mTextViewChangedHandler;
 
+    public static boolean mPasswdCheckBox;
     static boolean requireKeyStore(WifiConfiguration config) {
         if (config == null) {
             return false;
@@ -258,6 +259,7 @@ public class WifiConfigController implements TextWatcher,
             }
         }
 
+        if (mPasswdCheckBox) mPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
 
         mConfigUi.setCancelButton(context.getString(R.string.wifi_cancel));
         if (mConfigUi.getSubmitButton() != null) {
@@ -738,6 +740,7 @@ public class WifiConfigController implements TextWatcher,
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.show_password) {
+            mPasswdCheckBox = ((CheckBox) view).isChecked();
             int pos = mPasswordView.getSelectionEnd();
             mPasswordView.setInputType(
                     InputType.TYPE_CLASS_TEXT | (((CheckBox) view).isChecked() ?

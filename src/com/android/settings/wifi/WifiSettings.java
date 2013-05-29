@@ -596,6 +596,7 @@ public class WifiSettings extends SettingsPreferenceFragment
                 mSelectedAccessPoint.generateOpenNetworkConfig();
                 mWifiManager.connect(mSelectedAccessPoint.getConfig(), mConnectListener);
             } else {
+                WifiConfigController.mPasswdCheckBox = false;
                 showDialog(mSelectedAccessPoint, false);
             }
         } else {
