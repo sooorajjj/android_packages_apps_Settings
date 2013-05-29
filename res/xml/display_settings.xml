@@ -57,10 +57,6 @@
             android:key="notification_pulse"
             android:title="@string/notification_pulse_title"
             android:persistent="false" />
-       <CheckBoxPreference
-         android:key="hdmi_disable"
-         android:title="@string/hdmi_disable_title"
-         android:persistent="false" />
 
         <PreferenceScreen
                 android:key="wifi_display"

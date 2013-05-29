@@ -145,7 +145,7 @@
     <string name="large_font">Large</string>
 
     <!-- Do not translate. label for font size preview.  Does not need to be translated. -->
-    <string name="font_size_preview_text">Servez ? ce monsieur une bière et des kiwis.</string>
+    <string name="font_size_preview_text">Servez à ce monsieur une bière et des kiwis.</string>
     <!-- Button. Chosen when they want to save the chosen text size. -->
     <string name="font_size_save">OK</string>
 
@@ -2979,7 +2979,7 @@ alog [CHAR LIMIT=none] -->
     <!-- User dictionary settings. The list item to choose to insert a word into the user dictionary for all languages -->
     <string name="user_dict_settings_all_languages">For all languages</string>
     <!-- User dictionary settings. The text to show for the option that shows the entire list of supported locales to choose one [CHAR LIMIT=30] -->
-    <string name="user_dict_settings_more_languages">More languages??/string>
+    <string name="user_dict_settings_more_languages">More languages…</string>
 
     <!-- This is for diagnostics screen. The title of a screen with various items realted to launching screens that will giev the user info. For example, it contains "Phone information" and "Battery information" -->
     <string name="testing">Testing</string>
@@ -4508,8 +4508,4 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
-	  <!-- Title of the HDMI settings entry in the left top level menu -->
-    <!--string name="hdmi_settings_title">HDMI</string-->
-    <!-- add HDMI Disable in Display settings -->
-    <string name="hdmi_disable_title">Enable HDMI</string>
 </resources>

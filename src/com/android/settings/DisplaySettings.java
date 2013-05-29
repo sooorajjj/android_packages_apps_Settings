@@ -47,7 +47,6 @@ import com.android.internal.view.RotationPolicy;
 import com.android.settings.DreamSettings;
 
 import java.util.ArrayList;
-import android.os.SystemProperties;
 
 public class DisplaySettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener, OnPreferenceClickListener {
@@ -66,8 +65,6 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final int DLG_GLOBAL_CHANGE_WARNING = 1;
 
     private DisplayManager mDisplayManager;
-     private static final String KEY_HDMI = "hdmi_disable";
-     private CheckBoxPreference mHdmiDisable;
 
     private CheckBoxPreference mAccelerometer;
     private WarnedListPreference mFontSizePref;
@@ -146,12 +143,6 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             getPreferenceScreen().removePreference(mWifiDisplayPreference);
             mWifiDisplayPreference = null;
         }
-        
-          mHdmiDisable = (CheckBoxPreference) findPreference(KEY_HDMI);
-          mHdmiDisable.setPersistent(false);
-          boolean  hdmi_Enable = SystemProperties.getBoolean("persist.sys.hdmi.enable", false);
-          Log.e(TAG, "get properties hdmi Ischecked =  "+ hdmi_Enable );
-          mHdmiDisable.setChecked(hdmi_Enable);
     }
 
     private void updateTimeoutPreferenceDescription(long currentTimeout) {
@@ -345,15 +336,6 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             Settings.System.putInt(getContentResolver(), Settings.System.NOTIFICATION_LIGHT_PULSE,
                     value ? 1 : 0);
             return true;
-        }
-          else if (preference == mHdmiDisable) {
-          try{
-                           boolean value = mHdmiDisable.isChecked();
-                           SystemProperties.set("persist.sys.hdmi.enable", value? "1":"0");
-            }catch(Exception e){
-             Log.e(TAG, "could not set HDMI setting", e);
-             }
-            return true;    
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
