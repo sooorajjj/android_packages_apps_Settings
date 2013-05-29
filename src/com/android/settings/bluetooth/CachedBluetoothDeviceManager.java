@@ -24,6 +24,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * CachedBluetoothDeviceManager manages the set of remote Bluetooth devices.
@@ -74,6 +75,31 @@ final class CachedBluetoothDeviceManager {
         }
         return null;
     }
+
+     /**
+     * Search for existing cached devices by bounding state and remove from
+     * cached device list
+     * @param device bound state
+     * @return number of removing devices
+     */
+    public int removeAllDevices(int boundState) {
+
+        Iterator itr = mCachedDevices.iterator();
+        int cnt = 0;
+
+        while(itr.hasNext()){
+
+            CachedBluetoothDevice cachedDevice = (CachedBluetoothDevice)itr.next();
+            if (cachedDevice.getBondState() == BluetoothDevice.BOND_NONE) {
+                itr.remove();
+                mCachedDevices.remove(cachedDevice);
+                cnt++;
+            }
+
+        }
+        return cnt;
+    }
+
 
     /**
      * Create and return a new {@link CachedBluetoothDevice}. This assumes
