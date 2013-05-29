@@ -1049,7 +1049,7 @@
     <string name="location_gps" msgid="8392461023569708478">"GPS 卫星定位"</string>
     <string name="location_street_level" product="tablet" msgid="1669562198260860802">"允许应用使用您平板电脑上的 GPS 定位您的位置"</string>
     <string name="location_street_level" product="default" msgid="4617445745492014203">"允许应用使用您手机上的 GPS 定位您的位置"</string>
-    <string name="assisted_gps" msgid="4649317129586736885">"使用增强型 A-GPS"</string>
+    <string name="assisted_gps" msgid="4649317129586736885">"使用AGPS"</string>
     <string name="assisted_gps_enabled" msgid="8751899609589792803">"使用服务器来辅助 GPS（取消选中可降低网络使用率）"</string>
     <string name="assisted_gps_disabled" msgid="6982698333968010748">"使用服务器来辅助 GPS（选中可提高 GPS 性能）"</string>
     <string name="use_location_title" msgid="5206937465504979977">"位置和 Google 搜索"</string>
