@@ -520,6 +520,35 @@ public class CryptKeeper extends Activity implements TextView.OnEditorActionList
             }
         }
 
+        final View passwordOk = findViewById(R.id.passwordOkButton);
+        if(passwordOk != null){
+            passwordOk.setOnClickListener(new View.OnClickListener() {
+                    @Override
+
+                    public void onClick(View v) {
+                        // Get the password
+                        final String password = mPasswordEntry.getText().toString();
+                        
+                        if (TextUtils.isEmpty(password)) {
+                            return;
+                        }
+                        
+                        // Now that we have the password clear the password field.
+                        mPasswordEntry.setText(null);
+                        
+                        // Disable the password entry and back keypress while checking the password. These
+                        // we either be re-enabled if the password was wrong or after the cooldown period.
+                        mPasswordEntry.setEnabled(false);
+                        setBackFunctionality(false);
+                        
+                        Log.d(TAG, "Attempting to send command to decrypt");
+                        new DecryptTask().execute(password);
+                        
+                        return;
+                    }
+                });
+        }
+
         final View imeSwitcher = findViewById(R.id.switch_ime_button);
         final InputMethodManager imm = (InputMethodManager) getSystemService(
                 Context.INPUT_METHOD_SERVICE);
