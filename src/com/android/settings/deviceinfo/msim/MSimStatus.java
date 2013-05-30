@@ -208,8 +208,8 @@ public class MSimStatus extends PreferenceActivity {
     }
 
     private String getMultiSimName(int subscription) {
-        return Settings.Global.getString(getContentResolver(),
-                Settings.Global.MULTI_SIM_NAME[subscription]);
+        return Settings.System.getString(getContentResolver(),
+                Settings.System.MULTI_SIM_NAME[subscription]);
     }
 
     private Handler mHandler;
