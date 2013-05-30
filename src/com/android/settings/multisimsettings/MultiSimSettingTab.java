@@ -145,8 +145,8 @@ public class MultiSimSettingTab extends TabActivity {
     }
 
     private String getMultiSimName(int subscription) {
-        return Settings.Global.getString(this.getContentResolver(),
-                Settings.Global.MULTI_SIM_NAME[subscription]);
+        return Settings.System.getString(this.getContentResolver(),
+                Settings.System.MULTI_SIM_NAME[subscription]);
     }
 
     private void handleSimNameChanged(int subscription) {

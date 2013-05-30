@@ -467,8 +467,8 @@ public class MultiSimEnabler extends CheckBoxPreference implements
     }
 
     private void displayProgressDialog(boolean enabled) {
-        String title = Settings.Global.getString(mContext.getContentResolver(),
-                Settings.Global.MULTI_SIM_NAME[mSubscriptionId]);
+        String title = Settings.System.getString(mContext.getContentResolver(),
+                Settings.System.MULTI_SIM_NAME[mSubscriptionId]);
         String msg = mContext.getString(enabled ? R.string.sim_enabler_enabling
                 : R.string.sim_enabler_disabling);
         mProgressDialog = new ProgressDialog(mForegroundActivity);
