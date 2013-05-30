@@ -2394,7 +2394,7 @@ alog [CHAR LIMIT=none] -->
     <!-- [CHAR LIMIT=100] Security & location settings screen, setting check box summary for GPS satellites on a phone -->
     <string name="location_street_level" product="default">Let apps use GPS on your phone to pinpoint your location</string>
     <!-- Security & location settings screen, setting check box label if Assisted GPS should be enabled -->
-    <string name="assisted_gps">Use assisted A-GPS</string>
+    <string name="assisted_gps">Use AGPS</string>
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is selected -->
     <string name="assisted_gps_enabled">Use server to assist GPS (uncheck to reduce network usage)</string>
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is clear -->
