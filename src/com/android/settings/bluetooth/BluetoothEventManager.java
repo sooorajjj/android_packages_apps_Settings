@@ -260,6 +260,11 @@ final class BluetoothEventManager {
                 if (!readPairedDevices()) {
                     Log.e(TAG, "Got bonding state changed for " + device +
                             ", but we have no record of that device.");
+                    if (BluetoothPairingDialog.mEntryPinFlag) {
+                        int reason = intent.getIntExtra(BluetoothDevice.EXTRA_REASON,
+                                BluetoothDevice.ERROR);
+                        showUnbondMessage(context, device.getName(), reason);
+                    }
                     return;
                 }
                 cachedDevice = mDeviceManager.findDevice(device);
@@ -276,6 +281,9 @@ final class BluetoothEventManager {
                 }
             }
             cachedDevice.onBondingStateChanged(bondState);
+            if (bondState == BluetoothDevice.BOND_BONDED) {
+                BluetoothPairingDialog.mEntryPinFlag = false;
+            }
 
             if (bondState == BluetoothDevice.BOND_NONE) {
                 if (device.isBluetoothDock()) {
@@ -329,8 +337,16 @@ final class BluetoothEventManager {
                 errorMsg = R.string.bluetooth_pairing_error_message;
                 break;
             default:
-                Log.w(TAG, "showUnbondMessage: Not displaying any message for reason: " + reason);
-                return;
+                    if (reason == BluetoothDevice.UNBOND_REASON_REMOVED
+                            && BluetoothPairingDialog.mEntryPinFlag) {
+                        errorMsg = R.string.bluetooth_pairing_pin_error_message;
+                        BluetoothPairingDialog.mEntryPinFlag = false;
+                        break;
+                    } else {
+                        Log.w(TAG, "showUnbondMessage: Not displaying any message for reason: "
+                                + reason);
+                        return;
+                    }
             }
             Utils.showError(context, name, errorMsg);
         }
@@ -354,6 +370,7 @@ final class BluetoothEventManager {
         public void onReceive(Context context, Intent intent, BluetoothDevice device) {
             if (device == null) {
                 Log.e(TAG, "ACTION_PAIRING_CANCEL with no EXTRA_DEVICE");
+                BluetoothPairingDialog.mEntryPinFlag = false;
                 return;
             }
             int errorMsg = R.string.bluetooth_pairing_error_message;
