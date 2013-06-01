@@ -291,8 +291,8 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
         if (subscription == ALWAYS_ASK) {
             return mContext.getResources().getString(R.string.select_slot_always_ask);
         } else {
-            return Settings.Global.getString(mContext.getContentResolver(),
-                    Settings.Global.MULTI_SIM_NAME[subscription]);
+            return Settings.System.getString(mContext.getContentResolver(),
+                    Settings.System.MULTI_SIM_NAME[subscription]);
         }
     }
 

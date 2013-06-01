@@ -339,8 +339,8 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         if (mContext == null)
             return;
         String alpha = MSimTelephonyManager.getDefault().getSimOperatorName(mSubscriptionId);
-        String slotInfoStr = Settings.Global.getString(mContext.getContentResolver(),
-                Settings.Global.MULTI_SIM_NAME[mSubscriptionId]);
+        String slotInfoStr = Settings.System.getString(mContext.getContentResolver(),
+                Settings.System.MULTI_SIM_NAME[mSubscriptionId]);
         if (mSubTitle == null)
             return;
         // here need a feature judge of FEATURE_SETTINGS_SIM_NAME_AS_SLOT_NAME,default value is

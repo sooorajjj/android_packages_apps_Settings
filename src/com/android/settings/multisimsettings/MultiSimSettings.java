@@ -202,9 +202,9 @@ public class MultiSimSettings extends PreferenceActivity {
                     findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST__DATA);
             datalist.setValue(PREFERRED_SUB_DATA_LIST_VALUE_SLOT_ONE);
             datalist.setEntries(PREFERRED_SUB_DATA_LIST_ENTRY_SLOT_ONE);
-            datalist.setSummary(Settings.Global.getString(
+            datalist.setSummary(Settings.System.getString(
                     this.getContentResolver(),
-                    Settings.Global.MULTI_SIM_NAME[0]));
+                    Settings.System.MULTI_SIM_NAME[0]));
             datalist.setEnabled(false);
         } else {
             mPreferredSubLists = new PreferredSubscriptionListPreference[
@@ -295,9 +295,9 @@ public class MultiSimSettings extends PreferenceActivity {
         if (disableSlot2Data) {
             PreferredSubscriptionListPreference datalist = (PreferredSubscriptionListPreference)
                     findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST__DATA);
-            datalist.setSummary(Settings.Global.getString(
+            datalist.setSummary(Settings.System.getString(
                     this.getContentResolver(),
-                    Settings.Global.MULTI_SIM_NAME[0]));
+                    Settings.System.MULTI_SIM_NAME[0]));
         }
     }
 
@@ -446,8 +446,8 @@ public class MultiSimSettings extends PreferenceActivity {
                     progressDialog.setIndeterminate(true);
                     return progressDialog;
                 case DISABLE_ENABLE_PROGRESSDIALOG:
-                    String title = Settings.Global.getString(getActivity().getContentResolver(),
-                            Settings.Global.MULTI_SIM_NAME[mSubId]);
+                    String title = Settings.System.getString(getActivity().getContentResolver(),
+                            Settings.System.MULTI_SIM_NAME[mSubId]);
                     String msg = getString(mEnabled?R.string.sim_enabler_enabling
                             :R.string.sim_enabler_disabling);
                     ProgressDialog progressDiallog = new ProgressDialog(context);

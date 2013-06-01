@@ -109,8 +109,8 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         public boolean onPreferenceChange(Preference preference, Object value) {
             Log.i(LOG_TAG, "onPreferenceChange " + value);
             String multiSimName = (String) value;
-            String theOtherSimName = Global.getString(getContentResolver(),
-                    Global.MULTI_SIM_NAME[mSubscription == 0 ? 1 : 0]);
+            String theOtherSimName = System.getString(getContentResolver(),
+                    System.MULTI_SIM_NAME[mSubscription == 0 ? 1 : 0]);
             if (multiSimName.equals(theOtherSimName)) {
                 new AlertDialog.Builder(preference.getContext())
                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -125,7 +125,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
                                 }).show();
                 return false;
             }
-            Global.putString(getContentResolver(), Global.MULTI_SIM_NAME[mSubscription],
+            System.putString(getContentResolver(), System.MULTI_SIM_NAME[mSubscription],
                     multiSimName);
             mNamePreference.setSummary(multiSimName);
             Intent intent = new Intent(MultiSimSettingsConstants.SUBNAME_CHANGED);
@@ -139,13 +139,13 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
                 if (mSubscription == 0 && multiSimName.equals(getString(
                         R.string.default_sim1_name))) {
                     StringBuilder where = new StringBuilder();
-                    where.append("name = '" + Global.MULTI_SIM_NAME[0] + "'");
+                    where.append("name = '" + System.MULTI_SIM_NAME[0] + "'");
                     getContentResolver().delete(Uri.parse("content://settings/system"),
                             where.toString(), null);
                 } else if (mSubscription == 1 && multiSimName.equals(getString(
                         R.string.default_sim2_name))) {
                     StringBuilder where = new StringBuilder();
-                    where.append("name = '" + Global.MULTI_SIM_NAME[1] + "'");
+                    where.append("name = '" + System.MULTI_SIM_NAME[1] + "'");
                     getContentResolver().delete(Uri.parse("content://settings/system"),
                             where.toString(), null);
                 }
@@ -263,7 +263,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         if (subscription == ALWAYS_ASK) {
             return getResources().getString(R.string.select_slot_always_ask);
         } else {
-            return Global.getString(getContentResolver(), Global.MULTI_SIM_NAME[subscription]);
+            return System.getString(getContentResolver(), System.MULTI_SIM_NAME[subscription]);
         }
     }
 
