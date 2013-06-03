@@ -4610,6 +4610,8 @@ alog [CHAR LIMIT=none] -->
     <string name="sub_not_changed">State not changed</string>
     <string name="title_sim_alias">Alias name</string>
     <string name="same_name_alert">Two sim cards can not be the same name!</string>
+    <!-- Title for input language selection screen -->
+    <string name="language_selection_title">Input languages</string>
     <string name="select_slot_always_ask">Always ask</string>
     <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
     <!-- Default names for sim cards -->
