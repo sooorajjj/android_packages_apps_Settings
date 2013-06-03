@@ -126,7 +126,9 @@ public class UserDictionaryAddWordFragment extends Fragment
         final LocaleRenderer locale = (LocaleRenderer)parent.getItemAtPosition(pos);
         if (locale.isMoreLanguages()) {
             PreferenceActivity preferenceActivity = (PreferenceActivity)getActivity();
-            preferenceActivity.startPreferenceFragment(new UserDictionaryLocalePicker(this), true);
+            UserDictionaryLocalePicker localePicker = new UserDictionaryLocalePicker();
+            localePicker.setLocaleSelectionListener(this);
+            preferenceActivity.startPreferenceFragment(localePicker, true);
         } else {
             mContents.updateLocale(locale.getLocaleString());
         }

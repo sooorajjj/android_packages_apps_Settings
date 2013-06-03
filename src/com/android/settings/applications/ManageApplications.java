@@ -82,6 +82,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import android.os.SystemProperties;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.text.Editable;
+import android.view.KeyEvent;
+
+
 final class CanBeOnSdCardChecker {
     final IPackageManager mPm;
     int mInstallLocation;
@@ -462,6 +469,9 @@ public class ManageApplications extends Fragment implements
 
     AlertDialog mResetDialog;
 
+    public EditText mTextView;
+    public TextView mSearchTitle;
+
     class MyPagerAdapter extends PagerAdapter
             implements ViewPager.OnPageChangeListener {
         int mCurPos = 0;
@@ -536,6 +546,12 @@ public class ManageApplications extends Fragment implements
         private int mWhichSize = SIZE_TOTAL;
         CharSequence mCurFilterPrefix;
 
+        public View mCurrentView = null;
+
+        public View getMyView(){
+            return mCurrentView;
+        }
+        
         private Filter mFilter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
@@ -555,6 +571,14 @@ public class ManageApplications extends Fragment implements
                 mTab.updateStorageUsage();
             }
         };
+
+        public void setFilterPrefix(String prefix){
+            Log.d(TAG,"setFilterPrefix:prefix="+prefix);
+            mCurFilterPrefix = prefix;
+            rebuild(true);
+            notifyDataSetChanged();
+            mTab.updateStorageUsage();
+        }
 
         public ApplicationsAdapter(ApplicationsState state, TabInfo tab, int filterMode) {
             mState = state;
@@ -794,6 +818,7 @@ public class ManageApplications extends Fragment implements
             }
             mActive.remove(convertView);
             mActive.add(convertView);
+            mCurrentView = convertView;
             return convertView;
         }
 
@@ -885,6 +910,27 @@ public class ManageApplications extends Fragment implements
                 container, false);
         mContentContainer = container;
         mRootView = rootView;
+
+        mTextView = (EditText)rootView.findViewById(R.id.search_prefix);
+        mSearchTitle = (TextView)rootView.findViewById(R.id.search_title);
+        mTextView.addTextChangedListener(new TextWatcher() {			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        //textview.setText(edittext.getText());
+                        if(null!=mCurTab && (null!=mCurTab.mApplications)){
+                            mCurTab.mApplications.setFilterPrefix((null==mTextView.getText())?"":mTextView.getText().toString());
+                        }
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {								
+			}
+		});
 
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         MyPagerAdapter adapter = new MyPagerAdapter();
@@ -1246,6 +1292,11 @@ public class ManageApplications extends Fragment implements
         if (host != null) {
             host.invalidateOptionsMenu();
         }
+
+        if(mCurTab.mListType == LIST_TYPE_RUNNING){
+            mTextView.setVisibility(View.GONE);
+            mSearchTitle.setVisibility(View.GONE);
+        }
     }
 
     private volatile IMediaContainerService mContainerService;
@@ -1267,12 +1318,19 @@ public class ManageApplications extends Fragment implements
 
     //add for new feature for cmcc : search applications
     private void showInputmethod(){
+        /*
         if (mCurTab != null && mCurTab.mListType != LIST_TYPE_RUNNING) {
             mCurTab.mListView.requestFocus();
             InputMethodManager imm;
             imm = ((InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE));
             imm.showSoftInputUnchecked(0, null);
+        */
+        if(mTextView.getVisibility() != View.VISIBLE){
+            if(mCurTab.mListType!=LIST_TYPE_RUNNING){
+                mTextView.setVisibility(View.VISIBLE);
+                mSearchTitle.setVisibility(View.VISIBLE);
+                mTextView.requestFocus();
+            }
         }
-       
     }
 }
