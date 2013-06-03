@@ -109,7 +109,6 @@ public class SecuritySettings extends SettingsPreferenceFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate");
 
         mLockPatternUtils = new LockPatternUtils(getActivity());
 

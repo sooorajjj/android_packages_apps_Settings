@@ -648,6 +648,7 @@ public class ApnEditor extends PreferenceActivity
         String apn = checkNotSet(mApn.getText());
         String mcc = checkNotSet(mMcc.getText());
         String mnc = checkNotSet(mMnc.getText());
+        String port = checkNotSet(mPort.getText());
 
         if (name.length() < 1) {
             errorMsg = mRes.getString(R.string.error_name_empty);
@@ -657,6 +658,11 @@ public class ApnEditor extends PreferenceActivity
             errorMsg = mRes.getString(R.string.error_mcc_not3);
         } else if ((mnc.length() & 0xFFFE) != 2) {
             errorMsg = mRes.getString(R.string.error_mnc_not23);
+        }else if(port.length() >= 1){
+            int portNum = Integer.parseInt(port);
+            if (portNum < 0 || portNum > 65535) {
+                errorMsg = mRes.getString(R.string.error_port_invalid);
+            }
         }
 
         return errorMsg;

@@ -2227,6 +2227,8 @@ alog [CHAR LIMIT=none] -->
     <string name="error_mcc_not3">MCC field must be 3 digits.</string>
     <!-- APN error dialog messages: -->
     <string name="error_mnc_not23">MNC field must be 2 or 3 digits.</string>
+    <!-- APN error dialog messages: -->
+    <string name="error_port_invalid">The valid port range is 0-65535.</string>
     <!-- The message of dialog indicated restoring default APN settings in progress -->
     <string name="restore_default_apn">Restoring default APN settings.</string>
     <!-- APNs screen menu option to reset default APN settings -->
@@ -2394,7 +2396,7 @@ alog [CHAR LIMIT=none] -->
     <!-- [CHAR LIMIT=100] Security & location settings screen, setting check box summary for GPS satellites on a phone -->
     <string name="location_street_level" product="default">Let apps use GPS on your phone to pinpoint your location</string>
     <!-- Security & location settings screen, setting check box label if Assisted GPS should be enabled -->
-    <string name="assisted_gps">Use assisted A-GPS</string>
+    <string name="assisted_gps">Use AGPS</string>
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is selected -->
     <string name="assisted_gps_enabled">Use server to assist GPS (uncheck to reduce network usage)</string>
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is clear -->
@@ -4707,4 +4709,5 @@ alog [CHAR LIMIT=none] -->
     <!-- GPS time sync -->
     <string name="gps_time_sync_attention_gps_on">It will take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal.\n\nAre you sure to use GPS provided time?</string>
     <string name="gps_time_sync_attention_gps_off">To use GPS provided time, you must enable GPS first. It then take at most 1 minute to obtain GPS fix. Besides, GPS may fail to provide time due to weak environmental signal. \n\nAre you sure to enable GPS now and wait for GPS provided time?</string>
+    <string name="invalid_alias">"The alias name contains invalid characters,please try again!"</string>
 </resources>

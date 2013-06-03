@@ -899,6 +899,7 @@
     <string name="error_apn_empty" msgid="6056233831214537267">"APN 不能为空。"</string>
     <string name="error_mcc_not3" msgid="4560171714156251661">"MCC 字段必须为 3 位数。"</string>
     <string name="error_mnc_not23" msgid="8418177072458379439">"MNC 字段必须为 2 位数或 3 位数。"</string>
+    <string name="error_port_invalid">"端口有效范围 0-65535。"</string>
     <string name="restore_default_apn" msgid="8178010218751639581">"正在恢复默认 APN 设置。"</string>
     <string name="menu_restore" msgid="8260067415075573273">"重置为默认设置"</string>
     <string name="restore_default_apn_completed" msgid="2824775307377604897">"重置默认 APN 设置已完成。"</string>
@@ -1049,7 +1050,7 @@
     <string name="location_gps" msgid="8392461023569708478">"GPS 卫星定位"</string>
     <string name="location_street_level" product="tablet" msgid="1669562198260860802">"允许应用使用您平板电脑上的 GPS 定位您的位置"</string>
     <string name="location_street_level" product="default" msgid="4617445745492014203">"允许应用使用您手机上的 GPS 定位您的位置"</string>
-    <string name="assisted_gps" msgid="4649317129586736885">"使用增强型 A-GPS"</string>
+    <string name="assisted_gps" msgid="4649317129586736885">"使用AGPS"</string>
     <string name="assisted_gps_enabled" msgid="8751899609589792803">"使用服务器来辅助 GPS（取消选中可降低网络使用率）"</string>
     <string name="assisted_gps_disabled" msgid="6982698333968010748">"使用服务器来辅助 GPS（选中可提高 GPS 性能）"</string>
     <string name="use_location_title" msgid="5206937465504979977">"位置和 Google 搜索"</string>
@@ -2038,4 +2039,6 @@
     <string name="bluetooth_ftp_remember_choice">"下次不再询问"</string>
     <!-- Activity label of BluetoothPermissionActivity for FTP [CHAR LIMIT=none]-->
     <string name="bluetooth_ftp_connection_permission_request">Ftp连接请求</string>
+    
+    <string name="invalid_alias">"SIM卡名称包含无效字符，请重试!"</string>
 </resources>
