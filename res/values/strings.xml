@@ -1331,8 +1331,6 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_notify_open_networks">Network notification</string>
     <!-- Checkbox summary for option to notify user when open networks are nearby -->
     <string name="wifi_notify_open_networks_summary">Notify me when an open network is available</string>
-	<!-- Error message Certificate doesn't exits -->
-    <string name="wifi_wapi_certification_dont_exist">The network password you typed is not correct. Please try again.</string>
     <!-- Checkbox title for option to toggle poor network detection -->
     <string name="wifi_poor_network_detection">Avoid poor connections</string>
     <!-- Checkbox summary for option to toggle poor network detection -->
@@ -1435,8 +1433,6 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_eap_anonymous">Anonymous identity</string>
     <!-- Label for the password of the secured network -->
     <string name="wifi_password">Password</string>
-    <!-- Caption for the wireless password -->
-    <string name="please_type_passphrase">Wireless password</string>
     <!-- Label for the check box to show password -->
     <string name="wifi_show_password">Show password</string>
     <!-- Label for the spinner to show ip settings [CHAR LIMIT=25] -->
@@ -1481,11 +1477,6 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_security_short_psk_generic">@string/wifi_security_short_wpa_wpa2</string>
     <!-- Do not translate.  Concise terminology for wifi with 802.1x EAP security -->
     <string name="wifi_security_short_eap">802.1x</string>
-	<!-- Do not translate.  Concise terminology for wifi with WAPI PSK security -->
-    <string name="wifi_security_short_WAPI_PSK">WAPI PSK</string>
-	<!-- Do not translate.  Concise terminology for wifi with WAPI CERT security -->
-    <string name="wifi_security_short_WAPI_CERT">WAPI CERT</string>
-
 
     <!-- Used in Wi-Fi settings dialogs when Wi-Fi does not have any security. -->
     <string name="wifi_security_none">None</string>
@@ -1502,11 +1493,6 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_security_psk_generic">@string/wifi_security_wpa_wpa2</string>
     <!-- Do not translate.  Concise terminology for wifi with 802.1x EAP security -->
     <string name="wifi_security_eap">802.1x EAP</string>
-	<!-- Do not translate.  Concise terminology for wifi with WAPI PSK security -->
-    <string name="wifi_security_WAPI_PSK">WAPI PSK</string>
-	<!-- Do not translate.  Concise terminology for wifi with WAPI CERT security -->
-    <string name="wifi_security_WAPI_CERT">WAPI CERT</string>
-
 
 
     <!-- Button label to connect to a Wi-Fi network -->
@@ -1541,46 +1527,6 @@ alog [CHAR LIMIT=none] -->
     <!-- Text alerting that Wi-Fi couldn't connect (phone) [CHAR LIMIT=NONE] -->
     <string name="wifi_connect_failed_message" product="default" msgid="8220901976514642385">The phone was unable to connect to this Wi-Fi network.</string>
 
-    <!-- Wi-Fi settings screen, connect to network dialog box, spinner -->
-    <string name="wifi_certificate">Certificate</string>
-
-    <!-- Title of the WAPI certificate manage -->
-    <string name="wifi_wapi_cert_mgmt_titlebar">WAPI Certificate Management</string>
-    <!-- Action message of the install WAPI certificate -->
-    <string name="wifi_wapi_cert_install">Install WAPI Certificate</string>
-    <!-- Button caption to install wapi certificate button -->
-    <string name="wifi_wapi_cert_install_button">Install</string>
-    <!-- Button caption to uninstall wapi certificate button -->
-    <string name="wifi_wapi_cert_uninstall_button">Uninstall</string>
-    <!-- Button caption to  cancel wapi certificate button -->
-    <string name="wifi_wapi_cert_cancel_button">Cancel</string>
-    <!-- Action message of the uninstall WAPI certificate -->
-    <string name="wifi_wapi_cert_uninstall">Uninstall WAPI Certificate</string>
-    <!-- Caption for entering the directroy of wapi certificate which you want to storage -->
-    <string name="wifi_wapi_cert_create_subdir">Create a directroy</string>
-    <!-- Caption for entering the directroy of wapi certificate which you want to delet -->
-    <string name="wifi_wapi_cert_delet_subdir">Select a suit certificate</string>
-    <!-- Caption for the wapi as certificate -->
-    <string name="wifi_wapi_as_cert">AS Certificate</string>
-    <!-- Caption for the wapi user certificate -->
-    <string name="wifi_wapi_user_cert">User Certificate</string>
-    <string name="wifi_wapi_cert_mgmt_subdir_name_is_empty">Please input the directory name which you want to create!</string>
-    <string name="wifi_wapi_cert_mgmt_subdir_exist">Please input the other directory name, this one does exist</string>
-    <string name="wifi_wapi_cert_mgmt_subdir_create_fail">Create directory fail</string>
-    <string name="wifi_wapi_cert_mgmt_as_name_is_empty">Please input the as certificate name</string>
-    <string name="wifi_wapi_cert_mgmt_as_dont_exist">The SDCard does not has the AS certificate, please checke it!</string>
-    <string name="wifi_wapi_cert_mgmt_as_format_is_wrong">The as certificate format is wrong! Please intall right as certificate</string>
-    <string name="wifi_wapi_cert_mgmt_user_format_is_wrong">The user certificate format is wrong! Please intall right user certificate</string>
-    <string name="wifi_wapi_cert_mgmt_user_name_is_empty">Please input the user certificate name</string>
-    <string name="wifi_wapi_cert_mgmt_user_dont_exist">Please input the user certificate name</string>
-    <!--Wi-Fi settings screen, network context menu item -->
-    <string name="wifi_context_menu_connect">Connect to network</string>
-    <!--Wi-Fi settings screen, network context menu item -->
-    <string name="wifi_context_menu_forget">Forget network</string>
-    <!--Wi-Fi settings screen, network context menu item -->
-    <string name="wifi_context_menu_change_password">Change password</string>
-    <string name="wifi_context_menu_change_wapi_certificate">Change WAPI Certificate</string>
-    <string name="wifi_wapi_no_cert_file">No WAPI Certificate</string>
     <!-- Wi-Fi Advanced Settings --> <skip />
     <!-- Wi-Fi settings screen, advanced, settings section.  This is a header shown above advanced wifi settings. -->
     <string name="wifi_advanced_titlebar">Advanced Wi-Fi</string>

@@ -18,7 +18,6 @@ package com.android.settings.wifi;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
@@ -36,23 +35,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.settings.R;
-//WAPI+++
-import java.io.File;
-import android.app.Dialog;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.preference.PreferenceActivity;
-import android.os.FileUtils;
-//WAPI---
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
 import android.content.BroadcastReceiver;
 import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class AdvancedWifiSettings extends SettingsPreferenceFragment
-//WAPI+++
-        implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener{
-//WAPI---
+        implements Preference.OnPreferenceChangeListener {
 
     private static final String TAG = "AdvancedWifiSettings";
     private static final String KEY_MAC_ADDRESS = "mac_address";
@@ -62,12 +51,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_SLEEP_POLICY = "sleep_policy";
     private static final String KEY_POOR_NETWORK_DETECTION = "wifi_poor_network_detection";
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
-    //WAPI+++
-    private static final String DEFAULT_CERTIFICATE_PATH =
-			"/data/wapi_certificate";
-    private static final String KEY_WAPI_CERT_INSTALL = "wapi_cert_install";
-    private Preference mWapiCertInstall;
-    //WAPI---
+
 //QUALCOMM_CMCC_START 
     private static final String KEY_CURRENT_GATEWAY = "current_gateway";
     private static final String KEY_CURRENT_NETMASK = "current_netmask";
@@ -93,10 +77,6 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.wifi_advanced_settings);
-        //WAPI+++
-        Log.e(TAG, "Oncreate findpref.");
-        mWapiCertInstall = findPreference(KEY_WAPI_CERT_INSTALL);
-        //WAPI---
     }
 
     @Override
@@ -109,9 +89,6 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     public void onResume() {
         super.onResume();
         initPreferences();
-//WAPI+++
-        initWapiCertInstallPreference();
-//WAPI---
         refreshWifiInfo();
 //QUALCOMM_CMCC_START         
         if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
@@ -345,9 +322,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                     checked ? Settings.System.WIFI_GSM_CONNECT_TYPE_ASK : Settings.System.WIFI_GSM_CONNECT_TYPE_AUTO);
         }
 //QUALCOMM_CMCC_END
-//WAPI+++
-        mWapiCertInstall = findPreference(KEY_WAPI_CERT_INSTALL);
-//WAPI---
+
         return true;
     }
 
@@ -363,7 +338,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         String ipAddress = Utils.getWifiIpAddresses(getActivity());
         wifiIpAddressPref.setSummary(ipAddress == null ?
                 getActivity().getString(R.string.status_unavailable) : ipAddress);
-				
+
 //QUALCOMM_CMCC_START
         Preference wifiGatewayPref = findPreference(KEY_CURRENT_GATEWAY);
         String gateway = null;
@@ -399,50 +374,6 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
 //QUALCOMM_CMCC_END
     }
 
-//WAPI+++
-    private void initWapiCertInstallPreference() {
-        Preference pref = findPreference(KEY_WAPI_CERT_INSTALL);
-        if (null != pref) {
-            Log.e(TAG, "initWapiCertInstallPreference pref != null");
-            pref.setOnPreferenceClickListener((Preference.OnPreferenceClickListener)this);
-        } else {
-            Log.e(TAG, "initWapiCertInstallPreference pref == null");
-        }
-    }
-
-    public boolean onPreferenceClick(Preference preference) {
-        String key = preference.getKey();
-        Log.d(TAG, "onPreferenceClick key " + key);
-        if (key == null) return true;
-        if (key.equals(KEY_WAPI_CERT_INSTALL)) {
-            Log.d(TAG, "onPreferenceClick key 1" + key);
-			
-            String stringDefDir = DEFAULT_CERTIFICATE_PATH;
-            File defDir = new File(stringDefDir);
-            if (!defDir.exists()) {
-                defDir.mkdir();
-                if (!defDir.exists()) {
-                    new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.error_title)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setMessage("Cert. base dir create failed")
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-                } 
-                FileUtils.setPermissions(stringDefDir, FileUtils.S_IRWXU| FileUtils.S_IRWXG | FileUtils.S_IRWXO , -1, -1);
-            } else {
-                Log.d(TAG, "send wapi Broadcast");
-				Intent mIntent = new Intent();
-				ComponentName comp = new ComponentName("com.android.wapicertmgmtdialog", 
-					    "com.android.wapicertmgmtdialog.WapiCertActivity");
-				mIntent.setComponent(comp);
-				mIntent.setAction("android.intetn.action.VIEW");
-				startActivity(mIntent);
-			}
-        }
-        return true;
-    }
-//WAPI---
 
 //QUALCOMM_CMCC_START	
     private String ipTransfer(int value){

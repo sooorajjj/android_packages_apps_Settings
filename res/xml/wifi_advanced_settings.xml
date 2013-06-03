@@ -113,8 +113,4 @@
         android:title="@string/wifi_advanced_network_netmask"
         />
 <!-- QUALCOMM_CMCC_END -->
-<!-- WAPI +++ -->
-    <Preference android:key="wapi_cert_install"
-            android:title="@string/wifi_wapi_cert_mgmt_titlebar" />
-<!-- WAPI +++ -->
 </PreferenceScreen>   

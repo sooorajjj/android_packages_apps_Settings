@@ -84,7 +84,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.provider.Settings;
 import com.qrd.plugin.feature_query.FeatureQuery;
-import java.io.File;
 
 /**
  * Two types of UI are provided here.
@@ -615,18 +614,10 @@ public class WifiSettings extends SettingsPreferenceFragment
         switch (item.getItemId()) {
             case MENU_ID_CONNECT: {
                 if (mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
-//WAPI+++
-					WifiConfiguration wapiConfig = mSelectedAccessPoint.getConfig();
-					if (wapiConfig != null && mSelectedAccessPoint.getSecurity(wapiConfig) == 5) {
-						wapiConnectPolicy(wapiConfig, mSelectedAccessPoint.networkId);
-					} 
-//WAPI---
-					else {
-						if (!requireKeyStore(mSelectedAccessPoint.getConfig())) {
-							mWifiManager.connect(mSelectedAccessPoint.networkId,
-									mConnectListener);
-						}
-					}
+                    if (!requireKeyStore(mSelectedAccessPoint.getConfig())) {
+                        mWifiManager.connect(mSelectedAccessPoint.networkId,
+                                mConnectListener);
+                    }
                 } else if (mSelectedAccessPoint.security == AccessPoint.SECURITY_NONE) {
                     /** Bypass dialog for unsecured networks */
                     mSelectedAccessPoint.generateOpenNetworkConfig();
@@ -1125,17 +1116,9 @@ public class WifiSettings extends SettingsPreferenceFragment
                     && mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
                 DetailedState state = mSelectedAccessPoint.getState();
                 if(state == null){
-//WAPI+++
-					WifiConfiguration wapiConfig = mSelectedAccessPoint.getConfig();
-					if (wapiConfig != null && mSelectedAccessPoint.getSecurity(wapiConfig) == 5) {
-						wapiConnectPolicy(wapiConfig, mSelectedAccessPoint.networkId);
-					} 
-//WAPI---
-					else {
-						mWifiManager.connect(mSelectedAccessPoint.networkId,
-								 mConnectListener);
-					}
-				} else {
+                    mWifiManager.connect(mSelectedAccessPoint.networkId,
+                        mConnectListener);
+				 } else {
 					mWifiManager.disconnect();
 //QUALCOMM_CMCC_START 
 				    if (FeatureQuery.FEATURE_WLAN_CMCC_SUPPORT) {
@@ -1163,35 +1146,6 @@ public class WifiSettings extends SettingsPreferenceFragment
         }
         updateAccessPoints();
     }
-
-//WAPI+++
-	private void wapiConnectPolicy(WifiConfiguration mConfig, int networkId){
-        String asCert = mConfig.wapiASCert;
-        String userCert = mConfig.wapiUserCert;
-        //Log.d(TAG, "wapi asCert:" + asCert + ", userCert:" + userCert);
-        if (isWapiCertFileExist(asCert, userCert)) {
-             mWifiManager.connect(networkId, mConnectListener);
-        } else {
-            Toast.makeText(getActivity(), R.string.wifi_wapi_no_cert_file,
-                Toast.LENGTH_LONG).show();
-        }
-	}
-
-	private boolean isWapiCertFileExist(String asPath, String userPath){
-		if (asPath == null || userPath == null) {
-            return false;
-		}
-        String certStr = asPath.substring(1 ,asPath.length() -7);
-		File certDirector = new File(certStr);
-		//Log.d(TAG, "certStr:" + certStr);
-		Log.d(TAG, "isDirectory:" + certDirector.isDirectory());
-		Log.d(TAG, "exists:" + certDirector.exists());
-		if (certDirector.isDirectory() && certDirector.exists()){
-               return true;
-		}
-		return false;
-	}
-//WAPI---
 
     /* package */ void forget() {
         if (mSelectedAccessPoint.networkId == INVALID_NETWORK_ID) {
