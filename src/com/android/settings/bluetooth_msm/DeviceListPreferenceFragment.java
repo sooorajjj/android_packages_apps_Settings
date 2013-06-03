@@ -110,7 +110,8 @@ public abstract class DeviceListPreferenceFragment extends
         super.onPause();
         if (mLocalManager == null) return;
 
-        removeAllDevices();
+        //removeAllDevices();
+        onlyRemoveDevices();
         mLocalManager.setForegroundActivity(null);
         mLocalManager.getEventManager().unregisterCallback(this);
     }
@@ -120,7 +121,10 @@ public abstract class DeviceListPreferenceFragment extends
         mDevicePreferenceMap.clear();
         mDeviceListGroup.removeAll();
     }
-
+    private void onlyRemoveDevices() {
+        mDevicePreferenceMap.clear();
+        mDeviceListGroup.removeAll();
+    }
     void addCachedDevices() {
         Collection<CachedBluetoothDevice> cachedDevices =
                 mLocalManager.getCachedDeviceManager().getCachedDevicesCopy();
