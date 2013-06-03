@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
- * Copyright (C) 2012, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2012-2013, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothInputDevice;
+import android.bluetooth.BluetoothHogpDevice;
 import android.bluetooth.BluetoothPan;
 import android.bluetooth.BluetoothSap;
 import android.bluetooth.BluetoothDUN;
@@ -78,6 +79,7 @@ final class LocalBluetoothProfileManager {
     private A2dpProfile mA2dpProfile;
     private HeadsetProfile mHeadsetProfile;
     private final HidProfile mHidProfile;
+    private final HogpProfile mHogpProfile;
     private OppProfile mOppProfile;
     private final PanProfile mPanProfile;
     private SapProfile mSapProfile;
@@ -108,6 +110,11 @@ final class LocalBluetoothProfileManager {
         if (uuids != null) {
             updateLocalProfiles(uuids);
         }
+
+    // Always add HOGP profiles
+        mHogpProfile = new HogpProfile(context, mLocalAdapter);
+        addProfile(mHogpProfile, HogpProfile.NAME,
+                BluetoothHogpDevice.ACTION_CONNECTION_STATE_CHANGED);
 
         // Always add HID and PAN profiles
         mHidProfile = new HidProfile(context, mLocalAdapter);
@@ -411,6 +418,12 @@ final class LocalBluetoothProfileManager {
             removedProfiles.remove(mHidProfile);
         }
 
+        if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.Hogp) &&
+            mHogpProfile != null) {
+            profiles.add(mHogpProfile);
+            removedProfiles.remove(mHogpProfile);
+        }
+
         if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.NAP) &&
             mPanProfile != null) {
             profiles.add(mPanProfile);
@@ -464,6 +477,13 @@ final class LocalBluetoothProfileManager {
             !profiles.contains(mHidProfile)) {
             profiles.add(mHidProfile);
             removedProfiles.remove(mHidProfile);
+        }
+
+        if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.Hogp) &&
+            (mHogpProfile != null) &&
+            !profiles.contains(mHogpProfile)) {
+            profiles.add(mHogpProfile);
+            removedProfiles.remove(mHogpProfile);
         }
 
         if (BluetoothUuid.isUuidPresent(uuids, BluetoothUuid.NAP) &&
