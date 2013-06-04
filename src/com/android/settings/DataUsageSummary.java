@@ -159,7 +159,7 @@ import android.net.wifi.WifiManager;
  */
 public class DataUsageSummary extends Fragment {
     private static final String TAG = "DataUsage";
-    private static final boolean LOGD = true;
+    private static final boolean LOGD = false;
 
     // TODO: remove this testing code
     private static final boolean TEST_ANIM = false;
@@ -272,8 +272,6 @@ public class DataUsageSummary extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Context context = getActivity();
-        
-        Log.e(TAG, "onCreate");
 
         mNetworkService = INetworkManagementService.Stub.asInterface(
                 ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE));

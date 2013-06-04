@@ -83,7 +83,6 @@ public class ManageAccountsSettings extends AccountPreferenceBase
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        Log.e(TAG, "onCreate");
 
         Bundle args = getArguments();
         if (args != null && args.containsKey(KEY_ACCOUNT_TYPE)) {

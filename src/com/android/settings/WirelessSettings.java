@@ -41,7 +41,6 @@ import com.android.internal.telephony.TelephonyProperties;
 import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 import com.android.settings.nfc.NfcEnabler;
 import com.android.settings.NsdEnabler;
-import android.util.Log;
 
 public class WirelessSettings extends SettingsPreferenceFragment {
 
@@ -97,7 +96,6 @@ public class WirelessSettings extends SettingsPreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("WirelessSettings", "onCreate");
 
         addPreferencesFromResource(R.xml.wireless_settings);
 
