@@ -1319,7 +1319,18 @@ public class DataUsageSummary extends Fragment {
         }
     }
 
+    private static String getActiveSubscriberId(int sub) {
+        return MSimTelephonyManager.getDefault().getSubscriberId(sub);
+    }
+
     private static String getActiveSubscriberId(Context context) {
+        if(TelephonyManager.isMultiSimEnabled())
+        {
+            MSimTelephonyManager tele = MSimTelephonyManager.from(context);
+            int sub=tele.getPreferredDataSubscription();
+            return getActiveSubscriberId(sub);
+        }
+
         final TelephonyManager tele = TelephonyManager.from(context);
         final String actualSubscriberId = tele.getSubscriberId();
         return SystemProperties.get(TEST_SUBSCRIBER_PROP, actualSubscriberId);
@@ -2255,10 +2266,9 @@ public class DataUsageSummary extends Fragment {
         }
 
         final ConnectivityManager conn = ConnectivityManager.from(context);
-        final TelephonyManager tele = TelephonyManager.from(context);
 
         // require both supported network and ready SIM
-        return conn.isNetworkSupported(TYPE_MOBILE) && tele.getSimState() == SIM_STATE_READY;
+        return conn.isNetworkSupported(TYPE_MOBILE) && getSimState(context) == SIM_STATE_READY;
     }
 
     /**
@@ -2375,8 +2385,7 @@ public class DataUsageSummary extends Fragment {
         // build combined list of all limited networks
         final ArrayList<CharSequence> limited = Lists.newArrayList();
 
-        final TelephonyManager tele = TelephonyManager.from(context);
-        if (tele.getSimState() == SIM_STATE_READY) {
+        if (getSimState(context) == SIM_STATE_READY) {
             final String subscriberId = getActiveSubscriberId(context);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
@@ -2434,5 +2443,17 @@ public class DataUsageSummary extends Fragment {
         final TextView summary = (TextView) parent.findViewById(android.R.id.summary);
         summary.setVisibility(View.VISIBLE);
         summary.setText(string);
+    }
+
+    private static int getSimState(Context context)
+    {
+        if(TelephonyManager.isMultiSimEnabled())
+        {
+            MSimTelephonyManager tele = MSimTelephonyManager.from(context);
+            int sub=tele.getPreferredDataSubscription();
+            return tele.getSimState(sub);
+        }
+        TelephonyManager tele = TelephonyManager.from(context);
+        return tele.getSimState();
     }
 }

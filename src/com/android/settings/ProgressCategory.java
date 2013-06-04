@@ -20,14 +20,16 @@ import android.content.Context;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.View;
-
+import com.android.settings.bluetooth.LocalBluetoothAdapter;
+import com.android.settings.bluetooth.LocalBluetoothManager;
 public class ProgressCategory extends ProgressCategoryBase {
 
     private final int mEmptyTextRes;
     private boolean mProgress = false;
     private Preference mNoDeviceFoundPreference;
     private boolean mNoDeviceFoundAdded;
-
+    LocalBluetoothAdapter mLocalAdapter;
+    LocalBluetoothManager mLocalManager;
     public ProgressCategory(Context context, AttributeSet attrs,
             int emptyTextRes) {
         super(context, attrs);
@@ -39,6 +41,11 @@ public class ProgressCategory extends ProgressCategoryBase {
     public void onBindView(View view) {
         super.onBindView(view);
         final View progressBar = view.findViewById(R.id.scanning_progress);
+        mLocalManager = LocalBluetoothManager.getInstance(getContext());
+        mLocalAdapter = mLocalManager.getBluetoothAdapter();
+        if(mLocalAdapter.isDiscovering()){
+            mProgress = true;
+        }
 
         boolean noDeviceFound = (getPreferenceCount() == 0 ||
                 (getPreferenceCount() == 1 && getPreference(0) == mNoDeviceFoundPreference));
