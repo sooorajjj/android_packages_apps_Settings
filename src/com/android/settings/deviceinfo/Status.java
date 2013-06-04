@@ -431,7 +431,7 @@ public class Status extends PreferenceActivity {
         } else {
             setSummaryText(KEY_ROAMING_STATE, mRes.getString(R.string.radioInfo_roaming_not));
         }
-        setSummaryText(KEY_OPERATOR_NAME, serviceState.getOperatorAlphaLong());
+        setSummaryText(KEY_OPERATOR_NAME, mTelephonyManager.getNetworkName());
     }
 
     private void updateAreaInfo(String areaInfo) {
