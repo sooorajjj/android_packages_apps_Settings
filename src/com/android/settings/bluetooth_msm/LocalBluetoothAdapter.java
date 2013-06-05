@@ -115,7 +115,7 @@ public final class LocalBluetoothAdapter {
         return mAdapter.getUuids();
     }
 
-    boolean isDiscovering() {
+    public boolean isDiscovering() {
         return mAdapter.isDiscovering();
     }
 
