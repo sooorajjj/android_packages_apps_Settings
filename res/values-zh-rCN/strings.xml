@@ -2040,4 +2040,9 @@
     <string name="bluetooth_ftp_connection_permission_request">Ftp连接请求</string>
     
     <string name="invalid_alias">"SIM卡名称包含无效字符，请重试!"</string>
+        
+    <string name="backup_password_empty">"当前的完整备份密码不能为空"</string>
+    <string name="new_password_empty">"新的完整备份密码不能为空"</string>
+    <string name="confirmation_password_empty">"确认的完整备份密码不能为空"</string>
+
 </resources>
