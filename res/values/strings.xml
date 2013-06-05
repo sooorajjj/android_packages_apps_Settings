@@ -4669,6 +4669,10 @@ alog [CHAR LIMIT=none] -->
     <string name="china_telecom_net_apn_name">CTNET</string>
     <string name="china_telecom_wap_apn_name">CTWAP</string>
 
+    <string name="backup_password_empty">"Backup password can't be empty"</string>
+    <string name="new_password_empty">"New backup password can't be empty"</string>
+    <string name="confirmation_password_empty">"Confirmation backup password can't be empty"</string>
+
     <!-- agps settings begin-->
  
     <string name="location_agps_params_settings_title">AGPS settings</string>

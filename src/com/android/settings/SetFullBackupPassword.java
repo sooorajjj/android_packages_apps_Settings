@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.TextUtils;
 
 public class SetFullBackupPassword extends Activity {
     static final String TAG = "SetFullBackupPassword";
@@ -42,6 +43,23 @@ public class SetFullBackupPassword extends Activity {
                 final String curPw = mCurrentPw.getText().toString();
                 final String newPw = mNewPw.getText().toString();
                 final String confirmPw = mConfirmNewPw.getText().toString();
+
+                if(TextUtils.isEmpty(curPw.trim())){
+                    Toast.makeText(SetFullBackupPassword.this,
+                            R.string.backup_password_empty,
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }else if(TextUtils.isEmpty(newPw.trim())){
+                    Toast.makeText(SetFullBackupPassword.this,
+                            R.string.new_password_empty,
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }else if(TextUtils.isEmpty(confirmPw.trim())){
+                    Toast.makeText(SetFullBackupPassword.this,
+                            R.string.confirmation_password_empty,
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 if (!newPw.equals(confirmPw)) {
                     // Mismatch between new pw and its confirmation re-entry
