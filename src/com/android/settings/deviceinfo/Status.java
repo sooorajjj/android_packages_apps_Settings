@@ -431,7 +431,7 @@ public class Status extends PreferenceActivity {
         } else {
             setSummaryText(KEY_ROAMING_STATE, mRes.getString(R.string.radioInfo_roaming_not));
         }
-        setSummaryText(KEY_OPERATOR_NAME, serviceState.getOperatorAlphaLong());
+        setSummaryText(KEY_OPERATOR_NAME, mTelephonyManager.getNetworkName());
     }
 
     private void updateAreaInfo(String areaInfo) {
@@ -490,6 +490,9 @@ public class Status extends PreferenceActivity {
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
         Preference wifiMacAddressPref = findPreference(KEY_WIFI_MAC_ADDRESS);
+
+        String prefString = WifiManager.replaceAllWiFi(wifiMacAddressPref.getTitle().toString());
+        wifiMacAddressPref.setTitle(prefString);
 
         String macAddress = wifiInfo == null ? null : wifiInfo.getMacAddress();
         wifiMacAddressPref.setSummary(!TextUtils.isEmpty(macAddress) ? macAddress
