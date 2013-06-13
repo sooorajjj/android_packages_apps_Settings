@@ -1,4 +1,4 @@
-/* Copyright (c) 2011-12, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-13, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -31,6 +31,7 @@ package com.android.settings;
 
 
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -45,14 +46,21 @@ import android.os.Handler;
 import android.os.AsyncResult;
 import android.widget.Toast;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.PreferenceScreen;
+import android.telephony.MSimTelephonyManager;
 
 import com.qualcomm.internal.telephony.Subscription.SubscriptionStatus;
 import com.qualcomm.internal.telephony.SubscriptionManager;
 import com.qualcomm.internal.telephony.MSimPhoneFactory;
+import com.android.internal.telephony.PhoneProxy;
+import com.android.internal.telephony.PhoneBase;
+import com.android.internal.telephony.RIL;
 
 import com.android.settings.R;
+import java.lang.Object;
 
 public class MultiSimSettings extends PreferenceActivity implements DialogInterface.
         OnDismissListener, DialogInterface.OnClickListener, Preference.OnPreferenceChangeListener  {
@@ -64,6 +72,8 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     private static final String KEY_CONFIG_SUB = "config_sub";
 
     private static final String CONFIG_SUB = "CONFIG_SUB";
+    private static final String TUNE_AWAY = "tune_away";
+    private static final String PRIORITY_SUB = "priority_subscription";
 
     private static final int DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS = 100;
 
@@ -72,6 +82,12 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     static final int EVENT_SUBSCRIPTION_DEACTIVATED = 3;
     static final int EVENT_SET_VOICE_SUBSCRIPTION = 4;
     static final int EVENT_SET_SMS_SUBSCRIPTION = 5;
+    static final int EVENT_SET_TUNE_AWAY = 6;
+    static final int EVENT_SET_TUNE_AWAY_DONE = 7;
+    static final int EVENT_SET_PRIORITY_SUBSCRIPTION = 8;
+    static final int EVENT_SET_PRIORITY_SUBSCRIPTION_DONE = 9;
+    static final int EVENT_SET_VOICE_SUBSCRIPTION_DONE = 10;
+
     protected boolean mIsForeground = false;
     static final int SUBSCRIPTION_ID_0 = 0;
     static final int SUBSCRIPTION_ID_1 = 1;
@@ -83,6 +99,23 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     private ListPreference mData;
     private ListPreference mSms;
     private PreferenceScreen mConfigSub;
+    CharSequence[] entries;      // Used for entries like Subscription1, Subscription2 ...
+    CharSequence[] entryValues;  // Used for entryValues like 0, 1 ,2 ...
+    CharSequence[] summaries;    // Used for Summaries like Aubscription1, Subscription2....
+
+    /* tune away initial/old state */
+    private boolean mTuneAwayValue = false;
+    /* Priority subscription initial/old state */
+    private int mPrioritySubValue = 0;
+    /* Default voice subscription initial/old state */
+    private int mVoiceSub = 0;
+    private int numPhones = 0;
+    private PhoneProxy mPhoneProxy = null;
+    private PhoneBase mPhoneBase = null;
+    private RIL mCi = null;
+
+    private CheckBoxPreference mTuneAway;
+    private ListPreference mPrioritySub;
 
     SubscriptionManager subManager = SubscriptionManager.getInstance();
     @Override
@@ -99,6 +132,24 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         mSms.setOnPreferenceChangeListener(this);
         mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
         mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
+        mTuneAway = (CheckBoxPreference) findPreference(TUNE_AWAY);
+        mTuneAway.setOnPreferenceChangeListener(this);
+        mPrioritySub = (ListPreference) findPreference(PRIORITY_SUB);
+        mPrioritySub.setOnPreferenceChangeListener(this);
+        mPhoneProxy = (PhoneProxy)MSimPhoneFactory.getPhone(SUBSCRIPTION_ID_0);
+        mPhoneBase = (PhoneBase)mPhoneProxy.getActivePhone();
+        mCi = (RIL)mPhoneBase.mCM;
+        numPhones = MSimTelephonyManager.getDefault().getPhoneCount();
+        entries = new CharSequence[numPhones];
+        entryValues = new CharSequence[numPhones];
+        summaries = new CharSequence[numPhones];
+        CharSequence[] subString = getResources().getTextArray(R.array.multi_sim_entries);
+        for (int subIndex = 0; subIndex < numPhones; subIndex++) {
+            entries[subIndex] = subString[subIndex];
+            summaries[subIndex] = subString[subIndex];
+            entryValues[subIndex] = Integer.toString(subIndex);
+        }
+
         if (isAirplaneModeOn()) {
             Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
             mConfigSub.setEnabled(false);
@@ -125,6 +176,32 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         }
         mIsForeground = true;
         updateState();
+        updateTuneAwayState();
+        updatePrioritySubState();
+    }
+
+    private void updateTuneAwayState() {
+        boolean tuneawayVal = (Settings.Global.getInt(getContentResolver(),
+                                  Settings.Global.TUNE_AWAY_STATUS,  0) == 1);
+        mTuneAway.setChecked(tuneawayVal);
+        mTuneAway.setSummary(tuneawayVal ? "Enable" : "Disable");
+    }
+
+    private void updatePrioritySubState() {
+        mPrioritySub.setEntries(entries);
+        mPrioritySub.setEntryValues(entryValues);
+
+        try {
+            int priorityValue = Settings.Global.getInt(getContentResolver(),
+                           Settings.Global.MULTI_SIM_PRIORITY_SUBSCRIPTION);
+            mPrioritySub.setValue(Integer.toString(priorityValue));
+            mPrioritySub.setSummary(summaries[priorityValue]);
+            mPrioritySubValue = priorityValue;
+
+
+        } catch (SettingNotFoundException snfe) {
+            Log.d(TAG, "Settings Exception Reading Dual Sim Priority Subscription Values");
+        }
     }
 
     @Override
@@ -221,22 +298,21 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
 
         if (KEY_VOICE.equals(key)) {
             summaries = getResources().getTextArray(R.array.multi_sim_summaries_voice);
-            int voiceSub = Integer.parseInt((String) objValue);
-            if (voiceSub == PROMPT_OPTION) {
+            mVoiceSub = Integer.parseInt((String) objValue);
+            if (mVoiceSub == PROMPT_OPTION) {
                 MSimPhoneFactory.setPromptEnabled(true);
-                mVoice.setSummary(summaries[voiceSub]);
-                Log.d(TAG, "prompt is enabled " + voiceSub);
-            } else if (subManager.getCurrentSubscription(voiceSub).subStatus
+                mVoice.setSummary(summaries[mVoiceSub]);
+                Log.d(TAG, "prompt is enabled " + mVoiceSub);
+            } else if (subManager.getCurrentSubscription(mVoiceSub).subStatus
                    == SubscriptionStatus.SUB_ACTIVATED) {
-                Log.d(TAG, "setVoiceSubscription " + voiceSub);
+                Log.d(TAG, "setVoiceSubscription " + mVoiceSub);
                 MSimPhoneFactory.setPromptEnabled(false);
-                MSimPhoneFactory.setVoiceSubscription(voiceSub);
-                mVoice.setSummary(summaries[voiceSub]);
+                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_VOICE_SUBSCRIPTION,
+                        mVoiceSub));
             } else {
                 status = getResources().getString(R.string.set_voice_error);
                 displayAlertDialog(status);
             }
-            mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_VOICE_SUBSCRIPTION));
         }
 
         if (KEY_DATA.equals(key)) {
@@ -264,69 +340,26 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
             mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_SMS_SUBSCRIPTION));
         }
 
+        if (TUNE_AWAY.equals(key)) {
+            mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_TUNE_AWAY));
+        }
+
+        if (PRIORITY_SUB.equals(key)) {
+            int prioritySubIndex = Integer.parseInt((String) objValue);
+            if (subManager.getCurrentSubscription(prioritySubIndex).subStatus
+                    == SubscriptionStatus.SUB_ACTIVATED) {
+                mPrioritySubValue = prioritySubIndex;
+                mHandler.sendMessage(mHandler.obtainMessage(EVENT_SET_PRIORITY_SUBSCRIPTION,
+                        prioritySubIndex));
+            } else {
+                status = getResources().getString(R.string.set_priority_sub_error);
+                displayAlertDialog(status);
+            }
+        }
+
         return true;
     }
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            AsyncResult ar;
-
-            switch(msg.what) {
-                case EVENT_SET_DATA_SUBSCRIPTION_DONE:
-                    Log.d(TAG, "EVENT_SET_DATA_SUBSCRIPTION_DONE");
-                    if (mIsForeground) {
-                        dismissDialog(DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS);
-                    }
-                    getPreferenceScreen().setEnabled(true);
-                    updateDataSummary();
-
-                    ar = (AsyncResult) msg.obj;
-
-                    String status;
-
-                    if (ar.exception != null) {
-                        status = getResources().getString(R.string.set_dds_error)
-                                    + " " + ar.exception.getMessage();
-                        displayAlertDialog(status);
-                        break;
-                    }
-
-                    boolean result = (Boolean)ar.result;
-
-                    Log.d(TAG, "SET_DATA_SUBSCRIPTION_DONE: result = " + result);
-
-                    if (result == true) {
-                        status = getResources().getString(R.string.set_dds_success);
-                        Toast toast = Toast.makeText(getApplicationContext(), status,
-                                Toast.LENGTH_LONG);
-                        toast.show();
-                    } else {
-                        status = getResources().getString(R.string.set_dds_failed);
-                        displayAlertDialog(status);
-                    }
-
-                    break;
-                case EVENT_SUBSCRIPTION_ACTIVATED:
-                case EVENT_SUBSCRIPTION_DEACTIVATED:
-                    int count = subManager.getActiveSubscriptionsCount();
-                    if (count == SUBSCRIPTION_DUAL_STANDBY) {
-                        mVoice.setEntries(R.array.multi_sim_entries_voice);
-                        mVoice.setEntryValues(R.array.multi_sim_values_voice);
-                    } else  {
-                        mVoice.setEntries(R.array.multi_sim_entries_voice_without_prompt);
-                        mVoice.setEntryValues(R.array.multi_sim_values_voice_without_prompt);
-                    }
-                    break;
-                case EVENT_SET_VOICE_SUBSCRIPTION:
-                    updateVoiceSummary();
-                    break;
-                case EVENT_SET_SMS_SUBSCRIPTION:
-                    updateSmsSummary();
-                    break;
-            }
-        }
-    };
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -373,6 +406,142 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                .setPositiveButton(android.R.string.yes, this)
                .show()
                .setOnDismissListener(this);
-    }
-}
+        }
 
+        private void updateTuneAwayStatus() {
+            boolean tuneAwayValue = mTuneAway.isChecked();
+            mTuneAwayValue = tuneAwayValue;
+            Log.d(TAG," updateTuneAwayStatus change tuneAwayValue to: " + tuneAwayValue);
+            Message setTuneAwayMsg = Message.obtain(mHandler, EVENT_SET_TUNE_AWAY_DONE, null);
+            mCi.setTuneAway(tuneAwayValue, setTuneAwayMsg);
+        }
+
+        private void updatePrioritySub(int priorityIndex) {
+            Log.d(TAG, "updatePrioritySub change priority sub to: " + priorityIndex);
+            Message setPrioritySubMsg = Message.obtain(mHandler,
+                    EVENT_SET_PRIORITY_SUBSCRIPTION_DONE, null);
+            mCi.setPrioritySub(priorityIndex, setPrioritySubMsg);
+        }
+
+        private void updateVoiceSub(int subIndex) {
+            Log.d(TAG, "updateVoiceSub change voice sub to: " + subIndex);
+            Message setVoiceSubMsg = Message.obtain(mHandler,
+                    EVENT_SET_VOICE_SUBSCRIPTION_DONE, null);
+            mCi.setDefaultVoiceSub(subIndex, setVoiceSubMsg);
+        }
+
+
+        private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            AsyncResult ar;
+
+            switch(msg.what) {
+                case EVENT_SET_DATA_SUBSCRIPTION_DONE:
+                    Log.d(TAG, "EVENT_SET_DATA_SUBSCRIPTION_DONE");
+                    if (mIsForeground) {
+                        dismissDialog(DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS);
+                    }
+                    getPreferenceScreen().setEnabled(true);
+                    updateDataSummary();
+
+                    ar = (AsyncResult) msg.obj;
+
+                    String status;
+
+                    if (ar.exception != null) {
+                        status = getResources().getString(R.string.set_dds_error)
+                                           + " " + ar.exception.getMessage();
+                        displayAlertDialog(status);
+                        break;
+                    }
+
+                    boolean result = (Boolean)ar.result;
+
+                    Log.d(TAG, "SET_DATA_SUBSCRIPTION_DONE: result = " + result);
+
+                    if (result == true) {
+                        status = getResources().getString(R.string.set_dds_success);
+                        Toast toast = Toast.makeText(getApplicationContext(), status,
+                                                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else {
+                        status = getResources().getString(R.string.set_dds_failed);
+                        displayAlertDialog(status);
+                    }
+
+                    break;
+                case EVENT_SUBSCRIPTION_ACTIVATED:
+                case EVENT_SUBSCRIPTION_DEACTIVATED:
+                    int count = subManager.getActiveSubscriptionsCount();
+                    if (count == SUBSCRIPTION_DUAL_STANDBY) {
+                        mVoice.setEntries(R.array.multi_sim_entries_voice);
+                        mVoice.setEntryValues(R.array.multi_sim_values_voice);
+                    } else  {
+                        mVoice.setEntries(R.array.multi_sim_entries_voice_without_prompt);
+                        mVoice.setEntryValues(R.array.multi_sim_values_voice_without_prompt);
+                    }
+                    break;
+
+                case EVENT_SET_VOICE_SUBSCRIPTION:
+                    updateVoiceSub(msg.arg1);
+                    break;
+                case EVENT_SET_VOICE_SUBSCRIPTION_DONE:
+                    Log.d(TAG, "EVENT_SET_VOICE_SUBSCRIPTION_DONE");
+                    ar = (AsyncResult) msg.obj;
+                    String sub;
+                    if (ar.exception != null) {
+                        Log.e(TAG, "SET_VOICE_SUBSCRIPTION_DONE: returned Exception: "
+                                                                             + ar.exception);
+                        int voiceSub = MSimPhoneFactory.getVoiceSubscription();
+                        sub = Integer.toString(voiceSub);
+                        mVoice.setValue(sub);
+                        mVoice.setSummary(summaries[voiceSub]);
+                        mVoiceSub = voiceSub;
+                        break;
+                    }
+                    sub = Integer.toString(mVoiceSub);
+                    mVoice.setValue(sub);
+                    mVoice.setSummary(summaries[mVoiceSub]);
+                    MSimPhoneFactory.setVoiceSubscription(mVoiceSub);
+                    break;
+                case EVENT_SET_SMS_SUBSCRIPTION:
+                    updateSmsSummary();
+                    break;
+                case EVENT_SET_TUNE_AWAY:
+                    updateTuneAwayStatus();
+                    break;
+                case EVENT_SET_TUNE_AWAY_DONE:
+                    ar = (AsyncResult) msg.obj;
+                    if (ar.exception != null) {
+                        Log.e(TAG, "SET_TUNE_AWAY_DONE: returned Exception: " + ar.exception);
+                        updateTuneAwayState();
+                        break;
+                    }
+                    Log.d(TAG, "SET_TUNE_AWAY_DONE: mTuneAwayValue = " + mTuneAwayValue);
+                    mTuneAway.setChecked(mTuneAwayValue);
+                    mTuneAway.setSummary(mTuneAwayValue ? "Enable" : "Disable");
+                    Settings.Global.putInt(getContentResolver(), Settings.Global.TUNE_AWAY_STATUS,
+                                                              mTuneAwayValue ? 1 : 0);
+                    break;
+                case EVENT_SET_PRIORITY_SUBSCRIPTION:
+                    updatePrioritySub(msg.arg1);
+                    break;
+                case EVENT_SET_PRIORITY_SUBSCRIPTION_DONE:
+                    ar = (AsyncResult) msg.obj;
+                    if (ar.exception != null) {
+                        Log.e(TAG, "EVENT_SET_PRIORITY_SUBSCRIPTION_DONE: returned Exception: "
+                                                                             + ar.exception);
+                        updatePrioritySubState();
+                        break;
+                    }
+                    Log.d(TAG, "EVENT_SET_PRIORITY_SUBSCRIPTION_DONE : mPrioritySubValue "
+                                                                        + mPrioritySubValue);
+                    mPrioritySub.setValue(Integer.toString(mPrioritySubValue));
+                    mPrioritySub.setSummary(summaries[mPrioritySubValue]);
+                    MSimPhoneFactory.setPrioritySubscription(mPrioritySubValue);
+                    break;
+            }
+        }
+    };
+}
