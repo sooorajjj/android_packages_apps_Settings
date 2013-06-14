@@ -4274,4 +4274,6 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_eap_method_ttls">TTLS</string>
     <string name="wifi_eap_method_pwd">PWD</string>
     <string name="wifi_eap_method_sim">SIM</string>
+    <!-- add for wifi passwd detect -->
+    <string name="wifi_keyfail">Incorrect password</string>
 </resources>

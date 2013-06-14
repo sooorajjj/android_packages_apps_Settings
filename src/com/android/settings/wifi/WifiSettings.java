@@ -738,6 +738,8 @@ public class WifiSettings extends SettingsPreferenceFragment
             if (id != -1) {
                mWifiManager.forget(mChannel, id, mForgetListener);
                showDialog(mSelectedAccessPoint, false);
+               Toast.makeText(getActivity(), R.string.wifi_keyfail,
+                        Toast.LENGTH_LONG).show();
                enableNetwork();
             }
          }
