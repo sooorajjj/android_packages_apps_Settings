@@ -16,6 +16,7 @@
 
 package com.android.settings.bluetooth;
 
+import android.app.ActivityManagerNative;
 import android.app.Service;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
@@ -25,7 +26,10 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.PowerManager;
+import android.os.RemoteException;
+import android.os.UserHandle;
 import android.util.Log;
 
 public final class DockEventReceiver extends BroadcastReceiver {
@@ -45,6 +49,16 @@ public final class DockEventReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+            if (UserHandle.getUserId(Binder.getCallingUid()) != ActivityManagerNative.getDefault().getCurrentUser().id) {
+                Log.v(TAG,"Broadcast Receiver for different user " + UserHandle.getUserId(Binder.getCallingUid()) +
+                    " Current User logged on is " + ActivityManagerNative.getDefault().getCurrentUser().id);
+                return;
+            }
+        } catch (RemoteException re) {
+            Log.e(TAG, "Unable to retrieve current user");
+        }
+
         if (intent == null)
             return;
 
