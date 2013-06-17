@@ -41,6 +41,10 @@ import com.android.settings.widget.ChartSweepView.OnSweepListener;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import android.content.pm.ActivityInfo;
+import android.app.Activity;
+import android.content.res.Configuration;
+
 /**
  * Specific {@link ChartView} that displays {@link ChartNetworkSeriesView} along
  * with {@link ChartSweepView} for inspection ranges and warning/limits.
@@ -68,9 +72,11 @@ public class ChartDataUsageView extends ChartView {
     /** Current maximum value of {@link #mVert}. */
     private long mVertMax;
 
+    public Activity mActivity;
     /** set limit sweep and warning sweep max value*/
     private static final long LIMIT_MAX_SIZE = 1072668082176l;//999l * 1024 * 1024 * 1024
     private static final long WARNING_MAX_SIZE = 966367641600l;//900l * 1024 * 1024 * 1024
+
     public interface DataUsageChartListener {
         public void onInspectRangeChanged();
         public void onWarningChanged();
@@ -140,8 +146,8 @@ public class ChartDataUsageView extends ChartView {
         mSweepWarning.addOnSweepListener(mVertListener);
         mSweepLimit.addOnSweepListener(mVertListener);
 
-        mSweepWarning.setDragInterval(5 * MB_IN_BYTES);
-        mSweepLimit.setDragInterval(5 * MB_IN_BYTES);
+        mSweepWarning.setDragInterval(1 * MB_IN_BYTES);
+        mSweepLimit.setDragInterval(1 * MB_IN_BYTES);
 
         // TODO: make time sweeps adjustable through dpad
         mSweepLeft.setClickable(false);
@@ -275,6 +281,20 @@ public class ChartDataUsageView extends ChartView {
             if (mSweepWarning != activeSweep) {
                 layoutSweep(mSweepWarning);
             }
+
+            // After all, check the sweep values if they are out of bounds.
+            // If the warning value is out of bounds, just reset it to 0.
+            // If the limit value is out of bounds, reset it to the same value
+            // of warning. And after reseting the value, call
+            // updateVertAxisBounds() again to update the layout.
+            if (mSweepLimit.getValue() > newMax) {
+                mSweepLimit.setValue(mSweepWarning.getValue());
+                updateVertAxisBounds(activeSweep);
+            }
+            if (mSweepWarning.getValue() > newMax) {
+                mSweepWarning.setValue(0);
+                updateVertAxisBounds(activeSweep);
+            }
         }
     }
 
@@ -304,6 +324,18 @@ public class ChartDataUsageView extends ChartView {
     private OnSweepListener mHorizListener = new OnSweepListener() {
         @Override
         public void onSweep(ChartSweepView sweep, boolean sweepDone) {
+
+            if (sweepDone) {
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            } else if (!sweepDone) {
+                Configuration config = getResources().getConfiguration();
+                if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                } else if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+            }
+
             updatePrimaryRange();
 
             // update detail list only when done sweeping
@@ -580,6 +612,11 @@ public class ChartDataUsageView extends ChartView {
 
         @Override
         public float convertToPoint(long value) {
+		// When warning view is disabled, the value will be -1.
+            // This negative value will make following result be NaN.
+            // In such scenario, we really want it to be same with that of value 0. So we change it to 0.
+            if (value == -1)
+                value = 0;
             if (LOG_SCALE) {
                 // derived polynomial fit to make lower values more visible
                 final double normalized = ((double) value - mMin) / (mMax - mMin);
@@ -624,6 +661,9 @@ public class ChartDataUsageView extends ChartView {
             final CharSequence size;
 
             if (result < 10) {
+                size = String.format("%.2f", result);
+                resultRounded = (unitFactor * Math.round(result * 100)) / 100;
+            } else if (result < 100) {
                 size = String.format("%.1f", result);
                 resultRounded = (unitFactor * Math.round(result * 10)) / 10;
             } else {

@@ -88,6 +88,7 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -141,6 +142,7 @@ import com.android.settings.net.UidDetail;
 import com.android.settings.net.UidDetailProvider;
 import com.android.settings.widget.ChartDataUsageView;
 import com.android.settings.widget.ChartDataUsageView.DataUsageChartListener;
+import com.android.settings.widget.DataUsageTextView;
 import com.android.settings.widget.PieChartView;
 import com.google.android.collect.Lists;
 import android.telephony.MSimTelephonyManager;
@@ -152,6 +154,7 @@ import java.util.Locale;
 
 import libcore.util.Objects;
 import android.net.wifi.WifiManager;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 /**
  * Panel showing data usage history across various networks, including options
@@ -159,7 +162,7 @@ import android.net.wifi.WifiManager;
  */
 public class DataUsageSummary extends Fragment {
     private static final String TAG = "DataUsage";
-    private static final boolean LOGD = false;
+    private static final boolean LOGD = true;
 
     // TODO: remove this testing code
     private static final boolean TEST_ANIM = false;
@@ -173,6 +176,8 @@ public class DataUsageSummary extends Fragment {
     private static final String TAB_MOBILE = "mobile";
     private static final String TAB_WIFI = "wifi";
     private static final String TAB_ETHERNET = "ethernet";
+    private static final String TAB_SLOT1 = "slot1";
+    private static final String TAB_SLOT2 = "slot2";
 
     private static final String TAG_CONFIRM_DATA_DISABLE = "confirmDataDisable";
     private static final String TAG_CONFIRM_DATA_ROAMING = "confirmDataRoaming";
@@ -185,10 +190,12 @@ public class DataUsageSummary extends Fragment {
     private static final String TAG_CONFIRM_APP_RESTRICT = "confirmAppRestrict";
     private static final String TAG_CONFIRM_AUTO_SYNC_CHANGE = "confirmAutoSyncChange";
     private static final String TAG_APP_DETAILS = "appDetails";
+    private static final String TAG_WARNING_DATA_STATISTICS = "confirmDataStatistics";
 
     private static final int LOADER_CHART_DATA = 2;
     private static final int LOADER_SUMMARY = 3;
 
+    private static final long DEFAULT_LIMITED_BYTES = 5 * GB_IN_BYTES;
     /** set limit sweep and warning sweep max value */
     private static final int LIMIT_MAX_SIZE = 1022976; //999 * 1024
     private static final int WARNING_MAX_SIZE = 921600; //900 * 1024
@@ -228,7 +235,7 @@ public class DataUsageSummary extends Fragment {
     private CycleAdapter mCycleAdapter;
 
     private ChartDataUsageView mChart;
-    private TextView mUsageSummary;
+    private DataUsageTextView mUsageSummary;
     private TextView mEmpty;
 
     private View mAppDetail;
@@ -239,6 +246,7 @@ public class DataUsageSummary extends Fragment {
     private TextView mAppBackground;
     private Button mAppSettings;
 
+    private Switch mDataStatisticsSwitch;
     private LinearLayout mAppSwitches;
     private CheckBox mAppRestrict;
     private View mAppRestrictView;
@@ -266,7 +274,39 @@ public class DataUsageSummary extends Fragment {
     private boolean mBinding;
 
     private UidDetailProvider mUidDetailProvider;
+    private int mSummaryRes;
+    private String mRangePhrase = null;
     private NetworkStatusChangeIntentReceiver mReceiver;
+    private AirPlaneModeChangeIntentReceiver mAirPlaneModeReceiver;
+
+    /**Flag used to check the network and radio state.*/
+    private boolean mMobileRadioStateOld;
+    private boolean mMobile4gRadioStateOld;
+    private boolean mWifiRadioStateOld;
+    private boolean mEthernetStateOld;
+
+    private Handler mHandler = new Handler();
+    private Runnable runnable = new Runnable(){
+        @Override
+        public void run(){
+            boolean mMobileRadioStateNew = (hasReadyMobileRadio(getActivity()));
+            boolean mMobile4gRadioStateNew = (isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity()));
+            boolean mWifiRadioStateNew = (mShowWifi && hasWifiRadio(getActivity()));
+            boolean mEthernetStateNew = (mShowEthernet && hasEthernet(getActivity()));
+
+            if ((mMobileRadioStateNew != mMobileRadioStateOld) || (mMobile4gRadioStateNew != mMobile4gRadioStateOld) || (mWifiRadioStateNew != mWifiRadioStateOld) || (mEthernetStateNew != mEthernetStateOld)) {
+                Log.d(TAG,"liuwei---runnable update");
+                updateTabs();
+                mMobileRadioStateOld = mMobileRadioStateNew;
+                mMobile4gRadioStateOld = mMobile4gRadioStateNew;
+                mWifiRadioStateOld = mWifiRadioStateNew;
+                mEthernetStateOld = mEthernetStateNew;
+            } else {
+                Log.d(TAG,"liuwei---runnable delay");
+                mHandler.postDelayed(runnable,2000);
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -285,13 +325,15 @@ public class DataUsageSummary extends Fragment {
         mPolicyEditor = new NetworkPolicyEditor(mPolicyManager);
         mPolicyEditor.read();
 
-        mShowWifi = mPrefs.getBoolean(PREF_SHOW_WIFI, false);
+        mShowWifi = mPrefs.getBoolean(PREF_SHOW_WIFI, true);
         mShowEthernet = mPrefs.getBoolean(PREF_SHOW_ETHERNET, false);
+        Log.d(TAG,"liuwei---onCreate mShowWifi"+mShowWifi);
 
         // override preferences when no mobile radio
         if (!hasReadyMobileRadio(context)) {
             mShowWifi = hasWifiRadio(context);
             mShowEthernet = hasEthernet(context);
+            Log.d(TAG,"liuwei---MobileRadioNotReady mShowWifi"+mShowWifi);
         }
 
         setHasOptionsMenu(true);
@@ -355,7 +397,15 @@ public class DataUsageSummary extends Fragment {
             mDataEnabled = new Switch(inflater.getContext());
             mDataEnabledView = inflatePreference(inflater, mNetworkSwitches, mDataEnabled);
             mDataEnabled.setOnCheckedChangeListener(mDataEnabledListener);
+            mDataEnabledView.setClickable(true);
             mNetworkSwitches.addView(mDataEnabledView);
+
+            mDataStatisticsSwitch =
+                (Switch) mHeader.findViewById(R.id.data_usage_data_statistics_switch);
+            mDataStatisticsSwitch.setChecked(isDataStatisticsEnabled());
+            mDataStatisticsSwitch.setOnCheckedChangeListener(mDataStatisticsEnabledListener);
+            //just hide mDataStatisticsSwitch now,not to close data Statistics
+            mDataStatisticsSwitch.setVisibility(View.GONE);
 
             mDisableAtLimit = new CheckBox(inflater.getContext());
             mDisableAtLimit.setClickable(false);
@@ -377,6 +427,7 @@ public class DataUsageSummary extends Fragment {
         mChart = (ChartDataUsageView) mHeader.findViewById(R.id.chart);
         mChart.setListener(mChartListener);
         mChart.bindNetworkPolicy(null);
+        mChart.mActivity = getActivity();
 
         {
             // bind app detail controls
@@ -401,7 +452,7 @@ public class DataUsageSummary extends Fragment {
             mAppSwitches.addView(mAppRestrictView);
         }
 
-        mUsageSummary = (TextView) mHeader.findViewById(R.id.usage_summary);
+        mUsageSummary = (DataUsageTextView) mHeader.findViewById(R.id.usage_summary);
         mEmpty = (TextView) mHeader.findViewById(android.R.id.empty);
 
         mAdapter = new DataUsageAdapter(mUidDetailProvider, mInsetSide);
@@ -414,6 +465,7 @@ public class DataUsageSummary extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG,"liuwei---onResume");
 
         // pick default tab based on incoming intent
         final Intent intent = getActivity().getIntent();
@@ -429,6 +481,11 @@ public class DataUsageSummary extends Fragment {
         IntentFilter filter = new IntentFilter(
                 ConnectivityManager.MOBILE_CONNECTIVITY_ACTION);
         getActivity().registerReceiver(mReceiver, filter);
+
+        //Register a broadcast receiver to listen the airplane mode changed.
+        mAirPlaneModeReceiver = new AirPlaneModeChangeIntentReceiver();
+        IntentFilter mFilter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        getActivity().registerReceiver(mAirPlaneModeReceiver, mFilter);
 
         // kick off background task to update stats
         new AsyncTask<Void, Void, Void>() {
@@ -451,6 +508,11 @@ public class DataUsageSummary extends Fragment {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        mMobileRadioStateOld = (hasReadyMobileRadio(getActivity()));
+        mMobile4gRadioStateOld = (isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity()));
+        mWifiRadioStateOld = (mShowWifi && hasWifiRadio(getActivity()));
+        mEthernetStateOld = (mShowEthernet && hasEthernet(getActivity()));
     }
 
     /**
@@ -465,6 +527,23 @@ public class DataUsageSummary extends Fragment {
                 boolean enabled = intent.getBooleanExtra(ConnectivityManager.EXTRA_ENABLED, false);
                 // Make the DataEnabled button to correct state.
                 mDataEnabled.setChecked(enabled);
+            }
+        }
+    }
+
+    /**
+     * Receives notifications when enable/disable airplane mode.
+     */
+    private class AirPlaneModeChangeIntentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String actionStr = intent.getAction();
+            if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(actionStr)){
+                boolean enabled = intent.getBooleanExtra("state", false);
+                Log.d(TAG,"liuwei---AirPlaneModeChange onReceive enabled="+enabled);
+                if (enabled) {
+                    mHandler.post(runnable);
+                }
             }
         }
     }
@@ -485,9 +564,8 @@ public class DataUsageSummary extends Fragment {
         mMenuDataRoaming.setChecked(getDataRoaming());
 
         mMenuRestrictBackground = menu.findItem(R.id.data_usage_menu_restrict_background);
-        mMenuRestrictBackground.setVisible(hasReadyMobileRadio(context) && !appDetailMode);
+        mMenuRestrictBackground.setVisible(hasReadyMobileRadio(context) &&  isOwner &&!appDetailMode);
         mMenuRestrictBackground.setChecked(mPolicyManager.getRestrictBackground());
-        mMenuRestrictBackground.setVisible(isOwner);
 
         mMenuAutoSync = menu.findItem(R.id.data_usage_menu_auto_sync);
         mMenuAutoSync.setChecked(ContentResolver.getMasterSyncAutomatically());
@@ -525,7 +603,11 @@ public class DataUsageSummary extends Fragment {
         final MenuItem help = menu.findItem(R.id.data_usage_menu_help);
         String helpUrl;
         if (!TextUtils.isEmpty(helpUrl = getResources().getString(R.string.help_url_data_usage))) {
-            HelpUtils.prepareHelpMenuItem(context, help, helpUrl);
+            Intent helpIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(helpUrl));
+            helpIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            help.setIntent(helpIntent);
+            help.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         } else {
             help.setVisible(false);
         }
@@ -599,6 +681,9 @@ public class DataUsageSummary extends Fragment {
         // Unregister the broadcast receiver when the fragment is out of
         // foreground.
         getActivity().unregisterReceiver(mReceiver);
+        getActivity().unregisterReceiver(mAirPlaneModeReceiver);
+
+        mHandler.removeCallbacks(runnable);
     }
 
     @Override
@@ -655,12 +740,33 @@ public class DataUsageSummary extends Fragment {
         final Context context = getActivity();
         mTabHost.clearAllTabs();
 
+        // Record current tap before rebuild all tabs, and finally restore the tab.
+        String lastTab = null;
+        Log.d(TAG,"liuwei---updateTabs mCurrentTab"+mCurrentTab);
+        if (mCurrentTab != null) {
+            lastTab = mCurrentTab;
+        }
+
         final boolean mobileSplit = isMobilePolicySplit();
         if (mobileSplit && hasReadyMobile4gRadio(context)) {
             mTabHost.addTab(buildTabSpec(TAB_3G, R.string.data_usage_tab_3g));
             mTabHost.addTab(buildTabSpec(TAB_4G, R.string.data_usage_tab_4g));
         } else if (hasReadyMobileRadio(context)) {
-            mTabHost.addTab(buildTabSpec(TAB_MOBILE, R.string.data_usage_tab_mobile));
+            if(true/*FeatureQuery.FEATURE_DUAL_SIM_DATA_USAGE*/) {
+                if (MSimTelephonyManager.getDefault().getPhoneCount() == 2) {
+                    mTabHost.addTab(buildTabSpec(TAB_SLOT1,
+                            R.string.data_usage_tab_slot1));
+                    mTabHost.addTab(buildTabSpec(TAB_SLOT2,
+                            R.string.data_usage_tab_slot2));
+                } else {
+                    mTabHost.addTab(buildTabSpec(TAB_MOBILE,
+                    R.string.data_usage_tab_mobile));
+                }
+            } else {
+                mTabHost.addTab(buildTabSpec(TAB_MOBILE,
+                R.string.data_usage_tab_mobile));
+            }
+
         }
         if (mShowWifi && hasWifiRadio(context)) {
             mTabHost.addTab(buildTabSpec(TAB_WIFI, R.string.data_usage_tab_wifi));
@@ -673,6 +779,7 @@ public class DataUsageSummary extends Fragment {
         final boolean multipleTabs = mTabWidget.getTabCount() > 1;
         mTabWidget.setVisibility(multipleTabs ? View.VISIBLE : View.GONE);
         if (mIntentTab != null) {
+            Log.d(TAG,"liuwei---updateTabs mIntentTab"+mIntentTab);
             if (Objects.equal(mIntentTab, mTabHost.getCurrentTabTag())) {
                 // already hit updateBody() when added; ignore
                 updateBody();
@@ -682,7 +789,11 @@ public class DataUsageSummary extends Fragment {
             mIntentTab = null;
         } else if (noTabs) {
             // no usable tabs, so hide body
+            Log.d(TAG,"liuwei---updateTabs noTabs");
             updateBody();
+        } else if (lastTab != null) {
+            Log.d(TAG,"liuwei---updateTabs lastTab"+lastTab);
+            mTabHost.setCurrentTabByTag(lastTab);
         } else {
             // already hit updateBody() when added; ignore
         }
@@ -710,6 +821,7 @@ public class DataUsageSummary extends Fragment {
         @Override
         public void onTabChanged(String tabId) {
             // user changed tab; update body
+            Log.d(TAG,"liuwei---onTabChanged");
             updateBody();
         }
     };
@@ -726,6 +838,7 @@ public class DataUsageSummary extends Fragment {
         final Context context = getActivity();
         final String currentTab = mTabHost.getCurrentTabTag();
         final boolean isOwner = ActivityManager.getCurrentUser() == UserHandle.USER_OWNER;
+        Log.d(TAG,"liuwei---updateBody currentTab="+currentTab+" mCurrentTab="+mCurrentTab);
 
         if (currentTab == null) {
             Log.w(TAG, "no tab selected; hiding body");
@@ -741,14 +854,39 @@ public class DataUsageSummary extends Fragment {
         if (LOGD) Log.d(TAG, "updateBody() with currentTab=" + currentTab);
 
         mDataEnabledView.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+        if(isMobileDataEnabled() && mDataStatisticsSwitch.isChecked()) {
+            mDisableAtLimitView.setVisibility(View.VISIBLE);
+        } else {
+            // If one of the checkbox is unchecked, set the limit view to invisible
+            mDisableAtLimitView.setVisibility(View.GONE);
+        }
 
         // TODO: remove mobile tabs when SIM isn't ready
         final TelephonyManager tele = TelephonyManager.from(context);
 
+        int dataSub = MSimTelephonyManager.getDefault().getPreferredDataSubscription();
         if (TAB_MOBILE.equals(currentTab)) {
             setPreferenceTitle(mDataEnabledView, R.string.data_usage_enable_mobile);
             setPreferenceTitle(mDisableAtLimitView, R.string.data_usage_disable_mobile_limit);
             mTemplate = buildTemplateMobileAll(getActiveSubscriberId(context));
+
+        } else if (TAB_SLOT1.equals(currentTab)) {
+            setPreferenceTitle(mDataEnabledView, R.string.data_usage_enable_mobile);
+            setPreferenceTitle(mDisableAtLimitView, R.string.data_usage_disable_mobile_limit);
+            mTemplate = buildTemplateMobileAll(getActiveSubscriberId(0));
+            if (dataSub == 0)
+                mDataEnabledView.setVisibility(View.VISIBLE);
+            else
+                mDataEnabledView.setVisibility(View.GONE);
+
+        } else if (TAB_SLOT2.equals(currentTab)) {
+            setPreferenceTitle(mDataEnabledView, R.string.data_usage_enable_mobile);
+            setPreferenceTitle(mDisableAtLimitView, R.string.data_usage_disable_mobile_limit);
+            mTemplate = buildTemplateMobileAll(getActiveSubscriberId(1));
+            if (dataSub == 1)
+                mDataEnabledView.setVisibility(View.VISIBLE);
+            else
+                mDataEnabledView.setVisibility(View.GONE);
 
         } else if (TAB_3G.equals(currentTab)) {
             setPreferenceTitle(mDataEnabledView, R.string.data_usage_enable_3g);
@@ -911,7 +1049,7 @@ public class DataUsageSummary extends Fragment {
     }
 
     private boolean isNetworkPolicyModifiable(NetworkPolicy policy) {
-        return policy != null && isBandwidthControlEnabled() && mDataEnabled.isChecked()
+        return policy != null && isBandwidthControlEnabled() && isMobileDataEnabled()
                 && ActivityManager.getCurrentUser() == UserHandle.USER_OWNER;
     }
 
@@ -922,6 +1060,17 @@ public class DataUsageSummary extends Fragment {
             Log.w(TAG, "problem talking with INetworkManagementService: " + e);
             return false;
         }
+    }
+
+    private boolean isDataStatisticsEnabled() {
+        final ContentResolver resolver = getActivity().getContentResolver();
+        return Settings.Global.getInt(resolver, Settings.Global.NETSTATS_ENABLED, 1) != 0;
+    }
+
+    private void setDataStatistics(boolean enabled) {
+        final ContentResolver resolver = getActivity().getContentResolver();
+        Settings.Global.putInt(resolver, Settings.Global.NETSTATS_ENABLED, enabled ? 1 : 0);
+        mDataStatisticsSwitch.setChecked(enabled);
     }
 
     private boolean getDataRoaming() {
@@ -956,6 +1105,26 @@ public class DataUsageSummary extends Fragment {
         mAppRestrict.setChecked(restrictBackground);
     }
 
+    private void updateOnSelection(boolean confirmSelection) {
+        boolean currSelection = mDataStatisticsSwitch.isChecked();
+        if (LOGD) Log.d(TAG, "updateOnSelection() " + "Current State: " +
+                currSelection + "User Confirmation Selction: " + confirmSelection);
+        mDataStatisticsSwitch.setOnCheckedChangeListener(null);
+
+        if(confirmSelection) {
+            setDataStatistics(currSelection);
+        } else {
+            // User canceled the operation. Revert to the previous state
+            setDataStatistics(!currSelection);
+        }
+        // Enable/disable the Limit view if current tab is not wifi tab.
+        if (!TAB_WIFI.equals(mCurrentTab)) {
+            mDisableAtLimitView.setVisibility(mDataStatisticsSwitch.isChecked() ?
+                    View.VISIBLE : View.GONE);
+        }
+        mDataStatisticsSwitch.setOnCheckedChangeListener(mDataStatisticsEnabledListener);
+    }
+
     /**
      * Update chart sweeps and cycle list to reflect {@link NetworkPolicy} for
      * current {@link #mTemplate}.
@@ -967,16 +1136,25 @@ public class DataUsageSummary extends Fragment {
             mNetworkSwitches.setVisibility(View.VISIBLE);
         }
 
+        final NetworkPolicy policy = mPolicyEditor.getPolicy(mTemplate);
         // TODO: move enabled state directly into policy
-        if (TAB_MOBILE.equals(mCurrentTab)) {
+        if (TAB_MOBILE.equals(mCurrentTab) || TAB_SLOT1.equals(mCurrentTab) || TAB_SLOT2.equals(mCurrentTab)) {
             mBinding = true;
             mDataEnabled.setChecked(isMobileDataEnabled());
             mBinding = false;
+            // when Data enable and CurrentTab is TAB_SLOT1,TAB_SLOT2 or TAB_MOBILE,
+            // always show warning line. If policy is null,
+            // create one for it by function setPolicyWarningBytes.
+            if (policy == null && mDataEnabled.isChecked()) {
+                setPolicyWarningBytes(0);
+            }
         }
 
-        final NetworkPolicy policy = mPolicyEditor.getPolicy(mTemplate);
         if (isNetworkPolicyModifiable(policy)) {
-            mDisableAtLimitView.setVisibility(View.VISIBLE);
+            // Only both of the checkbox is checked, set the limit view to visible
+            if(isMobileDataEnabled() && mDataStatisticsSwitch.isChecked()) {
+                mDisableAtLimitView.setVisibility(View.VISIBLE);
+            }
             mDisableAtLimit.setChecked(policy != null && policy.limitBytes != LIMIT_DISABLED);
             if (!isAppDetailMode()) {
                 mChart.bindNetworkPolicy(policy);
@@ -984,7 +1162,7 @@ public class DataUsageSummary extends Fragment {
 
         } else {
             // controls are disabled; don't bind warning/limit sweeps
-            mDisableAtLimitView.setVisibility(View.GONE);
+            if (!isMobileDataEnabled()) mDisableAtLimitView.setVisibility(View.GONE);
             mChart.bindNetworkPolicy(null);
         }
 
@@ -1067,6 +1245,28 @@ public class DataUsageSummary extends Fragment {
         }
     }
 
+    private OnCheckedChangeListener mDataStatisticsEnabledListener =
+        new OnCheckedChangeListener() {
+        /** {@inheritDoc} */
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (mBinding) return;
+
+            final boolean dataStatsEnabled = isChecked;
+            final String currentTab = mCurrentTab;
+            if (TAB_MOBILE.equals(currentTab) || TAB_SLOT1.equals(currentTab) || TAB_SLOT2.equals(currentTab)) {
+                ConfirmDisableDataStatistics.show(DataUsageSummary.this, dataStatsEnabled);
+                mDisableAtLimitView.setVisibility(dataStatsEnabled ? View.VISIBLE : View.GONE);
+            } else {
+                if (TAB_WIFI.equals(currentTab)) {
+                    // show data statistics prompt and not show Limit view in wifi tab.
+                    ConfirmDisableDataStatistics.show(DataUsageSummary.this, dataStatsEnabled);
+                }
+                //when the currentTab is other type such as wifi ,it was not saved state.so save it.
+                setDataStatistics(isChecked);
+            }
+        }
+    };
+
     private OnCheckedChangeListener mDataEnabledListener = new OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -1074,7 +1274,7 @@ public class DataUsageSummary extends Fragment {
 
             final boolean dataEnabled = isChecked;
             final String currentTab = mCurrentTab;
-            if (TAB_MOBILE.equals(currentTab)) {
+            if (TAB_MOBILE.equals(currentTab) || TAB_SLOT1.equals(currentTab) || TAB_SLOT2.equals(currentTab)) {
                 if (dataEnabled) {
                     setMobileDataEnabled(true);
                 } else {
@@ -1229,7 +1429,7 @@ public class DataUsageSummary extends Fragment {
 
         final int summaryRes;
         if (TAB_MOBILE.equals(mCurrentTab) || TAB_3G.equals(mCurrentApp)
-                || TAB_4G.equals(mCurrentApp)) {
+                || TAB_4G.equals(mCurrentApp) || TAB_SLOT1.equals(mCurrentTab) || TAB_SLOT2.equals(mCurrentTab)) {
             summaryRes = R.string.data_usage_total_during_range_mobile;
         } else {
             summaryRes = R.string.data_usage_total_during_range;
@@ -1698,12 +1898,18 @@ public class DataUsageSummary extends Fragment {
         private static final String EXTRA_LIMIT_BYTES = "limitBytes";
 
         public static void show(DataUsageSummary parent) {
-            if (!parent.isAdded()) return;
+            if (null == parent || !parent.isAdded())
+                return;
 
             final Resources res = parent.getResources();
             final CharSequence message;
-            final long minLimitBytes = (long) (
-                    parent.mPolicyEditor.getPolicy(parent.mTemplate).warningBytes * 1.2f);
+            NetworkPolicy currentNetworkPolicy = parent.mPolicyEditor.getPolicy(parent.mTemplate);
+            // When we don't create NetworkPolicy for this current table,
+            // we need to defined a default limited bytes(5 * GB_IN_BYTES)
+            // instead of to getting it from our networkPolicy.
+            // TODO: DEFAULT_LIMITED_BYTES based on network template
+            final long minLimitBytes = (currentNetworkPolicy != null) ? ((long) (
+                    currentNetworkPolicy.warningBytes * 1.2f)) : DEFAULT_LIMITED_BYTES;
             final long limitBytes;
 
             // TODO: customize default limits based on network template
@@ -1715,6 +1921,12 @@ public class DataUsageSummary extends Fragment {
                 message = res.getString(R.string.data_usage_limit_dialog_mobile);
                 limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
             } else if (TAB_MOBILE.equals(currentTab)) {
+                message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+            } else if (TAB_SLOT1.equals(currentTab)) {
+                message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+            } else if (TAB_SLOT2.equals(currentTab)) {
                 message = res.getString(R.string.data_usage_limit_dialog_mobile);
                 limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
             } else {
@@ -1923,7 +2135,11 @@ public class DataUsageSummary extends Fragment {
             } else {
                 bytesPicker.setMinValue(0);
             }
-            bytesPicker.setValue((int) (limitBytes / MB_IN_BYTES));
+            // Set smaller value to limbitBytes, for drag interval set to 5MB
+            // Estimated limitbytes maybe smaller than bytesPicker's minValue.
+            int value = (limitBytes / MB_IN_BYTES) > bytesPicker.getMinValue()
+                    ? ((int) (limitBytes / MB_IN_BYTES)) : bytesPicker.getMinValue();
+            bytesPicker.setValue(value);
             bytesPicker.setWrapSelectorWheel(false);
 
             builder.setTitle(R.string.data_usage_limit_editor_title);
@@ -1974,7 +2190,18 @@ public class DataUsageSummary extends Fragment {
                     }
                 }
             });
-            builder.setNegativeButton(android.R.string.cancel, null);
+            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
+                    if (target != null) {
+                        // TODO: extend to modify policy enabled flag.
+                        //when press cancel button, should update UI.
+                        // If user choose not close the DataEnable
+                        // button, we should open this DataEnable again.
+                        target.setMobileDataEnabled(true);
+                    }
+                }
+            });
 
             return builder.create();
         }
@@ -2123,6 +2350,13 @@ public class DataUsageSummary extends Fragment {
 
             return builder.create();
         }
+
+        public void onCancel(DialogInterface dialog) {
+            final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
+            if (target != null) {
+                target.updateOnSelection(false);
+            }
+        }
     }
 
     /**
@@ -2172,6 +2406,58 @@ public class DataUsageSummary extends Fragment {
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
             outState.putBoolean(SAVE_ENABLING, mEnabling);
+        }
+    }
+	
+	    public static class ConfirmDisableDataStatistics extends DialogFragment {
+        private static boolean mUserSelection;
+        public static void show(DataUsageSummary parent, boolean enable) {
+            if (!parent.isAdded()) return;
+            mUserSelection = enable;
+            final ConfirmDisableDataStatistics dialog = new ConfirmDisableDataStatistics();
+            dialog.setTargetFragment(parent, 0);
+            dialog.show(parent.getFragmentManager(), TAG_WARNING_DATA_STATISTICS);
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Context context = getActivity();
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
+            builder.setTitle(R.string.data_usage_enable_mobile_statistics);
+            int id = mUserSelection ?  R.string.data_usage_enable_mobile_statistics_dialog :
+                R.string.data_usage_disable_mobile_statistics_dialog;
+            builder.setMessage(id);
+
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (target != null) {
+                        target.updateOnSelection(true);
+                    }
+                }
+            });
+
+            builder.setNegativeButton(android.R.string.cancel,
+                    new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
+                    if (target != null) {
+                        target.updateOnSelection(false);
+                    }
+                }
+            });
+
+            return builder.create();
+        }
+
+        // When user click back key, we need reset the switchbutton
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
+            if (target != null) {
+                target.updateOnSelection(false);
+            }
         }
     }
 
