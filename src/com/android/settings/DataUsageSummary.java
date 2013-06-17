@@ -162,7 +162,7 @@ import com.qrd.plugin.feature_query.FeatureQuery;
  */
 public class DataUsageSummary extends Fragment {
     private static final String TAG = "DataUsage";
-    private static final boolean LOGD = true;
+    private static final boolean LOGD = false;
 
     // TODO: remove this testing code
     private static final boolean TEST_ANIM = false;
@@ -327,13 +327,11 @@ public class DataUsageSummary extends Fragment {
 
         mShowWifi = mPrefs.getBoolean(PREF_SHOW_WIFI, true);
         mShowEthernet = mPrefs.getBoolean(PREF_SHOW_ETHERNET, false);
-        Log.d(TAG,"liuwei---onCreate mShowWifi"+mShowWifi);
 
         // override preferences when no mobile radio
         if (!hasReadyMobileRadio(context)) {
             mShowWifi = hasWifiRadio(context);
             mShowEthernet = hasEthernet(context);
-            Log.d(TAG,"liuwei---MobileRadioNotReady mShowWifi"+mShowWifi);
         }
 
         setHasOptionsMenu(true);
@@ -465,7 +463,6 @@ public class DataUsageSummary extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG,"liuwei---onResume");
 
         // pick default tab based on incoming intent
         final Intent intent = getActivity().getIntent();
@@ -742,7 +739,6 @@ public class DataUsageSummary extends Fragment {
 
         // Record current tap before rebuild all tabs, and finally restore the tab.
         String lastTab = null;
-        Log.d(TAG,"liuwei---updateTabs mCurrentTab"+mCurrentTab);
         if (mCurrentTab != null) {
             lastTab = mCurrentTab;
         }
@@ -752,7 +748,7 @@ public class DataUsageSummary extends Fragment {
             mTabHost.addTab(buildTabSpec(TAB_3G, R.string.data_usage_tab_3g));
             mTabHost.addTab(buildTabSpec(TAB_4G, R.string.data_usage_tab_4g));
         } else if (hasReadyMobileRadio(context)) {
-            if(true/*FeatureQuery.FEATURE_DUAL_SIM_DATA_USAGE*/) {
+            if(FeatureQuery.FEATURE_DUAL_SIM_DATA_USAGE) {
                 if (MSimTelephonyManager.getDefault().getPhoneCount() == 2) {
                     mTabHost.addTab(buildTabSpec(TAB_SLOT1,
                             R.string.data_usage_tab_slot1));
@@ -779,7 +775,6 @@ public class DataUsageSummary extends Fragment {
         final boolean multipleTabs = mTabWidget.getTabCount() > 1;
         mTabWidget.setVisibility(multipleTabs ? View.VISIBLE : View.GONE);
         if (mIntentTab != null) {
-            Log.d(TAG,"liuwei---updateTabs mIntentTab"+mIntentTab);
             if (Objects.equal(mIntentTab, mTabHost.getCurrentTabTag())) {
                 // already hit updateBody() when added; ignore
                 updateBody();
@@ -789,10 +784,8 @@ public class DataUsageSummary extends Fragment {
             mIntentTab = null;
         } else if (noTabs) {
             // no usable tabs, so hide body
-            Log.d(TAG,"liuwei---updateTabs noTabs");
             updateBody();
         } else if (lastTab != null) {
-            Log.d(TAG,"liuwei---updateTabs lastTab"+lastTab);
             mTabHost.setCurrentTabByTag(lastTab);
         } else {
             // already hit updateBody() when added; ignore
@@ -821,7 +814,6 @@ public class DataUsageSummary extends Fragment {
         @Override
         public void onTabChanged(String tabId) {
             // user changed tab; update body
-            Log.d(TAG,"liuwei---onTabChanged");
             updateBody();
         }
     };
@@ -838,7 +830,6 @@ public class DataUsageSummary extends Fragment {
         final Context context = getActivity();
         final String currentTab = mTabHost.getCurrentTabTag();
         final boolean isOwner = ActivityManager.getCurrentUser() == UserHandle.USER_OWNER;
-        Log.d(TAG,"liuwei---updateBody currentTab="+currentTab+" mCurrentTab="+mCurrentTab);
 
         if (currentTab == null) {
             Log.w(TAG, "no tab selected; hiding body");
