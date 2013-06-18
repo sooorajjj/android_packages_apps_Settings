@@ -405,7 +405,7 @@ public class MultiSimSettings extends PreferenceActivity {
             MultiSimDialog dialog = (MultiSimDialog)(getFragmentManager().findFragmentByTag("DisableEnableAlertDialog"));
             if (dialog != null) {
                 dialog.dismiss();
-                mNeedReshowAlertDialog = true;
+                //mNeedReshowAlertDialog = true;
             }
         }
     }
