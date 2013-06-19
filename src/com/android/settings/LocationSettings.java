@@ -151,6 +151,8 @@ public class LocationSettings extends SettingsPreferenceFragment
         boolean networkEnabled = Settings.Secure.isLocationProviderEnabled(
                 res, LocationManager.NETWORK_PROVIDER);
         mGps.setChecked(gpsEnabled);
+        // Set network checkbox status.
+        mNetwork.setChecked(networkEnabled);
         mLocationAccess.setChecked(gpsEnabled || networkEnabled);
         if (mAssistedGps != null) {
             mAssistedGps.setChecked(Settings.Global.getInt(res,
@@ -173,6 +175,9 @@ public class LocationSettings extends SettingsPreferenceFragment
         final ContentResolver cr = getContentResolver();
         Settings.Secure.setLocationProviderEnabled(cr,
                 LocationManager.GPS_PROVIDER, checked);
+        // Set Network access with Location access status.
+        Settings.Secure.setLocationProviderEnabled(cr,
+                LocationManager.NETWORK_PROVIDER, checked);
         updateLocationToggles();
     }
 
@@ -184,28 +189,7 @@ public class LocationSettings extends SettingsPreferenceFragment
     public boolean onPreferenceChange(Preference pref, Object newValue) {
         final boolean chooseValue = (Boolean) newValue;
         if (pref.getKey().equals(KEY_LOCATION_TOGGLE)) {
-            if (chooseValue && getActivity() != null) {
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.location_access_google_service_title)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setMessage(R.string.location_access_google_service_text)
-                        .setPositiveButton(
-                                R.string.location_access_google_service_agree,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        updateGoogleServiceAccess(true);
-                                    }
-                                })
-                        .setNegativeButton(
-                                R.string.location_access_google_service_disagree,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        updateGoogleServiceAccess(false);
-                                    }
-                                })
-                        .create()
-                        .show();
-            } else {
+            if (!chooseValue) {
                 updateGoogleServiceAccess(false);
             }
             onToggleLocationAccess(chooseValue);
