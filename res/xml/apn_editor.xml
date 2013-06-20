@@ -141,4 +141,11 @@
         android:entries="@array/bearer_entries"
         android:entryValues="@array/bearer_values"
         />
+    <EditTextPreference
+        android:dialogTitle="@string/apn_PPP_number"
+        android:inputType="phone"
+        android:key="apn_PPP_number"
+        android:singleLine="true"
+        android:title="@string/apn_PPP_number"
+        />
 </PreferenceScreen>   
