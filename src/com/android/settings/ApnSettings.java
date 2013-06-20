@@ -82,6 +82,7 @@ public class ApnSettings extends PreferenceActivity implements
     private static final Uri DEFAULTAPN_URI = Uri.parse(RESTORE_CARRIERS_URI);
     private static final Uri PREFERAPN_URI = Uri.parse(PREFERRED_APN_URI);
 
+    private static final String CHINA_UNION_PLMN = "46001";
     private static boolean mRestoreDefaultApnMode;
 
     private RestoreApnUiHandler mRestoreApnUiHandler;
@@ -201,6 +202,13 @@ public class ApnSettings extends PreferenceActivity implements
             String type = cursor.getString(TYPES_INDEX);
             boolean readOnly = (cursor.getInt(RO_INDEX) == 1);
 
+            //remove AGPS for china union
+            if (SystemProperties.getBoolean("persist.env.settings.hidesupl", false)
+                    && CHINA_UNION_PLMN.equals(MSimTelephonyManager.getDefault()
+                    .getSimOperator(mSubscription)) && type.equals("supl")) {
+                cursor.moveToNext();
+                continue;
+            }
             ApnPreference pref = new ApnPreference(this);
 
             pref.setApnReadOnly(readOnly);
