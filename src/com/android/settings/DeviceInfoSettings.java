@@ -38,6 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.qrd.plugin.feature_query.FeatureQuery;
 
 public class DeviceInfoSettings extends SettingsPreferenceFragment {
 
@@ -99,7 +100,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         }
 
         //add hardware and software version
-        setStringSummary(KEY_SOFTWARE_VERSION, Build.SOFTWARE_VERSION);
+        if(FeatureQuery.FEATURE_SETTINGS_CMCC_VERSION)
+            setStringSummary(KEY_SOFTWARE_VERSION, SystemProperties.get("ro.software.version", "unknown"));
+        else
+            setStringSummary(KEY_SOFTWARE_VERSION, Build.SOFTWARE_VERSION);
         setStringSummary(KEY_HARDWARE_VERSION, Build.HARDWARE_VERSION);
 
         if (!SELinux.isSELinuxEnabled()) {
