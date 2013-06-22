@@ -212,6 +212,10 @@ public class BrightnessPreference extends SeekBarDialogPreference implements
             setMode(mOldAutomatic);
         }
         setBrightness(mOldBrightness, false);
+        // update SeekBar
+        if (mSeekBar != null) {
+            mSeekBar.setProgress(mOldBrightness);
+        }
         mRestoredOldState = true;
         mCurBrightness = -1;
     }
