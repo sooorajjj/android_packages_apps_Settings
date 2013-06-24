@@ -89,6 +89,7 @@ public class ApnEditor extends PreferenceActivity
     private String mCurMnc;
     private String mCurMcc;
     private int mSubscription = 0;
+    private boolean mDisableEditor = false;
 
     private Uri mUri;
     private Cursor mCursor;
@@ -182,6 +183,11 @@ public class ApnEditor extends PreferenceActivity
 
         final Intent intent = getIntent();
         final String action = intent.getAction();
+        mDisableEditor = intent.getBooleanExtra("DISABLE_EDITOR",false);
+        if (mDisableEditor) {
+            getPreferenceScreen().setEnabled(false);
+            Log.d(TAG, "ApnEditor form is disabled.");
+        }
         // Read the subscription received from Phone settings.
         mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
@@ -388,6 +394,10 @@ public class ApnEditor extends PreferenceActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
+        if (mDisableEditor) {
+            Log.d(TAG, "Form is disabled. Do not create the options menu.");
+            return true;
+        }
         // If it's a new APN, then cancel will delete the new entry in onPause
         if (!mNewApn) {
             menu.add(0, MENU_DELETE, 0, R.string.menu_delete)
@@ -455,6 +465,12 @@ public class ApnEditor extends PreferenceActivity
         String mnc = checkNotSet(mMnc.getText());
         int dataSub = 0;
 
+        // If the form is not editable, do nothing and return.
+        if(mDisableEditor){
+            Log.d(TAG, "Form is disabled. Nothing to save.");
+            return true;
+        }
+
         if (getErrorMsg() != null && !force) {
             showDialog(ERROR_DIALOG_ID);
             return false;
@@ -474,7 +490,7 @@ public class ApnEditor extends PreferenceActivity
 
         ContentValues values = new ContentValues();
 
-        // Add a dummy name "Untitled", if the user exits the screen without adding a name but 
+        // Add a dummy name "Untitled", if the user exits the screen without adding a name but
         // entered other information worth keeping.
         values.put(Telephony.Carriers.NAME,
                 name.length() < 1 ? getResources().getString(R.string.untitled_apn) : name);
