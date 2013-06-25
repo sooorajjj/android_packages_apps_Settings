@@ -54,7 +54,8 @@ public class SettingsPreferenceFragment extends PreferenceFragment implements Di
         // Prepare help url and enable menu if necessary
         int helpResource = getHelpResource();
         if (helpResource != 0) {
-            mHelpUrl = getResources().getString(helpResource);
+            String helpUrl = getResources().getString(helpResource);
+            if (!TextUtils.isEmpty(helpUrl)) mHelpUrl = helpUrl;
         }
     }
 
