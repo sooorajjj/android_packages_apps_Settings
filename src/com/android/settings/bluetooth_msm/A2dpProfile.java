@@ -38,6 +38,7 @@ final class A2dpProfile implements LocalBluetoothProfile {
 
     static final ParcelUuid[] SINK_UUIDS = {
         BluetoothUuid.AudioSink,
+        BluetoothUuid.AudioSource,
         BluetoothUuid.AdvAudioDist,
     };
 
