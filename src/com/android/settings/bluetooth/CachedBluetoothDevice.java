@@ -261,6 +261,16 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     synchronized void connectInt(LocalBluetoothProfile profile) {
         if (!ensurePaired()) {
             return;
+        } else {
+            if (mLocalAdapter == null) {
+                Log.e(TAG, "Adapter is null");
+                return;
+            }
+
+            // connecting is unreliable while scanning, so cancel discovery
+            if (mLocalAdapter.isDiscovering()) {
+                   mLocalAdapter.cancelDiscovery();
+            }
         }
         if (profile.connect(mDevice)) {
             if (Utils.D) {
@@ -303,6 +313,8 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     }
 
     void unpair() {
+        disconnect();
+
         int state = getBondState();
 
         if (state == BluetoothDevice.BOND_BONDING) {
