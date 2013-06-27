@@ -300,6 +300,11 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
         switch (listType) {
             case MultiSimSettingsConstants.VOICE_SUBSCRIPTION_LIST:
                 MSimPhoneFactory.setVoiceSubscription(subscription);
+                if (subscription == ALWAYS_ASK) {
+                    MSimPhoneFactory.setPromptEnabled(true);
+                } else {
+                    MSimPhoneFactory.setPromptEnabled(false);
+                }
                 handlePreferredSubscriptionChanged();
                 // msg.sendToTarget();
                 break;
