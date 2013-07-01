@@ -745,6 +745,7 @@ public class DataUsageSummary extends Fragment {
                     setPreferenceTitle(mDisableAtLimitView,
                             R.string.data_usage_disable_mobile_limit);
                     mTemplate = buildTemplateMobileAll(getActiveSubscriberId(i-1));
+                    break;
                 }
             }
         } else if (TAB_3G.equals(currentTab)) {
@@ -2245,6 +2246,21 @@ public class DataUsageSummary extends Fragment {
         }
     }
 
+    private static boolean hasSimCardReady() {
+        MSimTelephonyManager msimTelephonyManagaer = MSimTelephonyManager.getDefault();
+        TelephonyManager telephonyManagaer = TelephonyManager.getDefault();
+        if (msimTelephonyManagaer.isMultiSimEnabled()) {
+            for (int i = 0; i < msimTelephonyManagaer.getPhoneCount(); i++) {
+                if (msimTelephonyManagaer.getSimState(i) == SIM_STATE_READY) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return telephonyManagaer.getSimState() == SIM_STATE_READY;
+        }
+    }
+
     /**
      * Test if device has a mobile data radio with SIM in ready state.
      */
@@ -2257,7 +2273,7 @@ public class DataUsageSummary extends Fragment {
         final TelephonyManager tele = TelephonyManager.from(context);
 
         // require both supported network and ready SIM
-        return conn.isNetworkSupported(TYPE_MOBILE) && tele.getSimState() == SIM_STATE_READY;
+        return conn.isNetworkSupported(TYPE_MOBILE) && hasSimCardReady();
     }
 
     /**
@@ -2374,8 +2390,7 @@ public class DataUsageSummary extends Fragment {
         // build combined list of all limited networks
         final ArrayList<CharSequence> limited = Lists.newArrayList();
 
-        final TelephonyManager tele = TelephonyManager.from(context);
-        if (tele.getSimState() == SIM_STATE_READY) {
+        if (hasSimCardReady()) {
             final String subscriberId = getActiveSubscriberId(context);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
