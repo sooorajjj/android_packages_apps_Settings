@@ -4735,4 +4735,15 @@
     <string name="smsc_refresh_error">refresh error</string>
     <string name="dns_allowed">0.0.0.0 allowed</string>
     <string name="dns_not_allowed">0.0.0.0 not allowed</string>
+
+    <!-- apn names for carriers -->
+    <string name="APN_NAME_CMNET">CMNET</string>
+    <string name="APN_NAME_CMWAP">CMWAP</string>
+    <string name="APN_NAME_CMMMS">CMMMS</string>
+    <string name="APN_NAME_CUWAP">China Unicom WAP</string>
+    <string name="APN_NAME_CUNET">China Unicom NET</string>
+    <string name="APN_NAME_CUMMS">China Unicom MMS</string>
+    <string name="APN_NAME_CUSUPL">China Unicom AGPS</string>
+    <string name="APN_NAME_CTNET">CTNET</string>
+    <string name="APN_NAME_CTWAP">CTWAP</string>
 </resources>

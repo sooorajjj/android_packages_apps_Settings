@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -70,6 +71,7 @@ public class ApnSettings extends PreferenceActivity implements
     private static final int APN_INDEX = 2;
     private static final int TYPES_INDEX = 3;
     private static final int RO_INDEX = 4;
+    private static final int LOCALIZED_NAME_INDEX = 5;
 
     private static final int MENU_NEW = Menu.FIRST;
     private static final int MENU_RESTORE = Menu.FIRST + 1;
@@ -187,7 +189,7 @@ public class ApnSettings extends PreferenceActivity implements
         }
 
         Cursor cursor = getContentResolver().query(Telephony.Carriers.CONTENT_URI, new String[] {
-                "_id", "name", "apn", "type", "read_only"}, where, null,
+                "_id", "name", "apn", "type", "read_only", "localized_name"}, where, null,
                 Telephony.Carriers.DEFAULT_SORT_ORDER);
 
         if (cursor != null) {
@@ -217,6 +219,22 @@ public class ApnSettings extends PreferenceActivity implements
                 if(APN_TYPE_DM.equalsIgnoreCase(type)){
                     cursor.moveToNext();
                     continue;
+                }
+
+                // If can find a localized name, replace the APN name with it
+                String resName = cursor.getString(LOCALIZED_NAME_INDEX);
+                if (resName != null && !resName.isEmpty()) {
+                    int resId = getResources().getIdentifier(resName, "string", getPackageName());
+                    String localizedName = null;
+                    try {
+                        localizedName = getResources().getString(resId);
+                        Log.d(TAG, "Replaced apn name with localized name: " + name);
+                    } catch (NotFoundException e) {
+                        Log.e(TAG, "Got execption while getting the localized apn name.", e);
+                    }
+                    if (!TextUtils.isEmpty(localizedName)) {
+                        name = localizedName;
+                    }
                 }
 
                 ApnPreference pref = new ApnPreference(this);
