@@ -260,8 +260,7 @@ public class WifiConfigController implements TextWatcher,
             }
         }
 
-        if (mPasswdCheckBox) mPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-
+        if (mPasswdCheckBox && mPasswordView != null) mPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         mConfigUi.setCancelButton(context.getString(R.string.wifi_cancel));
         if (mConfigUi.getSubmitButton() != null) {
             enableSubmitIfAppropriate();
