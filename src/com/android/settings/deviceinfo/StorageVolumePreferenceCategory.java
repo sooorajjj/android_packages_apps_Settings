@@ -96,14 +96,20 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory implemen
         final int mCategory;
         //final int mMediaType;
 
-        public MediaCategory(int category, String... directories) {
+        public MediaCategory(int category, boolean isPrimary, String... directories) {
             mCategory = category;
             final int length = directories.length;
             mDirPaths = new String[length];
             for (int i = 0; i < length; i++) {
                 final String name = directories[i];
-                final String path = Environment.getExternalStoragePublicDirectory(name).
-                        getAbsolutePath();
+                String path;
+                if (isPrimary) {
+                    path = Environment.getExternalStoragePublicDirectory(name).
+                            getAbsolutePath();
+                } else {
+                    path = Environment.getSecondaryStoragePublicDirectory(name).
+                            getAbsolutePath();
+                }
                 mDirPaths[i] = path;
                 sPathsExcludedForMisc.add(path);
             }
@@ -111,9 +117,17 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory implemen
     }
 
     static final MediaCategory[] sMediaCategories = new MediaCategory[] {
-        new MediaCategory(DCIM, Environment.DIRECTORY_DCIM, Environment.DIRECTORY_MOVIES,
+        new MediaCategory(DCIM, true, Environment.DIRECTORY_DCIM, Environment.DIRECTORY_MOVIES,
                 Environment.DIRECTORY_PICTURES),
-        new MediaCategory(MUSIC, Environment.DIRECTORY_MUSIC, Environment.DIRECTORY_ALARMS,
+        new MediaCategory(MUSIC, true, Environment.DIRECTORY_MUSIC, Environment.DIRECTORY_ALARMS,
+                Environment.DIRECTORY_NOTIFICATIONS, Environment.DIRECTORY_RINGTONES,
+                Environment.DIRECTORY_PODCASTS)
+    };
+
+    static final MediaCategory[] sSecondaryMediaCategories = new MediaCategory[] {
+        new MediaCategory(DCIM, false, Environment.DIRECTORY_DCIM, Environment.DIRECTORY_MOVIES,
+                Environment.DIRECTORY_PICTURES),
+        new MediaCategory(MUSIC, false, Environment.DIRECTORY_MUSIC, Environment.DIRECTORY_ALARMS,
                 Environment.DIRECTORY_NOTIFICATIONS, Environment.DIRECTORY_RINGTONES,
                 Environment.DIRECTORY_PODCASTS)
     };
@@ -325,12 +339,6 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory implemen
         mUsageBarPreference.clear();
 
         mPreferences[TOTAL_SIZE].setSummary(formatSize(totalSize));
-
-        if (mMeasurement.isExternalSDCard()) {
-            // TODO FIXME: external SD card will not report any size. Show used space in bar graph
-            final long usedSize = totalSize - availSize;
-            mUsageBarPreference.addEntry(usedSize / (float) totalSize, android.graphics.Color.GRAY);
-        }
 
         updatePreference(appsSize, totalSize, APPLICATIONS);
 

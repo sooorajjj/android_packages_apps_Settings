@@ -392,8 +392,8 @@ public class StorageMeasurement {
             }
 
             // Media
-            for (int i = 0; i < StorageVolumePreferenceCategory.sMediaCategories.length; i++) {
-                if (mIsPrimary) {
+            if (mIsPrimary) {
+                for (int i = 0; i < StorageVolumePreferenceCategory.sMediaCategories.length; i++) {
                     String[] dirs = StorageVolumePreferenceCategory.sMediaCategories[i].mDirPaths;
                     final int length = dirs.length;
                     mMediaSizes[i] = 0;
@@ -401,9 +401,16 @@ public class StorageMeasurement {
                         final String path = dirs[d];
                         mMediaSizes[i] += getDirectorySize(imcs, path);
                     }
-                } else {
-                    // TODO Compute sizes using the MediaStore
+                }
+            } else {
+                for (int i = 0; i < StorageVolumePreferenceCategory.sSecondaryMediaCategories.length; i++) {
+                    String[] dirs = StorageVolumePreferenceCategory.sSecondaryMediaCategories[i].mDirPaths;
+                    final int length = dirs.length;
                     mMediaSizes[i] = 0;
+                    for (int d = 0; d < length; d++) {
+                        final String path = dirs[d];
+                        mMediaSizes[i] += getDirectorySize(imcs, path);
+                    }
                 }
             }
 
@@ -438,19 +445,19 @@ public class StorageMeasurement {
              */
 
             // Downloads (primary volume only)
+            String downloadsPath;
             if (mIsPrimary) {
-                final String downloadsPath = Environment.getExternalStoragePublicDirectory(
+                downloadsPath = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-                mDownloadsSize = getDirectorySize(imcs, downloadsPath);
             } else {
-                mDownloadsSize = 0;
+                downloadsPath = Environment.getSecondaryStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
             }
+            mDownloadsSize = getDirectorySize(imcs, downloadsPath);
 
             // Misc
             mMiscSize = 0;
-            if (mIsPrimary) {
-                measureSizesOfMisc(imcs);
-            }
+            measureSizesOfMisc(imcs);
 
             // Apps
             // We have to get installd to measure the package sizes.
@@ -549,12 +556,5 @@ public class StorageMeasurement {
         public String toString() {
             return mFileName  + " : " + mSize + ", id:" + mId;
         }
-    }
-
-    /**
-     * TODO remove this method, only used because external SD Card needs a special treatment.
-     */
-    boolean isExternalSDCard() {
-        return !mIsPrimary && !mIsInternal;
     }
 }
