@@ -474,6 +474,8 @@ public class DataUsageSummary extends Fragment {
         split4g.setChecked(isMobilePolicySplit());
 
         final MenuItem showWifi = menu.findItem(R.id.data_usage_menu_show_wifi);
+        String showWifiTittle = Utils.replaceAllWiFi(showWifi.getTitle().toString());
+        showWifi.setTitle(showWifiTittle);
         if (hasWifiRadio(context)) {
             showWifi.setVisible(!appDetailMode);
             showWifi.setChecked(mShowWifi);
@@ -683,8 +685,8 @@ public class DataUsageSummary extends Fragment {
      * Build {@link TabSpec} with thin indicator, and empty content.
      */
     private TabSpec buildTabSpec(String tag, int titleRes) {
-        return mTabHost.newTabSpec(tag).setIndicator(getText(titleRes)).setContent(
-                mEmptyTabContent);
+        return mTabHost.newTabSpec(tag).setIndicator(Utils
+                .replaceAllWiFi((String)getText(titleRes))).setContent(mEmptyTabContent);
     }
 
     private TabSpec buildTabSpec(String tag, String title) {

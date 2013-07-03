@@ -1532,6 +1532,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Wi-Fi Advanced Settings --> <skip />
     <!-- Wi-Fi settings screen, advanced, settings section.  This is a header shown above advanced wifi settings. -->
     <string name="wifi_advanced_titlebar">Advanced Wi-Fi</string>
+    <string name="wlan_advanced_titlebar">Advanced WLAN</string>
     <!-- Wi-Fi settings screen, setting title for setting the band [CHAR LIMIT=50]-->
     <string name="wifi_setting_frequency_band_title">Wi-Fi frequency band</string>
     <!-- Wi-Fi settings screen, setting summary for setting the wifi frequency band [CHAR LIMIT=50]-->
@@ -1578,6 +1579,7 @@ alog [CHAR LIMIT=none] -->
     <!-- Wi-Fi p2p / Wi-Fi Direct settings -->
     <!-- Used in the 1st-level settings screen to launch Wi-fi Direct settings [CHAR LIMIT=25] -->
     <string name="wifi_p2p_settings_title">Wi-Fi Direct</string>
+    <string name="wlan_p2p_settings_title">WLAN Direct</string>
     <string name="wifi_p2p_device_info">Device information</string>
     <string name="wifi_p2p_persist_network">Remember this connection</string>
     <!-- Menu option to discover peers-->

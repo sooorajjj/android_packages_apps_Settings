@@ -34,6 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.settings.R;
+import com.android.settings.Utils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -128,8 +129,7 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
         setInverseBackgroundForced(true);
 
         Context context = getContext();
-
-        setTitle(R.string.wifi_tether_configure_ap_text);
+        setTitle(Utils.replaceAllWiFi(context.getString(R.string.wifi_tether_configure_ap_text)));
         mView.findViewById(R.id.type).setVisibility(View.VISIBLE);
         mSsid = (TextView) mView.findViewById(R.id.ssid);
         mPassword = (EditText) mView.findViewById(R.id.password);

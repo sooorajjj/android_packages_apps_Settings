@@ -617,6 +617,7 @@
     <string name="wifi_connect_failed_message" product="tablet" msgid="6904081070290941807">"平板电脑无法连接到此 Wi-Fi 网络。"</string>
     <string name="wifi_connect_failed_message" product="default" msgid="3894921379368046855">"手机无法连接到此 Wi-Fi 网络。"</string>
     <string name="wifi_advanced_titlebar" msgid="1627063574532930090">"高级 Wi-Fi 设置"</string>
+    <string name="wlan_advanced_titlebar" msgid="1627063574532930090">"高级 WLAN 设置"</string>
     <string name="wifi_setting_frequency_band_title" msgid="7493768705046080060">"Wi-Fi 频带"</string>
     <string name="wifi_setting_frequency_band_summary" msgid="3250740757118009784">"指定操作的频率范围"</string>
     <string name="wifi_setting_frequency_band_error" msgid="837281974489794378">"设置频带时出现问题。"</string>
@@ -633,7 +634,8 @@
     <string name="wifi_dns2" msgid="1368601006824882659">"域名 2"</string>
     <string name="wifi_gateway" msgid="163914742461092086">"网关"</string>
     <string name="wifi_network_prefix_length" msgid="3028785234245085998">"网络前缀长度"</string>
-    <string name="wifi_p2p_settings_title" msgid="400503541488064638">"Wi-Fi Direct"</string>
+    <string name="wifi_p2p_settings_title" msgid="400503541488064638">"Wi-Fi直接联接"</string>
+    <string name="wlan_p2p_settings_title">"WLAN直接联接"</string>
     <string name="wifi_p2p_device_info" msgid="3191876744469364173">"设备信息"</string>
     <string name="wifi_p2p_persist_network" msgid="1646424791818168590">"记住该连接"</string>
     <string name="wifi_p2p_menu_search" msgid="3436429984738771974">"搜索设备"</string>

@@ -41,6 +41,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.Preference;
@@ -71,6 +72,8 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -96,6 +99,8 @@ public class Utils {
      * to specify the summary text that should be displayed for the preference.
      */
     private static final String META_DATA_PREFERENCE_SUMMARY = "com.android.settings.summary";
+
+    private final static String TAG = "SettingsUtils";
 
     /**
      * Finds a matching activity for a preference's intent. If a matching
@@ -593,5 +598,41 @@ public class Utils {
     public static boolean hasMultipleUsers(Context context) {
         return ((UserManager) context.getSystemService(Context.USER_SERVICE))
                 .getUsers().size() > 1;
+    }
+
+   /**
+     * replace all the wifi string to WLAN in china
+     *
+     * @param res
+     *            The string need to be replaced.
+     *
+     * @return CharSequence The replaced string.
+     */
+    public static String replaceAllWiFi(String res) {
+        if (!SystemProperties.getBoolean("persist.env.settings.wifi2wlan", false))
+            return res;
+        if (null == res)
+            return null;
+        // ignore some special string contain "wifi" string
+        String regEx = "[a-zA-Z]wi-?fi";
+        Pattern p = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(res);
+        if (m.find())
+            return res;
+
+        regEx = "wi-?fi[a-zA-Z]";
+        p = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+        m = p.matcher(res);
+        if (m.find())
+            return res;
+
+        Log.i(TAG, "before replace string is " + res);
+        regEx = "wi-?fi";
+        p = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
+        m = p.matcher(res);
+        res = m.replaceAll("WLAN");
+
+        Log.i(TAG, "after replace string is " + res);
+        return res;
     }
 }

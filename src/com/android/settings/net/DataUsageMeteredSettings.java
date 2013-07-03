@@ -35,6 +35,7 @@ import android.telephony.TelephonyManager;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
+import com.android.settings.Utils;
 
 /**
  * Panel to configure {@link NetworkPolicy#metered} for networks.
@@ -48,6 +49,7 @@ public class DataUsageMeteredSettings extends SettingsPreferenceFragment {
 
     private NetworkPolicyEditor mPolicyEditor;
 
+    private Preference mBody;;
     private PreferenceCategory mMobileCategory;
     private PreferenceCategory mWifiCategory;
     private Preference mWifiDisabled;
@@ -67,6 +69,14 @@ public class DataUsageMeteredSettings extends SettingsPreferenceFragment {
         mMobileCategory = (PreferenceCategory) findPreference("mobile");
         mWifiCategory = (PreferenceCategory) findPreference("wifi");
         mWifiDisabled = findPreference("wifi_disabled");
+        mBody = findPreference("body");
+
+        String preferenceScreenSummary = Utils.replaceAllWiFi(mBody.getSummary().toString());
+        String showWifiTittle = Utils.replaceAllWiFi(mWifiCategory.getTitle().toString());
+        String WifiDisabledSummary = Utils.replaceAllWiFi(mWifiDisabled.getSummary().toString());
+        mBody.setSummary(preferenceScreenSummary);
+        mWifiCategory.setTitle(showWifiTittle);
+        mWifiDisabled.setSummary(WifiDisabledSummary);
 
         updateNetworks(context);
     }
