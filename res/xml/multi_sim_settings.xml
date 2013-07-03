@@ -51,8 +51,8 @@
             android:key="sms"
             android:title="@string/sms_title"
             android:persistent="false"
-            android:entries="@array/multi_sim_entries"
-            android:entryValues="@array/multi_sim_values" />
+            android:entries="@array/multi_sim_entries_sms"
+            android:entryValues="@array/multi_sim_values_sms" />
 
         <PreferenceScreen
             android:key="config_sub"
