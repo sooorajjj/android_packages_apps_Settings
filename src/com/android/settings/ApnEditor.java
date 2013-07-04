@@ -60,6 +60,8 @@ public class ApnEditor extends PreferenceActivity
     private final static String KEY_ROAMING_PROTOCOL = "apn_roaming_protocol";
     private final static String KEY_CARRIER_ENABLED = "carrier_enabled";
     private final static String KEY_BEARER = "bearer";
+    private final static String PPP_NUMBER = "PPP_number";
+    private final static String CT_NUMERIC = "46003";
 
     private static final int MENU_DELETE = Menu.FIRST;
     private static final int MENU_SAVE = Menu.FIRST + 1;
@@ -85,6 +87,7 @@ public class ApnEditor extends PreferenceActivity
     private ListPreference mRoamingProtocol;
     private CheckBoxPreference mCarrierEnabled;
     private ListPreference mBearer;
+    private EditTextPreference mPPPNum;
 
     private String mCurMnc;
     private String mCurMcc;
@@ -120,7 +123,8 @@ public class ApnEditor extends PreferenceActivity
             Telephony.Carriers.PROTOCOL, // 16
             Telephony.Carriers.CARRIER_ENABLED, // 17
             Telephony.Carriers.BEARER, // 18
-            Telephony.Carriers.ROAMING_PROTOCOL // 19
+            Telephony.Carriers.ROAMING_PROTOCOL, // 19
+            PPP_NUMBER                     //20
     };
 
     private static final int ID_INDEX = 0;
@@ -134,6 +138,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int MMSC_INDEX = 8;
     private static final int MCC_INDEX = 9;
     private static final int MNC_INDEX = 10;
+    private static final int NUMERIC_INDEX = 11;
     private static final int MMSPROXY_INDEX = 12;
     private static final int MMSPORT_INDEX = 13;
     private static final int AUTH_TYPE_INDEX = 14;
@@ -142,6 +147,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int CARRIER_ENABLED_INDEX = 17;
     private static final int BEARER_INDEX = 18;
     private static final int ROAMING_PROTOCOL_INDEX = 19;
+    private static final int PPP_NUMBER_INDEX = 20;
 
 
     @Override
@@ -246,6 +252,7 @@ public class ApnEditor extends PreferenceActivity
     private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
+            String numeric = null;
             // Fill in all the values from the db in both text editor and summary
             mName.setText(mCursor.getString(NAME_INDEX));
             mApn.setText(mCursor.getString(APN_INDEX));
@@ -260,6 +267,7 @@ public class ApnEditor extends PreferenceActivity
             mMcc.setText(mCursor.getString(MCC_INDEX));
             mMnc.setText(mCursor.getString(MNC_INDEX));
             mApnType.setText(mCursor.getString(TYPE_INDEX));
+            numeric = mCursor.getString(NUMERIC_INDEX);
             if (mNewApn) {
                 // MCC is first 3 chars and then in 2 - 3 chars of MNC
                 if (defaultOperatorNumeric != null && defaultOperatorNumeric.length() > 4) {
@@ -273,7 +281,20 @@ public class ApnEditor extends PreferenceActivity
                     mCurMnc = mnc;
                     mCurMcc = mcc;
                 }
+                numeric =  defaultOperatorNumeric;
             }
+
+            mPPPNum = (EditTextPreference) findPreference("apn_PPP_number");
+            if (SystemProperties.getBoolean("persist.env.settings.showppp", false)
+                    && CT_NUMERIC.equals(numeric)) {
+                mPPPNum.setText(mCursor.getString(PPP_NUMBER_INDEX));
+                mPPPNum.setSummary(checkNull(mPPPNum.getText()));
+                mPPPNum.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(mPPPNum);
+                mPPPNum = null;
+            }
+
             int authVal = mCursor.getInt(AUTH_TYPE_INDEX);
             if (authVal != -1) {
                 mAuthType.setValueIndex(authVal);
@@ -503,6 +524,9 @@ public class ApnEditor extends PreferenceActivity
         values.put(Telephony.Carriers.SERVER, checkNotSet(mServer.getText()));
         values.put(Telephony.Carriers.PASSWORD, checkNotSet(mPassword.getText()));
         values.put(Telephony.Carriers.MMSC, checkNotSet(mMmsc.getText()));
+        if (null != mPPPNum){
+            values.put(PPP_NUMBER, checkNotSet(mPPPNum.getText()));
+        }
 
         String authVal = mAuthType.getValue();
         if (authVal != null) {
