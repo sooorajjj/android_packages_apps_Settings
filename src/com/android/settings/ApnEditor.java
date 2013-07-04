@@ -252,7 +252,7 @@ public class ApnEditor extends PreferenceActivity
     private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
-            String numeric = null;
+            String numeric =  mCursor.getString(NUMERIC_INDEX);
             // Fill in all the values from the db in both text editor and summary
             mName.setText(mCursor.getString(NAME_INDEX));
             mApn.setText(mCursor.getString(APN_INDEX));
@@ -267,7 +267,7 @@ public class ApnEditor extends PreferenceActivity
             mMcc.setText(mCursor.getString(MCC_INDEX));
             mMnc.setText(mCursor.getString(MNC_INDEX));
             mApnType.setText(mCursor.getString(TYPE_INDEX));
-            numeric = mCursor.getString(NUMERIC_INDEX);
+
             if (mNewApn) {
                 // MCC is first 3 chars and then in 2 - 3 chars of MNC
                 if (defaultOperatorNumeric != null && defaultOperatorNumeric.length() > 4) {
@@ -282,6 +282,13 @@ public class ApnEditor extends PreferenceActivity
                     mCurMcc = mcc;
                 }
                 numeric =  defaultOperatorNumeric;
+            }
+
+            if (SystemProperties.getBoolean("persist.env.settings.cfgmmsapn", false) &&
+                CT_NUMERIC.equals(numeric)) {
+                mMmsProxy.setEnabled(false);
+                mMmsPort.setEnabled(false);
+                mMmsc.setEnabled(false);
             }
 
             mPPPNum = (EditTextPreference) findPreference("apn_PPP_number");
