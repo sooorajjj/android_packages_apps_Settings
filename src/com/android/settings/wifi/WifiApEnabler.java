@@ -17,6 +17,7 @@
 package com.android.settings.wifi;
 
 import com.android.settings.R;
+import com.android.settings.Utils;
 import com.android.settings.WirelessSettings;
 
 import java.util.ArrayList;
@@ -180,7 +181,8 @@ public class WifiApEnabler {
     private void handleWifiApStateChanged(int state) {
         switch (state) {
             case WifiManager.WIFI_AP_STATE_ENABLING:
-                mCheckBox.setSummary(R.string.wifi_tether_starting);
+                mCheckBox.setSummary(Utils.replaceAllWiFi(mContext
+                        .getString(R.string.wifi_starting)));
                 mCheckBox.setEnabled(false);
                 break;
             case WifiManager.WIFI_AP_STATE_ENABLED:

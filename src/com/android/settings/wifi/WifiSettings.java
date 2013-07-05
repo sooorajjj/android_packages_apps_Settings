@@ -43,6 +43,7 @@ import android.net.wifi.WpsInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
@@ -73,6 +74,7 @@ import android.widget.Toast;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
+import com.android.settings.Utils;
 import com.android.settings.wifi.p2p.WifiP2pSettings;
 
 import java.util.ArrayList;
@@ -461,7 +463,8 @@ public class WifiSettings extends SettingsPreferenceFragment
                     .setEnabled(wifiIsEnabled)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             if (mP2pSupported) {
-                menu.add(Menu.NONE, MENU_ID_P2P, 0, R.string.wifi_menu_p2p)
+                menu.add(Menu.NONE, MENU_ID_P2P, 0,
+                        Utils.replaceAllWiFi(getString(R.string.wifi_menu_p2p)))
                         .setEnabled(wifiIsEnabled)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             }
@@ -494,11 +497,15 @@ public class WifiSettings extends SettingsPreferenceFragment
                 showDialog(WPS_PBC_DIALOG_ID);
                 return true;
             case MENU_ID_P2P:
+                int settings_title = R.string.wifi_p2p_settings_title;
+                if (SystemProperties.getBoolean("persist.env.settings.wifi2wlan", false)) {
+                    settings_title = R.string.wlan_p2p_settings_title;
+                }
                 if (getActivity() instanceof PreferenceActivity) {
                     ((PreferenceActivity) getActivity()).startPreferencePanel(
                             WifiP2pSettings.class.getCanonicalName(),
                             null,
-                            R.string.wifi_p2p_settings_title, null,
+                            settings_title, null,
                             this, 0);
                 } else {
                     startFragment(this, WifiP2pSettings.class.getCanonicalName(), -1, null);
@@ -519,10 +526,14 @@ public class WifiSettings extends SettingsPreferenceFragment
                 return true;
             case MENU_ID_ADVANCED:
                 if (getActivity() instanceof PreferenceActivity) {
+                    int resId = R.string.wifi_advanced_titlebar;
+                    if (SystemProperties.getBoolean("persist.env.settings.wifi2wlan", false)) {
+                        resId = R.string.wlan_advanced_titlebar;
+                    }
                     ((PreferenceActivity) getActivity()).startPreferencePanel(
                             AdvancedWifiSettings.class.getCanonicalName(),
                             null,
-                            R.string.wifi_advanced_titlebar, null,
+                            resId, null,
                             this, 0);
                 } else {
                     startFragment(this, AdvancedWifiSettings.class.getCanonicalName(), -1, null);
@@ -749,7 +760,9 @@ public class WifiSettings extends SettingsPreferenceFragment
     }
 
     private void addMessagePreference(int messageId) {
-        if (mEmptyView != null) mEmptyView.setText(messageId);
+        if (mEmptyView != null) {
+            mEmptyView.setText(Utils.replaceAllWiFi(getString(messageId)));
+        }
         getPreferenceScreen().removeAll();
     }
 

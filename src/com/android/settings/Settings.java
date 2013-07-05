@@ -436,6 +436,9 @@ public class Settings extends PreferenceActivity
             if (id == R.id.operator_settings || id == R.id.manufacturer_settings) {
                 Utils.updateHeaderToSpecificActivityFromMetaDataOrRemove(this, target, header);
             } else if (id == R.id.wifi_settings) {
+                header.title = Utils.replaceAllWiFi(getString(header.titleRes));
+                //user title to replace titleRes to show;
+                header.titleRes = 0;
                 // Remove WiFi Settings if WiFi service is not available.
                 if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_WIFI)) {
                     target.remove(i);
