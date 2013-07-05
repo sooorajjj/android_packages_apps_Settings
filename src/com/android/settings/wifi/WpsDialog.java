@@ -122,6 +122,7 @@ public class WpsDialog extends AlertDialog {
 
         mFilter = new IntentFilter();
         mFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        mFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -246,6 +247,11 @@ public class WpsDialog extends AlertDialog {
                             R.string.wifi_wps_connected), wifiInfo.getSSID());
                     updateDialog(DialogState.CONNECTED, msg);
                 }
+            }
+        } else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
+            if (intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                    WifiManager.WIFI_STATE_UNKNOWN) == WifiManager.WIFI_STATE_DISABLED) {
+                dismiss();
             }
         }
     }
