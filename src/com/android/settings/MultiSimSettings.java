@@ -170,9 +170,15 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         if (count == SUBSCRIPTION_DUAL_STANDBY) {
             mVoice.setEntries(R.array.multi_sim_entries_voice);
             mVoice.setEntryValues(R.array.multi_sim_values_voice);
+            mSms.setEntries(R.array.multi_sim_entries_sms);
+            mSms.setEntryValues(R.array.multi_sim_values_sms);
+
         } else  {
             mVoice.setEntries(R.array.multi_sim_entries_voice_without_prompt);
             mVoice.setEntryValues(R.array.multi_sim_values_voice_without_prompt);
+            mSms.setEntries(R.array.multi_sim_entries);
+            mSms.setEntryValues(R.array.multi_sim_values);
+
         }
         mIsForeground = true;
         updateState();
@@ -268,26 +274,24 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     }
 
     private void updateSmsSummary() {
-        int Sms_val = SUBSCRIPTION_ID_INVALID;
-        CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries);
+        CharSequence[] summaries = getResources().getTextArray(R.array.multi_sim_summaries_sms);
+        int smsSub = MSimPhoneFactory.getSMSSubscription();
+        boolean promptEnabled  = MSimPhoneFactory.isSMSPromptEnabled();
+        int count = subManager.getActiveSubscriptionsCount();
 
-        try {
-            Sms_val = Settings.Global.getInt(getContentResolver(),
-                    Settings.Global.MULTI_SIM_SMS_SUBSCRIPTION);
-        } catch (SettingNotFoundException snfe) {
-            Log.e(TAG, "Settings Exception Reading Multi Sim SMS Call Values.");
-        }
+        Log.d(TAG, "updateSmsSummary: SmsSub =  " + smsSub
+                + " promptEnabled = " + promptEnabled
+                + " number of active SUBs = " + count);
 
-        Log.d(TAG, "updateSmsSummary: Sms_val = " + Sms_val);
-        if (Sms_val == SUBSCRIPTION_ID_0) {
-            mSms.setValue("0");
-            mSms.setSummary(summaries[0]);
-        } else if (Sms_val == SUBSCRIPTION_ID_1) {
-            mSms.setValue("1");
-            mSms.setSummary(summaries[1]);
+        if (promptEnabled && count == SUBSCRIPTION_DUAL_STANDBY) {
+            Log.d(TAG, "prompt is enabled: setting value to : 2");
+            mSms.setValue("2");
+            mSms.setSummary(summaries[2]);
         } else {
-            mSms.setValue("0");
-            mSms.setSummary(summaries[0]);
+            String sub = Integer.toString(smsSub);
+            Log.d(TAG, "setting value to : " + sub);
+            mSms.setValue(sub);
+            mSms.setSummary(summaries[smsSub]);
         }
     }
 
@@ -327,10 +331,16 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         }
 
         if (KEY_SMS.equals(key)) {
+            summaries = getResources().getTextArray(R.array.multi_sim_summaries_sms);
             int smsSub = Integer.parseInt((String) objValue);
-            Log.d(TAG, "setSMSSubscription " + smsSub);
-            if (subManager.getCurrentSubscription(smsSub).subStatus
-                    == SubscriptionStatus.SUB_ACTIVATED) {
+            if (smsSub == PROMPT_OPTION) {
+                MSimPhoneFactory.setSMSPromptEnabled(true);
+                mSms.setSummary(summaries[smsSub]);
+                Log.d(TAG, "prompt is enabled " + smsSub);
+            } else if (subManager.getCurrentSubscription(smsSub).subStatus
+                   == SubscriptionStatus.SUB_ACTIVATED) {
+                Log.d(TAG, "setVoiceSubscription " + smsSub);
+                MSimPhoneFactory.setSMSPromptEnabled(false);
                 MSimPhoneFactory.setSMSSubscription(smsSub);
                 mSms.setSummary(summaries[smsSub]);
             } else {
@@ -477,9 +487,14 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
                     if (count == SUBSCRIPTION_DUAL_STANDBY) {
                         mVoice.setEntries(R.array.multi_sim_entries_voice);
                         mVoice.setEntryValues(R.array.multi_sim_values_voice);
+                        mSms.setEntries(R.array.multi_sim_entries_sms);
+                        mSms.setEntryValues(R.array.multi_sim_values_sms);
+
                     } else  {
                         mVoice.setEntries(R.array.multi_sim_entries_voice_without_prompt);
                         mVoice.setEntryValues(R.array.multi_sim_values_voice_without_prompt);
+                        mSms.setEntries(R.array.multi_sim_entries);
+                        mSms.setEntryValues(R.array.multi_sim_values);
                     }
                     break;
 
