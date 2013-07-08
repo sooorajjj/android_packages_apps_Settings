@@ -58,6 +58,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.util.Log;
 
 import com.android.internal.content.PackageMonitor;
 import com.android.internal.view.RotationPolicy;
@@ -69,6 +70,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.lang.RuntimeException;
+import android.widget.Toast;
 /**
  * Activity with the accessibility settings.
  */
@@ -78,6 +81,8 @@ public class AccessibilitySettings extends SettingsPreferenceFragment implements
         "market://search?q=pname:com.google.android.marvin.talkback";
 
     private static final float LARGE_FONT_SCALE = 1.3f;
+
+    private static final String TAG = "AccessibilitySettings";
 
     private static final String SYSTEM_PROPERTY_MARKET_URL = "ro.screenreader.market";
 
@@ -492,7 +497,12 @@ public class AccessibilitySettings extends SettingsPreferenceFragment implements
                                         DEFAULT_SCREENREADER_MARKET_LINK);
                                 Uri marketUri = Uri.parse(screenreaderMarketLink);
                                 Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                                startActivity(marketIntent);
+                                try{
+                                  startActivity(marketIntent);
+                                } catch (RuntimeException re) {
+                                  // Android Market can not be found in base-rom version
+                                  Log.d(TAG, "Runtime Exception found "+re);
+                                }
                             }
                     })
                     .setNegativeButton(android.R.string.cancel, null)
