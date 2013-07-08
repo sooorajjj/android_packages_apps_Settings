@@ -263,10 +263,6 @@ public class RunningProcessesView extends FrameLayout
             return false;
         }
 
-        public boolean isEnabled(int position) {
-            return !mItems.get(position).mIsProcess;
-        }
-
         public View getView(int position, View convertView, ViewGroup parent) {
             View v;
             if (convertView == null) {
