@@ -525,7 +525,8 @@ public class MSimStatus extends PreferenceActivity {
                 operatorName = mServiceState[subscription].getOperatorAlphaLong();
                 // get the networktype from the xml file by using LocaleNamesParser
                 if (operatorName != null) {
-                    LocaleNamesParser localeNamesParser = new LocaleNamesParser(this,TAG,
+                    LocaleNamesParser localeNamesParser = new LocaleNamesParser(this,
+                            LocaleNamesParser.ANDROID_PKG,
                             com.android.internal.R.array.origin_carrier_names,
                             com.android.internal.R.array.locale_carrier_names);
                     operatorName = localeNamesParser.getLocaleName(operatorName).toString();
