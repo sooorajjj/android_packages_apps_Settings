@@ -4261,6 +4261,19 @@ alog [CHAR LIMIT=none] -->
     <string name="cell_broadcast_settings">Cell broadcasts</string>
     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
+ <!-- modify for usb settings start -->
+    <!-- Storage setting.  Summary for SD card checkbox [CHAR LIMIT=NONE]-->
+    <string name="usb_sdcard_summary">Lets you transfer media files in the SD card on Windows</string>
+    <string name="usb_sdcard_title">Mount SD card</string>
+    <!-- Storage setting.  Title for SD card checkbox [CHAR LIMIT=30]-->
+    <string name="usb_charging_title">Charging</string>
+    <!-- Storage setting.  Summary for SD card checkbox [CHAR LIMIT=NONE]-->
+    <string name="usb_charging_summary">Lets you only charge the device</string>
+    <string name="internal_storage_turn_on">Internal storage has been turned on</string>
+    <string name="internal_storage_turn_off">Internal storage has been turned off</string>
+    <string name="external_storage_turn_on">External storage has been turned on</string>
+    <string name="external_storage_turn_off">External storage has been turned off</string>
+    <!-- modify for usb settings end  -->
 <!-- for internal storage -->
    <string name="summary_storage_manage">SD card device: %1$s</string>
     <string name="external_sd">External SD</string>
