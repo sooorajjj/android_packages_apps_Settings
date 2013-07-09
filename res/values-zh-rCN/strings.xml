@@ -1707,4 +1707,14 @@
     <string name="help_label" msgid="1107174367904110532">"帮助"</string>
     <string name="cell_broadcast_settings" msgid="8415582011920085222">"小区广播"</string>
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"请选择要显示的紧急消息类型。"</string>
+<!-- modify for usb settings start -->
+    <string name="usb_sdcard_title">挂载SD 卡</string>
+    <string name="usb_sdcard_summary">"让您在 Windows 上传输SD 卡上的媒体文件"</string>
+    <string name="usb_charging_title">充电</string>
+    <string name="usb_charging_summary">使手机只处于充电状态</string>
+    <string name="internal_storage_turn_on">"内部存储器已打开"</string>
+    <string name="internal_storage_turn_off">"内部存储器已关闭"</string>
+    <string name="external_storage_turn_on">"外部存储器已打开"</string>
+    <string name="external_storage_turn_off">"外部存储器已关闭"</string>
+    <!-- modify for usb settings end  -->
 </resources>
