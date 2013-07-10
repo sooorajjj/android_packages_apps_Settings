@@ -220,7 +220,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
             updateToggles(UsbManager.USB_FUNCTION_MASS_STORAGE);
         } else if (preference == mCharging) {
             mUsbManager.setCurrentFunction(
-                    "mtp,diag,serial_smd,serial_tty,rmnet_smd,mass_storage,serial_smd", true);
+                    "diag,serial_smd,serial_tty,rmnet_bam,adb", true);
             updateToggles(null);
         }
         getPreferenceScreen().setEnabled(false);
