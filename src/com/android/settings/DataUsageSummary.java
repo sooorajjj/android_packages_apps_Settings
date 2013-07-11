@@ -56,10 +56,12 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -80,6 +82,7 @@ import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.INetworkManagementService;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -265,6 +268,40 @@ public class DataUsageSummary extends Fragment {
     private boolean mBinding;
 
     private UidDetailProvider mUidDetailProvider;
+    private AirPlaneModeChangeIntentReceiver mAirPlaneModeReceiver;
+
+    /** Flag used to check the network and radio state. */
+    private boolean mMobileRadioStateOld;
+    private boolean mMobile4gRadioStateOld;
+    private boolean mWifiRadioStateOld;
+    private boolean mEthernetStateOld;
+
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean mMobileRadioStateNew = hasReadyMobileRadio(getActivity());
+            boolean mMobile4gRadioStateNew =
+                    isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity());
+            boolean mWifiRadioStateNew = mShowWifi && hasWifiRadio(getActivity());
+            boolean mEthernetStateNew = mShowEthernet && hasEthernet(getActivity());
+
+            // When network or radio state has change, update body content based
+            // on current tab.
+            if ((mMobileRadioStateNew != mMobileRadioStateOld)
+                    || (mMobile4gRadioStateNew != mMobile4gRadioStateOld)
+                    || (mWifiRadioStateNew != mWifiRadioStateOld)
+                    || (mEthernetStateNew != mEthernetStateOld)) {
+                updateBody();
+                mMobileRadioStateOld = mMobileRadioStateNew;
+                mMobile4gRadioStateOld = mMobile4gRadioStateNew;
+                mWifiRadioStateOld = mWifiRadioStateNew;
+                mEthernetStateOld = mEthernetStateNew;
+            } else {
+                mHandler.postDelayed(mRunnable, 2 * DateUtils.SECOND_IN_MILLIS);
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -293,6 +330,11 @@ public class DataUsageSummary extends Fragment {
         }
 
         setHasOptionsMenu(true);
+
+        // Register a broadcast receiver to listen the airplane mode changed.
+        mAirPlaneModeReceiver = new AirPlaneModeChangeIntentReceiver();
+        IntentFilter mFilter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        getActivity().registerReceiver(mAirPlaneModeReceiver, mFilter);
     }
 
     @Override
@@ -443,6 +485,11 @@ public class DataUsageSummary extends Fragment {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        mMobileRadioStateOld = (hasReadyMobileRadio(getActivity()));
+        mMobile4gRadioStateOld = (isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity()));
+        mWifiRadioStateOld = (mShowWifi && hasWifiRadio(getActivity()));
+        mEthernetStateOld = (mShowEthernet && hasEthernet(getActivity()));
     }
 
     @Override
@@ -504,6 +551,19 @@ public class DataUsageSummary extends Fragment {
             HelpUtils.prepareHelpMenuItem(context, help, helpUrl);
         } else {
             help.setVisible(false);
+        }
+    }
+
+    /**
+     * Receives notifications when enable/disable airplane mode.
+     */
+    private class AirPlaneModeChangeIntentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String actionStr = intent.getAction();
+            if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(actionStr)) {
+                mHandler.post(mRunnable);
+            }
         }
     }
 
@@ -589,6 +649,10 @@ public class DataUsageSummary extends Fragment {
             getFragmentManager()
                     .popBackStack(TAG_APP_DETAILS, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+
+        // Unregister the broadcast receiver
+        getActivity().unregisterReceiver(mAirPlaneModeReceiver);
+        mHandler.removeCallbacks(mRunnable);
 
         super.onDestroy();
     }
