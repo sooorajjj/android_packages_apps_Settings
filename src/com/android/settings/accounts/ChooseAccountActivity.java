@@ -47,6 +47,8 @@ import java.util.Map;
 public class ChooseAccountActivity extends PreferenceActivity {
 
     private static final String TAG = "ChooseAccountActivity";
+    private static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
+    private static final String ACCOUNT_TYPE_SIM = "com.android.sim";
     private String[] mAuthorities;
     private PreferenceGroup mAddAccountGroup;
     private final ArrayList<ProviderEntry> mProviderList = new ArrayList<ProviderEntry>();
@@ -100,7 +102,18 @@ public class ChooseAccountActivity extends PreferenceActivity {
      * and update any UI that depends on AuthenticatorDescriptions in onAuthDescriptionsUpdated().
      */
     private void updateAuthDescriptions() {
-        mAuthDescs = AccountManager.get(this).getAuthenticatorTypes();
+        //If the Authenticator's type is localphone or sim,don't display them in this activity.
+        AuthenticatorDescription[] tempAuthDescs = AccountManager.get(this)
+                .getAuthenticatorTypes();
+        mAuthDescs = new AuthenticatorDescription[tempAuthDescs.length - 2];
+        for (int i = 0,j = 0; i < tempAuthDescs.length; i++) {
+            if (tempAuthDescs[i].type.equals(ACCOUNT_TYPE_PHONE)
+                    || tempAuthDescs[i].type.equals(ACCOUNT_TYPE_SIM)) {
+                continue;
+            }
+            mAuthDescs[j] = tempAuthDescs[i];
+            j++;
+        }
         for (int i = 0; i < mAuthDescs.length; i++) {
             mTypeToAuthDescription.put(mAuthDescs[i].type, mAuthDescs[i]);
         }
