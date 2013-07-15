@@ -122,6 +122,7 @@ public class BrightnessPreference extends SeekBarDialogPreference implements
 
     public void onProgressChanged(SeekBar seekBar, int progress,
             boolean fromTouch) {
+        if (Utils.isMonkeyRunning()) return;
         setBrightness(progress, false);
     }
 
@@ -134,6 +135,8 @@ public class BrightnessPreference extends SeekBarDialogPreference implements
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (Utils.isMonkeyRunning()) return;
+
         setMode(isChecked ? Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
                 : Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
         mSeekBar.setProgress(getBrightness());
