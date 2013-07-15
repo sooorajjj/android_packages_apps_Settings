@@ -257,6 +257,9 @@ public class DataUsageSummary extends Fragment {
     /** Flag used to ignore listeners during binding. */
     private boolean mBinding;
 
+    /** prevent ANR */
+    private boolean mIsUpdatingStats = false;
+
     private UidDetailProvider mUidDetailProvider;
 
     @Override
@@ -414,6 +417,7 @@ public class DataUsageSummary extends Fragment {
         // selected network, and binds chart, cycles and detail list.
         updateTabs();
 
+        mIsUpdatingStats = true;
         // kick off background task to update stats
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -430,6 +434,7 @@ public class DataUsageSummary extends Fragment {
 
             @Override
             protected void onPostExecute(Void result) {
+                mIsUpdatingStats = false;
                 if (isAdded()) {
                     updateBody();
                 }
@@ -676,7 +681,7 @@ public class DataUsageSummary extends Fragment {
      */
     private void updateBody() {
         mBinding = true;
-        if (!isAdded()) return;
+        if (!isAdded() || mIsUpdatingStats) return;
 
         final Context context = getActivity();
         final String currentTab = mTabHost.getCurrentTabTag();
