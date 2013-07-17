@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import android.bluetooth.IBluetoothPreferredDeviceListCallback;
 
 /**
  * CachedBluetoothDevice represents a remote Bluetooth device. It contains
@@ -50,6 +51,9 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private final BluetoothDevice mDevice;
     private String mName;
     private short mRssi;
+    private String mType;
+    private String mUuids;
+    private boolean isDevConnected = false;
     private BluetoothClass mBtClass;
     private HashMap<LocalBluetoothProfile, Integer> mProfileConnectionState;
 
@@ -160,11 +164,57 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         mProfileConnectionState = new HashMap<LocalBluetoothProfile, Integer>();
         fillData();
     }
+    public static IBluetoothPreferredDeviceListCallback mPreferredDeviceListCallback =
+        new IBluetoothPreferredDeviceListCallback.Stub() {
+
+        @Override
+        public void onAddDeviceToPreferredList(int result) {
+
+            Log.d(TAG, "onAddDeviceToPreferredList" +result);
+        }
+
+        @Override
+        public void onRemoveDeviceFromPreferredList(int result) {
+
+            Log.d(TAG, "onRemoveDeviceFromPreferredList" +result);
+        }
+
+        @Override
+        public void onClearPreferredDeviceList(int result) {
+
+            Log.d(TAG, "onClearPreferredDeviceList::" +result);
+        }
+
+        @Override
+        public void onGattConnectToPreferredDeviceList(int result) {
+
+            Log.d(TAG, "onGattConnectToPreferredDeviceList::"+result);
+        }
+
+         @Override
+         public void onGattCancelConnectToPreferredDeviceList(int result) {
+
+              Log.d(TAG, "onGattCancelConnectToPreferredDeviceList::"+result);
+         }
+
+         public void onGattAutoConnect(int result) {
+
+             Log.d(TAG, "onGattAutoConnect::"+result);
+         }
+         public void onGattAutoConnectCancel(int result) {
+
+             Log.d(TAG, "onGattAutoConnectCancel::"+result);
+         }
+    };
 
     void disconnect() {
-        for (LocalBluetoothProfile profile : mProfiles) {
-            disconnect(profile);
-        }
+         if("LE".equals(mType)) {
+             isDevConnected = false;
+         }
+           for (LocalBluetoothProfile profile : mProfiles) {
+               Log.d(TAG, "profile disconnect called");
+              disconnect(profile);
+           }
     }
 
     void disconnect(LocalBluetoothProfile profile) {
@@ -291,12 +341,13 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     }
 
     private boolean ensurePaired() {
+        if(mDevice == null)
+             return false;
         if (getBondState() == BluetoothDevice.BOND_NONE) {
             startPairing();
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     boolean startPairing() {
@@ -304,13 +355,22 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if (mLocalAdapter.isDiscovering()) {
             mLocalAdapter.cancelDiscovery();
         }
-
-        if (!mDevice.createBond()) {
-            return false;
-        }
-
-        mConnectAfterPairing = true;  // auto-connect after pairing
-        return true;
+        if (mDevice != null) {
+            if("LE".equals(mType)) {
+                boolean result = false;
+                if(!isDevConnected) {
+                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                    adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
+                    isDevConnected = true;
+                    Log.d(TAG, "gattAutoConnect called");
+                 }
+            }
+            else
+               mDevice.createBond();
+       } else
+           return false;
+       mConnectAfterPairing = true;  // auto-connect after pairing
+       return true;
     }
 
     /**
@@ -437,6 +497,28 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             mRssi = rssi;
             dispatchAttributesChanged();
         }
+    }
+
+    void setType(String  type) {
+        if (mType != type) {
+            mType = type;
+            dispatchAttributesChanged();
+        }
+    }
+
+    String getType() {
+      return mType;
+    }
+
+    void setUuids(String uuids) {
+        if (mUuids != uuids) {
+            mUuids = uuids;
+            dispatchAttributesChanged();
+        }
+    }
+
+    String getUuids() {
+        return mUuids;
     }
 
     /**
