@@ -772,6 +772,9 @@ public class DataUsageSummary extends Fragment {
             throw new IllegalStateException("unknown tab: " + currentTab);
         }
 
+        //this view move to parent view.
+        mDataEnabledView.setVisibility(View.GONE);
+
         // kick off loader for network history
         // TODO: consider chaining two loaders together instead of reloading
         // network history when showing app detail.
@@ -891,12 +894,7 @@ public class DataUsageSummary extends Fragment {
                     Settings.Global.MOBILE_DATA + multiSimGetCurrentSub(), 0) != 0;
         }
 
-        if (mMobileDataEnabled != null) {
-            // TODO: deprecate and remove this once enabled flag is on policy
-            return mMobileDataEnabled;
-        } else {
-            return mConnService.getMobileDataEnabled();
-        }
+        return mConnService.getMobileDataEnabled();
     }
 
     private void setMobileDataEnabled(boolean enabled) {
@@ -920,7 +918,7 @@ public class DataUsageSummary extends Fragment {
     }
 
     private boolean isNetworkPolicyModifiable(NetworkPolicy policy) {
-        return policy != null && isBandwidthControlEnabled() && mDataEnabled.isChecked()
+        return policy != null && isBandwidthControlEnabled() && isMobileDataEnabled()
                 && ActivityManager.getCurrentUser() == UserHandle.USER_OWNER;
     }
 

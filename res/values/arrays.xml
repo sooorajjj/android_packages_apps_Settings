@@ -889,6 +889,24 @@
         <item>Unsuccessful</item>
     </string-array>
 
+    <!-- Do not translate.  Value for each type of Subscription. -->
+    <string-array name="multi_sim_values">
+        <!-- Do not translate. -->
+        <item>0</item>
+        <!-- Do not translate. -->
+        <item>1</item>
+    </string-array>
+
+    <!-- Do not translate.  Value for voice Subscription. -->
+    <string-array name="multi_sim_values_voice">
+        <!-- Do not translate. -->
+        <item>0</item>
+        <!-- Do not translate. -->
+        <item>1</item>
+        <!-- Do not translate. -->
+        <item>2</item>
+    </string-array>
+
     <!-- User content ratings for restricted users [CHAR LIMIT=30] -->
     <string-array name="user_content_ratings_entries" translatable="false">
         <item>Ascended being</item>
@@ -924,4 +942,16 @@
         <item> Subscription 3 </item>
     </string-array>
 
-  </resources>
+    <!-- Used in choose preferred subscription-->
+    <string-array name="select_slot_items">
+        <item>SIM1</item>
+        <item>SIM2</item>
+        <item>Always ask</item>
+    </string-array>
+
+    <!-- Used in TestingSetting phone info -->
+    <string-array name="select_slot_phone_info">
+        <item>SIM1</item>
+        <item>SIM2</item>
+   </string-array>
+</resources>

@@ -41,6 +41,7 @@ import android.widget.Switch;
 
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.settings.multisimsettings.MultiSimSettingsConstants;
 import com.android.settings.nfc.NfcEnabler;
 import com.android.settings.NsdEnabler;
 
@@ -113,11 +114,10 @@ public class WirelessSettings extends SettingsPreferenceFragment {
 
             if (manageSub != null) {
                 Intent intent = manageSub.getIntent();
-                intent.setClassName("com.android.phone",
-                                    "com.android.phone.SelectSubscription");
-                intent.putExtra(SelectSubscription.PACKAGE,
-                                    "com.android.phone");
-                intent.putExtra(SelectSubscription.TARGET_CLASS,
+                intent.setClassName("com.android.settings",
+                                    "com.android.settings.multisimsettings.MultiSimSettingTab");
+                intent.putExtra(MultiSimSettingsConstants.TARGET_PACKAGE, "com.android.phone");
+                intent.putExtra(MultiSimSettingsConstants.TARGET_CLASS,
                                 "com.android.phone.MSimMobileNetworkSubSettings");
             }
         }

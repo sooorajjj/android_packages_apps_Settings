@@ -3706,6 +3706,8 @@
     <string name="untitled_apn">Untitled</string>
 
     <string name="sound_category_sound_title">General</string>
+    <string name="sound_category_calls_and_notification_title">Ringtone &amp; notifications</string>
+    <string name="sound_category_calls_title">Incoming calls</string>
     <string name="sound_category_notification_title">Notifications</string>
 
     <!-- Category title for phone call's ringtone and vibration settings in the Sound Setting.
@@ -4352,7 +4354,8 @@
     <string name="subs_settings">SUBS Status</string>
 
     <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
-    <string name="multi_sim_settings_title">Multi Sim Settings</string>
+    <string name="multi_sim_settings_title">Dual SIM settings</string>
+    <string name="multi_sim_settings_title_Multi">Multi Sim Settings</string>
     <!-- Main settings screen, Multi Sim settings summary for item to go into Multi settings -->
     <string name="multi_sim_settings_summary">Set up Multi Sim Settings for Voice, Data and SMS</string>
 
@@ -4367,7 +4370,7 @@
     <string name="data_summary">Select Subscription for Data Call</string>
 
     <!-- Multi Sim Settings screen, SMS box label -->
-    <string name="sms_title">SMS </string>
+    <string name="sms_title">Messaging</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="sms_summary">Select the Subscription for Sending SMS</string>
 
@@ -4610,4 +4613,59 @@
 
     <!-- Text to display in regulatory info screen (from device overlay). -->
     <string name="regulatory_info_text"></string>
+
+    <!-- for multisim settings -->
+    <string name="mobile_network_setting">Mobile network settings</string>
+    <string name="call_settings">Call settings</string>
+    <!-- Multi SIM settings screen, preferred subscription settings -->
+    <string name="preferred_subs_settings_title">Preferred SIM settings</string>
+    <!-- Multi Sim Setting screen, countdown timer waiting time -->
+    <string name="countdown_time_title">Count down time</string>
+    <!-- Multi Sim Setting screen, countdown timer no wait -->
+    <string name="no_wait_time">no wait</string>
+    <!-- Multi Sim Setting screen, countdown timer always wait -->
+    <string name="infinite_wait_time">always wait</string>
+    <!-- Multi Sim Setting screen, countdown timer wait time unit -->
+    <string name="wait_time_unit">s</string>
+    <!-- Multi Sim Select Subscription screen, invalid subscription -->
+    <string name="subscription_invalid">Card Absent Or Disabled</string>
+    <!-- Dual Sim Setting screen,  item title to preferred callback setting -->
+    <string name="preferred_callback_title">Preferred callback</string>
+    <!-- Dual Sim Settings screen, callback enable summary label -->
+    <string name="callback_enable_summary">Preferred callback is ON</string>
+    <!-- Dual Sim Settings screen, callback disable summary label -->
+    <string name="callback_disable_summary">Preferred callback is OFF</string>
+    <string name="close_dialog">OK</string>
+    <string name="sim_naming_title">SIM Card Naming</string>
+    <string name="summary_network_settings">Set options for mobile networks, APNs</string>
+    <string name="summary_call_settings">Set voice mail, call options for dual SIMs</string>
+    <string name="sim_enabler_title">SIM card</string>
+    <string name="sim_enabler">SIM card</string>
+    <string name="sim_enabler_summary">SIM is %1$s</string>
+    <string name="sim_enabled">enabled</string>
+    <string name="sim_disabled">disabled</string>
+    <string name="sim_missing">missing or error</string>
+    <string name="sim_enabler_need_enable_sim">Will enable it, are you sure?</string>
+    <string name="sim_enabler_need_disable_sim">Will disable it, are you sure?</string>
+    <string name="sim_enabler_airplane_on">ERROR, airplane mode is on!</string>
+    <string name="sim_enabler_in_call">ERROR, in call!</string>
+    <string name="sim_enabler_both_inactive">"Error, can't disable both at the same time!"</string>
+    <string name="sim_enabler_enabling">Enabling</string>
+    <string name="sim_enabler_disabling">Disabling</string>
+    <string name="sub_activate_success">Activate success.</string>
+    <string name="sub_activate_failed">Activate failed</string>
+    <string name="sub_deactivate_success">Deactivate success</string>
+    <string name="sub_deactivate_failed">Deactivate failed</string>
+    <string name="sub_deactivate_not_supported">Deactivate not supported</string>
+    <string name="sub_activate_not_supported">Activate not supported</string>
+    <string name="sub_not_changed">State not changed</string>
+    <string name="title_sim_alias">Alias name</string>
+    <string name="same_name_alert">Two sim cards can not be the same name!</string>
+    <string name="select_slot_always_ask">Always ask</string>
+    <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
+    <!-- Default names for sim cards -->
+    <string name="default_sim1_name">SLOT1</string>
+    <string name="default_sim2_name">SLOT2</string>
+
+    <string name="dual_sim_configure">Subscriptions Configuration</string>
 </resources>

@@ -606,6 +606,54 @@
                 android:resource="@id/display_settings" />
         </activity>
 
+        <!-- Multi Sim (Subscription) Settings change base on android original source-->
+        <activity android:name=".multisimsettings.MultiSimSettings"
+                android:label="@string/multi_sim_settings_title"
+                android:process="com.android.phone"
+                android:configChanges="orientation|screenSize|mcc|mnc"
+                android:clearTaskOnLaunch="true"
+                android:parentActivityName="Settings">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="com.android.settings.MULTI_SIM_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- MultiSimSettings should be found by 'Voice Dialer'. -->
+                <category android:name="android.intent.category.VOICE_LAUNCH" />
+                <category android:name="com.android.settings.SHORTCUT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim (Subscription) Settings Widget for Tab Layout-->
+        <activity android:name=".multisimsettings.MultiSimSettingTab"
+                android:label="@string/mobile_network_setting"
+                android:process="com.android.phone"
+                android:configChanges="orientation|screenSize|keyboardHidden"
+                android:parentActivityName=".multisimsettings.MultiSimSettings">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim Configuration in Tab Layout -->
+        <activity android:name=".multisimsettings.MultiSimConfiguration"
+                android:label="@string/multi_sim_settings_title"
+                android:process="com.android.phone">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Multi Sim Sound Setting Preference -->
+        <activity android:name=".multisimsettings.MultiSimSoundSettings"
+                android:label="@string/multi_sim_settings_title">
+           <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- Keep compatibility with old shortcuts. -->
         <activity-alias android:name="DisplaySettings"
                 android:label="@string/display_settings"
@@ -619,15 +667,17 @@
 
         <!-- Multi Sim (Subscription) Settings -->
         <activity android:name="MultiSimSettings"
-                android:label="@string/multi_sim_settings_title"
+                android:label="@string/multi_sim_settings_title_Multi"
                 android:process="com.android.phone"
                 android:clearTaskOnLaunch="true">
            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="com.android.settings.MULTI_SIM_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
+                <!-- This Activity is not used, so it should not be found by 'Voice Dialer'. -->
+                <!-- <category android:name="android.intent.category.VOICE_LAUNCH" /> -->
+                <!-- not display this shortcut on the widget shortcut -->
+                <!-- <category android:name="com.android.settings.SHORTCUT" /> -->
             </intent-filter>
         </activity>
 
