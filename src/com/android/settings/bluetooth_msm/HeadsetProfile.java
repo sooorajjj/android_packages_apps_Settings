@@ -58,6 +58,7 @@ final class HeadsetProfile implements LocalBluetoothProfile {
 
         public void onServiceConnected(int profile, BluetoothProfile proxy) {
             mService = (BluetoothHeadset) proxy;
+            Log.d(TAG, "Connected to headsetService");
             mProfileReady = true;
             // We just bound to the service, so refresh the UI of the
             // headset device.
@@ -79,6 +80,7 @@ final class HeadsetProfile implements LocalBluetoothProfile {
         }
 
         public void onServiceDisconnected(int profile) {
+            Log.d(TAG, "disConnected to headsetService");
             mProfileReady = false;
             mService = null;
             mProfileManager.callServiceDisconnectedListeners();
@@ -108,6 +110,7 @@ final class HeadsetProfile implements LocalBluetoothProfile {
     }
 
     public boolean connect(BluetoothDevice device) {
+        if (mService == null) return false;
         List<BluetoothDevice> sinks = mService.getConnectedDevices();
         if (sinks != null) {
             for (BluetoothDevice sink : sinks) {
@@ -119,6 +122,7 @@ final class HeadsetProfile implements LocalBluetoothProfile {
     }
 
     public boolean disconnect(BluetoothDevice device) {
+        if (mService == null) return false;
         List<BluetoothDevice> deviceList = mService.getConnectedDevices();
         if (!deviceList.isEmpty() && deviceList.get(0).equals(device)) {
             // Downgrade priority as user is disconnecting the headset.
@@ -142,14 +146,17 @@ final class HeadsetProfile implements LocalBluetoothProfile {
     }
 
     public boolean isPreferred(BluetoothDevice device) {
+        if (mService == null) return false;
         return mService.getPriority(device) > BluetoothProfile.PRIORITY_OFF;
     }
 
     public int getPreferred(BluetoothDevice device) {
+        if (mService == null) return BluetoothProfile.PRIORITY_OFF;
         return mService.getPriority(device);
     }
 
     public void setPreferred(BluetoothDevice device, boolean preferred) {
+        if (mService == null) return;
         if (preferred) {
             if (mService.getPriority(device) < BluetoothProfile.PRIORITY_ON) {
                 mService.setPriority(device, BluetoothProfile.PRIORITY_ON);
