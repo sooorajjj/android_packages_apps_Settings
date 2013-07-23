@@ -59,6 +59,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     private EditText mPairingView;
     private Button mOkButton;
     private boolean mIsSecurityHigh;
+    private CachedBluetoothDeviceManager mDeviceManager;
 
     /**
      * Dismiss the dialog if the bond state changes to bonded or none,
@@ -103,7 +104,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
             finish();
             return;
         }
-        CachedBluetoothDeviceManager deviceManager = manager.getCachedDeviceManager();
+       mDeviceManager = manager.getCachedDeviceManager();
 
         mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mType = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
@@ -113,7 +114,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
         switch (mType) {
             case BluetoothDevice.PAIRING_VARIANT_PIN:
             case BluetoothDevice.PAIRING_VARIANT_PASSKEY:
-                createUserEntryDialog(deviceManager);
+                createUserEntryDialog(mDeviceManager);
                 break;
 
             case BluetoothDevice.PAIRING_VARIANT_PASSKEY_CONFIRMATION:
@@ -124,12 +125,12 @@ public final class BluetoothPairingDialog extends AlertActivity implements
                     return;
                 }
                 mPairingKey = String.format("%06d", passkey);
-                createConfirmationDialog(deviceManager);
+                createConfirmationDialog(mDeviceManager);
                 break;
 
             case BluetoothDevice.PAIRING_VARIANT_CONSENT:
             case BluetoothDevice.PAIRING_VARIANT_OOB_CONSENT:
-                createConsentDialog(deviceManager);
+                createConsentDialog(mDeviceManager);
                 break;
 
             case BluetoothDevice.PAIRING_VARIANT_DISPLAY_PASSKEY:
@@ -145,7 +146,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
                 } else {
                     mPairingKey = String.format("%04d", pairingKey);
                 }
-                createDisplayPasskeyOrPinDialog(deviceManager);
+                createDisplayPasskeyOrPinDialog(mDeviceManager);
                 break;
 
             default:
@@ -366,6 +367,16 @@ public final class BluetoothPairingDialog extends AlertActivity implements
 
     private void onCancel() {
         mDevice.cancelPairingUserInput();
+        String type = mDeviceManager.getType(mDevice);
+        Log.d(TAG, "device type" + type);
+        if(type != null) {
+            if("LE".equals(type)) {
+                CachedBluetoothDevice cachedDevice = mDeviceManager.findDevice(mDevice);
+                if(cachedDevice != null) {
+                    cachedDevice.disconnect();
+                }
+            }
+        }
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

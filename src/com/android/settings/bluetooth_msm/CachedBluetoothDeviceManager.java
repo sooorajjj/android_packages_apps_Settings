@@ -108,6 +108,21 @@ final class CachedBluetoothDeviceManager {
 
         return device.getAddress();
     }
+    /**
+     * Attempts to get the  type of a remote device, otherwise returns null.
+     *
+     * @param device The remote device.
+     * @return type
+     */
+    public String getType(BluetoothDevice device) {
+        CachedBluetoothDevice cachedDevice = findDevice(device);
+        if (cachedDevice != null) {
+            Log.d(TAG, "getType called" );
+            return cachedDevice.getType();
+        }
+        return null;
+    }
+
 
     public synchronized void onScanningStateChanged(boolean started) {
         // If starting a new scan, clear old visibility
