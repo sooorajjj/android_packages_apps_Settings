@@ -2016,6 +2016,8 @@
     <string name="enhanced_brightness_summary">"通常用于在播放视频过程中，提升视频的质量，以及节约更多的电量"</string>
     <string name="enhanced_brightness">"动态背景光"</string>
 
+    <string name="show_search_function">搜索</string>
+
     <!--Prompt, used only for voice-->
     <string name="prompt">提示</string>
     <string name="prompt_user">提示用户</string>

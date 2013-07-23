@@ -4712,6 +4712,9 @@
     <string name="contrast_str">Contrast: <xliff:g id="contrast_value">%1$s</xliff:g></string>
     <string name="intensity_str">Intensity: <xliff:g id="intensity_str_value">%1$s</xliff:g></string>
 
+    <!--search function for application settings-->
+    <string name="show_search_function">Search</string>
+
     <!-- modify for usb settings start -->
     <!-- Storage setting.  Summary for SD card checkbox [CHAR LIMIT=NONE]-->
     <string name="usb_sdcard_summary">Lets you transfer media files in the SD card on Windows</string>
