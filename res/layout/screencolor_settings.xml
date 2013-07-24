@@ -155,12 +155,12 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     android:layout_toLeftOf="@id/increase_hue"
                     android:maxHeight="12px"
                     android:minHeight="12px"
-                    android:max="100"
+                    android:max="360"
+                    android:defaultValue="180"
                     android:paddingLeft="20dip"
                     android:paddingTop="10dip"
                     android:paddingRight="20dip"
-                    android:paddingBottom="10dip"
-                    android:progress="0"/>
+                    android:paddingBottom="10dip"/>
             </RelativeLayout>
 
             <TextView android:id="@+id/saturation"
@@ -196,12 +196,12 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     android:progressDrawable="@drawable/seekbar_define_style"
                     android:layout_toRightOf="@id/reduce_saturation"
                     android:layout_toLeftOf="@id/increase_saturation"
-                    android:max="100"
+                    android:max="360"
+                    android:defaultValue="180"
                     android:paddingLeft="20dip"
                     android:paddingTop="10dip"
                     android:paddingRight="20dip"
-                    android:paddingBottom="10dip"
-                    android:progress="0"/>
+                    android:paddingBottom="10dip"/>
             </RelativeLayout>
 
             <TextView android:id="@+id/contrast"
@@ -237,12 +237,12 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     android:progressDrawable="@drawable/seekbar_define_style"
                     android:layout_toRightOf="@id/reduce_contrast"
                     android:layout_toLeftOf="@id/increase_contrast"
-                    android:max="100"
+                    android:max="510"
+                    android:defaultValue="270"
                     android:paddingLeft="20dip"
                     android:paddingTop="10dip"
                     android:paddingRight="20dip"
-                    android:paddingBottom="10dip"
-                    android:progress="0"/>
+                    android:paddingBottom="10dip"/>
             </RelativeLayout>
 
             <TextView android:id="@+id/intensity"
@@ -279,12 +279,12 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     android:progressDrawable="@drawable/seekbar_define_style"
                     android:layout_toRightOf="@id/reduce_intensity"
                     android:layout_toLeftOf="@id/increase_intensity"
-                    android:max="100"
+                    android:max="360"
+                    android:defaultValue="180"
                     android:paddingLeft="20dip"
                     android:paddingTop="10dip"
                     android:paddingRight="20dip"
-                    android:paddingBottom="10dip"
-                    android:progress="0"/>
+                    android:paddingBottom="10dip"/>
             </RelativeLayout>
         </LinearLayout>
 

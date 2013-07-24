@@ -27,6 +27,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 package com.android.settings;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -35,6 +36,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -42,6 +44,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -61,8 +65,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.PopupWindow;
 
+import com.android.display.IPPService;
 
-public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarChangeListener,
+        View.OnClickListener {
     private final static String TAG = "ScreenColorSettings";
 
     private static final int RESTORE_DEFAULT_PREVIEW = 0;
@@ -76,8 +82,12 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private static final String IMAGE_UNSPECIFIED = "image/*";
     private static final String GALLERY_CLASSNAME = "com.android.gallery3d.app.Wallpaper";
     private static final String GALLERY_PACKAGENAME = "com.android.gallery3d";
-    private static final String STRING_KEY ="screencolor_preview_key";
-    private static final String STRING_NAME ="screencolor_preview_name";
+    private static final String PREVIEW_STRING_KEY = "screencolor_preview_key";
+    private static final String PREVIEW_STRING_NAME = "screencolor_preview_name";
+    private static final String COLOR_HUE = "hue";
+    private static final String COLOR_SATURATION = "saturation";
+    private static final String COLOR_INTENSITY = "intensity";
+    private static final String COLOR_CONTRAST = "contrast";
 
     private static final String KEY_ASPECT_X = "aspectX";
     private static final String KEY_ASPECT_Y = "aspectY";
@@ -94,33 +104,53 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private LinearLayout mScreenColorLayout;
     private SeekBar mHBar, mSBar, mCBar, mIBar;
     private TextView mHTv, mSTv, mCTv, mITv;
-    private ImageView mReduceH, mIncreaseH, mReduceS, mIncreaseS, mReduceC,
-            mIncreaseC, mReduceI, mIncreaseI, mUpdown, mMore;
+    private ImageView mReduceH, mIncreaseH, mReduceS, mIncreaseS, mReduceC, mIncreaseC, mReduceI,
+            mIncreaseI, mUpdown, mMore;
     private Button mCancelBtn, mSaveBtn, mPreviousBtn, mNewBtn;
     private boolean canRestorePreview;
+    private int mHueValue = 0;
+    private int mSaturationValue = 0;
+    private int mIntensityValue = 0;
+    private int mContrastValue = 0;
+
+    IPPService mPPService = null;
+    PPServiceConnection mPPServiceConn = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initPPService();
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.screencolor_settings);
         initView();
     }
 
-    private void initView(){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        restoreSavedHSCI(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mPPServiceConn);
+    }
+
+    private void initView() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mRLayout = (RelativeLayout)findViewById(R.id.background_preview);
-        String previewContent = getSharePreferences();
-        if("".equals(previewContent)){
+        mRLayout = (RelativeLayout) findViewById(R.id.background_preview);
+        String previewContent = getScreenColorPreviewKey();
+        if ("".equals(previewContent)) {
             resotreBackgroundByDefault();
-        }else{
+        } else {
             Uri previewUri = Uri.parse(previewContent);
             setBackgroundByUri(previewUri);
         }
 
-        mScreenColorLayout = (LinearLayout)findViewById(R.id.screencolor_control);
+        mScreenColorLayout = (LinearLayout) findViewById(R.id.screencolor_control);
         mScreenColorLayout.setBackgroundColor(R.color.screencolor_background);
         mScreenColorLayout.setOnClickListener(this);
 
@@ -128,39 +158,40 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         mHBar.setOnSeekBarChangeListener(this);
         mSBar = (SeekBar) findViewById(R.id.scontrol);
         mSBar.setOnSeekBarChangeListener(this);
-        mCBar = (SeekBar) findViewById(R.id.ccontrol);
-        mCBar.setOnSeekBarChangeListener(this);
         mIBar = (SeekBar) findViewById(R.id.icontrol);
         mIBar.setOnSeekBarChangeListener(this);
+        mCBar = (SeekBar) findViewById(R.id.ccontrol);
+        mCBar.setOnSeekBarChangeListener(this);
 
         mHTv = (TextView) findViewById(R.id.hue);
         mHTv.setText(getString(R.string.hue_str, mHBar.getProgress()));
         mSTv = (TextView) findViewById(R.id.saturation);
         mSTv.setText(getString(R.string.saturation_str, mSBar.getProgress()));
-        mCTv = (TextView) findViewById(R.id.contrast);
-        mCTv.setText(getString(R.string.contrast_str, mCBar.getProgress()));
         mITv = (TextView) findViewById(R.id.intensity);
         mITv.setText(getString(R.string.intensity_str, mIBar.getProgress()));
+        mCTv = (TextView) findViewById(R.id.contrast);
+        mCTv.setText(getString(R.string.contrast_str, mCBar.getProgress()));
 
-        mReduceH = (ImageView)findViewById(R.id.reduce_hue);
+        mReduceH = (ImageView) findViewById(R.id.reduce_hue);
         mReduceH.setOnClickListener(this);
-        mIncreaseH = (ImageView)findViewById(R.id.increase_hue);
+        mIncreaseH = (ImageView) findViewById(R.id.increase_hue);
         mIncreaseH.setOnClickListener(this);
-        mReduceS = (ImageView)findViewById(R.id.reduce_saturation);
+        mReduceS = (ImageView) findViewById(R.id.reduce_saturation);
         mReduceS.setOnClickListener(this);
-        mIncreaseS = (ImageView)findViewById(R.id.increase_saturation);
+        mIncreaseS = (ImageView) findViewById(R.id.increase_saturation);
         mIncreaseS.setOnClickListener(this);
-        mReduceC = (ImageView)findViewById(R.id.reduce_contrast);
-        mReduceC.setOnClickListener(this);
-        mIncreaseC = (ImageView)findViewById(R.id.increase_contrast);
-        mIncreaseC.setOnClickListener(this);
-        mReduceI = (ImageView)findViewById(R.id.reduce_intensity);
+        mReduceI = (ImageView) findViewById(R.id.reduce_intensity);
         mReduceI.setOnClickListener(this);
-        mIncreaseI = (ImageView)findViewById(R.id.increase_intensity);
+        mIncreaseI = (ImageView) findViewById(R.id.increase_intensity);
         mIncreaseI.setOnClickListener(this);
-        mUpdown = (ImageView)findViewById(R.id.up_down);
+        mReduceC = (ImageView) findViewById(R.id.reduce_contrast);
+        mReduceC.setOnClickListener(this);
+        mIncreaseC = (ImageView) findViewById(R.id.increase_contrast);
+        mIncreaseC.setOnClickListener(this);
+
+        mUpdown = (ImageView) findViewById(R.id.up_down);
         mUpdown.setOnClickListener(this);
-        mMore = (ImageView)findViewById(R.id.more);
+        mMore = (ImageView) findViewById(R.id.more);
         mMore.setOnClickListener(this);
 
         mPreviousBtn = (Button) findViewById(R.id.previous_btn);
@@ -175,9 +206,48 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         initBtnsStatus();
     }
 
+    private void initPPService() {
+        mPPServiceConn = new PPServiceConnection();
+        Intent i = new Intent(IPPService.class.getName());
+        boolean ret = bindService(i, mPPServiceConn, Context.BIND_AUTO_CREATE);
+    }
+
+    private class PPServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mPPService = IPPService.Stub.asInterface((IBinder) service);
+            Log.d(TAG, "onServiceConnected, service=" + mPPService);
+            try {
+                if (null != mPPService) {
+                    mPPService.startPP();
+                    restoreSavedHSCI(true);
+                }
+            } catch (RemoteException e) {
+                Log.e(TAG, "startPP exception");
+            }
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            if (null != mPPService) {
+                // end thread
+                try {
+                    Log.d(TAG, "stopPP");
+                    mPPService.stopPP();
+                } catch (RemoteException e) {
+                    Log.e(TAG, "stopPP exception");
+                }
+            }
+            mPPService = null;
+        }
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK){
+        if (resultCode != RESULT_OK) {
             Log.i(TAG, "bail due to resultCode=" + resultCode);
             return;
         }
@@ -192,7 +262,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(SELECT_FILE_GROUP1, SELECT_FILE_ITEM, SELECT_FILE_ORDER, R.string.selectfile_menu);
+        menu.add(SELECT_FILE_GROUP1, SELECT_FILE_ITEM, SELECT_FILE_ORDER,
+                R.string.selectfile_menu);
         menu.add(SELECT_FILE_GROUP1, RESET, SELECT_FILE_ORDER, R.string.restore_default_str);
         menu.add(SELECT_FILE_GROUP2, RESTORE_DEFAULT_PREVIEW, SELECT_FILE_ORDER,
                 R.string.restore_preview);
@@ -216,7 +287,7 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;
@@ -243,31 +314,49 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         int id = seekBar.getId();
         switch (id) {
             case R.id.hcontrol:
-                mHTv.setText(getString(R.string.hue_str, progress));
+                mHueValue = progress;
+                mHTv.setText(getString(R.string.hue_str, progress - 180));
                 break;
             case R.id.scontrol:
-                mSTv.setText(getString(R.string.saturation_str, mSBar.getProgress()));
+                mSaturationValue = progress;
+                mSTv.setText(getString(R.string.saturation_str,
+                        ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
                 break;
             case R.id.ccontrol:
-                mCTv.setText(getString(R.string.contrast_str, mCBar.getProgress()));
+                mContrastValue = progress;
+                mCTv.setText(getString(R.string.contrast_str, progress - 255));
                 break;
             case R.id.icontrol:
-                mITv.setText(getString(R.string.intensity_str, mIBar.getProgress()));
+                mIntensityValue = progress;
+                mITv.setText(getString(R.string.intensity_str,
+                        ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
                 break;
             default:
                 break;
+
+        }
+        Log.i(TAG, "onProgressChanged mHueValue=" + mHueValue + " mSaturationValue="
+                + mSaturationValue + " mNewContrastValue=" + mContrastValue + " mIntensityValue="
+                + mIntensityValue);
+        try {
+            if (null != mPPService && mPPService.getPPStatus()) {
+                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue,
+                                     mContrastValue);
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "updateHSIC exception");
         }
     }
 
     public void onStartTrackingTouch(SeekBar seekBar) {
-        setActivated(seekBar,true);
+        setActivated(seekBar, true);
     }
 
     public void onStopTrackingTouch(SeekBar seekBar) {
-        setActivated(seekBar,false);
+        setActivated(seekBar, false);
     }
 
-    private void setActivated(SeekBar seekBar, boolean isActivated){
+    private void setActivated(SeekBar seekBar, boolean isActivated) {
         int id = seekBar.getId();
         switch (id) {
             case R.id.hcontrol:
@@ -278,20 +367,25 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 mReduceS.setActivated(isActivated);
                 mIncreaseS.setActivated(isActivated);
                 break;
-            case R.id.ccontrol:
-                mReduceC.setActivated(isActivated);
-                mIncreaseC.setActivated(isActivated);
-                break;
             case R.id.icontrol:
                 mReduceI.setActivated(isActivated);
                 mIncreaseI.setActivated(isActivated);
+                break;
+            case R.id.ccontrol:
+                mReduceC.setActivated(isActivated);
+                mIncreaseC.setActivated(isActivated);
                 break;
             default:
                 break;
         }
 
     }
-
+/*
+   Hue          -> Valid from 0 to 360
+   Saturation   -> Valid from 0 to 360
+   Intensity    -> Valid from 0 to 510
+   Contrast     -> Valid from 0 to 360
+*/
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
@@ -314,35 +408,35 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 showMoreMenus();
                 break;
             case R.id.reduce_hue:
-                mHBar.setProgress(( mHBar.getProgress() - 1 > 0 ) ? ( mHBar.getProgress() - 1 ) : 0 );
+                mHBar.setProgress((mHueValue - 1 > 0) ? (mHueValue - 1) : 0);
                 break;
             case R.id.increase_hue:
-                mHBar.setProgress(( mHBar.getProgress() + 1 < 100 ) ? ( mHBar.getProgress() + 1 ) : 100 );
+                mHBar.setProgress((mHueValue + 1 < 360) ? (mHueValue + 1) : 360);
                 break;
             case R.id.reduce_saturation:
-                mSBar.setProgress(( mSBar.getProgress() - 1 > 0 ) ? ( mSBar.getProgress() - 1 ) : 0 );
+                mSBar.setProgress((mSaturationValue - 1 > 0) ? (mSaturationValue - 1) : 0);
                 break;
             case R.id.increase_saturation:
-                mSBar.setProgress(( mSBar.getProgress() + 1 < 100 ) ? ( mSBar.getProgress() + 1 ) : 100 );
-                break;
-            case R.id.reduce_contrast:
-                mCBar.setProgress(( mCBar.getProgress() - 1 > 0 ) ? ( mCBar.getProgress() - 1 ) : 0 );
-                break;
-            case R.id.increase_contrast:
-                mCBar.setProgress(( mCBar.getProgress() + 1 < 100 ) ? ( mCBar.getProgress() + 1 ) : 100 );
+                mSBar.setProgress((mSaturationValue + 1 < 360) ? (mSaturationValue + 1) : 360);
                 break;
             case R.id.reduce_intensity:
-                mIBar.setProgress(( mIBar.getProgress() - 1 > 0 ) ? ( mIBar.getProgress() - 1 ) : 0 );
+                mIBar.setProgress((mIntensityValue - 1 > 0) ? (mIntensityValue - 1) : 0);
                 break;
             case R.id.increase_intensity:
-                mIBar.setProgress(( mIBar.getProgress() + 1 < 100 ) ? ( mIBar.getProgress() + 1 ) : 100 );
+                mIBar.setProgress((mIntensityValue + 1 < 510) ? (mIntensityValue + 1) : 510);
+                break;
+            case R.id.reduce_contrast:
+                mCBar.setProgress((mContrastValue - 1 > 0) ? (mContrastValue - 1) : 0);
+                break;
+            case R.id.increase_contrast:
+                mCBar.setProgress((mContrastValue + 1 < 360) ? (mContrastValue + 1) : 360);
                 break;
             default:
                 break;
         }
     }
 
-    private void selectPicFromGallery2(){
+    private void selectPicFromGallery2() {
         Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
         intent.setComponent(new ComponentName(GALLERY_PACKAGENAME, GALLERY_CLASSNAME));
         Bundle bundle = new Bundle();
@@ -353,20 +447,62 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         bundle.putFloat(KEY_SPOTLIGHT_Y, SPOTLIGHT_Y);
         // send true to set CropImage view's title is not set wallpaper.
         bundle.putBoolean(KEY_FROME_SCREENCOLOR, true);
-        intent.putExtras( bundle );
-        startActivityForResult(intent,REQUEST_SELECT_FILE);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, REQUEST_SELECT_FILE);
     }
 
-    private void restoreDefaultHSCI(){
+    private void restoreDefaultHSCI() {
         // TODO restore default HSCI values.
         mHBar.setProgress(0);
         mSBar.setProgress(0);
-        mCBar.setProgress(0);
         mIBar.setProgress(0);
+        mCBar.setProgress(0);
         setNewBtnHighlight();
     }
 
-    private void setNewBtnHighlight(){
+    private void restoreSavedHSCI(boolean setProgress) {
+        SharedPreferences share = getSharedPreferences(PREVIEW_STRING_NAME,
+                Context.MODE_WORLD_WRITEABLE);
+        int hueValue = share.getInt(COLOR_HUE, 0);
+        int saturationValue = share.getInt(COLOR_SATURATION, 0);
+        int intensityValue = share.getInt(COLOR_INTENSITY, 0);
+        int contrastValue = share.getInt(COLOR_CONTRAST, 0);
+        if (setProgress) {
+            mHBar.setProgress(hueValue);
+            mSBar.setProgress(saturationValue);
+            mIBar.setProgress(intensityValue);
+            mCBar.setProgress(contrastValue);
+        }
+        Log.i(TAG, "restoreSavedHSCI hueValue=" + hueValue + " saturationValue=" + saturationValue
+                + " contrastValue=" + contrastValue + " intensityValue=" + intensityValue);
+        try {
+            if (null != mPPService && mPPService.getPPStatus()) {
+                mPPService.updateHSIC(hueValue, saturationValue, intensityValue, contrastValue);
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "updateHSIC exception");
+        }
+    }
+
+    private void previewNewHSIC() {
+        mHBar.setProgress(mHueValue);
+        mSBar.setProgress(mSaturationValue);
+        mIBar.setProgress(mIntensityValue);
+        mCBar.setProgress(mContrastValue);
+        Log.i(TAG, "previewNewHSIC mHueValue=" + mHueValue + " mSaturationValue="
+                + mSaturationValue + " mContrastValue=" + mContrastValue + " mIntensityValue="
+                + mIntensityValue);
+        try {
+            if (null != mPPService && mPPService.getPPStatus()) {
+                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue,
+                        mContrastValue);
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "updateHSIC exception");
+        }
+    }
+
+    private void setNewBtnHighlight() {
         mPreviousBtn.setBackgroundResource(R.drawable.ic_previous_default);
         mNewBtn.setBackgroundResource(R.drawable.ic_new_glow);
         mPreviousBtn.setEnabled(true);
@@ -374,7 +510,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         mSaveBtn.setEnabled(true);
 
     }
-    private void initBtnsStatus(){
+
+    private void initBtnsStatus() {
         mPreviousBtn.setBackgroundResource(R.drawable.ic_previous_dis);
         mNewBtn.setBackgroundResource(R.drawable.ic_new_dis);
         mPreviousBtn.setEnabled(false);
@@ -382,80 +519,92 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         mSaveBtn.setEnabled(false);
     }
 
-    private void previousOrNewHSCI(boolean isPrevious){
-        if(View.GONE != mScreenColorLayout.getVisibility()){
+    private void previousOrNewHSCI(boolean isPrevious) {
+        if (View.GONE != mScreenColorLayout.getVisibility()) {
             mScreenColorLayout.setVisibility(View.GONE);
             mUpdown.setBackgroundResource(R.drawable.up_button);
         }
-        if(isPrevious){
+        if (isPrevious) {
             mPreviousBtn.setBackgroundResource(R.drawable.ic_previous_glow);
             mNewBtn.setBackgroundResource(R.drawable.ic_new_default);
             mUpdown.setVisibility(View.GONE);
             mMore.setVisibility(View.GONE);
-            // TODO show previous HSCI values.
-        }else{
+            restoreSavedHSCI(false);
+        } else {
             mPreviousBtn.setBackgroundResource(R.drawable.ic_previous_default);
             mNewBtn.setBackgroundResource(R.drawable.ic_new_glow);
             mUpdown.setVisibility(View.VISIBLE);
             mMore.setVisibility(View.VISIBLE);
-            // TODO show new HSCI values.
+            previewNewHSIC();
         }
     }
 
-    private void saveHSCI(){
+    private void saveHSCI() {
         // TODO save HSCI values.
+        saveHSICPreference(mHueValue, mSaturationValue, mIntensityValue, mContrastValue);
         finish();
     }
 
-    private void changePreviewByData(Intent data){
+    private void changePreviewByData(Intent data) {
         if (data != null) {
             Uri uri = data.getData();
             setBackgroundByUri(uri);
-            saveSharePreferences(uri.toString());
+            savePreviewKey(uri.toString());
         }
     }
 
-    private void setBackgroundByUri(Uri uri){
+    private void setBackgroundByUri(Uri uri) {
         try {
             InputStream is = getContentResolver().openInputStream(uri);
             Bitmap bm = BitmapFactory.decodeStream(is);
-            BitmapDrawable bd=new BitmapDrawable(bm);
+            BitmapDrawable bd = new BitmapDrawable(bm);
             mRLayout.setBackgroundDrawable(bd);
         } catch (FileNotFoundException e) {
         }
         canRestorePreview = true;
     }
 
-    private void resotreBackgroundByDefault(){
+    private void resotreBackgroundByDefault() {
         mRLayout.setBackgroundResource(R.drawable.default_screencolor_setting);
-        saveSharePreferences("");
+        savePreviewKey("");
         canRestorePreview = false;
     }
 
-    //use sharepreference to save preview image.
-    private void saveSharePreferences(String value){
-        SharedPreferences share = getSharedPreferences(STRING_NAME, Context.MODE_PRIVATE);
+    // use sharepreference to save preview image.
+    private void savePreviewKey(String value) {
+        SharedPreferences share = getSharedPreferences(PREVIEW_STRING_NAME, Context.MODE_PRIVATE);
         Editor editor = share.edit();
-        editor.putString(STRING_KEY, value);
+        editor.putString(PREVIEW_STRING_KEY, value);
         editor.commit();
     }
 
-    private String getSharePreferences(){
-        SharedPreferences share = getSharedPreferences(STRING_NAME, Context.MODE_WORLD_WRITEABLE|Context.MODE_WORLD_READABLE);
-        return share.getString(STRING_KEY, "");
+    private void saveHSICPreference(int h, int s, int i, int c) {
+        SharedPreferences share = getSharedPreferences(PREVIEW_STRING_NAME, Context.MODE_PRIVATE);
+        Editor editor = share.edit();
+        editor.putInt(COLOR_HUE, h);
+        editor.putInt(COLOR_SATURATION, s);
+        editor.putInt(COLOR_INTENSITY, i);
+        editor.putInt(COLOR_CONTRAST, c);
+        editor.commit();
     }
 
-    private void upDownHSCISettingLayout(){
-        if(View.GONE != mScreenColorLayout.getVisibility()){
+    private String getScreenColorPreviewKey() {
+        SharedPreferences share = getSharedPreferences(PREVIEW_STRING_NAME,
+                Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
+        return share.getString(PREVIEW_STRING_KEY, "");
+    }
+
+    private void upDownHSCISettingLayout() {
+        if (View.GONE != mScreenColorLayout.getVisibility()) {
             mScreenColorLayout.setVisibility(View.GONE);
             mUpdown.setBackgroundResource(R.drawable.up_button);
-        }else{
+        } else {
             mScreenColorLayout.setVisibility(View.VISIBLE);
             mUpdown.setBackgroundResource(R.drawable.down_button);
         }
     }
 
-    private void showMoreMenus(){
+    private void showMoreMenus() {
         PopupMenu popup = new PopupMenu(ScreenColorSettings.this, mMore);
         Menu menu = popup.getMenu();
         popup.getMenuInflater().inflate(R.menu.screencolor_more, menu);
