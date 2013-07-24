@@ -22,6 +22,10 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.os.Bundle;
+import android.app.Activity;
 
 import com.android.settings.R;
 
@@ -118,14 +122,46 @@ final class Utils {
         LocalBluetoothManager manager = LocalBluetoothManager.getInstance(context);
         Context activity = manager.getForegroundActivity();
         if(manager.isForegroundActivity()) {
-            new AlertDialog.Builder(activity)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(R.string.bluetooth_error_title)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
+            DialogFragment errFragment = AlertErrorDialogFragment.newInstance(context, name, messageResId);
+            errFragment.show(((Activity) activity).getFragmentManager(), "dialog");
         } else {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
     }
+    public static class AlertErrorDialogFragment extends DialogFragment {
+        static String nameStr;
+        static int messageResId;
+        static Context mContext;
+        public static AlertErrorDialogFragment newInstance(Context context, String name, int msgId) {
+            AlertErrorDialogFragment frag = new AlertErrorDialogFragment();
+            mContext = context;
+            nameStr=name;
+            messageResId=msgId;
+            return frag;
+        }
+        @Override
+        public void onPause()
+        {
+            dismiss();
+            super.onPause();
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            String message = mContext.getString(messageResId, nameStr);
+            LocalBluetoothManager manager = LocalBluetoothManager.getInstance(mContext);
+            Context activity = manager.getForegroundActivity();
+            AlertDialog.Builder builder= new AlertDialog.Builder(activity);
+            builder.setIcon(android.R.drawable.ic_dialog_alert);
+            builder.setTitle(R.string.bluetooth_error_title);
+            builder.setMessage(message);
+            builder.setPositiveButton(android.R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                    }
+                });
+            return builder.create();
+       }
+   }
 }
