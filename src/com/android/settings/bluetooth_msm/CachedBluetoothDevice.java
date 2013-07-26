@@ -357,13 +357,26 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         }
         if (mDevice != null) {
             if("LE".equals(mType)) {
-                boolean result = false;
-                if(!isDevConnected) {
-                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                    adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
-                    isDevConnected = true;
-                    Log.d(TAG, "gattAutoConnect called");
-                 }
+                boolean isHogpDevice = false;
+                if(mUuids != null) {
+                    String[] srvUuids = mUuids.split(",");
+                    for(int i=0; i<srvUuids.length; i++) {
+                        if(srvUuids[i].equalsIgnoreCase("00001812-0000-1000-8000-00805f9b34fb")) {
+                            isHogpDevice = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(isHogpDevice) {
+                    Log.d(TAG, "HOGP device auto connect");
+                    boolean result = false;
+                    if(!isDevConnected) {
+                        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                        adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
+                        isDevConnected = true;
+                    }
+                }
             }
             else
                mDevice.createBond();
@@ -563,10 +576,25 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
 
     private boolean updateProfiles() {
         ParcelUuid[] uuids = mDevice.getUuids();
-        if (uuids == null) return false;
+        if (uuids == null) {
+            Log.v(TAG, "uuids is null");
+            if(mUuids == null) {
+                Log.v(TAG, "mUuids is null");
+                return false;
+            }
+            //Get the uuid from mUuids obtained from ACTION_FOUND intent
+            Log.d(TAG, "Obtaining UUIDS from ACTION FOUND intent::"+mUuids);
+            String[] srvUuids = mUuids.split(",");
+            uuids = new ParcelUuid[srvUuids.length];
+            for(int i=0; i<srvUuids.length; i++) {
+                uuids[i] = ParcelUuid.fromString(srvUuids[i]);
+            }
+        }
 
         ParcelUuid[] localUuids = mLocalAdapter.getUuids();
-        if (localUuids == null) return false;
+        if (localUuids == null) {
+            return false;
+        }
 
         if (mProfileManager == null) {
             Log.e(TAG, "ProfileManager is null");
