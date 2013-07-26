@@ -296,4 +296,13 @@
         <item>"Suscripción 2"</item>
         <item>"Apuntar Usuario"</item>
     </string-array>
+    <!-- Wi-Fi AP settings.  The type of security a Wi-Fi AP supports. -->
+    <!-- Note that adding/removing/moving the items will need wifi settings code change. -->
+    <string-array name="wifi_ap_security" translatable="false">
+        <item>Abierta</item>
+        <!-- Do not translate. -->
+        <item>WPA PSK</item>
+        <!-- Do not translate. -->
+        <item>WPA2 PSK</item>
+    </string-array>
 </resources>
