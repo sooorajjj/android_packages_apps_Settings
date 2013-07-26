@@ -113,6 +113,10 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private int mIntensityValue = 0;
     private int mContrastValue = 0;
 
+    /**
+     * The Service runs in vendor/qcom/proprietary/mm-core directory.
+     *  It is used to update the screen's hue, saturation, contrast, and intensity.
+     */
     IPPService mPPService = null;
     PPServiceConnection mPPServiceConn = null;
 
@@ -315,19 +319,23 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         switch (id) {
             case R.id.hcontrol:
                 mHueValue = progress;
+                //The screen hue display value varies from -180 to 180.
                 mHTv.setText(getString(R.string.hue_str, progress - 180));
                 break;
             case R.id.scontrol:
                 mSaturationValue = progress;
+                //Change the saturation display value varies from (-180, 180) to (-1.0, 1.0).
                 mSTv.setText(getString(R.string.saturation_str,
                         ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
                 break;
             case R.id.ccontrol:
                 mContrastValue = progress;
+                //The screen contrast display value varies from -255 to 255.
                 mCTv.setText(getString(R.string.contrast_str, progress - 255));
                 break;
             case R.id.icontrol:
                 mIntensityValue = progress;
+                //Change the intensity display value varies from (-180, 180) to (-1.0, 1.0).
                 mITv.setText(getString(R.string.intensity_str,
                         ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
                 break;
@@ -380,14 +388,24 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         }
 
     }
-/*
-   Hue          -> Valid from 0 to 360
-   Saturation   -> Valid from 0 to 360
-   Intensity    -> Valid from 0 to 510
-   Contrast     -> Valid from 0 to 360
-*/
+
     public void onClick(View v) {
         int id = v.getId();
+        /**
+         * Hue  -> Valid from 0 to 360
+         * Saturation -> Valid from 0 to 360
+         * Intensity  -> Valid from 0 to 510
+         * Contrast  -> Valid from 0 to 360
+         */
+        int minHueValue = getResources().getInteger(R.integer.minimum_hue_value);
+        int maxHueValue = getResources().getInteger(R.integer.maximum_hue_value);
+        int minSaturationValue = getResources().getInteger(R.integer.minimum_saturation_value);
+        int maxSaturationValue = getResources().getInteger(R.integer.maximum_saturation_value);
+        int minIntensityValue = getResources().getInteger(R.integer.minimum_intensity_value);
+        int maxIntensityValue = getResources().getInteger(R.integer.maximum_intensity_value);
+        int minContrastValue = getResources().getInteger(R.integer.minimum_contrast_value);
+        int maxContrastValue = getResources().getInteger(R.integer.maximum_contrast_value);
+
         switch (id) {
             case R.id.cancel:
                 finish();
@@ -408,28 +426,34 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 showMoreMenus();
                 break;
             case R.id.reduce_hue:
-                mHBar.setProgress((mHueValue - 1 > 0) ? (mHueValue - 1) : 0);
+                mHBar.setProgress((mHueValue - 1 > minHueValue) ? (mHueValue - 1) : minHueValue);
                 break;
             case R.id.increase_hue:
-                mHBar.setProgress((mHueValue + 1 < 360) ? (mHueValue + 1) : 360);
+                mHBar.setProgress((mHueValue + 1 < maxHueValue) ? (mHueValue + 1) : maxHueValue);
                 break;
             case R.id.reduce_saturation:
-                mSBar.setProgress((mSaturationValue - 1 > 0) ? (mSaturationValue - 1) : 0);
+                mSBar.setProgress((mSaturationValue - 1 > minSaturationValue) ?
+                    (mSaturationValue - 1) : minSaturationValue);
                 break;
             case R.id.increase_saturation:
-                mSBar.setProgress((mSaturationValue + 1 < 360) ? (mSaturationValue + 1) : 360);
+                mSBar.setProgress((mSaturationValue + 1 < maxSaturationValue) ?
+                    (mSaturationValue + 1) : maxSaturationValue);
                 break;
             case R.id.reduce_intensity:
-                mIBar.setProgress((mIntensityValue - 1 > 0) ? (mIntensityValue - 1) : 0);
+                mIBar.setProgress((mIntensityValue - 1 > minIntensityValue) ?
+                    (mIntensityValue - 1) : minIntensityValue);
                 break;
             case R.id.increase_intensity:
-                mIBar.setProgress((mIntensityValue + 1 < 510) ? (mIntensityValue + 1) : 510);
+                mIBar.setProgress((mIntensityValue + 1 < maxIntensityValue) ?
+                    (mIntensityValue + 1) : maxIntensityValue);
                 break;
             case R.id.reduce_contrast:
-                mCBar.setProgress((mContrastValue - 1 > 0) ? (mContrastValue - 1) : 0);
+                mCBar.setProgress((mContrastValue - 1 > minContrastValue) ?
+                    (mContrastValue - 1) : minContrastValue);
                 break;
             case R.id.increase_contrast:
-                mCBar.setProgress((mContrastValue + 1 < 360) ? (mContrastValue + 1) : 360);
+                mCBar.setProgress((mContrastValue + 1 < maxContrastValue) ?
+                    (mContrastValue + 1) : maxContrastValue);
                 break;
             default:
                 break;
