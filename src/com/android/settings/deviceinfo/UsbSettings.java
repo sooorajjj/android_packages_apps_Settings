@@ -158,22 +158,22 @@ public class UsbSettings extends SettingsPreferenceFragment {
             final boolean isExternalPath = (Environment.getExternalStorageDirectory().getPath()
                     .equals(path));
             if (newState.equals(Environment.MEDIA_SHARED)) {
-                if (isExternalPath) {
+               // if (isExternalPath) {
                     Toast.makeText(getActivity(), R.string.external_storage_turn_on,
                             Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), R.string.internal_storage_turn_on,
-                            Toast.LENGTH_SHORT).show();
-                }
+              //  } else {
+               //     Toast.makeText(getActivity(), R.string.internal_storage_turn_on,
+               //             Toast.LENGTH_SHORT).show();
+              //  }
             } else if (oldState.equals(Environment.MEDIA_SHARED)
                     && newState.equals(Environment.MEDIA_UNMOUNTED)) {
-                if (isExternalPath) {
+               // if (isExternalPath) {
                    Toast.makeText(getActivity(), R.string.external_storage_turn_off,
                             Toast.LENGTH_SHORT).show();
-                } else {
-                   Toast.makeText(getActivity(), R.string.internal_storage_turn_off,
-                            Toast.LENGTH_SHORT).show();
-                }
+              //  } else {
+            //       Toast.makeText(getActivity(), R.string.internal_storage_turn_off,
+              //              Toast.LENGTH_SHORT).show();
+            //    }
             }
 
 	    if(newState.equals(Environment.MEDIA_BAD_REMOVAL) ||newState.equals(Environment.MEDIA_REMOVED) ||newState.equals(Environment.MEDIA_MOUNTED) )
