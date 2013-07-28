@@ -355,9 +355,9 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if (mLocalAdapter.isDiscovering()) {
             mLocalAdapter.cancelDiscovery();
         }
+        boolean isHogpDevice = false;
         if (mDevice != null) {
             if("LE".equals(mType)) {
-                boolean isHogpDevice = false;
                 if(mUuids != null) {
                     String[] srvUuids = mUuids.split(",");
                     for(int i=0; i<srvUuids.length; i++) {
@@ -367,15 +367,15 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
                         }
                     }
                 }
+            }
 
-                if(isHogpDevice) {
-                    Log.d(TAG, "HOGP device auto connect");
-                    boolean result = false;
-                    if(!isDevConnected) {
-                        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                        adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
-                        isDevConnected = true;
-                    }
+            if(isHogpDevice) {
+                Log.d(TAG, "HOGP device auto connect");
+                boolean result = false;
+                if(!isDevConnected) {
+                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                    adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
+                    isDevConnected = true;
                 }
             }
             else
