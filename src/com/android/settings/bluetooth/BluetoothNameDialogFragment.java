@@ -52,7 +52,7 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
 
     // accessed from inner class (not private to avoid thunks)
     static final String TAG = "BluetoothNameDialogFragment";
-    final LocalBluetoothAdapter mLocalAdapter;
+    private LocalBluetoothAdapter mLocalAdapter = null;
     EditText mDeviceNameView;
 
     // This flag is set when the name is updated by code, to distinguish from user changes
@@ -79,13 +79,11 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
         }
     };
 
-    public BluetoothNameDialogFragment() {
-        LocalBluetoothManager localManager = LocalBluetoothManager.getInstance(getActivity());
-        mLocalAdapter = localManager.getBluetoothAdapter();
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LocalBluetoothManager localManager = LocalBluetoothManager.getInstance(getActivity());
+        mLocalAdapter = localManager.getBluetoothAdapter();
         String deviceName = mLocalAdapter.getName();
         if (savedInstanceState != null) {
             deviceName = savedInstanceState.getString(KEY_NAME, deviceName);
