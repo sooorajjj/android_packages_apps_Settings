@@ -1992,7 +1992,6 @@
     <string name="selectnewfile_menu">从图库选择文件预览</string>
     <string name="selectfile_menu">从图库选择文件预览</string>
     <string name="restore_preview">恢复默认预览图片</string>
-
     <!-- modify for usb settings start -->
     <string name="usb_sdcard_title">挂载SD 卡</string>
     <string name="usb_sdcard_summary">"让您在 Windows 上传输SD 卡上的媒体文件"</string>
@@ -2003,4 +2002,6 @@
     <string name="external_storage_turn_on">"外部存储器已打开"</string>
     <string name="external_storage_turn_off">"外部存储器已关闭"</string>
     <!-- modify for usb settings end  -->
+    <string name="enhanced_brightness_summary">"通常用于在播放视频过程中，提升视频的质量，以及节约更多的电量"</string>
+    <string name="enhanced_brightness">"动态背景光"</string>
 </resources>
