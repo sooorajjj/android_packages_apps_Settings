@@ -260,8 +260,9 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     }
 
     private String getMultiSimName(int subscription) {
-        if (subscription == ALWAYS_ASK) {
-            return getResources().getString(R.string.select_slot_always_ask);
+        //the last one take it as always ask
+        if (subscription == MSimTelephonyManager.getDefault().getPhoneCount()) {
+            return getResources().getString(R.string.prompt_user);
         } else {
             return System.getString(getContentResolver(), System.MULTI_SIM_NAME[subscription]);
         }
