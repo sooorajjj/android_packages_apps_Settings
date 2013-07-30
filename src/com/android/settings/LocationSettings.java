@@ -17,9 +17,11 @@
 package com.android.settings;
 
 
+import android.app.AlertDialog;
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.LocationManager;
@@ -198,10 +200,18 @@ public class LocationSettings extends SettingsPreferenceFragment
         updateLocationToggles();
     }
 
+    /**
+     * When the user turn on location access, pop up a dialog to let user choose
+     * whether allow Google service collect user location data.
+     */
     @Override
     public boolean onPreferenceChange(Preference pref, Object newValue) {
+        final boolean chooseValue = (Boolean) newValue;
         if (pref.getKey().equals(KEY_LOCATION_TOGGLE)) {
-            onToggleLocationAccess((Boolean) newValue);
+            if (!chooseValue) {
+                updateGoogleServiceAccess(false);
+            }
+            onToggleLocationAccess(chooseValue);
         }
         return true;
     }
@@ -210,6 +220,17 @@ public class LocationSettings extends SettingsPreferenceFragment
     public int getHelpResource() {
         return R.string.help_url_location_access;
     }
+
+    /**
+     * Enable or disable google service to collect anonymous location data.
+     */
+    private void updateGoogleServiceAccess(boolean newValue) {
+        ContentResolver cr = getContentResolver();
+        Settings.Secure.setLocationProviderEnabled(cr,
+                LocationManager.NETWORK_PROVIDER, newValue);
+        mNetwork.setChecked(newValue);
+    }
+
 }
 
 class WrappingSwitchPreference extends SwitchPreference {

@@ -2397,6 +2397,11 @@
     <string name="location_access_summary">Let apps that have asked your permission use your location information</string>
     <!-- [CHAR LIMIT=45] Section heading for location sources -->
     <string name="location_sources_heading">Location sources</string>
+    <string name="location_access_google_service_title">Location consent</string>
+    <string name="location_access_google_service_text">Allow Google\'s location service to collect anonymous location data.
+    Some data may be stored on your device. Collection may occur even when no apps are running.</string>
+    <string name="location_access_google_service_agree">Agree</string>
+    <string name="location_access_google_service_disagree">Disagree</string>
 
     <!-- About --> <skip />
     <!-- Main settings screen, setting title for the user to go into the About phone screen -->
