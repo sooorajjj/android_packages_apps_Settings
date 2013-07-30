@@ -1042,6 +1042,9 @@
     <!-- Message when bluetooth dialog for pin entry is showing. [CHAR LIMIT=NONE] -->
     <string name="bluetooth_enter_pin_msg">To pair with:<xliff:g id="bold">&lt;br>&lt;b></xliff:g><xliff:g id="device_name">%1$s</xliff:g><xliff:g id="end_bold">&lt;/b>&lt;br>&lt;br></xliff:g>Type the device\'s required PIN:</string>
 
+    <!-- Message when bluetooth dialog for pin entry is showing  when HIGH security enabled-->
+    <string name="bluetooth_enter_pin_msg_hs">\nType PIN to pair with \u0022<xliff:g id="device_name">%1$s</xliff:g>\u0022. [High Security Enabled: Needs 16 character key] </string>
+
     <!-- Message when bluetooth dialog for passkey entry is showing. [CHAR LIMIT=NONE] -->
     <string name="bluetooth_enter_passkey_msg">To pair with:<xliff:g id="bold">&lt;br>&lt;b></xliff:g><xliff:g id="device_name">%1$s</xliff:g><xliff:g id="end_bold">&lt;/b>&lt;br>&lt;br></xliff:g>Type the device\'s required passkey:</string>
 
@@ -1132,7 +1135,8 @@
     <string name="bluetooth_profile_pan">Internet access</string>
     <!-- Bluetooth settings. The user-visible string that is used whenever referring to the PAN profile (sharing this device's Internet connection). [CHAR LIMIT=40]-->
     <string name="bluetooth_profile_pan_nap">Internet connection sharing</string>
-
+    <!-- Bluetooth settings.  The user-visible string that is used whenever referring to the SAP profile. -->
+    <string name="bluetooth_profile_sap">SIM Access</string>
     <!-- Bluetooth settings.  Message for disconnecting from the A2DP profile. [CHAR LIMIT=80] -->
     <string name="bluetooth_disconnect_a2dp_profile"><xliff:g id="device_name">%1$s</xliff:g> will be disconnected from media audio.</string>
     <!-- Bluetooth settings.  Message for disconnecting from the headset profile. [CHAR LIMIT=80] -->
@@ -1164,6 +1168,8 @@
     <string name="bluetooth_headset_profile_summary_connected">Connected to phone audio</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the OPP checkbox preference when OPP is connected. -->
     <string name="bluetooth_opp_profile_summary_connected">Connected to file transfer server</string>
+    <!-- Bluetooth settings.  Connection options screen.  The summary for the SAP checkbox preference when SAP is connected. -->
+    <string name="bluetooth_sap_profile_summary_connected">Connected to SIM Access Server</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the OPP checkbox preference when OPP is not connected. -->
     <string name="bluetooth_opp_profile_summary_not_connected">Not connected to file transfer server</string>
     <!-- Bluetooth settings. Connection options screen. The summary for the HID checkbox preference when HID is connected. -->
@@ -1179,6 +1185,8 @@
     <string name="bluetooth_headset_profile_summary_use_for">Use for phone audio</string>
     <!-- Bluetooth settings.  Connection options screen.  The summary for the OPP checkbox preference that describes how checking it will set the OPP profile as preferred. -->
     <string name="bluetooth_opp_profile_summary_use_for">Use for file transfer</string>
+    <!-- Bluetooth settings.  Connection options screen.  The summary for the SAP checkbox preference that describes how checking it will set the SAP profile as preferred. -->
+    <string name="bluetooth_sap_profile_summary_use_for">Use for SIM Access</string>
     <!-- Bluetooth settings. Connection options screen. The summary
          for the HID checkbox preference that describes how checking it
          will set the HID profile as preferred. -->
@@ -2352,6 +2360,21 @@
 
     <!-- Wireless controls, item title to go into the network settings -->
     <string name="network_settings_title">Mobile networks</string>
+
+    <!-- Manage mobile plan [CHAR LIMIT=35]-->
+    <string name="manage_mobile_plan_title" translatable="true">Manage mobile plan</string>
+
+    <!-- The SIM operator is not known [CHAR_ LIMIT=50]-->
+    <string name="mobile_unknown_sim_operator" translatable="true">Uknown SIM operator</string>
+
+    <!-- There is no mobile provisiong website for the operator which is the firat parameter [CHAR_ LIMIT=50]-->
+    <string name="mobile_no_provisioning_url" translatable="true">%1$s has no known provisioning website</string>
+
+    <!-- Ask user to insert a SIM card [CHAR_ LIMIT=50]-->
+    <string name="mobile_insert_sim_card" translatable="true">Please insert SIM card and restart</string>
+
+    <!-- Ask user to connect to the internet [CHAR_ LIMIT=50]-->
+    <string name="mobile_connect_to_internet" translatable="true">Please connect to the internet</string>
 
     <!-- Security & location settings screen, section header for settings relating to location -->
     <string name="location_title">My Location</string>
@@ -4557,7 +4580,7 @@
     <!-- User limits screen, user name rename text [CHAR LIMIT=15] -->
     <string name="user_rename">RENAME</string>
     <!-- Preference label for custom restrictions [CHAR LIMIT=35] -->
-    <string name="app_restrictions_custom_label">Set application limits</string>
+    <string name="app_restrictions_custom_label">Set app restrictions</string>
     <!-- Summary for app entries that are controlled by another entry [CHAR LIMIT=none] -->
     <string name="user_restrictions_controlled_by">Controlled by <xliff:g id="app">%1$s</xliff:g></string>
     <!-- Summary for apps that aren't supported in limited users [CHAR LIMIT=none] -->
