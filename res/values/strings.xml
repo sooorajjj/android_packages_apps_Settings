@@ -4709,4 +4709,12 @@
     <string name="internal_storage_turn_off">Internal storage has been turned off</string>
     <string name="external_storage_turn_on">External storage has been turned on</string>
     <string name="external_storage_turn_off">External storage has been turned off</string>
+    <string name="message_waiting_true">true</string>
+    <string name="message_waiting_false">false</string>
+    <string name="message_callredirect_true">true</string>
+    <string name="message_callredirect_false">false</string>
+    <string name="smsc_update_error">update error</string>
+    <string name="smsc_refresh_error">refresh error</string>
+    <string name="dns_allowed">0.0.0.0 allowed</string>
+    <string name="dns_not_allowed">0.0.0.0 not allowed</string>
 </resources>
