@@ -53,7 +53,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private short mRssi;
     private String mType;
     private String mUuids;
-    private boolean isDevConnected = false;
     private BluetoothClass mBtClass;
     private HashMap<LocalBluetoothProfile, Integer> mProfileConnectionState;
 
@@ -208,13 +207,9 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     };
 
     void disconnect() {
-         if("LE".equals(mType)) {
-             isDevConnected = false;
-         }
-           for (LocalBluetoothProfile profile : mProfiles) {
-               Log.d(TAG, "profile disconnect called");
-              disconnect(profile);
-           }
+       for (LocalBluetoothProfile profile : mProfiles) {
+           disconnect(profile);
+       }
     }
 
     void disconnect(LocalBluetoothProfile profile) {
@@ -370,13 +365,9 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             }
 
             if(isHogpDevice) {
-                Log.d(TAG, "HOGP device auto connect");
                 boolean result = false;
-                if(!isDevConnected) {
-                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                    adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
-                    isDevConnected = true;
-                }
+                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
             }
             else
                mDevice.createBond();
