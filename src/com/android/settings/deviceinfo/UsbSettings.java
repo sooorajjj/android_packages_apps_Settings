@@ -157,7 +157,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
                         + " oldState = " + oldState + " newState= " + newState);
             final boolean isExternalPath = (Environment.getExternalStorageDirectory().getPath()
                     .equals(path));
-            if (newState.equals(Environment.MEDIA_SHARED)) {
+            if (Environment.MEDIA_SHARED.equals(newState)) {
                // if (isExternalPath) {
                     Toast.makeText(getActivity(), R.string.external_storage_turn_on,
                             Toast.LENGTH_SHORT).show();
@@ -165,8 +165,8 @@ public class UsbSettings extends SettingsPreferenceFragment {
                //     Toast.makeText(getActivity(), R.string.internal_storage_turn_on,
                //             Toast.LENGTH_SHORT).show();
               //  }
-            } else if (oldState.equals(Environment.MEDIA_SHARED)
-                    && newState.equals(Environment.MEDIA_UNMOUNTED)) {
+            } else if (Environment.MEDIA_SHARED.equals(oldState)
+                    && Environment.MEDIA_UNMOUNTED.equals(newState)) {
                // if (isExternalPath) {
                    Toast.makeText(getActivity(), R.string.external_storage_turn_off,
                             Toast.LENGTH_SHORT).show();
@@ -176,10 +176,10 @@ public class UsbSettings extends SettingsPreferenceFragment {
             //    }
             }
 
-	    if(newState.equals(Environment.MEDIA_BAD_REMOVAL) ||newState.equals(Environment.MEDIA_REMOVED) ||newState.equals(Environment.MEDIA_MOUNTED) )
+	    if(Environment.MEDIA_BAD_REMOVAL.equals(newState) ||Environment.MEDIA_REMOVED.equals(newState) ||Environment.MEDIA_MOUNTED.equals(newState) )
 	    {
                   Log.i(TAG, " oldState = " + oldState + " newState= " + newState);
-				 if(newState.equals(Environment.MEDIA_BAD_REMOVAL) ||newState.equals(Environment.MEDIA_REMOVED) )
+				 if(Environment.MEDIA_BAD_REMOVAL.equals(newState) ||Environment.MEDIA_REMOVED.equals(newState) )
 				 	SD_REMOVAL=true;	
 				 else
 				 	SD_REMOVAL=false;
