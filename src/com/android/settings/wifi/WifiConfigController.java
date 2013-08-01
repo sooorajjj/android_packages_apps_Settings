@@ -359,8 +359,12 @@ public class WifiConfigController implements TextWatcher,
 
                 config.eap.setValue((String) mEapMethodSpinner.getSelectedItem());
 
-                if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_SIM) config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
-                else config.allowedKeyManagement.set(KeyMgmt.IEEE8021X);
+                if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_SIM) {
+                    config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
+                } else {
+                    config.allowedKeyManagement.set(KeyMgmt.WPA_EAP);
+                    config.allowedKeyManagement.set(KeyMgmt.IEEE8021X);
+                }
 
                 config.phase2.setValue((mPhase2Spinner.getSelectedItemPosition() == 0) ? "" :
                         PHASE2_PREFIX + mPhase2Spinner.getSelectedItem());
@@ -384,8 +388,10 @@ public class WifiConfigController implements TextWatcher,
                     config.password.setValue(mPasswordView.getText().toString());
                 }
 
-                config.pin.setValue("1234");
-                config.pcsc.setValue(" ");
+                if (mEapMethodSpinner.getSelectedItemPosition() == WIFI_EAP_METHOD_SIM) {
+                    config.pin.setValue("1234");
+                    config.pcsc.setValue(" ");
+                }
 
                 break;
 
