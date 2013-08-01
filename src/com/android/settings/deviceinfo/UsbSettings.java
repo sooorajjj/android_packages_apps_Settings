@@ -44,10 +44,10 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private static final boolean FEATURE_ADD_USB_MODE = true;
 
     private static final boolean DEBUG = true;
-    private static boolean SD_REMOVAL = true;
-	
+    private static boolean sIsSdCardRemoval = true;
+
     private static final String TAG = "UsbSettings";
-	
+
     private static String KEY_CHOSEN = "usb_charging";
     private static final String KEY_MTP = "usb_mtp";
     private static final String KEY_PTP = "usb_ptp";
@@ -77,36 +77,24 @@ public class UsbSettings extends SettingsPreferenceFragment {
     };
 
     private void updateUsbFunctioState() {
-        //if (mUsbManager.isChargeOnlyEnabled()) {
-        //  updateToggles(null);
-        // } else {
-    createPreferenceHierarchy();
-   if((KEY_CHOSEN==KEY_SDCARD) && (SD_REMOVAL))
-   {
-        try
-             {
-            Thread.sleep(1500);
-	}
-           catch (Exception e){}
+        createPreferenceHierarchy();
+        if ((KEY_CHOSEN == KEY_SDCARD) && (sIsSdCardRemoval)) {
+            try {
+                Thread.sleep(1500);
+            } catch (Exception e) { e.printStackTrace(); }
 
-         KEY_CHOSEN= KEY_CHARGING;
-         mUsbManager.setCurrentFunction(
+            KEY_CHOSEN = KEY_CHARGING;
+            mUsbManager.setCurrentFunction(
                     "diag,serial_smd,serial_tty,rmnet_bam,adb", true);
             updateToggles(null);
-         
-   }
-   else{
-	 //   if(SD_REMOVAL)
-	//	updateToggles(null);	
-	//else	
+        } else {
             updateToggles(mUsbManager.getDefaultFunction());
-       // }
-        getPreferenceScreen().setEnabled(true);
-      }
+            getPreferenceScreen().setEnabled(true);
+        }
     }
-	
-   private PreferenceScreen createPreferenceHierarchy() {
- 	PreferenceScreen root = getPreferenceScreen();
+
+    private PreferenceScreen createPreferenceHierarchy() {
+        PreferenceScreen root = getPreferenceScreen();
         if (root != null) {
             root.removeAll();
         }
@@ -117,15 +105,14 @@ public class UsbSettings extends SettingsPreferenceFragment {
         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
         mSDCard = (CheckBoxPreference)root.findPreference(KEY_SDCARD);
         mCharging = (CheckBoxPreference)root.findPreference(KEY_CHARGING);
- 
-        if(!FEATURE_ADD_USB_MODE){
-           root.removePreference(mSDCard);
+
+        if (!FEATURE_ADD_USB_MODE) {
+            root.removePreference(mSDCard);
             root.removePreference(mCharging);
         }
-	 if(SD_REMOVAL== true)
-	 {
-              root.removePreference(mSDCard);
-	 }
+        if (sIsSdCardRemoval) {
+            root.removePreference(mSDCard);
+        }
         return root;
     }
 
@@ -137,15 +124,9 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (mStorageManager == null) {
             Log.w(TAG, "Failed to get StorageManager");
         }
-	String sdState = Environment.getExternalStorageState();
-	//NOT point to the /Storage/sdcard1
-	String exSdState = Environment.getSdCardState();
-	if (exSdState.equals(Environment.MEDIA_REMOVED) ||exSdState.equals(Environment.MEDIA_BAD_REMOVAL) ) 
-		SD_REMOVAL=true; 
-	else
-			 SD_REMOVAL=false;
-	
-      Log.i(TAG, " On Create:  SD_REMOVAL = " + SD_REMOVAL +",  exSdState = "+ exSdState);
+        //NOT point to the /Storage/sdcard1
+        sIsSdCardRemoval = isSdCardRemoval();
+        Log.i(TAG, " On Create:  sIsSdCardRemoval = " + sIsSdCardRemoval);
     }
 
     private StorageEventListener mStorageListener = new StorageEventListener() {
@@ -158,40 +139,31 @@ public class UsbSettings extends SettingsPreferenceFragment {
             final boolean isExternalPath = (Environment.getExternalStorageDirectory().getPath()
                     .equals(path));
             if (Environment.MEDIA_SHARED.equals(newState)) {
-               // if (isExternalPath) {
-                    Toast.makeText(getActivity(), R.string.external_storage_turn_on,
-                            Toast.LENGTH_SHORT).show();
-              //  } else {
-               //     Toast.makeText(getActivity(), R.string.internal_storage_turn_on,
-               //             Toast.LENGTH_SHORT).show();
-              //  }
+                Toast.makeText(getActivity(), R.string.external_storage_turn_on,
+                        Toast.LENGTH_SHORT).show();
             } else if (Environment.MEDIA_SHARED.equals(oldState)
                     && Environment.MEDIA_UNMOUNTED.equals(newState)) {
-               // if (isExternalPath) {
-                   Toast.makeText(getActivity(), R.string.external_storage_turn_off,
-                            Toast.LENGTH_SHORT).show();
-              //  } else {
-            //       Toast.makeText(getActivity(), R.string.internal_storage_turn_off,
-              //              Toast.LENGTH_SHORT).show();
-            //    }
+                Toast.makeText(getActivity(), R.string.external_storage_turn_off,
+                        Toast.LENGTH_SHORT).show();
             }
 
-	    if(Environment.MEDIA_BAD_REMOVAL.equals(newState) ||Environment.MEDIA_REMOVED.equals(newState) ||Environment.MEDIA_MOUNTED.equals(newState) )
-	    {
-                  Log.i(TAG, " oldState = " + oldState + " newState= " + newState);
-				 if(Environment.MEDIA_BAD_REMOVAL.equals(newState) ||Environment.MEDIA_REMOVED.equals(newState) )
-				 	SD_REMOVAL=true;	
-				 else
-				 	SD_REMOVAL=false;
-
-			 updateUsbFunctioState();
-				
-	    }
-	    else	
+            if (Environment.MEDIA_BAD_REMOVAL.equals(newState)
+                    || Environment.MEDIA_REMOVED.equals(newState)
+                    || Environment.MEDIA_MOUNTED.equals(newState)) {
+                Log.i(TAG, " oldState = " + oldState + " newState= " + newState);
+                sIsSdCardRemoval = isSdCardRemoval(newState);
+            }
             updateUsbFunctioState();
         }
-	 
     };
+
+    private static boolean isSdCardRemoval(String state) {
+        return (Environment.MEDIA_BAD_REMOVAL.equals(state) || Environment.MEDIA_REMOVED.equals(state));
+    }
+
+    private static boolean isSdCardRemoval() {
+        return isSdCardRemoval(Environment.getSdCardState());
+    }
 
     @Override
     public void onPause() {
@@ -200,8 +172,6 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (mStorageManager != null) {
             mStorageManager.unregisterListener(mStorageListener);
         }
-	  
-	
     }
 
     @Override
@@ -218,14 +188,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (mStorageManager != null) {
             mStorageManager.registerListener(mStorageListener);
         }
-		
-	String exSdState = Environment.getSdCardState();
-			 
-	if (exSdState.equals(Environment.MEDIA_REMOVED) ||exSdState.equals(Environment.MEDIA_BAD_REMOVAL) ) 
-		SD_REMOVAL=true; 
-	else
-		SD_REMOVAL=false;
-			 
+        sIsSdCardRemoval = isSdCardRemoval();
         updateUsbFunctioState();
     }
 
@@ -248,8 +211,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
         } else  {
             mMtp.setChecked(false);
             mPtp.setChecked(false);
-	 if(!SD_REMOVAL)		
-            mSDCard.setChecked(false);
+            if (!sIsSdCardRemoval) mSDCard.setChecked(false);
             mCharging.setChecked(true);
         }
     }
@@ -271,7 +233,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
                 return true;
             }
         }
-	 KEY_CHOSEN = KEY_CHARGING;
+        KEY_CHOSEN = KEY_CHARGING;
         if (preference == mMtp) {
             mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MTP, true);
             updateToggles(UsbManager.USB_FUNCTION_MTP);
