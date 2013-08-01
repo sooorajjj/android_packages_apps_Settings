@@ -2014,4 +2014,13 @@
     <!--Prompt, used only for voice-->
     <string name="prompt">提示</string>
     <string name="prompt_user">提示用户</string>
+
+    <string name="message_waiting_true">确定</string>
+    <string name="message_waiting_false">取消</string>
+    <string name="message_callredirect_true">确定</string>
+    <string name="message_callredirect_false">取消</string>
+    <string name="smsc_update_error">更新错误</string>
+    <string name="smsc_refresh_error">刷新错误</string>
+    <string name="dns_allowed">0.0.0.0 允许</string>
+    <string name="dns_not_allowed">0.0.0.0 不允许</string>
 </resources>
