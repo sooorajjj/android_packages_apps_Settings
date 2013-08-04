@@ -1755,7 +1755,7 @@
     <string name="bluetooth_sap_request" >Solicitud SAP</string>
     <string name="status_esn_number" >ESN</string>
     <string name="wifi_p2p_menu_create_group" >Crear grupo</string>
-    <string name="sim_change_failed_enable_sim_lock" >No se puede cambiar de SIM/RUIM PIN.\n Permitir SIM/RUIM LOCK.</string>
+    <string name="sim_change_failed_enable_sim_lock" >No se puede cambiar de SIM/USIM PIN.\n Permitir SIM/USIM LOCK.</string>
     <string name="bluetooth_mas_remember_choice" >No pregunte de novo</string>
     <string name="bluetooth_sap_profile_summary_use_for" >Usar para Acceso SIM</string>
     <string name="bluetooth_sap_profile_summary_not_connected" >No se conecta al Servidor de Acceso SIM</string>
@@ -1767,7 +1767,7 @@
     <string name="wifi_security_wpa_wpa2" >WPA/WPA2 PSK</string>
     <string name="multi_sim_settings_summary" >Ajustar Configuración Multi SIM para voz, datos y SMS</string>
     <string name="sel_sub_title" >Configurar subscripiciones</string>
-    <string name="sim_lock_change_not_supported" >No se puede cambiar de SIM/RUIM Lock. \n SIM/RUIM no soportado.</string>
+    <string name="sim_lock_change_not_supported" >No se puede cambiar de SIM/USIM Lock. \n SIM/USIM no soportado.</string>
     <string name="wifi_p2p_menu_remove_group" >Remover grupo</string>
      <!-- Pantalla de Seguridad y configuración de ubicación, cambie la instrucción para desbloquear  la pantalla si el usuario diseña el patrón incorrecto -->
     <string name="wifi_security_psk_generic" >@string/wifi_security_wpa_wpa2</string>
@@ -1776,7 +1776,7 @@
     <string name="sim_pin_enabled" >PIN1 activado!</string>
     <string name="bluetooth_mas_request" >Mensaje de solicitud de acceso</string>
     <string name="status_imei" >IMEI</string>
-    <string name="sim_absent" >No SIM/RUIM</string>
+    <string name="sim_absent" >No SIM/USIM</string>
     <string name="sync_item_title" ><xliff:g id="authority" example="Calendar">%s</xliff:g></string>
     <string name="device_additional_status_summary" >Número de teléfono, nivel de señal, IMEI, etc.</string>
     <string name="bluetooth_dun_profile_summary_use_for" >Uso para acceso a la red Dial-up</string>

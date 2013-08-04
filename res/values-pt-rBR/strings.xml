@@ -957,7 +957,7 @@
     <string name="proxy_error_empty_port" >É necessário preencher o campo da porta.</string>
     <string name="wifi_menu_modify" >Modificar rede</string>
     <string name="sd_ejecting_summary" >Desconexão em andamento</string>
-    <string name="sim_change_failed_enable_sim_lock" >Impossível modificar SIM/RUIM PIN. Habilitar SIM/RUIM LOCK.</string>
+    <string name="sim_change_failed_enable_sim_lock" >Impossível modificar SIM/USIM PIN. Habilitar SIM/USIM LOCK.</string>
     <string name="ask_compatibility" >Perguntar ao iniciar</string>
     <string name="memory_size" >Espaço total</string>
     <string name="vpn_routes" >Rotas de encaminhamento (por exemplo, 10.0.0.0/8)</string>
@@ -1141,7 +1141,7 @@
     <string name="cant_sync_dialog_title" >Não é possível sincronizar manualmente</string>
     <string name="dock_sounds_enable_title" >Som de inserção no dock</string>
     <string name="wifi_tether_configure_ssid_default" >Ponto de acesso Android</string>
-    <string name="sim_lock_change_not_supported" >Impossível mudar a senha do SIM/RUIM Lock.\n SIM/RUIM não suporta esta operação.</string>
+    <string name="sim_lock_change_not_supported" >Impossível mudar a senha do SIM/UISM Lock.\n SIM/USIM não suporta esta operação.</string>
     <string name="user_dict_settings_empty_text" >Você não possui palavras no dicionário do usuário. Adicione uma palavra tocando no botão \"Adicionar\" ou no símbolo \"+\".</string>
     <string name="radioInfo_menu_viewSDN" >Visualizar números de chamada de serviço</string>
     <string name="data_usage_list_none" >Nenhum</string>
