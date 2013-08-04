@@ -795,7 +795,7 @@
     <string name="wifi_p2p_menu_searching" >Pesquisando…</string>
     <string name="wifi_wps_available_first_item" >WPS disponível</string>
     <string name="sort_order_alpha" >Classificar por nome</string>
-    <string name="sim_pin_toggle" >Bloquear cartão SIM</string>
+    <string name="sim_pin_toggle" >Bloqueio cartão SIM</string>
     <string name="new_backup_pw_prompt" >Digite uma nova senha para backups completos aqui</string>
     <string name="data_usage_app_settings" >Ver configurações do aplicativo</string>
     <string name="quick_launch_shortcut" >Pesquisar + <xliff:g id="SHORTCUT_LETTER">%1$s</xliff:g></string>
@@ -1164,7 +1164,7 @@
     <string name="apn_not_set" >Não definido</string>
     <string name="wifi_speed" >Velocidade do link</string>
     <string name="disable_text" >Desativar</string>
-    <string name="sim_enable_sim_lock" >Bloquear cartão SIM</string>
+    <string name="sim_enable_sim_lock" >Bloqueio cartão SIM</string>
     <string name="ims_reg_required_on" >É obrigatório ligar o registro IMS</string>
     <string name="roaming_warning" >Quando você permite o roaming de dados, poderão ser cobradas taxas significativas de roaming!</string>
     <string name="debug_app_set" >Aplicativo de depuração: <xliff:g id="APP_NAME">%1$s</xliff:g></string>
