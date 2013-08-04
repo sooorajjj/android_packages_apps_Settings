@@ -4289,4 +4289,5 @@ alog [CHAR LIMIT=none] -->
     <string name="wifi_eap_method_sim">SIM</string>
     <!-- add for wifi passwd detect -->
     <string name="wifi_keyfail">Incorrect password</string>
+    <string name="sim_pin_too_short">PIN code must more than 4 digit.</string>
 </resources>

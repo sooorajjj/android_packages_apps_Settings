@@ -375,7 +375,13 @@ public class IccLockSettings extends PreferenceActivity
                 }
                 Toast.makeText(this, mRes.getString(id),Toast.LENGTH_SHORT).show();
             } else {
-                displayRetryCounter(mRes.getString(R.string.sim_change_failed));
+                if (requestType == MSG_ENABLE_ICC_PIN_COMPLETE) {
+                    displayRetryCounter(mRes
+                            .getString(R.string.sim_lock_failed));
+                } else if (requestType == MSG_CHANGE_ICC_PIN_COMPLETE) {
+                    displayRetryCounter(mRes
+                            .getString(R.string.sim_change_failed));
+                }
             }
         } else if (exception instanceof RuntimeException) {
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show();
@@ -415,7 +421,12 @@ public class IccLockSettings extends PreferenceActivity
     }
 
     private boolean reasonablePin(String pin) {
-        if (pin == null || pin.length() < MIN_PIN_LENGTH || pin.length() > MAX_PIN_LENGTH) {
+        if (pin == null ){
+            return false;
+        } else if (pin.length() < MIN_PIN_LENGTH){
+            Toast.makeText(this, R.string.sim_pin_too_short , Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (pin.length() > MAX_PIN_LENGTH){
             return false;
         } else {
             return true;
