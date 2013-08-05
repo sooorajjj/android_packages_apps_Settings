@@ -33,6 +33,7 @@ import android.net.NetworkPolicyManager;
 import android.net.NetworkTemplate;
 import android.os.AsyncTask;
 import android.text.format.Time;
+import android.util.Log;
 
 import com.android.internal.util.Objects;
 import com.google.android.collect.Lists;
@@ -50,6 +51,8 @@ public class NetworkPolicyEditor {
     // TODO: be more robust when missing policies from service
 
     public static final boolean ENABLE_SPLIT_POLICIES = false;
+
+    private static final String TAG = "NetworkPolicyEditor";
 
     private NetworkPolicyManager mPolicyManager;
     private ArrayList<NetworkPolicy> mPolicies = Lists.newArrayList();
@@ -89,6 +92,13 @@ public class NetworkPolicyEditor {
     public void writeAsync() {
         // TODO: consider making more robust by passing through service
         final NetworkPolicy[] policies = mPolicies.toArray(new NetworkPolicy[mPolicies.size()]);
+        for ( int i=0 ; i<mPolicies.size(); i++ ) {
+           if ( policies[i].template.getMatchRule()<1 || policies[i].template.getMatchRule()>7) {
+              Log.e(TAG,"Network Template Error: "+policies[i].template.getMatchRule());
+              return;
+           }
+        }
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
