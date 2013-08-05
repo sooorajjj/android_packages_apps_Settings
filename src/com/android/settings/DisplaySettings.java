@@ -519,15 +519,6 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            if(null != mCABLService){
-                //end thread
-                try{
-                    Log.d(TAG, "stopListener");
-                    mCABLService.stopListener();
-                }catch(RemoteException e){
-                    Log.e(TAG, "stopListener, exception");
-                }
-            }
             mCABLService = null;
             //CABLDialogPreference.setCABLService(null);
         }
