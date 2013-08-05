@@ -351,6 +351,8 @@ public class DevelopmentSettings extends PreferenceFragment
             return;
         }
         mEnabledSwitch.setOnCheckedChangeListener(this);
+        mEnabledSwitch.setEnabled(false);
+        setPrefsEnabledState(false);
     }
 
     @Override
@@ -420,9 +422,12 @@ public class DevelopmentSettings extends PreferenceFragment
         mLastEnabledState = Settings.Global.getInt(cr,
                 Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
         mEnabledSwitch.setChecked(mLastEnabledState);
-        setPrefsEnabledState(mLastEnabledState);
+        mEnabledSwitch.setEnabled(!Utils.isMonkeyRunning());
+        setPrefsEnabledState(!Utils.isMonkeyRunning() && mLastEnabledState);
 
-        if (mHaveDebugSettings && !mLastEnabledState) {
+        if (mHaveDebugSettings &&
+                !mLastEnabledState &&
+                !Utils.isMonkeyRunning()) {
             // Overall debugging is disabled, but there are some debug
             // settings that are enabled.  This is an invalid state.  Switch
             // to debug settings being enabled, so the user knows there is
@@ -1021,6 +1026,9 @@ public class DevelopmentSettings extends PreferenceFragment
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (Utils.isMonkeyRunning()) {
+            return;
+        }
         if (buttonView == mEnabledSwitch) {
             if (isChecked != mLastEnabledState) {
                 if (isChecked) {
