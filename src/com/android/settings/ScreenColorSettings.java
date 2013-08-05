@@ -127,12 +127,12 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.screencolor_settings);
         initView();
+        restoreSavedHSCI(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        restoreSavedHSCI(true);
     }
 
     @Override
