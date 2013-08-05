@@ -101,7 +101,7 @@ public class CmccMainReceiver extends BroadcastReceiver {
                     currentConnected = info.isConnected();
                 }
                 if (lastConnected && !currentConnected) {             
-                    mWifiManager.startScanActive();
+                    mWifiManager.startScan();
                 }
                 if (!currentConnected || lastConnected) {
                     isInSSIDs = true;
