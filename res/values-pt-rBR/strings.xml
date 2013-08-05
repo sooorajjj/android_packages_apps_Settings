@@ -957,7 +957,7 @@
     <string name="proxy_error_empty_port" >É necessário preencher o campo da porta.</string>
     <string name="wifi_menu_modify" >Modificar rede</string>
     <string name="sd_ejecting_summary" >Desconexão em andamento</string>
-    <string name="sim_change_failed_enable_sim_lock" >Impossível modificar SIM/USIM PIN. Habilitar SIM/USIM LOCK.</string>
+    <string name="sim_change_failed_enable_sim_lock" >Impossível modificar SIM/USIM PIN. Habilitar SIM/USIM Bloqueio.</string>
     <string name="ask_compatibility" >Perguntar ao iniciar</string>
     <string name="memory_size" >Espaço total</string>
     <string name="vpn_routes" >Rotas de encaminhamento (por exemplo, 10.0.0.0/8)</string>
