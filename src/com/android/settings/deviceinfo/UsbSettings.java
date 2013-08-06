@@ -203,11 +203,16 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mPtp.setChecked(false);
             mSDCard.setChecked(true);
             mCharging.setChecked(false);
-        } else {
+        } else if (USB_FUNCTION_CHARGING.equals(function)) {
             mMtp.setChecked(false);
             mPtp.setChecked(false);
             mSDCard.setChecked(false);
             mCharging.setChecked(true);
+        } else {
+            mMtp.setChecked(false);
+            mPtp.setChecked(false);
+            mSDCard.setChecked(false);
+            mCharging.setChecked(false);
         }
 
         UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
@@ -250,7 +255,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
             function = UsbManager.USB_FUNCTION_PTP;
         } else if (preference == mSDCard && mSDCard.isChecked()) {
             function = UsbManager.USB_FUNCTION_MASS_STORAGE;
-        } else if (preference == mCharging) {
+        } else if (preference == mCharging && mCharging.isChecked()) {
             function = USB_FUNCTION_CHARGING;
         }
 
