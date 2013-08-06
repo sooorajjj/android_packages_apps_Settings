@@ -61,6 +61,7 @@ import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
 
+import android.hardware.usb.UsbManager;
 public class Memory extends SettingsPreferenceFragment {
     private static final String TAG = "MemorySettings";
     private static final String STORAGE_MGR_KEY = "storage_mgr";
@@ -86,6 +87,7 @@ public class Memory extends SettingsPreferenceFragment {
 
     private String internalStr;
     private String externalStr;
+	boolean connected =false;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -152,6 +154,10 @@ public class Memory extends SettingsPreferenceFragment {
         intentFilter.addDataScheme("file");
         getActivity().registerReceiver(mMediaScannerReceiver, intentFilter);
 
+        // ACTION_USB_STATE is sticky so this will call updateToggles
+        getActivity().registerReceiver(mStateReceiver,
+                new IntentFilter(UsbManager.ACTION_USB_STATE));
+
         if (mInternalStorageVolumePreferenceCategory != null) {
             mInternalStorageVolumePreferenceCategory.onResume();
         }
@@ -180,6 +186,8 @@ public class Memory extends SettingsPreferenceFragment {
     @Override
     public void onPause() {
         super.onPause();
+	getActivity().unregisterReceiver(mStateReceiver);
+	
         getActivity().unregisterReceiver(mMediaScannerReceiver);
         if (mInternalStorageVolumePreferenceCategory != null) {
             mInternalStorageVolumePreferenceCategory.onPause();
@@ -202,17 +210,29 @@ public class Memory extends SettingsPreferenceFragment {
         inflater.inflate(R.menu.storage, menu);
     }
 
+    private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
+        public void onReceive(Context content, Intent intent) {
+             String action = intent.getAction();
+             if (action.equals(UsbManager.ACTION_USB_STATE)) {
+                 connected = intent.getExtras().getBoolean(UsbManager.USB_CONNECTED);
+             }
+        }
+    };
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        final MenuItem usb = menu.findItem(R.id.storage_usb);
-        usb.setVisible(!isMassStorageEnabled());
+      final MenuItem usb = menu.findItem(R.id.storage_usb);
+       usb.setVisible(!isMassStorageEnabled());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.storage_usb:
-                if (getActivity() instanceof PreferenceActivity) {
+	          if (getActivity() instanceof PreferenceActivity) {
+			if(!connected)
+                                return true;
+			else		
                     ((PreferenceActivity) getActivity()).startPreferencePanel(
                             UsbSettings.class.getCanonicalName(),
                             null,
