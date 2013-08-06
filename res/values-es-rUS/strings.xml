@@ -1793,4 +1793,11 @@
     <string name="summary_storage_manage">Dispositivo de la tarjeta SD: %1$s</string>
     <string name="external_sd">SD externa</string>
     <string name="internal_sd">SD interna</string>
+    <string name="usb_sdcard_summary">Le permite transferir archivos multimedia en la tarjeta SD en Windows</string>
+    <string name="usb_sdcard_title">Monte la tarjeta SD</string>
+    <string name="usb_charging_summary">Le permite usted cargar el dispositivo solamente</string>
+    <string name="internal_storage_turn_on">Almacenamiento interno se ha encendido</string>
+    <string name="internal_storage_turn_off">Almacenamiento interno se ha apagado</string>
+    <string name="external_storage_turn_on">Almacenamiento externo se ha encendido</string>
+    <string name="external_storage_turn_off">Almacenamiento externo se ha apagado</string>
 </resources>

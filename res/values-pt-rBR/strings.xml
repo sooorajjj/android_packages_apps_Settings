@@ -1211,4 +1211,11 @@
     <string name="summary_storage_manage">Dispositivo de cartão SD: %1$s</string>
     <string name="external_sd">SD externo</string>
     <string name="internal_sd">SD interno</string>
+    <string name="usb_sdcard_summary">Permite você transferir arquivos de mídia para o cartão SD no Windows</string>
+    <string name="usb_sdcard_title">Monte o cartão SD</string>
+    <string name="internal_storage_turn_on">Armazenamento interno foi habilitado</string>
+    <string name="internal_storage_turn_off">Armazenamento interno foi desabilitado</string>
+    <string name="external_storage_turn_on">Armazenamento externo foi habilitado</string>
+    <string name="external_storage_turn_off">Armazenamento externo foi desabilitado</string>
+    <string name="usb_charging_summary">Permite somente você carregar o dispositivo</string>
 </resources>
