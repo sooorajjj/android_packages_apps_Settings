@@ -1218,4 +1218,5 @@
     <string name="external_storage_turn_on">Armazenamento externo foi habilitado</string>
     <string name="external_storage_turn_off">Armazenamento externo foi desabilitado</string>
     <string name="usb_charging_summary">Permite somente você carregar o dispositivo</string>
+    <string name="sim_pin_too_short">PIN deve ter pelo menos 4 dígitos</string>
 </resources>

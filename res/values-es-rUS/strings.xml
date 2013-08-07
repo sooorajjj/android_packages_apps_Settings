@@ -1800,4 +1800,5 @@
     <string name="internal_storage_turn_off">Almacenamiento interno se ha apagado</string>
     <string name="external_storage_turn_on">Almacenamiento externo se ha encendido</string>
     <string name="external_storage_turn_off">Almacenamiento externo se ha apagado</string>
+    <string name="sim_pin_too_short">PIN debe tener al menos 4 dígitos</string>
 </resources>
