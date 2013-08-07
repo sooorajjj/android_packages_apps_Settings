@@ -113,6 +113,19 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private int mIntensityValue = 0;
     private int mContrastValue = 0;
 
+    private int mMinHueValue = 0;
+    private int mMaxHueValue = 0;
+    private int mDefaultHueValue = 0;
+    private int mMinSaturationValue = 0;
+    private int mMaxSaturationValue = 0;
+    private int mDefaultSaturationValue = 0;
+    private int mMinIntensityValue = 0;
+    private int mMaxIntensityValue = 0;
+    private int mDefaultIntensityValue = 0;
+    private int mMinContrastValue = 0;
+    private int mMaxContrastValue = 0;
+    private int mDefaultContrastValue = 0;
+
     /**
      * The Service runs in vendor/qcom/proprietary/mm-core directory.
      *  It is used to update the screen's hue, saturation, contrast, and intensity.
@@ -145,6 +158,19 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        mMinHueValue = getResources().getInteger(R.integer.minimum_hue_value);
+        mMaxHueValue = getResources().getInteger(R.integer.maximum_hue_value);
+        mDefaultHueValue = getResources().getInteger(R.integer.default_hue_value);
+        mMinSaturationValue = getResources().getInteger(R.integer.minimum_saturation_value);
+        mMaxSaturationValue = getResources().getInteger(R.integer.maximum_saturation_value);
+        mDefaultSaturationValue = getResources().getInteger(R.integer.default_saturation_value);
+        mMinIntensityValue = getResources().getInteger(R.integer.minimum_intensity_value);
+        mMaxIntensityValue = getResources().getInteger(R.integer.maximum_intensity_value);
+        mDefaultIntensityValue = getResources().getInteger(R.integer.default_intensity_value);
+        mMinContrastValue = getResources().getInteger(R.integer.minimum_contrast_value);
+        mMaxContrastValue = getResources().getInteger(R.integer.maximum_contrast_value);
+        mDefaultContrastValue = getResources().getInteger(R.integer.default_contrast_value);
+
         mRLayout = (RelativeLayout) findViewById(R.id.background_preview);
         String previewContent = getScreenColorPreviewKey();
         if ("".equals(previewContent)) {
@@ -159,12 +185,16 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         mScreenColorLayout.setOnClickListener(this);
 
         mHBar = (SeekBar) findViewById(R.id.hcontrol);
+        mHBar.setMax(mMaxHueValue);
         mHBar.setOnSeekBarChangeListener(this);
         mSBar = (SeekBar) findViewById(R.id.scontrol);
+        mSBar.setMax(mMaxSaturationValue);
         mSBar.setOnSeekBarChangeListener(this);
         mIBar = (SeekBar) findViewById(R.id.icontrol);
+        mIBar.setMax(mMaxIntensityValue);
         mIBar.setOnSeekBarChangeListener(this);
         mCBar = (SeekBar) findViewById(R.id.ccontrol);
+        mCBar.setMax(mMaxContrastValue);
         mCBar.setOnSeekBarChangeListener(this);
 
         mHTv = (TextView) findViewById(R.id.hue);
@@ -330,14 +360,14 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 break;
             case R.id.ccontrol:
                 mContrastValue = progress;
-                //The screen contrast display value varies from -255 to 255.
-                mCTv.setText(getString(R.string.contrast_str, progress - 255));
+                //Change the contrast display value varies from (-180, 180) to (-1.0, 1.0).
+                mCTv.setText(getString(R.string.contrast_str,
+                        ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
                 break;
             case R.id.icontrol:
                 mIntensityValue = progress;
-                //Change the intensity display value varies from (-180, 180) to (-1.0, 1.0).
-                mITv.setText(getString(R.string.intensity_str,
-                        ((int) (((progress - 180) * 100) / 180.0)) / 100.0));
+                //The screen intensity display value varies from -255 to 255.
+                mITv.setText(getString(R.string.intensity_str, progress - 255));
                 break;
             default:
                 break;
@@ -426,34 +456,34 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 showMoreMenus();
                 break;
             case R.id.reduce_hue:
-                mHBar.setProgress((mHueValue - 1 > minHueValue) ? (mHueValue - 1) : minHueValue);
+                mHBar.setProgress((mHueValue - 1 > mMinHueValue) ? (mHueValue - 1) : mMinHueValue);
                 break;
             case R.id.increase_hue:
-                mHBar.setProgress((mHueValue + 1 < maxHueValue) ? (mHueValue + 1) : maxHueValue);
+                mHBar.setProgress((mHueValue + 1 < mMaxHueValue) ? (mHueValue + 1) : mMaxHueValue);
                 break;
             case R.id.reduce_saturation:
-                mSBar.setProgress((mSaturationValue - 1 > minSaturationValue) ?
-                    (mSaturationValue - 1) : minSaturationValue);
+                mSBar.setProgress((mSaturationValue - 1 > mMinSaturationValue) ?
+                    (mSaturationValue - 1) : mMinSaturationValue);
                 break;
             case R.id.increase_saturation:
-                mSBar.setProgress((mSaturationValue + 1 < maxSaturationValue) ?
-                    (mSaturationValue + 1) : maxSaturationValue);
+                mSBar.setProgress((mSaturationValue + 1 < mMaxSaturationValue) ?
+                    (mSaturationValue + 1) : mMaxSaturationValue);
                 break;
             case R.id.reduce_intensity:
-                mIBar.setProgress((mIntensityValue - 1 > minIntensityValue) ?
-                    (mIntensityValue - 1) : minIntensityValue);
+                mIBar.setProgress((mIntensityValue - 1 > mMinIntensityValue) ?
+                    (mIntensityValue - 1) : mMinIntensityValue);
                 break;
             case R.id.increase_intensity:
-                mIBar.setProgress((mIntensityValue + 1 < maxIntensityValue) ?
-                    (mIntensityValue + 1) : maxIntensityValue);
+                mIBar.setProgress((mIntensityValue + 1 < mMaxIntensityValue) ?
+                    (mIntensityValue + 1) : mMaxIntensityValue);
                 break;
             case R.id.reduce_contrast:
-                mCBar.setProgress((mContrastValue - 1 > minContrastValue) ?
-                    (mContrastValue - 1) : minContrastValue);
+                mCBar.setProgress((mContrastValue - 1 > mMinContrastValue) ?
+                    (mContrastValue - 1) : mMinContrastValue);
                 break;
             case R.id.increase_contrast:
-                mCBar.setProgress((mContrastValue + 1 < maxContrastValue) ?
-                    (mContrastValue + 1) : maxContrastValue);
+                mCBar.setProgress((mContrastValue + 1 < mMaxContrastValue) ?
+                    (mContrastValue + 1) : mMaxContrastValue);
                 break;
             default:
                 break;
@@ -477,20 +507,20 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
 
     private void restoreDefaultHSCI() {
         // TODO restore default HSCI values.
-        mHBar.setProgress(0);
-        mSBar.setProgress(0);
-        mIBar.setProgress(0);
-        mCBar.setProgress(0);
+        mHBar.setProgress(mDefaultHueValue);
+        mSBar.setProgress(mDefaultSaturationValue);
+        mIBar.setProgress(mDefaultIntensityValue);
+        mCBar.setProgress(mDefaultContrastValue);
         setNewBtnHighlight();
     }
 
     private void restoreSavedHSCI(boolean setProgress) {
         SharedPreferences share = getSharedPreferences(PREVIEW_STRING_NAME,
                 Context.MODE_WORLD_WRITEABLE);
-        int hueValue = share.getInt(COLOR_HUE, 0);
-        int saturationValue = share.getInt(COLOR_SATURATION, 0);
-        int intensityValue = share.getInt(COLOR_INTENSITY, 0);
-        int contrastValue = share.getInt(COLOR_CONTRAST, 0);
+        int hueValue = share.getInt(COLOR_HUE, mDefaultHueValue);
+        int saturationValue = share.getInt(COLOR_SATURATION, mDefaultSaturationValue);
+        int intensityValue = share.getInt(COLOR_INTENSITY, mDefaultIntensityValue);
+        int contrastValue = share.getInt(COLOR_CONTRAST, mDefaultContrastValue);
         if (setProgress) {
             mHBar.setProgress(hueValue);
             mSBar.setProgress(saturationValue);
