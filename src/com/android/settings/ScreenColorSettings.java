@@ -408,6 +408,7 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
 
         switch (id) {
             case R.id.cancel:
+                restoreSavedHSCI(false);
                 finish();
                 break;
             case R.id.save:
