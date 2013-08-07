@@ -709,7 +709,7 @@ public class Settings extends PreferenceActivity
                         mDataEnabler.setSwitch(holder.switch_);
                         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
                             header.intent.setClassName("com.android.settings",
-                                    "com.android.settings.multisimsettings.MultiSimSettingTab");
+                                    "com.android.settings.SelectSubscription");
                             header.intent.putExtra(MultiSimSettingsConstants.TARGET_PACKAGE,
                                     "com.android.phone");
                             header.intent.putExtra(MultiSimSettingsConstants.TARGET_CLASS,

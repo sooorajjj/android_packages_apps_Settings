@@ -75,13 +75,10 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private static final String KEY_NETWORK_SETTING = "mobile_network_key";
     private static final String KEY_CALL_SETTING = "call_setting_key";
 
-    private static final int EVENT_SET_SUBSCRIPTION_DONE = 2;
-
     private static final int CHANNEL_NAME_MAX_LENGTH = 6;
     private static final int ALWAYS_ASK = 2;
 
     private PreferenceScreen mPrefScreen;
-    private SubscriptionManager mSubscriptionManager;
     private PreferenceScreen mNetworkSetting;
     private PreferenceScreen mCallSetting;
 
@@ -165,19 +162,6 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         }
     }
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case EVENT_SET_SUBSCRIPTION_DONE:
-                    setScreenState();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -188,9 +172,6 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         Intent intent = getIntent();
         mSubscription = intent.getIntExtra(MSimConstants.SUBSCRIPTION_KEY, MSimConstants.SUB1);
 
-        mSubscriptionManager = SubscriptionManager.getInstance();
-        mSubscriptionManager.registerForSetSubscriptionCompleted(mHandler,
-                EVENT_SET_SUBSCRIPTION_DONE, null);
         registerReceiver(mReceiver, mIntentFilter);
 
         mNamePreference = (EditTextPreference) findPreference(KEY_SIM_NAME);
@@ -237,12 +218,13 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
 
     protected void onDestroy() {
         super.onDestroy();
-        mSubscriptionManager.unRegisterForSetSubscriptionCompleted(mHandler);
         unregisterReceiver(mReceiver);
     }
 
     private boolean isSubActivated() {
-        return mSubscriptionManager.isSubActive(mSubscription);
+        //take sim state ready as actived state
+        return  TelephonyManager.SIM_STATE_READY ==
+                MSimTelephonyManager.getDefault().getSimState(mSubscription);
     }
 
     private boolean isAirplaneModeOn() {

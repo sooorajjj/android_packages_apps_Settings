@@ -48,14 +48,13 @@ import android.preference.PreferenceActivity;
 import android.provider.MediaStore;
 import android.provider.Settings.System;
 
+import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.MSimConstants;
 import com.android.settings.DefaultRingtonePreference;
 import com.android.settings.R;
-
-import com.codeaurora.telephony.msim.SubscriptionManager;
 
 public class MultiSimSoundSettings extends PreferenceActivity {
     private String LOG_TAG = "MultiSimSoundSettings";
@@ -66,7 +65,6 @@ public class MultiSimSoundSettings extends PreferenceActivity {
 
     private DefaultRingtonePreference mRingtonePref;
     private int mSubscription;
-    private SubscriptionManager mSubscriptionManager;
 
     private Runnable mRingtoneLookupRunnable = new Runnable() {
         @Override
@@ -131,7 +129,6 @@ public class MultiSimSoundSettings extends PreferenceActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSubscriptionManager = SubscriptionManager.getInstance();
         addPreferencesFromResource(R.xml.multi_sim_sound_settings);
         mRingtonePref = (DefaultRingtonePreference) findPreference(KEY_RINGSTONE);
         mSubscription = this.getIntent().getIntExtra(MSimConstants.SUBSCRIPTION_KEY,
@@ -157,7 +154,9 @@ public class MultiSimSoundSettings extends PreferenceActivity {
 
     // Determine the current card slot is available.
     private boolean isSubActivated() {
-        return mSubscriptionManager.isSubActive(mSubscription);
+        //take sim state ready as actived state
+        return  TelephonyManager.SIM_STATE_READY ==
+                MSimTelephonyManager.getDefault().getSimState(mSubscription);
     }
 
 }
