@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2013 The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +61,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     private Button mOkButton;
     private boolean mIsSecurityHigh;
     private CachedBluetoothDeviceManager mDeviceManager;
+    private boolean pair_cancel = true;
 
     /**
      * Dismiss the dialog if the bond state changes to bonded or none,
@@ -72,10 +74,12 @@ public final class BluetoothPairingDialog extends AlertActivity implements
             if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
                 int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE,
                                                    BluetoothDevice.ERROR);
-                if (bondState == BluetoothDevice.BOND_BONDED ||
-                        bondState == BluetoothDevice.BOND_NONE) {
-                    dismiss();
-                }
+                if (bondState == BluetoothDevice.BOND_BONDED)
+                    pair_cancel = false;
+                else if (bondState == BluetoothDevice.BOND_NONE)
+                    pair_cancel = true;
+
+                dismiss();
             } else if (BluetoothDevice.ACTION_PAIRING_CANCEL.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device == null || device.equals(mDevice)) {
@@ -301,6 +305,8 @@ public final class BluetoothPairingDialog extends AlertActivity implements
 
     @Override
     protected void onDestroy() {
+        if (pair_cancel)
+            onCancel();
         super.onDestroy();
         unregisterReceiver(mReceiver);
     }
@@ -366,6 +372,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     }
 
     private void onCancel() {
+        pair_cancel = true;
         mDevice.cancelPairingUserInput();
         String type = mDeviceManager.getType(mDevice);
         Log.d(TAG, "device type" + type);
@@ -389,6 +396,7 @@ public final class BluetoothPairingDialog extends AlertActivity implements
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case BUTTON_POSITIVE:
+                pair_cancel = false;
                 if (mPairingView != null) {
                     onPair(mPairingView.getText().toString());
                 } else {
