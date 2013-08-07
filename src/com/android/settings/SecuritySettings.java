@@ -278,7 +278,7 @@ public class SecuritySettings extends SettingsPreferenceFragment
             Intent intent = new Intent();
             if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
                 intent.setClassName("com.android.settings",
-                        "com.android.settings.multisimsettings.MultiSimSettingTab");
+                        "com.android.settings.SelectSubscription");
                 intent.putExtra(SelectSubscription.PACKAGE, "com.android.settings");
                 intent.putExtra(SelectSubscription.TARGET_CLASS,
                         "com.android.settings.IccLockSettings");

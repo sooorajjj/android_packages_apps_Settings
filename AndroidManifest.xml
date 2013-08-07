@@ -634,7 +634,6 @@
         <!-- Multi Sim (Subscription) Settings Widget for Tab Layout-->
         <activity android:name=".multisimsettings.MultiSimSettingTab"
                 android:label="@string/mobile_network_setting"
-                android:process="com.android.phone"
                 android:configChanges="orientation|screenSize|keyboardHidden"
                 android:parentActivityName=".multisimsettings.MultiSimSettings">
            <intent-filter>
@@ -645,8 +644,7 @@
 
         <!-- Multi Sim Configuration in Tab Layout -->
         <activity android:name=".multisimsettings.MultiSimConfiguration"
-                android:label="@string/multi_sim_settings_title"
-                android:process="com.android.phone">
+                android:label="@string/multi_sim_settings_title">
            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
