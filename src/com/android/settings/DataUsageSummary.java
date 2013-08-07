@@ -1723,6 +1723,7 @@ public class DataUsageSummary extends Fragment {
     public static class ConfirmLimitFragment extends DialogFragment {
         private static final String EXTRA_MESSAGE = "message";
         private static final String EXTRA_LIMIT_BYTES = "limitBytes";
+        private static final String EXTRA_TAG_NAME = "tagName";
 
         public static void show(DataUsageSummary parent) {
             if (null == parent || !parent.isAdded())
@@ -1730,37 +1731,42 @@ public class DataUsageSummary extends Fragment {
 
             final Resources res = parent.getResources();
             final CharSequence message;
-            final long minLimitBytes = (long) (
-                    parent.mPolicyEditor.getPolicy(parent.mTemplate).warningBytes * 1.2f);
-            final long limitBytes;
 
-            // TODO: customize default limits based on network template
-            final String currentTab = parent.mCurrentTab;
-            if (TAB_3G.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (TAB_4G.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (TAB_MOBILE.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (currentTab.startsWith(TAB_SIM)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+            if (parent.mPolicyEditor.getPolicy(parent.mTemplate) != null) {
+                final long minLimitBytes = (long) (
+                        parent.mPolicyEditor.getPolicy(parent.mTemplate).warningBytes * 1.2f);
 
-            } else {
-                throw new IllegalArgumentException("unknown current tab: " + currentTab);
+
+                final long limitBytes;
+
+                // TODO: customize default limits based on network template
+                final String currentTab = parent.mCurrentTab;
+                if (TAB_3G.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (TAB_4G.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (TAB_MOBILE.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (currentTab.startsWith(TAB_SIM)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else {
+                    throw new IllegalArgumentException("unknown current tab: " + currentTab);
+                }
+
+                final Bundle args = new Bundle();
+                args.putCharSequence(EXTRA_MESSAGE, message);
+                args.putLong(EXTRA_LIMIT_BYTES, limitBytes);
+                args.putString(EXTRA_TAG_NAME, currentTab);
+
+                final ConfirmLimitFragment dialog = new ConfirmLimitFragment();
+                dialog.setArguments(args);
+                dialog.setTargetFragment(parent, 0);
+                dialog.show(parent.getFragmentManager(), TAG_CONFIRM_LIMIT);
             }
-
-            final Bundle args = new Bundle();
-            args.putCharSequence(EXTRA_MESSAGE, message);
-            args.putLong(EXTRA_LIMIT_BYTES, limitBytes);
-
-            final ConfirmLimitFragment dialog = new ConfirmLimitFragment();
-            dialog.setArguments(args);
-            dialog.setTargetFragment(parent, 0);
-            dialog.show(parent.getFragmentManager(), TAG_CONFIRM_LIMIT);
         }
 
         @Override
@@ -1769,6 +1775,7 @@ public class DataUsageSummary extends Fragment {
 
             final CharSequence message = getArguments().getCharSequence(EXTRA_MESSAGE);
             final long limitBytes = getArguments().getLong(EXTRA_LIMIT_BYTES);
+            final String tabName = getArguments().getString(EXTRA_TAG_NAME);
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(R.string.data_usage_limit_dialog_title);
@@ -1778,7 +1785,7 @@ public class DataUsageSummary extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
-                    if (target != null) {
+                    if (target != null && tabName.equals(target.mCurrentTab)) {
                         target.setPolicyLimitBytes(limitBytes);
                     }
                 }
