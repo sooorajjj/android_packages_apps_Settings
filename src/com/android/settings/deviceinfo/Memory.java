@@ -204,12 +204,12 @@ public class Memory extends SettingsPreferenceFragment {
         }
         super.onDestroy();
     }
-
+/*
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.storage, menu);
     }
-
+*/
     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
         public void onReceive(Context content, Intent intent) {
              String action = intent.getAction();
@@ -218,13 +218,13 @@ public class Memory extends SettingsPreferenceFragment {
              }
         }
     };
-
+/*
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
       final MenuItem usb = menu.findItem(R.id.storage_usb);
        usb.setVisible(!isMassStorageEnabled());
     }
-
+*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
