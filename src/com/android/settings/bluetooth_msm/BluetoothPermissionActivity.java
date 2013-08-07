@@ -380,6 +380,9 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         if (mRememberChoiceValue && (requestType == BluetoothDevice.REQUEST_TYPE_PHONEBOOK_ACCESS)) {
             savePhonebookPermissionChoice(CachedBluetoothDevice.PHONEBOOK_ACCESS_ALLOWED);
         }
+        if (mRememberChoiceValue && (requestType == BluetoothDevice.REQUEST_TYPE_MESSAGE_ACCESS)) {
+            saveMapPermissionChoice(CachedBluetoothDevice.MAP_ACCESS_ALLOWED);
+        }
         sendIntentToReceiver(BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY, true,
                              BluetoothDevice.EXTRA_ALWAYS_ALLOWED, mRememberChoiceValue);
         mHandler.removeMessages(MSG_INTERNAL_USER_CONFIRM_TIMEOUT);
@@ -391,6 +394,9 @@ public class BluetoothPermissionActivity extends AlertActivity implements
 
         if (mRememberChoiceValue && (requestType == BluetoothDevice.REQUEST_TYPE_PHONEBOOK_ACCESS)) {
             savePhonebookPermissionChoice(CachedBluetoothDevice.PHONEBOOK_ACCESS_REJECTED);
+        }
+        if (mRememberChoiceValue && (requestType == BluetoothDevice.REQUEST_TYPE_MESSAGE_ACCESS)) {
+            saveMapPermissionChoice(CachedBluetoothDevice.MAP_ACCESS_REJECTED);
         }
         sendIntentToReceiver(BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY, false,
                              null, false // dummy value, no effect since last param is null
@@ -449,6 +455,17 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         return true;
     }
 
+    private void saveMapPermissionChoice(int permissionChoice) {
+        LocalBluetoothManager bluetoothManager = LocalBluetoothManager.getInstance(this);
+        CachedBluetoothDeviceManager cachedDeviceManager =
+            bluetoothManager.getCachedDeviceManager();
+        CachedBluetoothDevice cachedDevice = cachedDeviceManager.findDevice(mDevice);
+        try {
+            cachedDevice.setMapPermissionChoice(permissionChoice);
+        } catch (NullPointerException ex) {
+            Log.e(TAG, "Exception occured in savePhonebookPermissionChoice");
+        }
+    }
     private void savePhonebookPermissionChoice(int permissionChoice) {
         LocalBluetoothManager bluetoothManager = LocalBluetoothManager.getInstance(this);
         CachedBluetoothDeviceManager cachedDeviceManager =

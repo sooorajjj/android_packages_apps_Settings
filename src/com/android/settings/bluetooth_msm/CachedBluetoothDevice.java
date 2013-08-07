@@ -68,8 +68,19 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private boolean mDeviceRemove;
 
     private int mPhonebookPermissionChoice;
+    private int mMapPermissionChoice;
 
     private final Collection<Callback> mCallbacks = new ArrayList<Callback>();
+
+    // Following constants indicate the user's choices of Message access settings
+    // User hasn't made any choice or settings app has wiped out the memory
+    final static int MAP_ACCESS_UNKNOWN = 0;
+    // User has accepted the connection and let Settings app remember the decision
+    final static int MAP_ACCESS_ALLOWED = 1;
+    // User has rejected the connection and let Settings app remember the decision
+    final static int MAP_ACCESS_REJECTED = 2;
+
+    private final static String MAP_PREFS_NAME = "bluetooth_map_permission";
 
     // Following constants indicate the user's choices of Phone book access settings
     // User hasn't made any choice or settings app has wiped out the memory
@@ -363,6 +374,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         fetchBtClass();
         updateProfiles();
         fetchPhonebookPermissionChoice();
+        fetchMapPermissionChoice();
 
         mVisible = false;
         dispatchAttributesChanged();
@@ -546,6 +558,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             mProfiles.clear();
             mConnectAfterPairing = false;  // cancel auto-connect
             setPhonebookPermissionChoice(PHONEBOOK_ACCESS_UNKNOWN);
+            setMapPermissionChoice(MAP_ACCESS_UNKNOWN);
         }
 
         if (bondState == BluetoothDevice.BOND_BONDED) {
@@ -669,6 +682,22 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         return mPhonebookPermissionChoice;
     }
 
+    int getMapPermissionChoice() {
+        return mMapPermissionChoice;
+    }
+
+    void setMapPermissionChoice(int permissionChoice) {
+        SharedPreferences.Editor editor =
+            mContext.getSharedPreferences(MAP_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        if (permissionChoice == MAP_ACCESS_UNKNOWN) {
+            editor.remove(mDevice.getAddress());
+        } else {
+            editor.putInt(mDevice.getAddress(), permissionChoice);
+        }
+        editor.commit();
+        mMapPermissionChoice = permissionChoice;
+    }
+
     void setPhonebookPermissionChoice(int permissionChoice) {
         SharedPreferences.Editor editor =
             mContext.getSharedPreferences(PHONEBOOK_PREFS_NAME, Context.MODE_PRIVATE).edit();
@@ -679,6 +708,13 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         }
         editor.commit();
         mPhonebookPermissionChoice = permissionChoice;
+    }
+
+    private void fetchMapPermissionChoice() {
+        SharedPreferences preference = mContext.getSharedPreferences(MAP_PREFS_NAME,
+                                                                     Context.MODE_PRIVATE);
+        mMapPermissionChoice = preference.getInt(mDevice.getAddress(),
+                                                       MAP_ACCESS_UNKNOWN);
     }
 
     private void fetchPhonebookPermissionChoice() {
