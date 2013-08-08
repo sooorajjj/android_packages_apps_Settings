@@ -127,7 +127,6 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private int mDefaultContrastValue = 0;
 
     /**
-     * The Service runs in vendor/qcom/proprietary/mm-core directory.
      *  It is used to update the screen's hue, saturation, contrast, and intensity.
      */
     IPPService mPPService = null;
