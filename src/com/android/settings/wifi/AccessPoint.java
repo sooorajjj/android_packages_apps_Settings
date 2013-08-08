@@ -410,7 +410,8 @@ class AccessPoint extends Preference {
             return;
         mConfig = new WifiConfiguration();
         mConfig.SSID = AccessPoint.convertToQuotedString(ssid);
-        mConfig.allowedKeyManagement.set(KeyMgmt.NONE);
+	mConfig.BSSID = bssid;
+	mConfig.allowedKeyManagement.set(KeyMgmt.NONE);
     }
 
     static boolean isCarrierAp(AccessPoint mAccessPoint) {
