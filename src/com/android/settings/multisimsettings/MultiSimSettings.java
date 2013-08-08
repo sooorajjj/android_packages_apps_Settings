@@ -410,7 +410,7 @@ public class MultiSimSettings extends PreferenceActivity {
         }
     }
 
-    private static class MultiSimDialog extends DialogFragment {
+    public static class MultiSimDialog extends DialogFragment {
         public final static String TAG = "MultiSimDialog";
 
         static int mSubId = -1;
