@@ -1801,4 +1801,5 @@
     <string name="external_storage_turn_on">Almacenamiento externo se ha encendido</string>
     <string name="external_storage_turn_off">Almacenamiento externo se ha apagado</string>
     <string name="sim_pin_too_short">PIN debe tener al menos 4 dígitos</string>
+    <string name="usb_charging_title">Cargando</string>
 </resources>
