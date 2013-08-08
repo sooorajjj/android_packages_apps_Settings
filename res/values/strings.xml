@@ -4746,4 +4746,6 @@
     <string name="APN_NAME_CUSUPL">China Unicom AGPS</string>
     <string name="APN_NAME_CTNET">CTNET</string>
     <string name="APN_NAME_CTWAP">CTWAP</string>
+    <!-- Roaming Date Settings -->
+    <string name="label_global_roaming_settings">Global roaming settings</string>
 </resources>
