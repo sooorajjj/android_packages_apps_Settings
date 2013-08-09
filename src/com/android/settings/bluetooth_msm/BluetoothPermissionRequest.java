@@ -183,8 +183,9 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
     private boolean checkUserChoice() {
         boolean processed = false;
 
-        // we only remember PHONEBOOK permission
-        if (mRequestType != BluetoothDevice.REQUEST_TYPE_PHONEBOOK_ACCESS) {
+        // we only remember PHONEBOOK / Message Access permission
+        if (mRequestType != BluetoothDevice.REQUEST_TYPE_PHONEBOOK_ACCESS &&
+            mRequestType != BluetoothDevice.REQUEST_TYPE_MESSAGE_ACCESS) {
             return processed;
         }
 
@@ -198,23 +199,46 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
                 bluetoothManager.getProfileManager(), mDevice);
         }
 
-        int phonebookPermission = cachedDevice.getPhonebookPermissionChoice();
+        if (mRequestType == BluetoothDevice.REQUEST_TYPE_PHONEBOOK_ACCESS) {
+            int phonebookPermission = cachedDevice.getPhonebookPermissionChoice();
 
-        if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_UNKNOWN) {
-            return processed;
-        }
+            if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_UNKNOWN ) {
+                return processed;
+            }
 
-        String intentName = BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY;
-        if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_ALLOWED) {
-            sendIntentToReceiver(intentName, true, BluetoothDevice.EXTRA_ALWAYS_ALLOWED, true);
-            processed = true;
-        } else if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_REJECTED) {
-            sendIntentToReceiver(intentName, false,
-                                 null, false // dummy value, no effect since previous param is null
-                                 );
-            processed = true;
-        } else {
-            Log.e(TAG, "Bad phonebookPermission: " + phonebookPermission);
+            String intentName = BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY;
+            if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_ALLOWED) {
+                sendIntentToReceiver(intentName, true,
+                                     BluetoothDevice.EXTRA_ALWAYS_ALLOWED, true);
+                processed = true;
+            } else if (phonebookPermission == CachedBluetoothDevice.PHONEBOOK_ACCESS_REJECTED) {
+                sendIntentToReceiver(intentName, false,
+                                     null, false // dummy value, no effect since previous param is null
+                                     );
+                processed = true;
+            } else {
+                Log.e(TAG, "Bad phonebookPermission: " + phonebookPermission);
+            }
+        } else if (mRequestType == BluetoothDevice.REQUEST_TYPE_MESSAGE_ACCESS) {
+            int mapPermission = cachedDevice.getMapPermissionChoice();
+
+            if (mapPermission == CachedBluetoothDevice.MAP_ACCESS_UNKNOWN ) {
+                return processed;
+            }
+
+            String intentName = BluetoothDevice.ACTION_CONNECTION_ACCESS_REPLY;
+            if (mapPermission == CachedBluetoothDevice.MAP_ACCESS_ALLOWED) {
+                sendIntentToReceiver(intentName, true,
+                                     BluetoothDevice.EXTRA_ALWAYS_ALLOWED, true);
+                processed = true;
+            } else if (mapPermission == CachedBluetoothDevice.MAP_ACCESS_REJECTED) {
+                sendIntentToReceiver(intentName, false,
+                                     null, false // dummy value, no effect since previous param is null
+                                     );
+                processed = true;
+            } else {
+                Log.e(TAG, "Bad Message Access Permission: " + mapPermission);
+            }
         }
         return processed;
     }
