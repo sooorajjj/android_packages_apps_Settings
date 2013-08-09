@@ -47,6 +47,8 @@ import java.util.Map;
 public class ChooseAccountActivity extends PreferenceActivity {
 
     private static final String TAG = "ChooseAccountActivity";
+    public static final String ACCOUNT_TYPE_SIM = "com.android.sim";
+    public static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
     private String[] mAuthorities;
     private PreferenceGroup mAddAccountGroup;
     private final ArrayList<ProviderEntry> mProviderList = new ArrayList<ProviderEntry>();
@@ -130,7 +132,9 @@ public class ChooseAccountActivity extends PreferenceActivity {
                     && !mAccountTypesFilter.contains(accountType)) {
                 addAccountPref = false;
             }
-            if (addAccountPref) {
+            if (addAccountPref &&
+                !ACCOUNT_TYPE_PHONE.equals(accountType) &&
+                !ACCOUNT_TYPE_SIM.equals(accountType)) {
                 mProviderList.add(new ProviderEntry(providerName, accountType));
             } else {
                 if (Log.isLoggable(TAG, Log.VERBOSE)) {
