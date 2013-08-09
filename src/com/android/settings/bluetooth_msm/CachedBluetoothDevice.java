@@ -53,6 +53,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     private short mRssi;
     private String mType;
     private String mUuids;
+    private boolean isDevConnected = false;
     private BluetoothClass mBtClass;
     private HashMap<LocalBluetoothProfile, Integer> mProfileConnectionState;
 
@@ -207,6 +208,13 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     };
 
     void disconnect() {
+        if("LE".equals(mType)) {
+            isDevConnected = false;
+            if((mDevice.getBondState() != BluetoothDevice.BOND_BONDED)) {
+               BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+               adapter.gattAutoConnectCancel(mPreferredDeviceListCallback, mDevice);
+            }
+         }
        for (LocalBluetoothProfile profile : mProfiles) {
            disconnect(profile);
        }
@@ -353,6 +361,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         boolean isHogpDevice = false;
         if (mDevice != null) {
             if("LE".equals(mType)) {
+                Log.d(TAG,"type=" + mType);
                 if(mUuids != null) {
                     String[] srvUuids = mUuids.split(",");
                     for(int i=0; i<srvUuids.length; i++) {
@@ -362,15 +371,19 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
                         }
                     }
                 }
-            }
-
-            if(isHogpDevice) {
-                boolean result = false;
-                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
+                if(isHogpDevice) {
+                    boolean result = false;
+                    if(!isDevConnected) {
+                        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                        adapter.gattAutoConnect(mPreferredDeviceListCallback, mDevice);
+                        isDevConnected = true;
+                    }
+                }
+                else
+                    mDevice.createBond();
             }
             else
-               mDevice.createBond();
+                mDevice.createBond();
        } else
            return false;
        mConnectAfterPairing = true;  // auto-connect after pairing
