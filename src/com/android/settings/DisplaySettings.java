@@ -78,6 +78,11 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_CABL_BRIGHTNESS = "cabl_brightness";
     private static final int DLG_GLOBAL_CHANGE_WARNING = 1;
 
+    private static final int CABL_CON_TYPE_DISABLE = 0;
+    private static final int CABL_CON_TYPE_ENABLE  = 1;
+
+    private static final String CABL_SERVICE_INTENT = "org.codeaurora.cabl.ICABLService";
+
     private DisplayManager mDisplayManager;
     private BrightnessPreference mBrightnessPreference;
     private Preference mBrightnessSettingsPreference;
@@ -452,7 +457,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                     public void run() {
                         try {
                             Log.d(TAG, "startCABL");
-                            boolean result = mCABLService.startCABL();
+                            boolean result = mCABLService.control(CABL_CON_TYPE_ENABLE);
                             //0-disable cabl 1-enable cabl
                             Settings.Global.putInt(resolver,
                                     CABL_ENABLED,
@@ -480,7 +485,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                     public void run() {
                         try {
                             Log.d(TAG, "stopCABL");
-                            boolean result = mCABLService.stopCABL();
+                            boolean result = mCABLService.control(CABL_CON_TYPE_DISABLE);
                             //0-disable cabl 1-enable cabl
                             Settings.Global.putInt(resolver,
                                     CABL_ENABLED,
@@ -494,33 +499,17 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
     }
 
-    private void setCABLStateOnResume(){
-        boolean status = (1 == android.provider.Settings.Global.getInt(getContentResolver(),
-                CABL_ENABLED, 0));
-        Log.d(TAG, "CABL services status = "+status );
-        try{
-            if (null != mCABLService)
-                mCABLService.setCABLStateOnResume(status);
-        }catch(RemoteException e){
-            Log.e(TAG, "CABL services setCABLStateOnResume exception");
-        }
-    }
-
-
     private class CABLServiceConnection implements ServiceConnection{
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mCABLService = ICABLService.Stub.asInterface((IBinder)service);
             Log.d(TAG, "onServiceConnected, service=" + mCABLService);
-            //CABLDialogPreference.setCABLService(mCABLService);
-            setCABLStateOnResume();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mCABLService = null;
-            //CABLDialogPreference.setCABLService(null);
         }
 
     }
@@ -529,7 +518,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         Log.d(TAG, "initCABLService");
 
         mCABLServiceConn = new CABLServiceConnection();
-        Intent i = new Intent(ICABLService.class.getName());
+        Intent i = new Intent(CABL_SERVICE_INTENT);
         boolean ret = getActivity().bindService(i, mCABLServiceConn, Context.BIND_AUTO_CREATE);
     }
 
