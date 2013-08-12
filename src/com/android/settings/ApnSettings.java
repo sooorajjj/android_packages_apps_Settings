@@ -85,6 +85,8 @@ public class ApnSettings extends PreferenceActivity implements
     private static final String CHINA_UNION_PLMN = "46001";
     private static boolean mRestoreDefaultApnMode;
 
+    private static final String APN_TYPE_DM = "dm";
+
     private RestoreApnUiHandler mRestoreApnUiHandler;
     private RestoreApnProcessHandler mRestoreApnProcessHandler;
     private HandlerThread mRestoreDefaultApnThread;
@@ -207,6 +209,12 @@ public class ApnSettings extends PreferenceActivity implements
                 if (SystemProperties.getBoolean("persist.env.settings.hidesupl", false)
                         && CHINA_UNION_PLMN.equals(MSimTelephonyManager.getDefault()
                         .getSimOperator(mSubscription)) && type.equals("supl")) {
+                    cursor.moveToNext();
+                    continue;
+                }
+
+                //remove the test item
+                if(APN_TYPE_DM.equalsIgnoreCase(type)){
                     cursor.moveToNext();
                     continue;
                 }
