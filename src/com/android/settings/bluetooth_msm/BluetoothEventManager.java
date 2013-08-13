@@ -199,6 +199,13 @@ final class BluetoothEventManager {
             String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
             String type = intent.getStringExtra(BluetoothDevice.EXTRA_TYPE);
             String uuids = intent.getStringExtra(BluetoothDevice.EXTRA_UUIDS);
+
+            // check if it's "valid" device advertising; if not, return directly
+            if("LE".equalsIgnoreCase(type)) {
+              // We are expecting LE device advertises uuid of services it supports
+                 if(uuids == null || uuids.length() == 0)
+                     return;
+	    }
             // TODO Pick up UUID. They should be available for 2.1 devices.
             // Skip for now, there's a bluez problem and we are not getting uuids even for 2.1.
             CachedBluetoothDevice cachedDevice = mDeviceManager.findDevice(device);
