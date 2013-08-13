@@ -18,6 +18,7 @@ package com.android.settings.wifi;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
@@ -26,6 +27,7 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.UserHandle;
+import android.os.SystemProperties;
 import android.provider.Settings;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -43,6 +45,7 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
 
     private final WifiManager mWifiManager;
     private boolean mStateMachineEvent;
+    private ContentResolver mContentResolver;
     private final IntentFilter mIntentFilter;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -51,6 +54,9 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
                 handleWifiStateChanged(intent.getIntExtra(
                         WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN));
+                if (needPrompt()) {
+                    setSwitchChecked(false);
+                }
             } else if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
                 if (!mConnected.get()) {
                     handleStateChanged(WifiInfo.getDetailedStateOf((SupplicantState)
@@ -74,12 +80,16 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         // The order matters! We really should not depend on this. :(
         mIntentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        mContentResolver = context.getContentResolver();
     }
 
     public void resume() {
         // Wi-Fi state is sticky, so just let the receiver update UI
         mContext.registerReceiver(mReceiver, mIntentFilter);
         mSwitch.setOnCheckedChangeListener(this);
+        if (needPrompt()) {
+            setSwitchChecked(false);
+        }
     }
 
     public void pause() {
@@ -98,6 +108,9 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         boolean isDisabled = wifiState == WifiManager.WIFI_STATE_DISABLED;
         mSwitch.setChecked(isEnabled);
         mSwitch.setEnabled(isEnabled || isDisabled);
+        if (needPrompt()) {
+            setSwitchChecked(false);
+        }
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -105,9 +118,13 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         if (mStateMachineEvent) {
             return;
         }
+
         // Show toast message if Wi-Fi is not allowed in airplane mode
-        if (isChecked && !WirelessSettings.isRadioAllowed(mContext, Settings.Global.RADIO_WIFI)) {
-            Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
+        if (isChecked
+                && (needPrompt() || !WirelessSettings.isRadioAllowed(
+                        mContext, Settings.Global.RADIO_WIFI))) {
+            Toast.makeText(mContext, R.string.wifi_in_airplane_mode,
+                    Toast.LENGTH_SHORT).show();
             // Reset switch to off. No infinite check/listenenr loop.
             buttonView.setChecked(false);
         }
@@ -119,12 +136,19 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             mWifiManager.setWifiApEnabled(null, false);
         }
 
-        if (mWifiManager.setWifiEnabled(isChecked)) {
-            // Intent has been taken into account, disable until new state is active
-            mSwitch.setEnabled(false);
+        // shouldn't setWifiEnabled(true) in airplane mode.
+        if (isChecked && needPrompt()) {
+            return;
         } else {
-            // Error
-            Toast.makeText(mContext, R.string.wifi_error, Toast.LENGTH_SHORT).show();
+            if (mWifiManager.setWifiEnabled(isChecked)) {
+                // Intent has been taken into account, disable until new state
+                // is active
+                mSwitch.setEnabled(false);
+            } else {
+                // Error
+                Toast.makeText(mContext, R.string.wifi_error,
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -173,5 +197,18 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
             }
         }
         */
+    }
+
+    private boolean needPrompt() {
+        if (mContentResolver == null) {
+            return false;
+        } else {
+            boolean airplane = (android.provider.Settings.System.getInt(mContentResolver,
+                    android.provider.Settings.System.AIRPLANE_MODE_ON, 0) != 0);
+            boolean needPrompt =
+                    SystemProperties.getBoolean("persist.env.settings.apprompt", false);
+
+            return airplane && needPrompt;
+        }
     }
 }
