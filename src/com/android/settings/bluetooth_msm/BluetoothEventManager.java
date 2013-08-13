@@ -305,7 +305,12 @@ final class BluetoothEventManager {
                 }
                 int reason = intent.getIntExtra(BluetoothDevice.EXTRA_REASON,
                         BluetoothDevice.ERROR);
-
+                String type = cachedDevice.getType();
+                if (type != null) {
+                    if (type.equalsIgnoreCase("LE")) {
+                        cachedDevice.disconnect();
+                    }
+                }
                 showUnbondMessage(context, cachedDevice.getName(), reason);
             }
         }
