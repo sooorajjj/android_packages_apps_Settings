@@ -2030,7 +2030,8 @@
     <string name="smsc_refresh_error">刷新错误</string>
     <string name="dns_allowed">0.0.0.0 允许</string>
     <string name="dns_not_allowed">0.0.0.0 不允许</string>
-
+    <string name="wifi_advanced_gateway">网关</string>
+    <string name="wifi_advanced_network_netmask">网络掩码</string>
     <!-- apn names for carriers -->
     <string name="APN_NAME_CMNET">中国移动互联网 CMNET</string>
     <string name="APN_NAME_CMWAP">中国移动WAP设置 CMWAP</string>
