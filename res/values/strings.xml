@@ -4792,4 +4792,19 @@
     <string name="wifi_to_gsm_connect_type_title">WLAN->Cellular hint</string>
     <string name="wifi2cell_connect_type">"wifi_gsm_connect_type"</string>
     <string name="radio_info">Radio Info</string>
+    <string name="wifi_set_priority_type_title">Set AP priority manually</string>
+    <string name="wifi_set_priority_type_summary">Allow to set priority for each access point manually</string>
+    <string name="wifi_set_priority_settings_title">AP priority settings</string>
+    <string name="wifi_set_priority_settings_summary">Click to set priority of each access point</string>
+    <string name="wifi_priority_settings_label">Priority settings</string>
+    <string name="wifi_configured_ap_list">Remembered access point list</string>
+    <string name="wifi_priority_label">Priority</string>
+    <string name="wifi_priority_changed">Priority old value=<xliff:g id="old_value">%s</xliff:g>,new value=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="default_trust_access_points">Default credible access points</string>
+    <string name="configed_access_points">Credible access points</string>
+    <string name="unknown_access_points">Unknown access points</string>
+    <string name="carrier_ssid">CMCC</string>
+    <string name="carrier_edu_ssid">CMCC-EDU</string>
+    <string name="wifi_priority_type">wifi_priority_type</string>
+
 </resources>
