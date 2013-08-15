@@ -4670,7 +4670,7 @@
     <string name="summary_call_settings">Set voice mail, call options for dual SIMs</string>
     <string name="sim_enabler_title">SIM card</string>
     <string name="sim_enabler">SIM card</string>
-    <string name="sim_enabler_summary">SIM is %1$s</string>
+    <string name="sim_enabler_summary">SIM is <xliff:g id="status">%1$s</xliff:g></string>
     <string name="sim_enabled">enabled</string>
     <string name="sim_disabled">disabled</string>
     <string name="sim_missing">missing or error</string>
