@@ -197,6 +197,11 @@ public class MasterClear extends Fragment {
         for (int i=0; i<N; i++) {
             Account account = accounts[i];
             AuthenticatorDescription desc = null;
+            if ((account != null) && (account.type.equals(Settings.ACCOUNT_TYPE_SIM)
+                    || account.type.equals(Settings.ACCOUNT_TYPE_PHONE))){
+                //Do not display SIM & Phone account
+                continue;
+            }
             for (int j=0; j<M; j++) {
                 if (account.type.equals(descs[j].type)) {
                     desc = descs[j];

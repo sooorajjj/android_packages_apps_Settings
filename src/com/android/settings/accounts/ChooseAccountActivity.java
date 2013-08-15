@@ -33,6 +33,8 @@ import android.preference.PreferenceScreen;
 import android.util.Log;
 import com.android.internal.util.CharSequences;
 import com.android.settings.R;
+import static com.android.settings.Settings.ACCOUNT_TYPE_SIM;
+import static com.android.settings.Settings.ACCOUNT_TYPE_PHONE;
 import com.google.android.collect.Maps;
 
 import java.util.ArrayList;
@@ -47,8 +49,6 @@ import java.util.Map;
 public class ChooseAccountActivity extends PreferenceActivity {
 
     private static final String TAG = "ChooseAccountActivity";
-    public static final String ACCOUNT_TYPE_SIM = "com.android.sim";
-    public static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
     private String[] mAuthorities;
     private PreferenceGroup mAddAccountGroup;
     private final ArrayList<ProviderEntry> mProviderList = new ArrayList<ProviderEntry>();

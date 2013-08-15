@@ -344,6 +344,10 @@ public class ManageAccountsSettings extends AccountPreferenceBase
                     }
                 }
             }
+            if (Settings.ACCOUNT_TYPE_PHONE.equals(account.type) ||
+                Settings.ACCOUNT_TYPE_SIM.equals(account.type)) {
+                showAccount = false;
+            }
 
             if (showAccount) {
                 final Drawable icon = getDrawableForType(account.type);

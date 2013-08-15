@@ -34,6 +34,8 @@ import android.util.Log;
 import com.android.settings.AccountPreference;
 import com.android.settings.DialogCreatable;
 import com.android.settings.R;
+import static com.android.settings.Settings.ACCOUNT_TYPE_SIM;
+import static com.android.settings.Settings.ACCOUNT_TYPE_PHONE;
 
 import java.util.ArrayList;
 
@@ -152,7 +154,8 @@ public class SyncSettings extends AccountPreferenceBase
                 }
             }
 
-            if (showAccount) {
+            if (showAccount && !account.type.equals(ACCOUNT_TYPE_PHONE)
+                    && !account.type.equals(ACCOUNT_TYPE_SIM)) {
                 final Drawable icon = getDrawableForType(account.type);
                 final AccountPreference preference =
                         new AccountPreference(getActivity(), account, icon, auths, true);
