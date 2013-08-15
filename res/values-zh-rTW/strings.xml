@@ -1853,7 +1853,7 @@
     <string name="same_name_alert">"兩張SIM卡不能同名!"</string>
     <string name="sim_enabler_title">"SIM 卡"</string>
     <string name="sim_enabler">"SIM 卡"</string>
-    <string name="sim_enabler_summary">"SIM 卡 %1$s"</string>
+    <string name="sim_enabler_summary">"SIM 卡 "<xliff:g id="status">%1$s</xliff:g></string>
     <string name="sim_enabled">"已啟用"</string>
     <string name="sim_disabled">"已禁用"</string>
     <string name="sim_missing">"缺失或錯誤"</string>

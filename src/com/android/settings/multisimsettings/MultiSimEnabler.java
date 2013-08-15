@@ -493,11 +493,11 @@ public class MultiSimEnabler extends CheckBoxPreference implements
         boolean isActivated = mSubscriptionManager.isSubActive(mSubscriptionId);
         if (isActivated) {
             mState = true;
-            mSummary = String.format(res.getString(R.string.sim_enabler_summary),
+            mSummary = mContext.getString(R.string.sim_enabler_summary,
                     res.getString(R.string.sim_enabled));
         } else {
             mState = false;
-            mSummary = String.format(res.getString(R.string.sim_enabler_summary),
+            mSummary = mContext.getString(R.string.sim_enabler_summary,
                     res.getString(mCardSubscrInfo[mSubscriptionId] != null ?
                             R.string.sim_disabled : R.string.sim_missing));
         }

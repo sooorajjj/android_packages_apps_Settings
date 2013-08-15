@@ -1033,7 +1033,7 @@
     <string name="subscription_invalid">"没有SIM卡，或SIM卡被禁用"</string>
     <string name="sim_enabler_title">"SIM卡"</string>
     <string name="sim_enabler">"SIM卡"</string>
-    <string name="sim_enabler_summary">"SIM卡%1$s"</string>
+    <string name="sim_enabler_summary">"SIM卡"<xliff:g id="status">%1$s</xliff:g></string>
     <string name="sim_enabled">"已启用"</string>
     <string name="sim_disabled">"已禁用"</string>
     <string name="sim_missing">"缺失或错误"</string>
