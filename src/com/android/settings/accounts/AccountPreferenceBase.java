@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.android.settings.SettingsPreferenceFragment;
+import static com.android.settings.Settings.ACCOUNT_TYPE_SIM;
+import static com.android.settings.Settings.ACCOUNT_TYPE_PHONE;
+
 import com.google.android.collect.Maps;
 
 import android.accounts.Account;
@@ -147,7 +150,9 @@ class AccountPreferenceBase extends SettingsPreferenceFragment
             AuthenticatorDescription desc = null;
             try {
                 desc = mAuthenticatorHelper.getAccountTypeDescription(accountType);
-                if (desc != null && desc.accountPreferencesId != 0) {
+                if (desc != null && desc.accountPreferencesId != 0 &&
+                    !ACCOUNT_TYPE_PHONE.equals(accountType) &&
+                    !ACCOUNT_TYPE_SIM.equals(accountType)) {
                     Context authContext = getActivity().createPackageContext(desc.packageName, 0);
                     prefs = getPreferenceManager().inflateFromResource(authContext,
                             desc.accountPreferencesId, parent);
