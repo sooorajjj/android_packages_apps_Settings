@@ -19,8 +19,10 @@ package com.android.settings.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.SystemProperties;
 import android.provider.Settings;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -40,6 +42,7 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
     private boolean mValidListener;
     private final LocalBluetoothAdapter mLocalAdapter;
     private final IntentFilter mIntentFilter;
+    private ContentResolver mContentResolver;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -55,6 +58,7 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
         mContext = context;
         mSwitch = switch_;
         mValidListener = false;
+        mContentResolver = context.getContentResolver();
 
         LocalBluetoothManager manager = LocalBluetoothManager.getInstance(context);
         if (manager == null) {
@@ -107,14 +111,20 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         // Show toast message if Bluetooth is not allowed in airplane mode
-        if (isChecked &&
-                !WirelessSettings.isRadioAllowed(mContext, Settings.Global.RADIO_BLUETOOTH)) {
-            Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
+        if (isChecked
+                && (needPrompt() || !WirelessSettings.isRadioAllowed(
+                        mContext, Settings.Global.RADIO_BLUETOOTH))) {
+            Toast.makeText(mContext, R.string.wifi_in_airplane_mode,
+                    Toast.LENGTH_SHORT).show();
             // Reset switch to off
             buttonView.setChecked(false);
         }
 
+        // shouldn't setBluetoothEnabled(true) in airplane mode.
         if (mLocalAdapter != null) {
+            if (isChecked && needPrompt()) {
+                return;
+            }
             mLocalAdapter.setBluetoothEnabled(isChecked);
         }
         mSwitch.setEnabled(false);
@@ -153,6 +163,19 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
             if (mValidListener) {
                 mSwitch.setOnCheckedChangeListener(this);
             }
+        }
+    }
+
+    private boolean needPrompt() {
+        if (mContentResolver == null) {
+            return false;
+        } else {
+            boolean airplane = (android.provider.Settings.System.getInt(mContentResolver,
+                    android.provider.Settings.System.AIRPLANE_MODE_ON, 0) != 0);
+            boolean needPrompt =
+                    SystemProperties.getBoolean("persist.env.settings.apprompt", false);
+
+            return airplane && needPrompt;
         }
     }
 }

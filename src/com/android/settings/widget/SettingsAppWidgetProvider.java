@@ -35,10 +35,12 @@ import android.os.IPowerManager;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UserManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.android.settings.R;
 import com.android.settings.bluetooth.LocalBluetoothAdapter;
@@ -789,6 +791,11 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
             Uri data = intent.getData();
             int buttonId = Integer.parseInt(data.getSchemeSpecificPart());
             if (buttonId == BUTTON_WIFI) {
+                if (needPrompt(context)) {
+                    Toast.makeText(context, R.string.wifi_in_airplane_mode,
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 sWifiState.toggleState(context);
             } else if (buttonId == BUTTON_BRIGHTNESS) {
                 toggleBrightness(context);
@@ -797,6 +804,11 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
             } else if (buttonId == BUTTON_GPS) {
                 sGpsState.toggleState(context);
             } else if (buttonId == BUTTON_BLUETOOTH) {
+                if (needPrompt(context)) {
+                    Toast.makeText(context, R.string.wifi_in_airplane_mode,
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 sBluetoothState.toggleState(context);
             }
         } else {
@@ -931,4 +943,17 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private boolean needPrompt(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        if (contentResolver == null) {
+            return false;
+        } else {
+            boolean airplane = (android.provider.Settings.System.getInt(contentResolver,
+                    android.provider.Settings.System.AIRPLANE_MODE_ON, 0) != 0);
+            boolean needPrompt =
+                    SystemProperties.getBoolean("persist.env.settings.apprompt", false);
+
+            return airplane && needPrompt;
+        }
+    }
 }
