@@ -2418,9 +2418,10 @@ public class DataUsageSummary extends Fragment {
         // build combined list of all limited networks
         final ArrayList<CharSequence> limited = Lists.newArrayList();
 
-        final TelephonyManager tele = TelephonyManager.from(context);
-        if (tele.getSimState() == SIM_STATE_READY) {
-            final String subscriberId = getActiveSubscriberId(context);
+        int sub = MSimTelephonyManager.getDefault().getPreferredDataSubscription();
+        MSimTelephonyManager msimTele = MSimTelephonyManager.from(context);
+        if (msimTele.getSimState(sub) == SIM_STATE_READY) {
+            final String subscriberId = getActiveSubscriberId(sub);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
             }
