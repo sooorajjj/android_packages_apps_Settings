@@ -365,8 +365,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 break;
             case R.id.icontrol:
                 mIntensityValue = progress;
-                //The screen intensity display value varies from -255 to 255.
-                mITv.setText(getString(R.string.intensity_str, progress - 255));
+                //The screen intensity display value varies from -200 to 200.
+                mITv.setText(getString(R.string.intensity_str, progress - 200));
                 break;
             default:
                 break;
@@ -423,7 +423,7 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
         /**
          * Hue  -> Valid from 0 to 360
          * Saturation -> Valid from 0 to 360
-         * Intensity  -> Valid from 0 to 510
+         * Intensity  -> Valid from 0 to 400
          * Contrast  -> Valid from 0 to 360
          */
         int minHueValue = getResources().getInteger(R.integer.minimum_hue_value);
