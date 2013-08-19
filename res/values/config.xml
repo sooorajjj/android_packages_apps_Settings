@@ -51,10 +51,10 @@
     <integer name="minimum_intensity_value" translatable="false">0</integer>
 
     <!-- This is used to define screen color's intensity progress bar maximum value-->
-    <integer name="maximum_intensity_value" translatable="false">510</integer>
+    <integer name="maximum_intensity_value" translatable="false">400</integer>
 
     <!-- This is used to define screen color's intensity progress bar default value-->
-    <integer name="default_intensity_value" translatable="false">255</integer>
+    <integer name="default_intensity_value" translatable="false">200</integer>
 
     <!-- This is used to define screen color's contrast progress bar minimum value-->
     <integer name="minimum_contrast_value" translatable="false">0</integer>
