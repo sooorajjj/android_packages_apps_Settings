@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import android.preference.PreferenceActivity;
 import android.provider.Telephony;
 import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -130,7 +132,8 @@ public class ApnEditor extends PreferenceActivity
             Telephony.Carriers.ROAMING_PROTOCOL, // 19
             Telephony.Carriers.MVNO_TYPE,   // 20
             Telephony.Carriers.MVNO_MATCH_DATA,  // 21
-            Telephony.Carriers.PPP_NUMBER // 22
+            Telephony.Carriers.PPP_NUMBER, // 22
+            Telephony.Carriers.LOCALIZED_NAME // 23
     };
 
     private static final int ID_INDEX = 0;
@@ -156,6 +159,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int MVNO_TYPE_INDEX = 20;
     private static final int MVNO_MATCH_DATA_INDEX = 21;
     private static final int PPP_NUMBER_INDEX = 22;
+    private static final int LOCALIZED_NAME_INDEX = 23;
 
 
     @Override
@@ -324,6 +328,22 @@ public class ApnEditor extends PreferenceActivity
                 getPreferenceScreen().removePreference(mPppNumber);
             }
 
+        }
+
+        // If can find a localized name, replace the APN name with it
+        String resName = mCursor.getString(LOCALIZED_NAME_INDEX);
+        if (resName != null && !resName.isEmpty()) {
+            int resId = getResources().getIdentifier(resName, "string", getPackageName());
+            String localizedName = null;
+            try {
+                localizedName = getResources().getString(resId);
+                Log.d(TAG, "Localized Apn Name is not editable");
+            } catch (NotFoundException e) {
+                Log.e(TAG, "Got execption while getting the localized apn name.", e);
+            }
+            if (!TextUtils.isEmpty(localizedName)) {
+                mName.setText(localizedName);
+            }
         }
 
         mName.setSummary(checkNull(mName.getText()));
