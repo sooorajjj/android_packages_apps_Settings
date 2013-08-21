@@ -694,6 +694,10 @@ public class DataUsageSummary extends Fragment {
         final Context context = getActivity();
         mTabHost.clearAllTabs();
 
+        if (!hasReadyMobileRadio(context)) {
+            mShowWifi = true;
+            mShowEthernet = true;
+        }
         final boolean mobileSplit = isMobilePolicySplit();
         if (mobileSplit && hasReadyMobile4gRadio(context)) {
             mTabHost.addTab(buildTabSpec(TAB_3G, R.string.data_usage_tab_3g));
