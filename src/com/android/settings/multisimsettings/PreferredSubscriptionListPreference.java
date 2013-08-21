@@ -301,8 +301,12 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
         if (subscription == mNumPhones) {
             return summariesPrompt[mNumPhones];
         } else {
-            return Settings.System.getString(mContext.getContentResolver(),
+            String name = Settings.System.getString(mContext.getContentResolver(),
                     Settings.System.MULTI_SIM_NAME[subscription]);
+            if (name.contains("%")) {
+                name = name.replace("%", "%%");
+            }
+            return name;
         }
     }
 
