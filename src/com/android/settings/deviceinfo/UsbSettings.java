@@ -215,6 +215,9 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mCharging.setChecked(false);
         }
 
+        if(getActivity() == null) {
+            return;
+        }
         UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
         if (um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER)) {
             Log.e(TAG, "USB is locked down");
