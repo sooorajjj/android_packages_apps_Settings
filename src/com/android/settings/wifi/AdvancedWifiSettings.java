@@ -22,6 +22,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiWatchdogStateMachine;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -50,6 +51,8 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_SCAN_ALWAYS_AVAILABLE = "wifi_scan_always_available";
     private static final String KEY_INSTALL_CREDENTIALS = "install_credentials";
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
+    private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
+    private static final String PROP_SSID = "persist.env.settings.ssid";
 
     private WifiManager mWifiManager;
 
@@ -140,6 +143,22 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             sleepPolicyPref.setValue(stringValue);
             updateSleepPolicySummary(sleepPolicyPref, stringValue);
         }
+
+        String selectBySSIDKey = getActivity().getString(R.string.select_in_ssids_key);
+        String selectBySSIDValueAsk = getActivity().getString(R.string.select_in_ssids_value_ask);
+        ListPreference ssidPref = (ListPreference) findPreference(KEY_SELECT_IN_SSIDS_TYPE);
+        if (ssidPref != null) {
+            if (SystemProperties.getBoolean(PROP_SSID, false)) {
+                int value = Settings.System.getInt(getContentResolver(), selectBySSIDKey,
+                        Integer.parseInt(selectBySSIDValueAsk));
+                ssidPref.setValue(String.valueOf(value));
+                ssidPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(ssidPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get ssid pref");
+        }
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -218,6 +237,16 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             } catch (NumberFormatException e) {
                 Toast.makeText(getActivity(), R.string.wifi_setting_sleep_policy_error,
                         Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+        if (KEY_SELECT_IN_SSIDS_TYPE.equals(key)) {
+            try {
+                String selectBySSIDKey = getActivity().getString(R.string.select_in_ssids_key);
+                Settings.System.putInt(getContentResolver(), selectBySSIDKey,
+                        Integer.parseInt(((String) newValue)));
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
