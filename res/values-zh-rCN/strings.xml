@@ -2042,8 +2042,11 @@
     <string name="APN_NAME_CUSUPL">联通AGPS</string>
     <string name="APN_NAME_CTNET">中国电信互联网设置 CTNET</string>
     <string name="APN_NAME_CTWAP">中国电信WAP设置 CTWAP</string>
+
     <!-- Roaming Date Settings -->
     <string name="label_global_roaming_settings">国际漫游设置</string>
 
     <string name="select_in_ssids_type_title">不同 SSID 间重选</string>
+    <string name="wifi_auto_connect_type_summary">设置网络连接方式</string>
+    <string name="wifi_menu_disconnect">断开网络</string>
 </resources>

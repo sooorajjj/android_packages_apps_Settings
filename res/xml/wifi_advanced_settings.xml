@@ -43,6 +43,11 @@
             android:entries="@array/wifi_connect_type_entries"
             android:entryValues="@array/wifi_connect_type_values"
             />
+     <CheckBoxPreference
+            android:key="auto_connect_type"
+            android:title="@string/wifi_auto_connect_type_title"
+            android:summary="@string/wifi_auto_connect_type_summary"
+            android:persistent="false"/>
 
     <!-- android:dependency="enable_wifi" -->
     <CheckBoxPreference

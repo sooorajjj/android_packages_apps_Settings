@@ -43,6 +43,7 @@ import android.net.wifi.WpsInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemProperties;
 import android.os.UserManager;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -102,6 +103,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private static final int MENU_ID_CONNECT = Menu.FIRST + 6;
     private static final int MENU_ID_FORGET = Menu.FIRST + 7;
     private static final int MENU_ID_MODIFY = Menu.FIRST + 8;
+    private static final int MENU_ID_DISCONNECT = Menu.FIRST + 9;
 
     private static final int WIFI_DIALOG_ID = 1;
     private static final int WPS_PBC_DIALOG_ID = 2;
@@ -116,6 +118,8 @@ public class WifiSettings extends SettingsPreferenceFragment
     private static final String SAVE_DIALOG_EDIT_MODE = "edit_mode";
     private static final String SAVE_DIALOG_ACCESS_POINT_STATE = "wifi_ap_state";
 
+    private static final String PROP_AUTOCON = "persist.env.settings.autocon";
+
     // Activity result when pressing the Skip button
     private static final int RESULT_SKIP = Activity.RESULT_FIRST_USER;
 
@@ -128,7 +132,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private WifiManager.ActionListener mSaveListener;
     private WifiManager.ActionListener mForgetListener;
     private boolean mP2pSupported;
-
+    private boolean mAutoConnect = true;
 
     private UserManager mUserManager;
 
@@ -432,6 +436,13 @@ public class WifiSettings extends SettingsPreferenceFragment
             mWifiEnabler.resume();
         }
 
+        if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
+            mAutoConnect = Settings.System.getInt(getActivity().getContentResolver(),
+                    getResources().getString(R.string.wifi_autoconn_type),
+                    getResources().getInteger(R.integer.wifi_autoconn_type_auto)) ==
+                    getResources().getInteger(R.integer.wifi_autoconn_type_auto);
+        }
+
         getActivity().registerReceiver(mReceiver, mFilter);
         updateAccessPoints();
     }
@@ -565,6 +576,12 @@ public class WifiSettings extends SettingsPreferenceFragment
                         && mSelectedAccessPoint.getState() == null) {
                     menu.add(Menu.NONE, MENU_ID_CONNECT, 0, R.string.wifi_menu_connect);
                 }
+                // current connected AP, add a disconnect option to it
+                if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
+                    if (mSelectedAccessPoint.getState() != null) {
+                        menu.add(Menu.NONE, MENU_ID_DISCONNECT, 0, R.string.wifi_menu_disconnect);
+                    }
+                }
                 if (mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
                     menu.add(Menu.NONE, MENU_ID_FORGET, 0, R.string.wifi_menu_forget);
                     menu.add(Menu.NONE, MENU_ID_MODIFY, 0, R.string.wifi_menu_modify);
@@ -599,6 +616,15 @@ public class WifiSettings extends SettingsPreferenceFragment
             }
             case MENU_ID_MODIFY: {
                 showDialog(mSelectedAccessPoint, true);
+                return true;
+            }
+            case MENU_ID_DISCONNECT: {
+                if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
+                    mWifiManager.disconnect();
+                    if (mAutoConnect) {
+                        mWifiManager.reconnect();
+                    }
+                }
                 return true;
             }
         }

@@ -55,6 +55,8 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
     private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
     private static final String PROP_SSID = "persist.env.settings.ssid";
+    private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
+    private static final String PROP_AUTOCON = "persist.env.settings.autocon";
 
     private static final String KEY_CURRENT_GATEWAY = "current_gateway";
     private static final String KEY_CURRENT_NETMASK = "current_netmask";
@@ -163,6 +165,21 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         } else {
             Log.d(TAG, "Fail to get ssid pref");
         }
+
+        CheckBoxPreference AutoPref = (CheckBoxPreference) findPreference(KEY_AUTO_CONNECT_TYPE);
+        if (AutoPref != null) {
+            if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
+                AutoPref.setChecked(Settings.System.getInt(getContentResolver(),
+                        getResources().getString(R.string.wifi_autoconn_type),
+                        getResources().getInteger(R.integer.wifi_autoconn_type_auto)) ==
+                        getResources().getInteger(R.integer.wifi_autoconn_type_auto));
+                AutoPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(AutoPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get auto connect pref");
+        }
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -253,6 +270,14 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             } catch (NumberFormatException e) {
                 return false;
             }
+        }
+
+        if (KEY_AUTO_CONNECT_TYPE.equals(key)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(),
+                    getResources().getString(R.string.wifi_autoconn_type),
+                    checked ? getResources().getInteger(R.integer.wifi_autoconn_type_auto)
+                            : getResources().getInteger(R.integer.wifi_autoconn_type_manual));
         }
 
         return true;
