@@ -29,6 +29,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
@@ -121,7 +122,8 @@ public class IccLockSettings extends PreferenceActivity
     private final BroadcastReceiver mSimStateReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(action)) {
+            if (TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(action)
+                    || Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(action)) {
                 mHandler.sendMessage(mHandler.obtainMessage(MSG_SIM_STATE_CHANGED));
             }
         }
@@ -192,7 +194,15 @@ public class IccLockSettings extends PreferenceActivity
     }
 
     private void updatePreferences() {
-        mPinToggle.setChecked(mPhone.getIccCard().getIccLockEnabled());
+        Intent intent = getIntent();
+        int subscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
+                MSimPhoneFactory.getDefaultSubscription());
+        int simState = MSimTelephonyManager.getDefault().getSimState(subscription);
+        boolean isReady = simState == TelephonyManager.SIM_STATE_READY;
+        getPreferenceScreen().setEnabled(isReady);
+        if (isReady) {
+            mPinToggle.setChecked(mPhone.getIccCard().getIccLockEnabled());
+        }
     }
 
     @Override
