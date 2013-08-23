@@ -2043,4 +2043,6 @@
     <string name="APN_NAME_CTWAP">中国电信WAP设置 CTWAP</string>
     <!-- Roaming Date Settings -->
     <string name="label_global_roaming_settings">国际漫游设置</string>
+
+    <string name="select_in_ssids_type_title">不同 SSID 间重选</string>
 </resources>
