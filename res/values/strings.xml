@@ -4735,7 +4735,8 @@
     <string name="smsc_refresh_error">refresh error</string>
     <string name="dns_allowed">0.0.0.0 allowed</string>
     <string name="dns_not_allowed">0.0.0.0 not allowed</string>
-
+    <string name="wifi_advanced_gateway">Gateway</string>
+    <string name="wifi_advanced_network_netmask">Netmask</string>
     <!-- apn names for carriers -->
     <string name="APN_NAME_CMNET">CMNET</string>
     <string name="APN_NAME_CMWAP">CMWAP</string>
