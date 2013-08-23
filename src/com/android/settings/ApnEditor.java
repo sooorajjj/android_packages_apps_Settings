@@ -18,9 +18,12 @@ package com.android.settings;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
@@ -47,6 +50,7 @@ import android.provider.Settings.SettingNotFoundException;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.RILConstants;
+import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
 
 
@@ -106,6 +110,8 @@ public class ApnEditor extends PreferenceActivity
     private Resources mRes;
     private TelephonyManager mTelephonyManager;
 
+    private IntentFilter mMobileStateFilter;
+
     /**
      * Standard projection for the interesting columns of a normal note.
      */
@@ -161,6 +167,17 @@ public class ApnEditor extends PreferenceActivity
     private static final int PPP_NUMBER_INDEX = 22;
     private static final int LOCALIZED_NAME_INDEX = 23;
 
+    /*
+     * Add BroadcastReceiver to filter ACTION_SIM_STATE_CHANGED and
+     * ACTION_AIRPLANE_MODE_CHANGED.
+     */
+    private final BroadcastReceiver mMobileStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                setScreenEnabled();
+                invalidateOptionsMenu();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -252,11 +269,16 @@ public class ApnEditor extends PreferenceActivity
         mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 
         fillUi(intent.getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
+        mMobileStateFilter = new IntentFilter();
+        mMobileStateFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        mMobileStateFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        setScreenEnabled();
+        registerReceiver(mMobileStateReceiver, mMobileStateFilter);
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
     }
@@ -519,6 +541,19 @@ public class ApnEditor extends PreferenceActivity
         return true;
     }
 
+    /*
+     * If airplane mode is on or SIM card don't prepar, set options menu don't pop up.
+     * Restrict user to new APN, reset to default or click the APN list.
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!isAPNNumericLoaded() || isAirplaneOn()) {
+            return false;
+        } else {
+            super.onPrepareOptionsMenu(menu);
+            return true;
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -755,5 +790,36 @@ public class ApnEditor extends PreferenceActivity
                 pref.setSummary(checkNull(sharedPreferences.getString(key, "")));
             }
         }
+    }
+
+    /*
+     * Get apn property to judge if it has been loaded.
+     */
+    private boolean isAPNNumericLoaded(){
+        String mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC,mSubscription, null);
+
+        return !((null == mccMncFromSim) || mccMncFromSim.equals(""));
+    }
+
+    /*
+     * If airplane mode is on or SIM card don't prepar, make sure user can't edit the Apn.
+     * So we disable the screen.
+     */
+    private void setScreenEnabled() {
+        if (!isAPNNumericLoaded() || isAirplaneOn()) {
+            getPreferenceScreen().setEnabled(false);
+        } else {
+            getPreferenceScreen().setEnabled(true);
+        }
+    }
+
+    /*
+     * Add the method to check the phone state is airplane mode or not.
+     * Return true, if the phone state is airplane mode.
+     */
+    private boolean isAirplaneOn() {
+        return Settings.System.getInt(getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) == 1;
     }
 }
