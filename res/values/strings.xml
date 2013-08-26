@@ -4747,6 +4747,7 @@
     <string name="APN_NAME_CUSUPL">China Unicom AGPS</string>
     <string name="APN_NAME_CTNET">CTNET</string>
     <string name="APN_NAME_CTWAP">CTWAP</string>
+
     <!-- Roaming Date Settings -->
     <string name="label_global_roaming_settings">Global roaming settings</string>
 
@@ -4755,4 +4756,9 @@
     <string name="select_in_ssids_value_auto">0</string>
     <string name="select_in_ssids_value_manul">1</string>
     <string name="select_in_ssids_value_ask">2</string>
+    <string name="wifi_auto_connect_type_title">Auto connect type</string>
+    <string name="wifi_auto_connect_type_summary">Specify network connection type</string>
+    <string name="wifi_menu_disconnect">Disconnect from network</string>
+    <string name="wifi_autoconn_type">wifi_auto_connect_type</string>
+
 </resources>
