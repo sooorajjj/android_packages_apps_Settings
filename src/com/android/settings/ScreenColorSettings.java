@@ -148,6 +148,12 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        restoreSavedHSCI(true);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(mPPServiceConn);
