@@ -17,6 +17,7 @@
 package com.android.settings.wifi;
 
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
@@ -57,6 +58,8 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String PROP_SSID = "persist.env.settings.ssid";
     private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
     private static final String PROP_AUTOCON = "persist.env.settings.autocon";
+    private static final String KEY_WIFI_GSM_CONNECT_TYPE = "wifi_gsm_connect_type";
+    private static final String PROP_WIFI2CELL = "persist.env.settings.wifi2cell";
 
     private static final String KEY_CURRENT_GATEWAY = "current_gateway";
     private static final String KEY_CURRENT_NETMASK = "current_netmask";
@@ -180,6 +183,22 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         } else {
             Log.d(TAG, "Fail to get auto connect pref");
         }
+
+        CheckBoxPreference wifi2cellPref =
+                (CheckBoxPreference) findPreference(KEY_WIFI_GSM_CONNECT_TYPE);
+        if (wifi2cellPref != null) {
+            if (SystemProperties.getBoolean(PROP_WIFI2CELL, false)) {
+                wifi2cellPref.setChecked(Settings.System.getInt(getContentResolver(),
+                        getResources().getString(R.string.wifi2cell_connect_type),
+                        getResources().getInteger(R.integer.wifi2cell_connect_type_ask))
+                        == getResources().getInteger(R.integer.wifi2cell_connect_type_ask));
+                wifi2cellPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(wifi2cellPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get wifi2cell pref");
+        }
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -271,6 +290,14 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
                 return false;
             }
         }
+        if (KEY_WIFI_GSM_CONNECT_TYPE.equals(key)) {
+            Log.d(TAG, "wifi2cell connect type is " + newValue);
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(),
+                    getResources().getString(R.string.wifi2cell_connect_type),
+                    checked ? getResources().getInteger(R.integer.wifi2cell_connect_type_ask)
+                            : getResources().getInteger(R.integer.wifi2cell_connect_type_auto));
+        }
 
         if (KEY_AUTO_CONNECT_TYPE.equals(key)) {
             boolean checked = ((Boolean) newValue).booleanValue();
@@ -282,6 +309,7 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
 
         return true;
     }
+
 
     private void refreshWifiInfo() {
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
