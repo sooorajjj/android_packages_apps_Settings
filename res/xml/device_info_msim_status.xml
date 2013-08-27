@@ -83,6 +83,12 @@
         android:summary="@string/device_info_not_available"
         android:persistent="false" />
     <!-- used for multisim -->
+    <Preference android:key="latest_area_info"
+        style="?android:attr/preferenceInformationStyle"
+        android:title="@string/status_latest_area_info"
+        android:summary="@string/device_info_not_available"
+        android:persistent="false" />
+    <!-- used for multisim -->
     <Preference android:key="network_type"
         style="?android:attr/preferenceInformationStyle"
         android:title="@string/status_network_type"

@@ -36,10 +36,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.SystemProperties;
+import android.os.UserHandle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.telephony.CellBroadcastMessage;
 import android.telephony.MSimTelephonyManager;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.PhoneStateListener;
@@ -124,6 +126,7 @@ public class MSimStatus extends PreferenceActivity {
     private static final String KEY_MEID_NUMBER = "meid_number";
     private static final String KEY_SIGNAL_STRENGTH = "signal_strength";
     private static final String KEY_BASEBAND_VERSION = "baseband_version";
+    private static final String KEY_LATEST_AREA_INFO = "latest_area_info";
 
     private static final String[] RELATED_ENTRIES = {
             KEY_SERVICE_STATE,
@@ -138,8 +141,19 @@ public class MSimStatus extends PreferenceActivity {
             KEY_ESN_NUMBER,
             KEY_MEID_NUMBER,
             KEY_SIGNAL_STRENGTH,
-            KEY_BASEBAND_VERSION
+            KEY_BASEBAND_VERSION,
+            KEY_LATEST_AREA_INFO
     };
+
+    static final String CB_AREA_INFO_RECEIVED_ACTION =
+            "android.cellbroadcastreceiver.CB_AREA_INFO_RECEIVED";
+
+    static final String GET_LATEST_CB_AREA_INFO_ACTION =
+            "android.cellbroadcastreceiver.GET_LATEST_CB_AREA_INFO";
+
+    // Require the sender to have this permission to prevent third-party spoofing.
+    static final String CB_AREA_INFO_SENDER_PERMISSION =
+            "android.permission.RECEIVE_EMERGENCY_BROADCAST";
 
     private String[] esnNumberSummery;
     private String[] meidNumberSummery;
@@ -154,6 +168,7 @@ public class MSimStatus extends PreferenceActivity {
     private String[] operatorNameSummery;
     private String[] mSigStrengthSummery;
     private String[] dataStateSummery;
+    private String[] areaInfoSummery;
 
     private SignalStrength[] mSignalStrength;
     private ServiceState[] mServiceState;
@@ -163,6 +178,24 @@ public class MSimStatus extends PreferenceActivity {
     private String[] SIM;
 
     private String[] networkSummery;
+
+    private BroadcastReceiver mAreaInfoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (CB_AREA_INFO_RECEIVED_ACTION.equals(action)) {
+                Bundle extras = intent.getExtras();
+                if (extras == null) {
+                    return;
+                }
+                CellBroadcastMessage cbMessage = (CellBroadcastMessage) extras.get("message");
+                if (cbMessage != null && cbMessage.getServiceCategory() == 50) {
+                    String latestAreaInfo = cbMessage.getMessageBody();
+                    updateAreaInfo(latestAreaInfo, cbMessage.getSubId());
+                }
+            }
+        }
+    };
 
     private void initMSimSummery(String[] str) {
         for (int i = 0; i < mTelephonyManager.getPhoneCount(); i++) {
@@ -272,6 +305,7 @@ public class MSimStatus extends PreferenceActivity {
         operatorNameSummery = new String[mTelephonyManager.getPhoneCount()];
         mSigStrengthSummery = new String[mTelephonyManager.getPhoneCount()];
         dataStateSummery = new String[mTelephonyManager.getPhoneCount()];
+        areaInfoSummery = new String[mTelephonyManager.getPhoneCount()];
 
         mSignalStrength = new SignalStrength[mTelephonyManager.getPhoneCount()];
         mServiceState = new ServiceState[mTelephonyManager.getPhoneCount()];
@@ -341,6 +375,7 @@ public class MSimStatus extends PreferenceActivity {
         initMSimSummery(mSigStrengthSummery);
         initMSimSummery(dataStateSummery);
         initMSimSummery(networkSummery);
+        initMSimSummery(areaInfoSummery);
 
         updateMSimSummery(indexOfCDMA);
     }
@@ -430,10 +465,17 @@ public class MSimStatus extends PreferenceActivity {
                 updateServiceState(i);
                 updateDataState(i);
                 updateNetworkType(i);
+                // Ask CellBroadcastReceiver to broadcast the latest area info received
+                Intent getLatestIntent = new Intent(GET_LATEST_CB_AREA_INFO_ACTION);
+                getLatestIntent.putExtra(MSimConstants.SUBSCRIPTION_KEY, i);
+                sendBroadcastAsUser(getLatestIntent, UserHandle.ALL,
+                        CB_AREA_INFO_SENDER_PERMISSION);
             }
         }
         registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         mHandler.sendEmptyMessage(EVENT_UPDATE_STATS);
+        registerReceiver(mAreaInfoReceiver, new IntentFilter(CB_AREA_INFO_RECEIVED_ACTION),
+                CB_AREA_INFO_SENDER_PERMISSION, null);
     }
 
     @Override
@@ -447,6 +489,7 @@ public class MSimStatus extends PreferenceActivity {
         }
         unregisterReceiver(mBatteryInfoReceiver);
         mHandler.removeMessages(EVENT_UPDATE_STATS);
+        unregisterReceiver(mAreaInfoReceiver);
     }
 
     private PhoneStateListener getPhoneStateListener(final int subscription) {
@@ -629,6 +672,14 @@ public class MSimStatus extends PreferenceActivity {
 
         dataStateSummery[subscription] = getSimSummery(subscription, display);
         setMSimSummery(KEY_DATA_STATE, dataStateSummery);
+    }
+
+    private void updateAreaInfo(String areaInfo, int sub) {
+        if (DEBUG) Log.i(TAG, "updateAreaInfo areaInfo="+areaInfo+" sub="+sub);
+        if (areaInfo != null) {
+            areaInfoSummery[sub] = areaInfo;
+            setMSimSummery(KEY_LATEST_AREA_INFO, areaInfoSummery);
+        }
     }
 
     private boolean isDataServiceEnable(int subscription) {
