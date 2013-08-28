@@ -4762,4 +4762,5 @@
     <string name="wifi_autoconn_type">wifi_auto_connect_type</string>
     <string name="wifi_to_gsm_connect_type_title">WLAN->Cellular hint</string>
     <string name="wifi2cell_connect_type">"wifi_gsm_connect_type"</string>
+    <string name="radio_info">Radio Info</string>
 </resources>
