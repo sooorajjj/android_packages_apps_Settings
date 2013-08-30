@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +49,8 @@ public abstract class DeviceListPreferenceFragment extends
 
     private BluetoothDeviceFilter.Filter mFilter;
 
+    private static BluetoothDevicePreference mLastBTPreference = null;
+
     BluetoothDevice mSelectedDevice;
 
     LocalBluetoothAdapter mLocalAdapter;
@@ -84,6 +87,13 @@ public abstract class DeviceListPreferenceFragment extends
         addPreferencesForActivity();
 
         mDeviceListGroup = (PreferenceCategory) findPreference(KEY_BT_DEVICE_LIST);
+        if (savedInstanceState != null) {
+           if (mLastBTPreference != null) onDevicePreferenceClick(mLastBTPreference);
+        } else {
+            // Clean the object with null assignment. It is required when previous device
+            // disconnect pop up is destroyed with home key press.
+            mLastBTPreference = null;
+        }
     }
 
     void setDeviceListGroup(PreferenceGroup preferenceGroup) {
@@ -114,6 +124,18 @@ public abstract class DeviceListPreferenceFragment extends
         mLocalManager.getEventManager().unregisterCallback(this);
     }
 
+    @Override
+    public void onDestroy() {
+        if (mLastBTPreference != null) {
+           if (!mLastBTPreference.isShowing()) {
+              mLastBTPreference = null;
+           } else {
+              mLastBTPreference.clearDialog();
+           }
+        }
+        super.onDestroy();
+    }
+
     void removeAllDevices() {
         mLocalAdapter.stopScanning();
         mDevicePreferenceMap.clear();
@@ -138,6 +160,7 @@ public abstract class DeviceListPreferenceFragment extends
 
         if (preference instanceof BluetoothDevicePreference) {
             BluetoothDevicePreference btPreference = (BluetoothDevicePreference) preference;
+            mLastBTPreference = btPreference;
             CachedBluetoothDevice device = btPreference.getCachedDevice();
             mSelectedDevice = device.getDevice();
             onDevicePreferenceClick(btPreference);

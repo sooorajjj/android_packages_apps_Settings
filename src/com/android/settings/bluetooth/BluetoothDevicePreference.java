@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +53,7 @@ public final class BluetoothDevicePreference extends Preference implements
 
     private OnClickListener mOnSettingsClickListener;
 
-    private AlertDialog mDisconnectDialog;
+    private AlertDialog mDisconnectDialog = null;
 
     public BluetoothDevicePreference(Context context, CachedBluetoothDevice cachedDevice) {
         super(context);
@@ -180,6 +181,20 @@ public final class BluetoothDevicePreference extends Preference implements
         } else if (bondState == BluetoothDevice.BOND_NONE) {
             pair();
         }
+    }
+
+    void clearDialog() {
+        if (mDisconnectDialog != null) {
+            mDisconnectDialog.dismiss();
+            mDisconnectDialog = null;
+        }
+    }
+
+    boolean isShowing() {
+        if (mDisconnectDialog != null) {
+           if (mDisconnectDialog.isShowing()) return true;
+        }
+        return false;
     }
 
     // Show disconnect confirmation dialog for a device.
