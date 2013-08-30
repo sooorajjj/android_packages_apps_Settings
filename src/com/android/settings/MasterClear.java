@@ -28,6 +28,8 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -39,6 +41,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * Confirm and execute a reset of the device to a clean "just out of the box"
@@ -140,8 +144,18 @@ public class MasterClear extends Fragment {
          * others. Likewise, if it's non-removable storage, it could potentially have been
          * encrypted, and will also need to be wiped.
          */
-        boolean isExtStorageEmulated = Environment.isExternalStorageEmulated();
-        if (isExtStorageEmulated
+        Context context = getActivity();
+        StorageManager storageManager = StorageManager.from(context);
+        final ArrayList<StorageVolume> physicalVols =
+                storageManager.getPhysicalExternalVolume(storageManager.getVolumeList());
+        String state = null;
+        if (physicalVols.size() != 0) {
+            String extStoragePath = null;
+            extStoragePath = physicalVols.get(0).getPath();
+            state = storageManager.getVolumeState(extStoragePath);
+        }
+        boolean isExtStorageMounted = Environment.MEDIA_MOUNTED.equals(state);
+        if (!isExtStorageMounted
                 || (!Environment.isExternalStorageRemovable() && isExtStorageEncrypted())) {
             mExternalStorageContainer.setVisibility(View.GONE);
 
@@ -153,7 +167,7 @@ public class MasterClear extends Fragment {
 
             // If it's not emulated, it is on a separate partition but it means we're doing
             // a force wipe due to encryption.
-            mExternalStorage.setChecked(!isExtStorageEmulated);
+            mExternalStorage.setChecked(!isExtStorageMounted);
         } else {
             mExternalStorageContainer.setOnClickListener(new View.OnClickListener() {
 
@@ -197,6 +211,11 @@ public class MasterClear extends Fragment {
         for (int i=0; i<N; i++) {
             Account account = accounts[i];
             AuthenticatorDescription desc = null;
+            if ((account != null) && (account.type.equals(Settings.ACCOUNT_TYPE_SIM)
+                    || account.type.equals(Settings.ACCOUNT_TYPE_PHONE))){
+                //Do not display SIM & Phone account
+                continue;
+            }
             for (int j=0; j<M; j++) {
                 if (account.type.equals(descs[j].type)) {
                     desc = descs[j];

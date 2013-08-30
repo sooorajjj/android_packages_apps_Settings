@@ -74,13 +74,53 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
     private Context mContext;
     private Handler mMultiSimHandler;
 
+    SubscriptionManager subManager = SubscriptionManager.getInstance();
+
+    private int mNumPhones = MSimTelephonyManager.getDefault().getPhoneCount();
+    private CharSequence[] entries; // Used for entries like Subscription1, Subscription2 ...
+    private CharSequence[] entryValues; // Used for entryValues like 0, 1 ,2 ...
+    private CharSequence[] summaries; // Used for Summaries like Subscription1, Subscription2....
+    private CharSequence[] entriesPrompt; // Used in case of prompt option is required.
+    private CharSequence[] entryValuesPrompt; // Used in case of prompt option is required.
+    private CharSequence[] summariesPrompt; // Used in case of prompt option is required.
+
     public PreferredSubscriptionListPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        initEntries();
     }
 
     public PreferredSubscriptionListPreference(Context context) {
         this(context, null);
+    }
+
+    //Init always prompt entry, use the phone count number as prompt list item index
+    private void initEntries(){
+        // Create and Intialize the strings required for MultiSIM
+        // Dynamic creation of entries instead of using static array vlues.
+        // entries are Subscription1, Subscription2, Subscription3 ....
+        // EntryValues are 0, 1 ,2 ....
+        // Summaries are Subscription1, Subscription2, Subscription3 ....
+        entries = new CharSequence[mNumPhones];
+        entryValues = new CharSequence[mNumPhones];
+        summaries = new CharSequence[mNumPhones];
+        entriesPrompt = new CharSequence[mNumPhones + 1];
+        entryValuesPrompt = new CharSequence[mNumPhones + 1];
+        summariesPrompt = new CharSequence[mNumPhones + 1];
+
+        CharSequence[] subString = mContext.getResources().getTextArray(R.array.multi_sim_entries);
+        for (int i = 0; i < mNumPhones; i++) {
+            entries[i] = subString[i];
+            entryValues[i] = Integer.toString(i);
+            summaries[i] = subString[i];
+
+            entriesPrompt[i] = subString[i];
+            entryValuesPrompt[i] = Integer.toString(i);
+            summariesPrompt[i] = subString[i];
+        }
+        entriesPrompt[mNumPhones] = mContext.getResources().getString(R.string.prompt);
+        entryValuesPrompt[mNumPhones] = Integer.toString(mNumPhones);
+        summariesPrompt[mNumPhones] = mContext.getResources().getString(R.string.prompt_user);
     }
 
     public void setType(int listType, Handler handler) {
@@ -90,7 +130,7 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
         setValue(String.valueOf(mPreferredSubscription));
         // get the string from database
         setEntryValues(getEntityValues(listType));
-        setEntries(getMultiSimNamesFromDb(listType));
+        setEntries(getMultiSimNamesFromRes(listType));
         setSummary(getMultiSimName(mPreferredSubscription));
     }
 
@@ -198,7 +238,7 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
         boolean isOn = AirplaneModeEnabler.isAirplaneModeOn(mContext);
         if (!isOn) {
             // only not in airplane mode and the number of active subscription is 2, enabled.
-            if (SubscriptionManager.getInstance().getActiveSubscriptionsCount() == 2) {
+            if (subManager.getActiveSubscriptionsCount() == 2) {
                 isEnabled = true;
             }
         }
@@ -211,12 +251,15 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
     /*** For preferred subscription process on Voice, Sms, Data ***/
     private int getPreferredSubscription(int listType) {
         int preferredSubscription = 0;
+
         switch (listType) {
             case MultiSimSettingsConstants.VOICE_SUBSCRIPTION_LIST:
-                preferredSubscription = MSimPhoneFactory.getVoiceSubscription();
+                preferredSubscription = MSimPhoneFactory.isPromptEnabled() ? mNumPhones :
+                        MSimPhoneFactory.getVoiceSubscription();
                 break;
             case MultiSimSettingsConstants.SMS_SUBSCRIPTION_LIST:
-                preferredSubscription = MSimPhoneFactory.getSMSSubscription();
+                preferredSubscription = MSimPhoneFactory.isSMSPromptEnabled() ? mNumPhones :
+                        MSimPhoneFactory.getSMSSubscription();
                 break;
             case MultiSimSettingsConstants.DATA_SUBSCRIPTION_LIST:
                 preferredSubscription = MSimPhoneFactory.getDataSubscription();
@@ -229,15 +272,13 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
      * Get EntityValues for ListPreference. Data Call always use
      * multi_sim_values return the string arrays get from arrays.xml
      */
-    private String[] getEntityValues(int listType) {
-        if (listType != MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
-            String[] values = new String[3];
-            values = mContext.getResources().getStringArray(R.array.multi_sim_values_voice);
-            return values;
-        } else {
-            String[] values = new String[2];
-            values = mContext.getResources().getStringArray(R.array.multi_sim_values);
-            return values;
+    private CharSequence[] getEntityValues(int listType) {
+        int count = subManager.getActiveSubscriptionsCount();
+        if (count >= MSimConstants.MAX_PHONE_COUNT_DUAL_SIM &&
+            listType != MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
+            return entryValuesPrompt;
+        } else  {
+            return entryValues;
         }
     }
 
@@ -245,73 +286,57 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
      * Used for get the simNames from the resource file while change the
      * language. return the string arrays get from arrays.xml
      */
-    private String[] getMultiSimNamesFromRes(int listType) {
-        int count = MSimTelephonyManager.getDefault().getPhoneCount();
-        String[] names;
-        // When the three conditions are ok, the choice will contains always ask.
-        if (MSimTelephonyManager.getDefault().isMultiSimEnabled() && listType !=
-                MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
-            count += 1; // add 'always ask'
+    private CharSequence[] getMultiSimNamesFromRes(int listType) {
+        int count = subManager.getActiveSubscriptionsCount();
+        if (count >= MSimConstants.MAX_PHONE_COUNT_DUAL_SIM &&
+            listType != MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
+            return entriesPrompt;
+        } else  {
+            return entries;
         }
-
-        names = new String[count];
-
-        for (int i = 0; i < count; i++) {
-            names[i] = mContext.getResources().getStringArray(R.array.select_slot_items)[i];
-        }
-        return names;
     }
 
-    /**
-     * Used for get the simNames from the database, for the selection item can
-     * match with the selected result.
-     */
-    public String[] getMultiSimNamesFromDb(int listType) {
-        int count = MSimTelephonyManager.getDefault().getPhoneCount();
-        String[] names;
-        // When the three conditions are ok, the choice will contains always ask.
-        if (MSimTelephonyManager.getDefault().isMultiSimEnabled() && listType !=
-                MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
-            count += 1; // add 'always ask'
-        }
-
-        names = new String[count];
-
-        for (int i = 0; i < count; i++) {
-            names[i] = getMultiSimName(i);
-            if (names[i] == null) {
-                names[i] = mContext.getResources().getStringArray(R.array.select_slot_items)[i];
-            }
-        }
-        return names;
-    }
-
-    private String getMultiSimName(int subscription) {
+    private CharSequence getMultiSimName(int subscription) {
         //the last one take it as always ask
-        if (subscription == MSimTelephonyManager.getDefault().getPhoneCount()) {
-            return mContext.getResources().getString(R.string.select_slot_always_ask);
+        if (subscription == mNumPhones) {
+            return summariesPrompt[mNumPhones];
         } else {
-            return Settings.System.getString(mContext.getContentResolver(),
+            String name = Settings.System.getString(mContext.getContentResolver(),
                     Settings.System.MULTI_SIM_NAME[subscription]);
+            if (name.contains("%")) {
+                name = name.replace("%", "%%");
+            }
+            return name;
         }
     }
 
     private void setPreferredSubscription(int listType, int subscription) {
         switch (listType) {
             case MultiSimSettingsConstants.VOICE_SUBSCRIPTION_LIST:
-                MSimPhoneFactory.setVoiceSubscription(subscription);
+                //enable always ask
+                if (subscription == mNumPhones) {
+                    MSimPhoneFactory.setPromptEnabled(true);
+                } else {
+                    MSimPhoneFactory.setPromptEnabled(false);
+                    MSimPhoneFactory.setVoiceSubscription(subscription);
+                }
                 handlePreferredSubscriptionChanged();
                 // msg.sendToTarget();
                 break;
             case MultiSimSettingsConstants.SMS_SUBSCRIPTION_LIST:
-                MSimPhoneFactory.setSMSSubscription(subscription);
+                //enable always ask
+                if (subscription == mNumPhones) {
+                    MSimPhoneFactory.setSMSPromptEnabled(true);
+                } else {
+                   MSimPhoneFactory.setSMSPromptEnabled(false);
+                   MSimPhoneFactory.setSMSSubscription(subscription);
+                }
                 handlePreferredSubscriptionChanged();
                 // msg.sendToTarget();
                 break;
             case MultiSimSettingsConstants.DATA_SUBSCRIPTION_LIST:
                 mMultiSimHandler.sendEmptyMessage(SHOW_PROGRESSDIALOG);
                 // showDialog();
-                SubscriptionManager subManager = SubscriptionManager.getInstance();
                 Message setDdsMsg = Message.obtain(mHandler, EVENT_SET_DATA_SUBSCRIPTION_DONE,
                         subscription, 0);
                 subManager.setDataSubscription(subscription, setDdsMsg);

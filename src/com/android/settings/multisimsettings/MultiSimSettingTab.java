@@ -60,7 +60,6 @@ public class MultiSimSettingTab extends TabActivity {
     private static final String LOG_TAG = "MultiSimSettingWidget";
 
     private static final boolean DBG = true;
-    private static final int ALWAYS_ASK = 2;
 
     private int[] tabIcons = {
             R.drawable.ic_tab_sim1, R.drawable.ic_tab_sim2

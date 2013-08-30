@@ -171,13 +171,6 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
                 addPreference(new PreferenceHeader(context, currentUser.name));
             }
 
-            addPreference(mItemApps);
-            addPreference(mItemDcim);
-            addPreference(mItemMusic);
-            addPreference(mItemDownloads);
-            addPreference(mItemCache);
-            addPreference(mItemMisc);
-
             if (showUsers) {
                 addPreference(new PreferenceHeader(context, R.string.storage_other_users));
 
@@ -188,7 +181,6 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
                     final StorageItemPreference userPref = new StorageItemPreference(
                             getContext(), info.name, colorRes, info.id);
                     mItemUsers.add(userPref);
-                    addPreference(userPref);
                 }
             }
         }
@@ -204,27 +196,76 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
 
         // Only allow formatting of primary physical storage
         // TODO: enable for non-primary volumes once MTP is fixed
-        final boolean allowFormat = mVolume != null ? mVolume.isPrimary() : false;
+        final boolean allowFormat = mVolume != null && !mVolume.isEmulated();
         if (allowFormat) {
             mFormatPreference = new Preference(context);
             mFormatPreference.setTitle(R.string.sd_format);
             mFormatPreference.setSummary(R.string.sd_format_summary);
+        }
+
+        /* only add Storage low preference to INTERNAL STORAGE */
+        if(mVolume == null) {
+            final IPackageManager pm = ActivityThread.getPackageManager();
+            try {
+                if (pm.isStorageLow()) {
+                    mStorageLow = new Preference(context);
+                    mStorageLow.setOrder(ORDER_STORAGE_LOW);
+                    mStorageLow.setTitle(R.string.storage_low_title);
+                    mStorageLow.setSummary(R.string.storage_low_summary);
+                } else if (mStorageLow != null) {
+                    mStorageLow = null;
+                }
+            } catch (RemoteException e) {
+            }
+        }
+    }
+
+    private void resetPreferences() {
+        removeAll();
+
+        addPreference(mUsageBarPreference);
+
+        addPreference(mItemTotal);
+        addPreference(mItemAvailable);
+
+        final UserInfo currentUser;
+        try {
+            currentUser = ActivityManagerNative.getDefault().getCurrentUser();
+        } catch (RemoteException e) {
+            throw new RuntimeException("Failed to get current user");
+        }
+
+        final List<UserInfo> otherUsers = getUsersExcluding(currentUser);
+        final boolean showUsers = mVolume == null && otherUsers.size() > 0;
+
+        boolean showDetails = mVolume == null || mVolume.isPrimary();
+        if (showDetails) {
+            addPreference(mItemApps);
+            addPreference(mItemDcim);
+            addPreference(mItemMusic);
+            addPreference(mItemDownloads);
+            addPreference(mItemCache);
+            addPreference(mItemMisc);
+
+            if (showUsers) {
+                for (StorageItemPreference user : mItemUsers) {
+                    addPreference(user);
+                }
+            }
+        }
+
+        final boolean isRemovable = mVolume != null ? mVolume.isRemovable() : false;
+        if (isRemovable) {
+            addPreference(mMountTogglePreference);
+        }
+
+        final boolean allowFormat = mVolume != null ? !mVolume.isEmulated() : false;
+        if (allowFormat) {
             addPreference(mFormatPreference);
         }
 
-        final IPackageManager pm = ActivityThread.getPackageManager();
-        try {
-            if (pm.isStorageLow()) {
-                mStorageLow = new Preference(context);
-                mStorageLow.setOrder(ORDER_STORAGE_LOW);
-                mStorageLow.setTitle(R.string.storage_low_title);
-                mStorageLow.setSummary(R.string.storage_low_summary);
-                addPreference(mStorageLow);
-            } else if (mStorageLow != null) {
-                removePreference(mStorageLow);
-                mStorageLow = null;
-            }
-        } catch (RemoteException e) {
+        if (mStorageLow != null && mVolume == null) {
+            addPreference(mStorageLow);
         }
     }
 
@@ -233,6 +274,8 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
     }
 
     private void updatePreferencesFromState() {
+        resetPreferences();
+
         // Only update for physical volumes
         if (mVolume == null) return;
 
@@ -254,6 +297,12 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
             mMountTogglePreference.setEnabled(true);
             mMountTogglePreference.setTitle(mResources.getString(R.string.sd_eject));
             mMountTogglePreference.setSummary(mResources.getString(R.string.sd_eject_summary));
+            addPreference(mUsageBarPreference);
+            addPreference(mItemTotal);
+            addPreference(mItemAvailable);
+            if (mFormatPreference != null) {
+                addPreference(mFormatPreference);
+            }
         } else {
             if (Environment.MEDIA_UNMOUNTED.equals(state) || Environment.MEDIA_NOFS.equals(state)
                     || Environment.MEDIA_UNMOUNTABLE.equals(state)) {

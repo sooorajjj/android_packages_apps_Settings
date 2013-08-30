@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -54,6 +55,7 @@ public class UserDictionaryAddWordFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
     }
 
     @Override
@@ -117,6 +119,9 @@ public class UserDictionaryAddWordFragment extends Fragment
         // We are being hidden: commit changes to the user dictionary, unless we were deleting it
         if (!mIsDeleting) {
             mContents.apply(getActivity(), null);
+            // After commit the changes and save the values in databases, it should be in edit mode,
+            // and update the variables for used after resume the activity.
+            mContents.updateValues(getActivity());
         }
     }
 

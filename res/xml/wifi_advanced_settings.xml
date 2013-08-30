@@ -31,11 +31,41 @@
             android:entries="@array/wifi_sleep_policy_entries"
             android:entryValues="@array/wifi_sleep_policy_values"
             />
+     <CheckBoxPreference
+            android:key="wifi_priority_type"
+            android:title="@string/wifi_set_priority_type_title"
+            android:summary="@string/wifi_set_priority_type_summary"
+            android:persistent="false"/>
+     <PreferenceScreen
+            android:fragment="com.android.settings.wifi.WifiPrioritySettings"
+            android:key="wifi_priority_settings"
+            android:title="@string/wifi_set_priority_settings_title"
+            android:summary="@string/wifi_set_priority_settings_summary"
+            android:dependency="wifi_priority_type"
+            android:persistent="false"/>
     <CheckBoxPreference
             android:key="wifi_scan_always_available"
             android:title="@string/wifi_scan_always_available"
             android:summary="@string/wifi_scan_always_available_summary"
             android:persistent="false" />
+    <ListPreference
+            android:key="select_in_ssids_type"
+            android:title="@string/select_in_ssids_type_title"
+            android:persistent="false"
+            android:entries="@array/wifi_connect_type_entries"
+            android:entryValues="@array/wifi_connect_type_values"
+            />
+     <CheckBoxPreference
+            android:key="auto_connect_type"
+            android:title="@string/wifi_auto_connect_type_title"
+            android:summary="@string/wifi_auto_connect_type_summary"
+            android:persistent="false"/>
+
+    <CheckBoxPreference
+            android:key="wifi_gsm_connect_type"
+            android:title="@string/wifi_to_gsm_connect_type_title"
+            android:persistent="false"
+            />
 
     <!-- android:dependency="enable_wifi" -->
     <CheckBoxPreference
@@ -74,4 +104,12 @@
         android:title="@string/wifi_advanced_ip_address_title"
         />
 
+    <Preference android:key="current_gateway"
+        style="?android:attr/preferenceInformationStyle"
+        android:title="@string/wifi_advanced_gateway"
+        />
+    <Preference android:key="current_netmask"
+        style="?android:attr/preferenceInformationStyle"
+        android:title="@string/wifi_advanced_network_netmask"
+        />
 </PreferenceScreen>   

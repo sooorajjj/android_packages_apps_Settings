@@ -18,11 +18,15 @@ package com.android.settings;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +39,7 @@ import android.preference.PreferenceActivity;
 import android.provider.Telephony;
 import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -45,6 +50,7 @@ import android.provider.Settings.SettingNotFoundException;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.RILConstants;
+import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
 
 
@@ -61,6 +67,8 @@ public class ApnEditor extends PreferenceActivity
     private final static String KEY_CARRIER_ENABLED = "carrier_enabled";
     private final static String KEY_BEARER = "bearer";
     private final static String KEY_MVNO_TYPE = "mvno_type";
+    //Add China Telecom's PLMN
+    private final static String CT_NUMERIC = "46003";
 
     private static final int MENU_DELETE = Menu.FIRST;
     private static final int MENU_SAVE = Menu.FIRST + 1;
@@ -88,10 +96,12 @@ public class ApnEditor extends PreferenceActivity
     private ListPreference mBearer;
     private ListPreference mMvnoType;
     private EditTextPreference mMvnoMatchData;
+    private EditTextPreference mPppNumber;
 
     private String mCurMnc;
     private String mCurMcc;
     private int mSubscription = 0;
+    private boolean mDisableEditor = false;
 
     private Uri mUri;
     private Cursor mCursor;
@@ -99,6 +109,8 @@ public class ApnEditor extends PreferenceActivity
     private boolean mFirstTime;
     private Resources mRes;
     private TelephonyManager mTelephonyManager;
+
+    private IntentFilter mMobileStateFilter;
 
     /**
      * Standard projection for the interesting columns of a normal note.
@@ -125,7 +137,9 @@ public class ApnEditor extends PreferenceActivity
             Telephony.Carriers.BEARER, // 18
             Telephony.Carriers.ROAMING_PROTOCOL, // 19
             Telephony.Carriers.MVNO_TYPE,   // 20
-            Telephony.Carriers.MVNO_MATCH_DATA  // 21
+            Telephony.Carriers.MVNO_MATCH_DATA,  // 21
+            Telephony.Carriers.PPP_NUMBER, // 22
+            Telephony.Carriers.LOCALIZED_NAME // 23
     };
 
     private static final int ID_INDEX = 0;
@@ -139,6 +153,7 @@ public class ApnEditor extends PreferenceActivity
     private static final int MMSC_INDEX = 8;
     private static final int MCC_INDEX = 9;
     private static final int MNC_INDEX = 10;
+    private static final int NUMERIC_INDEX = 11;
     private static final int MMSPROXY_INDEX = 12;
     private static final int MMSPORT_INDEX = 13;
     private static final int AUTH_TYPE_INDEX = 14;
@@ -149,7 +164,20 @@ public class ApnEditor extends PreferenceActivity
     private static final int ROAMING_PROTOCOL_INDEX = 19;
     private static final int MVNO_TYPE_INDEX = 20;
     private static final int MVNO_MATCH_DATA_INDEX = 21;
+    private static final int PPP_NUMBER_INDEX = 22;
+    private static final int LOCALIZED_NAME_INDEX = 23;
 
+    /*
+     * Add BroadcastReceiver to filter ACTION_SIM_STATE_CHANGED and
+     * ACTION_AIRPLANE_MODE_CHANGED.
+     */
+    private final BroadcastReceiver mMobileStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                setScreenEnabled();
+                invalidateOptionsMenu();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -171,6 +199,7 @@ public class ApnEditor extends PreferenceActivity
         mMcc = (EditTextPreference) findPreference("apn_mcc");
         mMnc = (EditTextPreference) findPreference("apn_mnc");
         mApnType = (EditTextPreference) findPreference("apn_type");
+        mPppNumber = (EditTextPreference) findPreference("apn_ppp_number");
 
         mAuthType = (ListPreference) findPreference(KEY_AUTH_TYPE);
         mAuthType.setOnPreferenceChangeListener(this);
@@ -194,6 +223,11 @@ public class ApnEditor extends PreferenceActivity
 
         final Intent intent = getIntent();
         final String action = intent.getAction();
+        mDisableEditor = intent.getBooleanExtra("DISABLE_EDITOR",false);
+        if (mDisableEditor) {
+            getPreferenceScreen().setEnabled(false);
+            Log.d(TAG, "ApnEditor form is disabled.");
+        }
         // Read the subscription received from Phone settings.
         mSubscription = intent.getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
@@ -235,11 +269,16 @@ public class ApnEditor extends PreferenceActivity
         mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 
         fillUi(intent.getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
+        mMobileStateFilter = new IntentFilter();
+        mMobileStateFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        mMobileStateFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        setScreenEnabled();
+        registerReceiver(mMobileStateReceiver, mMobileStateFilter);
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
     }
@@ -254,6 +293,7 @@ public class ApnEditor extends PreferenceActivity
     private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
+            String numeric =  mCursor.getString(NUMERIC_INDEX);
             // Fill in all the values from the db in both text editor and summary
             mName.setText(mCursor.getString(NAME_INDEX));
             mApn.setText(mCursor.getString(APN_INDEX));
@@ -281,6 +321,13 @@ public class ApnEditor extends PreferenceActivity
                     mCurMnc = mnc;
                     mCurMcc = mcc;
                 }
+                numeric =  defaultOperatorNumeric;
+            }
+            if (SystemProperties.getBoolean("persist.env.settings.cfgmmsapn", false) &&
+                CT_NUMERIC.equals(numeric)) {
+                mMmsProxy.setEnabled(false);
+                mMmsPort.setEnabled(false);
+                mMmsc.setEnabled(false);
             }
             int authVal = mCursor.getInt(AUTH_TYPE_INDEX);
             if (authVal != -1) {
@@ -296,6 +343,29 @@ public class ApnEditor extends PreferenceActivity
             mMvnoType.setValue(mCursor.getString(MVNO_TYPE_INDEX));
             mMvnoMatchData.setEnabled(false);
             mMvnoMatchData.setText(mCursor.getString(MVNO_MATCH_DATA_INDEX));
+
+            String pppNumber = mCursor.getString(PPP_NUMBER_INDEX);
+            mPppNumber.setText(pppNumber);
+            if (pppNumber == null) {
+                getPreferenceScreen().removePreference(mPppNumber);
+            }
+
+        }
+
+        // If can find a localized name, replace the APN name with it
+        String resName = mCursor.getString(LOCALIZED_NAME_INDEX);
+        if (resName != null && !resName.isEmpty()) {
+            int resId = getResources().getIdentifier(resName, "string", getPackageName());
+            String localizedName = null;
+            try {
+                localizedName = getResources().getString(resId);
+                Log.d(TAG, "Localized Apn Name is not editable");
+            } catch (NotFoundException e) {
+                Log.e(TAG, "Got execption while getting the localized apn name.", e);
+            }
+            if (!TextUtils.isEmpty(localizedName)) {
+                mName.setText(localizedName);
+            }
         }
 
         mName.setSummary(checkNull(mName.getText()));
@@ -311,6 +381,13 @@ public class ApnEditor extends PreferenceActivity
         mMcc.setSummary(checkNull(mMcc.getText()));
         mMnc.setSummary(checkNull(mMnc.getText()));
         mApnType.setSummary(checkNull(mApnType.getText()));
+
+        String pppNumber = mPppNumber.getText();
+        if (pppNumber != null) {
+            // Remove this preference if PPP number is not present
+            // in the APN settings
+            mPppNumber.setSummary(checkNull(pppNumber));
+        }
 
         String authVal = mAuthType.getValue();
         if (authVal != null) {
@@ -448,6 +525,10 @@ public class ApnEditor extends PreferenceActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
+        if (mDisableEditor) {
+            Log.d(TAG, "Form is disabled. Do not create the options menu.");
+            return true;
+        }
         // If it's a new APN, then cancel will delete the new entry in onPause
         if (!mNewApn) {
             menu.add(0, MENU_DELETE, 0, R.string.menu_delete)
@@ -460,6 +541,19 @@ public class ApnEditor extends PreferenceActivity
         return true;
     }
 
+    /*
+     * If airplane mode is on or SIM card don't prepar, set options menu don't pop up.
+     * Restrict user to new APN, reset to default or click the APN list.
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!isAPNNumericLoaded() || isAirplaneOn()) {
+            return false;
+        } else {
+            super.onPrepareOptionsMenu(menu);
+            return true;
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -515,6 +609,12 @@ public class ApnEditor extends PreferenceActivity
         String mnc = checkNotSet(mMnc.getText());
         int dataSub = 0;
 
+        // If the form is not editable, do nothing and return.
+        if(mDisableEditor){
+            Log.d(TAG, "Form is disabled. Nothing to save.");
+            return true;
+        }
+
         if (getErrorMsg() != null && !force) {
             showDialog(ERROR_DIALOG_ID);
             return false;
@@ -534,7 +634,7 @@ public class ApnEditor extends PreferenceActivity
 
         ContentValues values = new ContentValues();
 
-        // Add a dummy name "Untitled", if the user exits the screen without adding a name but 
+        // Add a dummy name "Untitled", if the user exits the screen without adding a name but
         // entered other information worth keeping.
         values.put(Telephony.Carriers.NAME,
                 name.length() < 1 ? getResources().getString(R.string.untitled_apn) : name);
@@ -562,6 +662,11 @@ public class ApnEditor extends PreferenceActivity
         values.put(Telephony.Carriers.MNC, mnc);
 
         values.put(Telephony.Carriers.NUMERIC, mcc + mnc);
+
+        String pppNumber = mPppNumber.getText();
+        if (pppNumber != null) {
+            values.put(Telephony.Carriers.PPP_NUMBER, pppNumber);
+        }
 
         try {
             dataSub = Settings.Global.getInt(getContentResolver(),
@@ -685,5 +790,36 @@ public class ApnEditor extends PreferenceActivity
                 pref.setSummary(checkNull(sharedPreferences.getString(key, "")));
             }
         }
+    }
+
+    /*
+     * Get apn property to judge if it has been loaded.
+     */
+    private boolean isAPNNumericLoaded(){
+        String mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
+                TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC,mSubscription, null);
+
+        return !((null == mccMncFromSim) || mccMncFromSim.equals(""));
+    }
+
+    /*
+     * If airplane mode is on or SIM card don't prepar, make sure user can't edit the Apn.
+     * So we disable the screen.
+     */
+    private void setScreenEnabled() {
+        if (!isAPNNumericLoaded() || isAirplaneOn()) {
+            getPreferenceScreen().setEnabled(false);
+        } else {
+            getPreferenceScreen().setEnabled(true);
+        }
+    }
+
+    /*
+     * Add the method to check the phone state is airplane mode or not.
+     * Return true, if the phone state is airplane mode.
+     */
+    private boolean isAirplaneOn() {
+        return Settings.System.getInt(getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) == 1;
     }
 }

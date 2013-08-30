@@ -1,5 +1,8 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (c) 2013, The Linux Foundation. All Rights Reserved.
+ *
+ * Not a Contribution.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +20,7 @@
 package com.android.settings;
 
 import static android.provider.Settings.System.SCREEN_OFF_TIMEOUT;
+import static android.provider.Settings.System.CABL_ENABLED;
 
 import android.app.ActivityManagerNative;
 import android.app.Dialog;
@@ -33,6 +37,7 @@ import android.hardware.display.WifiDisplay;
 import android.hardware.display.WifiDisplayStatus;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -48,6 +53,14 @@ import com.android.settings.DreamSettings;
 
 import java.util.ArrayList;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.os.SystemProperties;
+import com.android.cabl.ICABLService;
+
 public class DisplaySettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener, OnPreferenceClickListener {
     private static final String TAG = "DisplaySettings";
@@ -59,13 +72,20 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_ACCELEROMETER = "accelerometer";
     private static final String KEY_FONT_SIZE = "font_size";
     private static final String KEY_NOTIFICATION_PULSE = "notification_pulse";
+    private static final String KEY_BRIGHTNESS = "brightness";
     private static final String KEY_SCREEN_SAVER = "screensaver";
     private static final String KEY_WIFI_DISPLAY = "wifi_display";
-
+    private static final String KEY_CABL_BRIGHTNESS = "cabl_brightness";
     private static final int DLG_GLOBAL_CHANGE_WARNING = 1;
 
-    private DisplayManager mDisplayManager;
+    private static final int CABL_CON_TYPE_DISABLE = 0;
+    private static final int CABL_CON_TYPE_ENABLE  = 1;
 
+    private static final String CABL_SERVICE_INTENT = "org.codeaurora.cabl.ICABLService";
+
+    private DisplayManager mDisplayManager;
+    private BrightnessPreference mBrightnessPreference;
+    private Preference mBrightnessSettingsPreference;
     private CheckBoxPreference mAccelerometer;
     private WarnedListPreference mFontSizePref;
     private CheckBoxPreference mNotificationPulse;
@@ -77,6 +97,13 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
     private WifiDisplayStatus mWifiDisplayStatus;
     private Preference mWifiDisplayPreference;
+
+    private CheckBoxPreference mCablBrightnessPreference;
+    private static boolean mCablAvailable;
+    private static ICABLService mCABLService = null;
+    private CABLServiceConnection mCABLServiceConn = null;
+    private static boolean sCABLEnabled = true;
+    private static final String PROP_CABL = "persist.env.settings.cabl";
 
     private final RotationPolicy.RotationPolicyListener mRotationPolicyListener =
             new RotationPolicy.RotationPolicyListener() {
@@ -92,6 +119,9 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         ContentResolver resolver = getActivity().getContentResolver();
 
         addPreferencesFromResource(R.xml.display_settings);
+
+        //add content adaptive backlight support
+        mBrightnessPreference = (BrightnessPreference) findPreference(KEY_BRIGHTNESS);
 
         mAccelerometer = (CheckBoxPreference) findPreference(KEY_ACCELEROMETER);
         mAccelerometer.setPersistent(false);
@@ -143,6 +173,15 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                 == WifiDisplayStatus.FEATURE_STATE_UNAVAILABLE) {
             getPreferenceScreen().removePreference(mWifiDisplayPreference);
             mWifiDisplayPreference = null;
+        }
+
+        mCablBrightnessPreference = (CheckBoxPreference) findPreference(KEY_CABL_BRIGHTNESS);
+        sCABLEnabled = SystemProperties.getBoolean(PROP_CABL,true);
+        if (!sCABLEnabled) {
+             getPreferenceScreen().removePreference(mCablBrightnessPreference);
+        } else {
+            mCablAvailable = SystemProperties.getBoolean("ro.qualcomm.cabl", false);
+            initCABLService();
         }
     }
 
@@ -284,6 +323,9 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         readFontSizePreference(mFontSizePref);
         updateScreenSaverSummary();
         updateWifiDisplaySummary();
+        if (sCABLEnabled) {
+            updateCablBrightnessCheckbox();
+        }
     }
 
     private void updateScreenSaverSummary() {
@@ -335,6 +377,13 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             Settings.System.putInt(getContentResolver(), Settings.System.NOTIFICATION_LIGHT_PULSE,
                     value ? 1 : 0);
             return true;
+        } else if (preference == mCablBrightnessPreference) {
+            final boolean checked = mCablBrightnessPreference.isChecked();
+            if (checked) {
+                startCABL();
+            } else {
+                stopCABL();
+            }
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
@@ -385,4 +434,101 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
         return false;
     }
+
+    // add for UX_Brightness_settings start
+    private void updateCablBrightnessCheckbox() {
+        boolean cablEnabled = (1 == android.provider.Settings.Global.getInt(getContentResolver(),
+                CABL_ENABLED, 0));
+        //set default value for CABL check status
+        if(null != mCablBrightnessPreference){
+            mCablBrightnessPreference.setChecked(cablEnabled);
+        }
+    }
+
+    private void startCABL() {
+        if (mCablAvailable) {
+            if (null != mCABLService) {
+                final ContentResolver resolver = getActivity().getContentResolver();
+                // Create a new thread execution
+                // mCABLService.startCABL().
+                // sleep will execution in the this thread.dosen't
+                // Obstruction main thread.
+                new Thread() {
+                    public void run() {
+                        try {
+                            Log.d(TAG, "startCABL");
+                            boolean result = mCABLService.control(CABL_CON_TYPE_ENABLE);
+                            //0-disable cabl 1-enable cabl
+                            Settings.Global.putInt(resolver,
+                                    CABL_ENABLED,
+                                    result ? 1 : 0);
+                        } catch (RemoteException e) {
+                                Log.e(TAG, "startCABL, exception");
+                        }
+                    }
+                }.start();
+            }
+        }
+    }
+
+    private void stopCABL() {
+        if (mCablAvailable
+                && SystemProperties.get("init.svc.ppd").equals(
+                        "running")) {
+            if (null != mCABLService) {
+                final ContentResolver resolver = getActivity().getContentResolver();
+                // Create a new thread execution
+                // mCABLService.stopCABL().
+                // sleep will execution in the this thread.dosen't
+                // Obstruction main thread.
+                new Thread() {
+                    public void run() {
+                        try {
+                            Log.d(TAG, "stopCABL");
+                            boolean result = mCABLService.control(CABL_CON_TYPE_DISABLE);
+                            //0-disable cabl 1-enable cabl
+                            Settings.Global.putInt(resolver,
+                                    CABL_ENABLED,
+                                    result ? 0 : 1);
+                        } catch (RemoteException e) {
+                            Log.e(TAG, "stopCABL, exception");
+                        }
+                    }
+                }.start();
+            }
+        }
+    }
+
+    private class CABLServiceConnection implements ServiceConnection{
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mCABLService = ICABLService.Stub.asInterface((IBinder)service);
+            Log.d(TAG, "onServiceConnected, service=" + mCABLService);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mCABLService = null;
+        }
+
+    }
+
+    private void initCABLService(){
+        Log.d(TAG, "initCABLService");
+
+        mCABLServiceConn = new CABLServiceConnection();
+        Intent i = new Intent(CABL_SERVICE_INTENT);
+        boolean ret = getActivity().bindService(i, mCABLServiceConn, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        if (sCABLEnabled){
+            getActivity().unbindService(mCABLServiceConn);
+        }
+    }
+    // add for UX_Brightness_settings end
 }

@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.telephony.MSimTelephonyManager;
@@ -69,6 +71,8 @@ public class ApnSettings extends PreferenceActivity implements
     private static final int NAME_INDEX = 1;
     private static final int APN_INDEX = 2;
     private static final int TYPES_INDEX = 3;
+    private static final int RO_INDEX = 4;
+    private static final int LOCALIZED_NAME_INDEX = 5;
 
     private static final int MENU_NEW = Menu.FIRST;
     private static final int MENU_RESTORE = Menu.FIRST + 1;
@@ -80,9 +84,12 @@ public class ApnSettings extends PreferenceActivity implements
 
     private static final Uri DEFAULTAPN_URI = Uri.parse(RESTORE_CARRIERS_URI);
     private static final Uri PREFERAPN_URI = Uri.parse(PREFERRED_APN_URI);
+    private Uri mPreferApnUri;
 
     private static final String CHINA_UNION_PLMN = "46001";
     private static boolean mRestoreDefaultApnMode;
+
+    private static final String APN_TYPE_DM = "dm";
 
     private RestoreApnUiHandler mRestoreApnUiHandler;
     private RestoreApnProcessHandler mRestoreApnProcessHandler;
@@ -112,6 +119,11 @@ public class ApnSettings extends PreferenceActivity implements
                     break;
                 }
             }
+            if (intent.getAction().equals(Intent.ACTION_AIRPLANE_MODE_CHANGED) ||
+                    intent.getAction().equals(TelephonyIntents.ACTION_SIM_STATE_CHANGED)) {
+                setScreenEnabled();
+                invalidateOptionsMenu();
+            }
         }
     };
 
@@ -133,14 +145,22 @@ public class ApnSettings extends PreferenceActivity implements
         mSubscription = getIntent().getIntExtra(SelectSubscription.SUBSCRIPTION_KEY,
                 MSimTelephonyManager.getDefault().getDefaultSubscription());
         Log.d(TAG, "onCreate received sub :" + mSubscription);
-        mMobileStateFilter = new IntentFilter(
-                TelephonyIntents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED);
+        mMobileStateFilter = new IntentFilter();
+        mMobileStateFilter.addAction(TelephonyIntents.ACTION_ANY_DATA_CONNECTION_STATE_CHANGED);
+        mMobileStateFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
+        mMobileStateFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+            mPreferApnUri = Uri.parse(PREFERRED_APN_URI + "/" + mSubscription);
+        } else {
+            mPreferApnUri = Uri.parse(PREFERRED_APN_URI);
+        }
+        Log.d(TAG, "Preferred APN Uri is set to '" + mPreferApnUri.toString() + "'");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        setScreenEnabled();
         registerReceiver(mMobileStateReceiver, mMobileStateFilter);
 
         if (!mRestoreDefaultApnMode) {
@@ -184,7 +204,7 @@ public class ApnSettings extends PreferenceActivity implements
         }
 
         Cursor cursor = getContentResolver().query(Telephony.Carriers.CONTENT_URI, new String[] {
-                "_id", "name", "apn", "type"}, where, null,
+                "_id", "name", "apn", "type", "read_only", "localized_name"}, where, null,
                 Telephony.Carriers.DEFAULT_SORT_ORDER);
 
         if (cursor != null) {
@@ -200,6 +220,7 @@ public class ApnSettings extends PreferenceActivity implements
                 String apn = cursor.getString(APN_INDEX);
                 String key = cursor.getString(ID_INDEX);
                 String type = cursor.getString(TYPES_INDEX);
+                boolean readOnly = (cursor.getInt(RO_INDEX) == 1);
 
                 //remove AGPS for china union
                 if (SystemProperties.getBoolean("persist.env.settings.hidesupl", false)
@@ -209,8 +230,31 @@ public class ApnSettings extends PreferenceActivity implements
                     continue;
                 }
 
+                //remove the test item
+                if(APN_TYPE_DM.equalsIgnoreCase(type)){
+                    cursor.moveToNext();
+                    continue;
+                }
+
+                // If can find a localized name, replace the APN name with it
+                String resName = cursor.getString(LOCALIZED_NAME_INDEX);
+                if (resName != null && !resName.isEmpty()) {
+                    int resId = getResources().getIdentifier(resName, "string", getPackageName());
+                    String localizedName = null;
+                    try {
+                        localizedName = getResources().getString(resId);
+                        Log.d(TAG, "Replaced apn name with localized name: " + name);
+                    } catch (NotFoundException e) {
+                        Log.e(TAG, "Got execption while getting the localized apn name.", e);
+                    }
+                    if (!TextUtils.isEmpty(localizedName)) {
+                        name = localizedName;
+                    }
+                }
+
                 ApnPreference pref = new ApnPreference(this);
 
+                pref.setApnReadOnly(readOnly);
                 pref.setKey(key);
                 pref.setTitle(name);
                 pref.setSummary(apn);
@@ -248,6 +292,21 @@ public class ApnSettings extends PreferenceActivity implements
                 getResources().getString(R.string.menu_restore))
                 .setIcon(android.R.drawable.ic_menu_upload);
         return true;
+    }
+
+    /*
+     * If airplane mode is on or SIM card don't prepar, set options menu don't pop up.
+     * Restrict user to new APN, reset to default or click the APN list.
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        String where = getOperatorNumericSelection();
+        if (TextUtils.isEmpty(where) || isAirplaneOn()) {
+            return false;
+        } else {
+            super.onPrepareOptionsMenu(menu);
+            return true;
+        }
     }
 
     @Override
@@ -295,13 +354,13 @@ public class ApnSettings extends PreferenceActivity implements
 
         ContentValues values = new ContentValues();
         values.put(APN_ID, mSelectedKey);
-        resolver.update(PREFERAPN_URI, values, null, null);
+        resolver.update(mPreferApnUri, values, null, null);
     }
 
     private String getSelectedApnKey() {
         String key = null;
 
-        Cursor cursor = getContentResolver().query(PREFERAPN_URI, new String[] {"_id"},
+        Cursor cursor = getContentResolver().query(mPreferApnUri, new String[] {"_id"},
                 null, null, Telephony.Carriers.DEFAULT_SORT_ORDER);
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -414,5 +473,27 @@ public class ApnSettings extends PreferenceActivity implements
             result.add(mccMncFromSim);
         }
         return result.toArray(new String[2]);
+    }
+
+    /**
+     * If airplane mode is on or SIM card don't prepar, make sure user can't edit the Apn.
+     * So we disable the screen.
+     */
+    private void setScreenEnabled() {
+        String where = getOperatorNumericSelection();
+        if (TextUtils.isEmpty(where) || isAirplaneOn()) {
+            getPreferenceScreen().setEnabled(false);
+        } else {
+            getPreferenceScreen().setEnabled(true);
+        }
+    }
+
+    /**
+     * Add the method to check the phone state is airplane mode or not.
+     * Return true, if the phone state is airplane mode.
+     */
+    private boolean isAirplaneOn() {
+        return Settings.System.getInt(getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) == 1;
     }
 }

@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.INetworkManagementService;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.Preference;
@@ -41,6 +42,7 @@ import android.text.TextUtils;
 import android.telephony.MSimTelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -87,10 +89,14 @@ public class Settings extends PreferenceActivity
     private static final String META_DATA_KEY_PARENT_FRAGMENT_CLASS =
         "com.android.settings.PARENT_FRAGMENT_CLASS";
 
+    private static final String GLOBAL_PROP = "persist.env.phone.global";
+
     private static final String EXTRA_UI_OPTIONS = "settings:ui_options";
 
     private static final String SAVE_KEY_CURRENT_HEADER = "com.android.settings.CURRENT_HEADER";
     private static final String SAVE_KEY_PARENT_HEADER = "com.android.settings.PARENT_HEADER";
+    public static final String ACCOUNT_TYPE_PHONE = "com.android.localphone";
+    public static final String ACCOUNT_TYPE_SIM = "com.android.sim";
 
     private String mFragmentClass;
     private int mTopLevelHeaderId;
@@ -462,6 +468,10 @@ public class Settings extends PreferenceActivity
             } else if (id == R.id.multi_sim_settings) {
                 if (!MSimTelephonyManager.getDefault().isMultiSimEnabled())
                     target.remove(header);
+            } else if (id == R.id.global_roaming_settings) {
+                if (!SystemProperties.getBoolean(GLOBAL_PROP, false)) {
+                    target.remove(header);
+                }
             }
 
             if (i < target.size() && target.get(i) == header
@@ -523,7 +533,10 @@ public class Settings extends PreferenceActivity
                             label.toString());
                 }
             }
-            accountHeaders.add(accHeader);
+            //If the account type is Phone or SIM.It will dismiss
+            if (!accountType.equals(ACCOUNT_TYPE_PHONE) && !accountType.equals(ACCOUNT_TYPE_SIM)) {
+                accountHeaders.add(accHeader);
+            }
         }
 
         // Sort by label
@@ -708,7 +721,7 @@ public class Settings extends PreferenceActivity
                         mDataEnabler.setSwitch(holder.switch_);
                         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
                             header.intent.setClassName("com.android.settings",
-                                    "com.android.settings.multisimsettings.MultiSimSettingTab");
+                                    "com.android.settings.SelectSubscription");
                             header.intent.putExtra(MultiSimSettingsConstants.TARGET_PACKAGE,
                                     "com.android.phone");
                             header.intent.putExtra(MultiSimSettingsConstants.TARGET_CLASS,
@@ -815,6 +828,13 @@ public class Settings extends PreferenceActivity
         mAuthenticatorHelper.updateAuthDescriptions(this);
         mAuthenticatorHelper.onAccountsUpdated(this, accounts);
         invalidateHeaders();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Let the system ignore the menu key when the activity is foreground.
+        return false;
     }
 
     /*

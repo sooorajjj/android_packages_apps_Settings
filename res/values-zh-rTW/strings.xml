@@ -765,7 +765,7 @@
     <string name="sim_lock_off" product="tablet" msgid="2813800553917012356">"需要 PIN 才能使用平板電腦"</string>
     <string name="sim_lock_off" product="default" msgid="258981978215428916">"需要輸入 PIN 才可使用電話"</string>
     <string name="sim_pin_change" msgid="6311414184279932368">"變更 SIM PIN"</string>
-    <string name="sim_enter_pin" msgid="6608715137008508432">"SIM PIN"</string>
+    <string name="sim_enter_pin" msgid="6608715137008508432">"SIM PIN (請輸入4-8個數字)"</string>
     <string name="sim_enable_sim_lock" msgid="4517742794997166918">"鎖定 SIM 卡"</string>
     <string name="sim_disable_sim_lock" msgid="7664729528754784824">"解除鎖定 SIM 卡"</string>
     <string name="sim_enter_old" msgid="6074196344494634348">"舊的 SIM PIN"</string>
@@ -979,6 +979,11 @@
     <string name="bluetooth_untether_blank" msgid="2871192409329334813">"將中斷 <xliff:g id="DEVICE_NAME">%1$s</xliff:g> 的網路共用。"</string>
     <string name="tethering_help_button_text" msgid="656117495547173630">"說明"</string>
     <string name="network_settings_title" msgid="7967552516440151852">"行動網路"</string>
+    <string name="manage_mobile_plan_title" msgid="7588182101738043593">"管理行動數據傳輸資費方案"</string>
+    <string name="mobile_unknown_sim_operator" msgid="9101230468757324260">"未知的 SIM 行動通訊業者"</string>
+    <string name="mobile_no_provisioning_url" msgid="2399426808423775711">"%1$s 沒有任何已知的佈建網站"</string>
+    <string name="mobile_insert_sim_card" msgid="9052590985784056395">"請插入 SIM 卡，並重新啟動裝置"</string>
+    <string name="mobile_connect_to_internet" msgid="1733894125065249639">"請連線至網際網路"</string>
     <string name="location_title" msgid="1029961368397484576">"我的位置"</string>
     <string name="location_network_based" msgid="9134175479520582215">"Wi-Fi 和行動網路位置"</string>
     <string name="location_neighborhood_level" msgid="5626515380188353712">"允許應用程式使用 Google 的定位服務加速判斷您的約略位置。系統會收集匿名的位置資料並傳送給 Google。"</string>
@@ -1210,6 +1215,7 @@
     <string name="language_settings" msgid="5292716747264442359">"語言與輸入設定"</string>
     <string name="language_keyboard_settings_title" msgid="243220021717425813">"語言與輸入設定"</string>
     <string name="language_settings_category" msgid="2288258489940617043">"語言設定"</string>
+    <string name="language_selection_title">"輸入語言"</string>
     <string name="keyboard_settings_category" msgid="8275523930352487827">"鍵盤與輸入法"</string>
     <string name="phone_language" msgid="8870144109924299673">"語言"</string>
     <string name="phone_language_summary" msgid="3871309445655554211"></string>
@@ -1847,7 +1853,7 @@
     <string name="same_name_alert">"兩張SIM卡不能同名!"</string>
     <string name="sim_enabler_title">"SIM 卡"</string>
     <string name="sim_enabler">"SIM 卡"</string>
-    <string name="sim_enabler_summary">"SIM 卡 %1$s"</string>
+    <string name="sim_enabler_summary">"SIM 卡 "<xliff:g id="status">%1$s</xliff:g></string>
     <string name="sim_enabled">"已啟用"</string>
     <string name="sim_disabled">"已禁用"</string>
     <string name="sim_missing">"缺失或錯誤"</string>
@@ -1924,7 +1930,7 @@
     <string name="cell_broadcast_settings_summary" msgid="3301339398950905913">"選取要顯示的緊急警示類型。"</string>
     <string name="user_restrictions_title" msgid="7745810037152772035">"應用程式與內容限制"</string>
     <string name="user_rename" msgid="8523499513614655279">"重新命名"</string>
-    <string name="app_restrictions_custom_label" msgid="4171895848817279538">"設定應用程式限制"</string>
+    <string name="app_restrictions_custom_label" msgid="6160672982086584261">"設定應用程式限制"</string>
     <string name="user_restrictions_controlled_by" msgid="3164078767438313899">"受到「<xliff:g id="APP">%1$s</xliff:g>」控制"</string>
     <string name="app_not_supported_in_limited" msgid="913035259626149121">"系統不支援設有限制的個人資料使用這個應用程式"</string>
     <string name="app_sees_restricted_accounts" msgid="7503264525057246240">"這個應用程式可存取您的帳戶"</string>
@@ -1944,4 +1950,16 @@
     <string name="user_image_choose_photo" msgid="7940990613897477057">"從圖片庫選擇相片"</string>
     <string name="regulatory_info_text" msgid="5623087902354026557"></string>
     <string name="slot_name">卡 <xliff:g id="sub">%d</xliff:g></string>
+    <string name="show_search_function">搜索</string>
+
+    <!-- apn names for carriers -->
+    <string name="APN_NAME_CMNET">中國移動互聯網設置 CMNET</string>
+    <string name="APN_NAME_CMWAP">中國移動WAP設置 CMWAP</string>
+    <string name="APN_NAME_CMMMS">中國移動彩信設置</string>
+    <string name="APN_NAME_CUWAP">沃3G手機上網</string>
+    <string name="APN_NAME_CUNET">沃3G連接互聯網</string>
+    <string name="APN_NAME_CUMMS">聯通彩信</string>
+    <string name="APN_NAME_CUSUPL">聯通AGPS</string>
+    <string name="APN_NAME_CTNET">中國電信互聯網設置 CTNET</string>
+    <string name="APN_NAME_CTWAP">中國電信WAP設置 CTWAP</string>
 </resources>

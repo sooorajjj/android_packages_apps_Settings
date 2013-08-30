@@ -59,10 +59,12 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -82,6 +84,7 @@ import android.net.NetworkTemplate;
 import android.net.TrafficStats;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.INetworkManagementService;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -265,6 +268,40 @@ public class DataUsageSummary extends Fragment {
     private boolean mBinding;
 
     private UidDetailProvider mUidDetailProvider;
+    private AirPlaneModeChangeIntentReceiver mAirPlaneModeReceiver;
+
+    /** Flag used to check the network and radio state. */
+    private boolean mMobileRadioStateOld;
+    private boolean mMobile4gRadioStateOld;
+    private boolean mWifiRadioStateOld;
+    private boolean mEthernetStateOld;
+
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean mMobileRadioStateNew = hasReadyMobileRadio(getActivity());
+            boolean mMobile4gRadioStateNew =
+                    isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity());
+            boolean mWifiRadioStateNew = mShowWifi && hasWifiRadio(getActivity());
+            boolean mEthernetStateNew = mShowEthernet && hasEthernet(getActivity());
+
+            // When network or radio state has change, update body content based
+            // on current tab.
+            if ((mMobileRadioStateNew != mMobileRadioStateOld)
+                    || (mMobile4gRadioStateNew != mMobile4gRadioStateOld)
+                    || (mWifiRadioStateNew != mWifiRadioStateOld)
+                    || (mEthernetStateNew != mEthernetStateOld)) {
+                updateBody();
+                mMobileRadioStateOld = mMobileRadioStateNew;
+                mMobile4gRadioStateOld = mMobile4gRadioStateNew;
+                mWifiRadioStateOld = mWifiRadioStateNew;
+                mEthernetStateOld = mEthernetStateNew;
+            } else {
+                mHandler.postDelayed(mRunnable, 2 * DateUtils.SECOND_IN_MILLIS);
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -299,6 +336,11 @@ public class DataUsageSummary extends Fragment {
         }
 
         setHasOptionsMenu(true);
+
+        // Register a broadcast receiver to listen the airplane mode changed.
+        mAirPlaneModeReceiver = new AirPlaneModeChangeIntentReceiver();
+        IntentFilter mFilter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        getActivity().registerReceiver(mAirPlaneModeReceiver, mFilter);
     }
 
     @Override
@@ -443,6 +485,11 @@ public class DataUsageSummary extends Fragment {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        mMobileRadioStateOld = (hasReadyMobileRadio(getActivity()));
+        mMobile4gRadioStateOld = (isMobilePolicySplit() && hasReadyMobile4gRadio(getActivity()));
+        mWifiRadioStateOld = (mShowWifi && hasWifiRadio(getActivity()));
+        mEthernetStateOld = (mShowEthernet && hasEthernet(getActivity()));
     }
 
     @Override
@@ -525,7 +572,13 @@ public class DataUsageSummary extends Fragment {
             case R.id.data_usage_menu_restrict_background: {
                 final boolean restrictBackground = !item.isChecked();
                 if (restrictBackground) {
-                    ConfirmRestrictFragment.show(this);
+                    // check whether mobile data is limited
+                    if (hasLimitedNetworks()) {
+                        ConfirmRestrictFragment.show(this);
+                    } else {
+                        DeniedRestrictFragment.show(this);
+                        setRestrictBackground(false);
+                    }
                 } else {
                     // no confirmation to drop restriction
                     setRestrictBackground(false);
@@ -571,6 +624,19 @@ public class DataUsageSummary extends Fragment {
         return false;
     }
 
+    /**
+     * Receives notifications when enable/disable airplane mode.
+     */
+    private class AirPlaneModeChangeIntentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String actionStr = intent.getAction();
+            if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(actionStr)) {
+                mHandler.post(mRunnable);
+            }
+        }
+    }
+
     @Override
     public void onDestroy() {
         mDataEnabledView = null;
@@ -585,6 +651,9 @@ public class DataUsageSummary extends Fragment {
             getFragmentManager()
                     .popBackStack(TAG_APP_DETAILS, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+        // Unregister the broadcast receiver
+        getActivity().unregisterReceiver(mAirPlaneModeReceiver);
+        mHandler.removeCallbacks(mRunnable);
 
         super.onDestroy();
     }
@@ -625,6 +694,10 @@ public class DataUsageSummary extends Fragment {
         final Context context = getActivity();
         mTabHost.clearAllTabs();
 
+        if (!hasReadyMobileRadio(context)) {
+            mShowWifi = true;
+            mShowEthernet = true;
+        }
         final boolean mobileSplit = isMobilePolicySplit();
         if (mobileSplit && hasReadyMobile4gRadio(context)) {
             mTabHost.addTab(buildTabSpec(TAB_3G, R.string.data_usage_tab_3g));
@@ -1717,43 +1790,50 @@ public class DataUsageSummary extends Fragment {
     public static class ConfirmLimitFragment extends DialogFragment {
         private static final String EXTRA_MESSAGE = "message";
         private static final String EXTRA_LIMIT_BYTES = "limitBytes";
+        private static final String EXTRA_TAG_NAME = "tagName";
 
         public static void show(DataUsageSummary parent) {
-            if (!parent.isAdded()) return;
+            if (null == parent || !parent.isAdded())
+                return;
 
             final Resources res = parent.getResources();
             final CharSequence message;
-            final long minLimitBytes = (long) (
-                    parent.mPolicyEditor.getPolicy(parent.mTemplate).warningBytes * 1.2f);
-            final long limitBytes;
 
-            // TODO: customize default limits based on network template
-            final String currentTab = parent.mCurrentTab;
-            if (TAB_3G.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (TAB_4G.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (TAB_MOBILE.equals(currentTab)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
-            } else if (currentTab.startsWith(TAB_SIM)) {
-                message = res.getString(R.string.data_usage_limit_dialog_mobile);
-                limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+            if (parent.mPolicyEditor.getPolicy(parent.mTemplate) != null) {
+                final long minLimitBytes = (long) (
+                        parent.mPolicyEditor.getPolicy(parent.mTemplate).warningBytes * 1.2f);
 
-            } else {
-                throw new IllegalArgumentException("unknown current tab: " + currentTab);
+
+                final long limitBytes;
+
+                // TODO: customize default limits based on network template
+                final String currentTab = parent.mCurrentTab;
+                if (TAB_3G.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (TAB_4G.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (TAB_MOBILE.equals(currentTab)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else if (currentTab.startsWith(TAB_SIM)) {
+                    message = res.getString(R.string.data_usage_limit_dialog_mobile);
+                    limitBytes = Math.max(5 * GB_IN_BYTES, minLimitBytes);
+                } else {
+                    throw new IllegalArgumentException("unknown current tab: " + currentTab);
+                }
+
+                final Bundle args = new Bundle();
+                args.putCharSequence(EXTRA_MESSAGE, message);
+                args.putLong(EXTRA_LIMIT_BYTES, limitBytes);
+                args.putString(EXTRA_TAG_NAME, currentTab);
+
+                final ConfirmLimitFragment dialog = new ConfirmLimitFragment();
+                dialog.setArguments(args);
+                dialog.setTargetFragment(parent, 0);
+                dialog.show(parent.getFragmentManager(), TAG_CONFIRM_LIMIT);
             }
-
-            final Bundle args = new Bundle();
-            args.putCharSequence(EXTRA_MESSAGE, message);
-            args.putLong(EXTRA_LIMIT_BYTES, limitBytes);
-
-            final ConfirmLimitFragment dialog = new ConfirmLimitFragment();
-            dialog.setArguments(args);
-            dialog.setTargetFragment(parent, 0);
-            dialog.show(parent.getFragmentManager(), TAG_CONFIRM_LIMIT);
         }
 
         @Override
@@ -1762,6 +1842,7 @@ public class DataUsageSummary extends Fragment {
 
             final CharSequence message = getArguments().getCharSequence(EXTRA_MESSAGE);
             final long limitBytes = getArguments().getLong(EXTRA_LIMIT_BYTES);
+            final String tabName = getArguments().getString(EXTRA_TAG_NAME);
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(R.string.data_usage_limit_dialog_title);
@@ -1771,7 +1852,7 @@ public class DataUsageSummary extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     final DataUsageSummary target = (DataUsageSummary) getTargetFragment();
-                    if (target != null) {
+                    if (target != null && tabName.equals(target.mCurrentTab)) {
                         target.setPolicyLimitBytes(limitBytes);
                     }
                 }
@@ -2404,9 +2485,10 @@ public class DataUsageSummary extends Fragment {
         // build combined list of all limited networks
         final ArrayList<CharSequence> limited = Lists.newArrayList();
 
-        final TelephonyManager tele = TelephonyManager.from(context);
-        if (tele.getSimState() == SIM_STATE_READY) {
-            final String subscriberId = getActiveSubscriberId(context);
+        int sub = MSimTelephonyManager.getDefault().getPreferredDataSubscription();
+        MSimTelephonyManager msimTele = MSimTelephonyManager.from(context);
+        if (msimTele.getSimState(sub) == SIM_STATE_READY) {
+            final String subscriberId = getActiveSubscriberId(sub);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
             }
