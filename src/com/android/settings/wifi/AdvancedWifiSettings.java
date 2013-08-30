@@ -64,6 +64,8 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_PRIORITY_TYPE = "wifi_priority_type";
     private static final String KEY_PRIORITY_SETTINGS = "wifi_priority_settings";
     private static final String PROP_WIFIPRIOR = "persist.env.settings.wifiprior";
+    private static final String KEY_GSM_WIFI_CONNECT_TYPE = "gsm_wifi_connect_type";
+    private static final String PROP_CELL2WIFI = "persist.env.settings.cell2wifi";
 
     private static final String KEY_CURRENT_GATEWAY = "current_gateway";
     private static final String KEY_CURRENT_NETMASK = "current_netmask";
@@ -220,6 +222,23 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         } else {
             Log.d(TAG, "Fail to get priority pref...");
         }
+
+        String data2wifiKey = getActivity().getString(R.string.data_to_wifi_connect_key);
+        String data2wifiValueAsk = getActivity().getString(R.string.data_to_wifi_connect_value_ask);
+        ListPreference cell2wifiPref = (ListPreference) findPreference(KEY_GSM_WIFI_CONNECT_TYPE);
+
+        if (cell2wifiPref != null) {
+            if (SystemProperties.getBoolean(PROP_CELL2WIFI, false)) {
+                int value = Settings.System.getInt(getContentResolver(), data2wifiKey,
+                        Integer.parseInt(data2wifiValueAsk));
+                cell2wifiPref.setValue(String.valueOf(value));
+                cell2wifiPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(cell2wifiPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get cellular2wifi pref");
+        }
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -302,12 +321,25 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             }
         }
 
+
         if (KEY_SELECT_IN_SSIDS_TYPE.equals(key)) {
             try {
                 String selectBySSIDKey = getActivity().getString(R.string.select_in_ssids_key);
                 Settings.System.putInt(getContentResolver(), selectBySSIDKey,
                         Integer.parseInt(((String) newValue)));
             } catch (NumberFormatException e) {
+
+            }
+        }
+        if (KEY_GSM_WIFI_CONNECT_TYPE.equals(key)) {
+            Log.d(TAG, "Gsm to Wifi connect type is " + newValue);
+            try {
+                String data2wifiKey = getActivity().getString(R.string.data_to_wifi_connect_key);
+                Settings.System.putInt(getContentResolver(), data2wifiKey,
+                        Integer.parseInt(((String) newValue)));
+            } catch (NumberFormatException e) {
+                Toast.makeText(getActivity(), R.string.wifi_setting_connect_type_error,
+                        Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
