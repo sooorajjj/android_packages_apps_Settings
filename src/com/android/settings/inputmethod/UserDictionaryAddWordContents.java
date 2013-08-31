@@ -51,12 +51,12 @@ public class UserDictionaryAddWordContents {
 
     private static final int FREQUENCY_FOR_USER_DICTIONARY_ADDS = 250;
 
-    private final int mMode; // Either MODE_EDIT or MODE_INSERT
+    private int mMode; // Either MODE_EDIT or MODE_INSERT
     private final EditText mWordEditText;
     private final EditText mShortcutEditText;
     private String mLocale;
-    private final String mOldWord;
-    private final String mOldShortcut;
+    private String mOldWord;
+    private String mOldShortcut;
 
     /* package */ UserDictionaryAddWordContents(final View view, final Bundle args) {
         mWordEditText = (EditText)view.findViewById(R.id.user_dictionary_add_word_text);
@@ -64,7 +64,10 @@ public class UserDictionaryAddWordContents {
         final String word = args.getString(EXTRA_WORD);
         if (null != word) {
             mWordEditText.setText(word);
-            mWordEditText.setSelection(word.length());
+            int maxLength = mWordEditText.getResources()
+                    .getInteger(R.integer.maximum_user_dictionary_word_length);
+            int selectionLength = word.length() < maxLength ? word.length() : maxLength;
+            mWordEditText.setSelection(selectionLength);
         }
         final String shortcut = args.getString(EXTRA_SHORTCUT);
         if (null != shortcut && null != mShortcutEditText) {
@@ -103,6 +106,12 @@ public class UserDictionaryAddWordContents {
         // If we are in add mode, nothing was added, so we don't need to do anything.
     }
 
+    // Update the values, it's in edit mode after commit the changes in apply.
+    void updateValues(final Context context) {
+        mMode = MODE_EDIT;
+        mOldWord = mWordEditText.getText().toString();
+        mOldShortcut = mShortcutEditText.getText().toString();
+    }
     /* package */ int apply(final Context context, final Bundle outParameters) {
         if (null != outParameters) saveStateIntoBundle(outParameters);
         final ContentResolver resolver = context.getContentResolver();

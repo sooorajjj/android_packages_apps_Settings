@@ -24,6 +24,7 @@ import android.net.wifi.WifiConfiguration.KeyMgmt;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,9 @@ class AccessPoint extends Preference {
     private static final String KEY_WIFIINFO = "key_wifiinfo";
     private static final String KEY_SCANRESULT = "key_scanresult";
     private static final String KEY_CONFIG = "key_config";
+    private static final String PROP_WIFIPRIOR = "persist.env.settings.wifiprior";
+    static final String CARRIER_SSID = "CMCC";
+    static final String CARRIER_EDU_SSID = "CMCC-EDU";
 
     private static final int[] STATE_SECURED = {
         R.attr.state_encrypted
@@ -227,6 +231,16 @@ class AccessPoint extends Preference {
         if (mInfo != null && other.mInfo == null) return -1;
         if (mInfo == null && other.mInfo != null) return 1;
 
+        if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
+            if (isCarrierAp(this)) {
+                if (!isCarrierAp(other)) {
+                    return -1;
+                }
+            } else if (isCarrierAp(other)) {
+                return 1;
+            }
+        }
+
         // Reachable one goes before unreachable one.
         if (mRssi != Integer.MAX_VALUE && other.mRssi == Integer.MAX_VALUE) return -1;
         if (mRssi == Integer.MAX_VALUE && other.mRssi != Integer.MAX_VALUE) return 1;
@@ -397,5 +411,21 @@ class AccessPoint extends Preference {
         mConfig = new WifiConfiguration();
         mConfig.SSID = AccessPoint.convertToQuotedString(ssid);
         mConfig.allowedKeyManagement.set(KeyMgmt.NONE);
+    }
+
+    static boolean isCarrierAp(AccessPoint mAccessPoint) {
+        if (mAccessPoint == null) {
+            return false;
+        }
+        if (!(SystemProperties.getBoolean(PROP_WIFIPRIOR, false))) {
+            return false;
+        }
+
+        if (CARRIER_SSID.equals(mAccessPoint.ssid) || CARRIER_EDU_SSID.equals(mAccessPoint.ssid)) {
+            if (mAccessPoint.security == AccessPoint.SECURITY_NONE) {
+                return true;
+            }
+        }
+        return false;
     }
 }

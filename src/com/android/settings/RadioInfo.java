@@ -59,6 +59,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import com.codeaurora.telephony.msim.MSimPhoneFactory;
+import android.telephony.MSimTelephonyManager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -66,7 +68,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RadioInfo extends Activity {
-    private final String TAG = "phone";
+    private final String TAG = "RadioInfo";
 
     private static final int EVENT_PHONE_STATE_CHANGED = 100;
     private static final int EVENT_SIGNAL_STRENGTH_CHANGED = 200;
@@ -125,14 +127,17 @@ public class RadioInfo extends Activity {
     private Spinner preferredNetworkType;
 
     private TelephonyManager mTelephonyManager;
-    private Phone phone = null;
+    private MSimTelephonyManager mMSimTelephonyManager;
+    private Phone mPhone = null;
     private PhoneStateIntentReceiver mPhoneStateReceiver;
 
     private String mPingIpAddrResult;
     private String mPingHostnameResult;
     private String mHttpClientTestResult;
+    private String[] mPreferredNetworkLabels = null;
     private boolean mMwiValue = false;
     private boolean mCfiValue = false;
+    private boolean mMultiSimFlag = false;
     private List<CellInfo> mCellInfoValue;
 
     private PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
@@ -207,7 +212,7 @@ public class RadioInfo extends Activity {
                 case EVENT_SET_PREFERRED_TYPE_DONE:
                     ar= (AsyncResult) msg.obj;
                     if (ar.exception != null) {
-                        phone.getPreferredNetworkType(
+                        mPhone.getPreferredNetworkType(
                                 obtainMessage(EVENT_QUERY_PREFERRED_TYPE_DONE));
                     }
                     break;
@@ -222,7 +227,7 @@ public class RadioInfo extends Activity {
                 case EVENT_QUERY_SMSC_DONE:
                     ar= (AsyncResult) msg.obj;
                     if (ar.exception != null) {
-                        smsc.setText("refresh error");
+                        smsc.setText(getResources().getString(R.string.smsc_refresh_error));
                     } else {
                         smsc.setText((String)ar.result);
                     }
@@ -231,7 +236,7 @@ public class RadioInfo extends Activity {
                     updateSmscButton.setEnabled(true);
                     ar= (AsyncResult) msg.obj;
                     if (ar.exception != null) {
-                        smsc.setText("update error");
+                        smsc.setText(getResources().getString(R.string.smsc_update_error));
                     }
                     break;
                 default:
@@ -248,7 +253,17 @@ public class RadioInfo extends Activity {
         setContentView(R.layout.radio_info);
 
         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
-        phone = PhoneFactory.getDefaultPhone();
+
+        mMSimTelephonyManager =
+                (MSimTelephonyManager) getSystemService (Context.MSIM_TELEPHONY_SERVICE);
+
+        try {
+            mMultiSimFlag = mMSimTelephonyManager.isMultiSimEnabled();
+        } catch(Exception e) {
+            mMultiSimFlag = false;
+        }
+
+        mPhone = PhoneFactory.getDefaultPhone();
 
         mDeviceId= (TextView) findViewById(R.id.imei);
         number = (TextView) findViewById(R.id.number);
@@ -279,6 +294,8 @@ public class RadioInfo extends Activity {
         mPingHostname = (TextView) findViewById(R.id.pingHostname);
         mHttpClientTest = (TextView) findViewById(R.id.httpClientTest);
 
+        mPreferredNetworkLabels = getApplicationContext().getResources()
+            .getStringArray(R.array.preferred_network);
         preferredNetworkType = (Spinner) findViewById(R.id.preferredNetworkType);
         ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
                 android.R.layout.simple_spinner_item, mPreferredNetworkLabels);
@@ -324,15 +341,18 @@ public class RadioInfo extends Activity {
         mPhoneStateReceiver.notifyServiceState(EVENT_SERVICE_STATE_CHANGED);
         mPhoneStateReceiver.notifyPhoneCallState(EVENT_PHONE_STATE_CHANGED);
 
-        phone.getPreferredNetworkType(
+        mPhone.getPreferredNetworkType(
                 mHandler.obtainMessage(EVENT_QUERY_PREFERRED_TYPE_DONE));
-        phone.getNeighboringCids(
+        mPhone.getNeighboringCids(
                 mHandler.obtainMessage(EVENT_QUERY_NEIGHBORING_CIDS_DONE));
 
         CellLocation.requestLocationUpdate();
 
         // Get current cell info
-        mCellInfoValue = mTelephonyManager.getAllCellInfo();
+        if(!mMultiSimFlag)
+            mCellInfoValue = mTelephonyManager.getAllCellInfo();
+        else
+            mCellInfoValue = mMSimTelephonyManager.getAllCellInfo();
         log("onCreate: mCellInfoValue=" + mCellInfoValue);
     }
 
@@ -360,13 +380,24 @@ public class RadioInfo extends Activity {
         log("onResume: register phone & data intents");
 
         mPhoneStateReceiver.registerIntent();
-        mTelephonyManager.listen(mPhoneStateListener,
+
+        if(!mMultiSimFlag) {
+            mTelephonyManager.listen(mPhoneStateListener,
                   PhoneStateListener.LISTEN_DATA_CONNECTION_STATE
                 | PhoneStateListener.LISTEN_DATA_ACTIVITY
                 | PhoneStateListener.LISTEN_CELL_LOCATION
                 | PhoneStateListener.LISTEN_MESSAGE_WAITING_INDICATOR
                 | PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR
                 | PhoneStateListener.LISTEN_CELL_INFO);
+        } else {
+             mMSimTelephonyManager.listen(mPhoneStateListener,
+                  PhoneStateListener.LISTEN_DATA_CONNECTION_STATE
+                | PhoneStateListener.LISTEN_DATA_ACTIVITY
+                | PhoneStateListener.LISTEN_CELL_LOCATION
+                | PhoneStateListener.LISTEN_MESSAGE_WAITING_INDICATOR
+                | PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR
+                | PhoneStateListener.LISTEN_CELL_INFO);
+        }
     }
 
     @Override
@@ -376,7 +407,11 @@ public class RadioInfo extends Activity {
         log("onPause: unregister phone & data intents");
 
         mPhoneStateReceiver.unregisterIntent();
-        mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+
+        if(!mMultiSimFlag)
+            mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+        else
+            mMSimTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
     }
 
     @Override
@@ -401,7 +436,12 @@ public class RadioInfo extends Activity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Get the TOGGLE DATA menu item in the right state.
         MenuItem item = menu.findItem(MENU_ITEM_TOGGLE_DATA);
-        int state = mTelephonyManager.getDataState();
+        int state = 0;
+
+        if(!mMultiSimFlag)
+            state = mTelephonyManager.getDataState();
+        else
+            state = mMSimTelephonyManager.getDataState();
         boolean visible = true;
 
         switch (state) {
@@ -421,7 +461,7 @@ public class RadioInfo extends Activity {
     }
 
     private boolean isRadioOn() {
-        return phone.getServiceState().getState() != ServiceState.STATE_POWER_OFF;
+        return mPhone.getServiceState().getState() != ServiceState.STATE_POWER_OFF;
     }
 
     private void updatePowerState() {
@@ -433,12 +473,17 @@ public class RadioInfo extends Activity {
 
     private void updateCellInfoListRate() {
         cellInfoListRateButton.setText("CellInfoListRate " + mCellInfoListRateHandler.getRate());
-        updateCellInfoTv(mTelephonyManager.getAllCellInfo());
+
+        if(!mMultiSimFlag)
+            updateCellInfoTv(mTelephonyManager.getAllCellInfo());
+        else
+            updateCellInfoTv(mMSimTelephonyManager.getAllCellInfo());
     }
 
     private void updateDnsCheckState() {
-        dnsCheckState.setText(phone.isDnsCheckDisabled() ?
-                "0.0.0.0 allowed" :"0.0.0.0 not allowed");
+        dnsCheckState.setText(mPhone.isDnsCheckDisabled() ?
+                getResources().getString(R.string.dns_allowed) :
+                getResources().getString(R.string.  dns_not_allowed));
     }
 
     private final void
@@ -543,12 +588,16 @@ public class RadioInfo extends Activity {
 
     private final void
     updateMessageWaiting() {
-        mMwi.setText(String.valueOf(mMwiValue));
+        mMwi.setText(mMwiValue ?
+                getResources().getString(R.string.message_waiting_true) :
+                getResources().getString(R.string.message_waiting_false));
     }
 
     private final void
     updateCallRedirect() {
-        mCfi.setText(String.valueOf(mCfiValue));
+        mCfi.setText(mMwiValue ?
+                getResources().getString(R.string.message_callredirect_true) :
+                getResources().getString(R.string.message_callredirect_false));
     }
 
 
@@ -606,7 +655,13 @@ public class RadioInfo extends Activity {
 
     private final void
     updateDataState() {
-        int state = mTelephonyManager.getDataState();
+        int state=0;
+
+        if(!mMultiSimFlag)
+            state = mTelephonyManager.getDataState();
+        else
+            state = mMSimTelephonyManager.getDataState();
+
         Resources r = getResources();
         String display = r.getString(R.string.radioInfo_unknown);
 
@@ -641,12 +696,12 @@ public class RadioInfo extends Activity {
         String s;
         Resources r = getResources();
 
-        s = phone.getDeviceId();
+        s = mPhone.getDeviceId();
         if (s == null) s = r.getString(R.string.radioInfo_unknown);
         mDeviceId.setText(s);
 
 
-        s = phone.getLine1Number();
+        s = mPhone.getLine1Number();
         if (s == null) s = r.getString(R.string.radioInfo_unknown);
         number.setText(s);
     }
@@ -748,7 +803,7 @@ public class RadioInfo extends Activity {
     }
 
     private void refreshSmsc() {
-        phone.getSmscAddress(mHandler.obtainMessage(EVENT_QUERY_SMSC_DONE));
+        mPhone.getSmscAddress(mHandler.obtainMessage(EVENT_QUERY_SMSC_DONE));
     }
 
     private final void updatePingState() {
@@ -887,7 +942,7 @@ public class RadioInfo extends Activity {
 
     private MenuItem.OnMenuItemClickListener mGetPdpList = new MenuItem.OnMenuItemClickListener() {
         public boolean onMenuItemClick(MenuItem item) {
-            phone.getDataCallList(null);
+            mPhone.getDataCallList(null);
             return true;
         }
     };
@@ -905,7 +960,13 @@ public class RadioInfo extends Activity {
         public boolean onMenuItemClick(MenuItem item) {
             ConnectivityManager cm =
                     (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-            int state = mTelephonyManager.getDataState();
+        int state = 0;
+
+        if(!mMultiSimFlag)
+            state = mTelephonyManager.getDataState();
+        else
+            state = mMSimTelephonyManager.getDataState();
+
             switch (state) {
                 case TelephonyManager.DATA_CONNECTED:
                     cm.setMobileDataEnabled(false);
@@ -924,7 +985,7 @@ public class RadioInfo extends Activity {
     OnClickListener mPowerButtonHandler = new OnClickListener() {
         public void onClick(View v) {
             //log("toggle radio power: currently " + (isRadioOn()?"on":"off"));
-            phone.setRadioPower(!isRadioOn());
+            mPhone.setRadioPower(!isRadioOn());
         }
     };
 
@@ -942,7 +1003,7 @@ public class RadioInfo extends Activity {
             if (index >= rates.length) {
                 index = 0;
             }
-            phone.setCellInfoListRate(rates[index]);
+            mPhone.setCellInfoListRate(rates[index]);
             updateCellInfoListRate();
         }
     }
@@ -1026,7 +1087,7 @@ public class RadioInfo extends Activity {
 
     OnClickListener mDnsCheckButtonHandler = new OnClickListener() {
         public void onClick(View v) {
-            phone.disableDnsCheck(!phone.isDnsCheckDisabled());
+            mPhone.disableDnsCheck(!mPhone.isDnsCheckDisabled());
             updateDnsCheckState();
         }
     };
@@ -1053,7 +1114,7 @@ public class RadioInfo extends Activity {
     OnClickListener mUpdateSmscButtonHandler = new OnClickListener() {
         public void onClick(View v) {
             updateSmscButton.setEnabled(false);
-            phone.setSmscAddress(smsc.getText().toString(),
+            mPhone.setSmscAddress(smsc.getText().toString(),
                     mHandler.obtainMessage(EVENT_UPDATE_SMSC_DONE));
         }
     };
@@ -1069,28 +1130,13 @@ public class RadioInfo extends Activity {
         public void onItemSelected(AdapterView parent, View v, int pos, long id) {
             Message msg = mHandler.obtainMessage(EVENT_SET_PREFERRED_TYPE_DONE);
             if (pos>=0 && pos<=(mPreferredNetworkLabels.length - 2)) {
-                phone.setPreferredNetworkType(pos, msg);
+                mPhone.setPreferredNetworkType(pos, msg);
             }
         }
 
         public void onNothingSelected(AdapterView parent) {
         }
     };
-
-    private String[] mPreferredNetworkLabels = {
-            "WCDMA preferred",
-            "GSM only",
-            "WCDMA only",
-            "GSM auto (PRL)",
-            "CDMA auto (PRL)",
-            "CDMA only",
-            "EvDo only",
-            "GSM/CDMA auto (PRL)",
-            "LTE/CDMA auto (PRL)",
-            "LTE/GSM auto (PRL)",
-            "LTE/GSM/CDMA auto (PRL)",
-            "LTE only",
-            "Unknown"};
 
     private void log(String s) {
         Log.d(TAG, "[RadioInfo] " + s);

@@ -46,7 +46,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:persistent="false">
         <intent android:action="android.intent.action.MAIN"
             android:targetPackage="com.android.settings"
-            android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"/>
+            android:targetClass="com.android.settings.SelectSubscription"/>
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -56,7 +56,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:persistent="false">
         <intent android:action="android.intent.action.MAIN"
             android:targetPackage="com.android.settings"
-            android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"/>
+            android:targetClass="com.android.settings.SelectSubscription"/>
     </PreferenceScreen>
 
 

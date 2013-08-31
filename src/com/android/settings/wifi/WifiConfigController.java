@@ -36,6 +36,7 @@ import android.net.wifi.WifiEnterpriseConfig.Eap;
 import android.net.wifi.WifiEnterpriseConfig.Phase2;
 import android.net.wifi.WifiInfo;
 import android.os.Handler;
+import android.os.SystemProperties;
 import android.security.Credentials;
 import android.security.KeyStore;
 import android.text.Editable;
@@ -118,6 +119,8 @@ public class WifiConfigController implements TextWatcher,
     public static final int WIFI_PEAP_PHASE2_GTC        = 2;
 
     private static final String TAG = "WifiConfigController";
+
+    private static final String PROP_WIFIPRIOR = "persist.env.settings.wifiprior";
 
     private Spinner mIpSettingsSpinner;
     private TextView mIpAddressView;
@@ -264,7 +267,14 @@ public class WifiConfigController implements TextWatcher,
                     mView.findViewById(R.id.ip_fields).setVisibility(View.GONE);
                 }
                 if (mAccessPoint.networkId != INVALID_NETWORK_ID) {
-                    mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+                    if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
+                        if (!AccessPoint.isCarrierAp(accessPoint)) {
+                            mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+                        }
+                    }
+                    else {
+                        mConfigUi.setForgetButton(context.getString(R.string.wifi_forget));
+                    }
                 }
             }
         }

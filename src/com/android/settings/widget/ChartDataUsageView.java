@@ -52,6 +52,9 @@ public class ChartDataUsageView extends ChartView {
 
     private static final boolean LIMIT_SWEEPS_TO_VALID_DATA = false;
 
+    // minimum value of drag interval.
+    private static final int INTERVAL_OF_DRAG = 1;
+
     private ChartGridView mGrid;
     private ChartNetworkSeriesView mSeries;
     private ChartNetworkSeriesView mDetailSeries;
@@ -134,8 +137,8 @@ public class ChartDataUsageView extends ChartView {
         mSweepWarning.addOnSweepListener(mVertListener);
         mSweepLimit.addOnSweepListener(mVertListener);
 
-        mSweepWarning.setDragInterval(5 * MB_IN_BYTES);
-        mSweepLimit.setDragInterval(5 * MB_IN_BYTES);
+        mSweepWarning.setDragInterval(INTERVAL_OF_DRAG * MB_IN_BYTES);
+        mSweepLimit.setDragInterval(INTERVAL_OF_DRAG * MB_IN_BYTES);
 
         // TODO: make time sweeps adjustable through dpad
         mSweepLeft.setClickable(false);

@@ -352,8 +352,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         } else {
             if ((mContext.getResources() != null) && (mContext.getResources()
                     .getString(R.string.sim_enabler) != null)) {
-                mSubTitle.setText(slotInfoStr + ": " + String.format(mContext.getResources()
-                        .getString(R.string.sim_enabler)));
+                mSubTitle.setText(slotInfoStr + ": " + mContext.getString(R.string.sim_enabler));
             }
         }
 
@@ -427,14 +426,12 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         } else {
             if (isActivated) {
                 mState = true;
-                mSummary = String.format(
-                        res.getString(R.string.sim_enabler_summary),
+                mSummary = mContext.getString(R.string.sim_enabler_summary,
                         res.getString(R.string.sim_enabled));
             } else {
                 mState = false;
-                mSummary = String.format(res
-                        .getString(R.string.sim_enabler_summary), res
-                        .getString(hasCard() ? R.string.sim_disabled
+                mSummary = mContext.getString(R.string.sim_enabler_summary,
+                        res.getString(hasCard() ? R.string.sim_disabled
                                 : R.string.sim_missing));
             }
         }
@@ -550,8 +547,8 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
                         sendCommand(mRequest);
                     } else if (which == DialogInterface.BUTTON_NEGATIVE) {
                         setChecked(true);
-                        mSubSummary.setText(String.format(
-                                mContext.getString(R.string.sim_enabler_summary),
+                        mSubSummary.setText(mContext.getString(
+                                R.string.sim_enabler_summary,
                                 mContext.getString(R.string.sim_enabled)));
                     }
                     mHasDisableOneSimCard = false;

@@ -16,12 +16,16 @@
 
 package com.android.settings.wifi;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiWatchdogStateMachine;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -29,6 +33,7 @@ import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.Global;
 import android.security.Credentials;
+import android.text.format.Formatter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,7 +55,18 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
     private static final String KEY_SCAN_ALWAYS_AVAILABLE = "wifi_scan_always_available";
     private static final String KEY_INSTALL_CREDENTIALS = "install_credentials";
     private static final String KEY_SUSPEND_OPTIMIZATIONS = "suspend_optimizations";
+    private static final String KEY_SELECT_IN_SSIDS_TYPE = "select_in_ssids_type";
+    private static final String PROP_SSID = "persist.env.settings.ssid";
+    private static final String KEY_AUTO_CONNECT_TYPE = "auto_connect_type";
+    private static final String PROP_AUTOCON = "persist.env.settings.autocon";
+    private static final String KEY_WIFI_GSM_CONNECT_TYPE = "wifi_gsm_connect_type";
+    private static final String PROP_WIFI2CELL = "persist.env.settings.wifi2cell";
+    private static final String KEY_PRIORITY_TYPE = "wifi_priority_type";
+    private static final String KEY_PRIORITY_SETTINGS = "wifi_priority_settings";
+    private static final String PROP_WIFIPRIOR = "persist.env.settings.wifiprior";
 
+    private static final String KEY_CURRENT_GATEWAY = "current_gateway";
+    private static final String KEY_CURRENT_NETMASK = "current_netmask";
     private WifiManager mWifiManager;
 
     @Override
@@ -140,6 +156,70 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             sleepPolicyPref.setValue(stringValue);
             updateSleepPolicySummary(sleepPolicyPref, stringValue);
         }
+
+        String selectBySSIDKey = getActivity().getString(R.string.select_in_ssids_key);
+        String selectBySSIDValueAsk = getActivity().getString(R.string.select_in_ssids_value_ask);
+        ListPreference ssidPref = (ListPreference) findPreference(KEY_SELECT_IN_SSIDS_TYPE);
+        if (ssidPref != null) {
+            if (SystemProperties.getBoolean(PROP_SSID, false)) {
+                int value = Settings.System.getInt(getContentResolver(), selectBySSIDKey,
+                        Integer.parseInt(selectBySSIDValueAsk));
+                ssidPref.setValue(String.valueOf(value));
+                ssidPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(ssidPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get ssid pref");
+        }
+
+        CheckBoxPreference AutoPref = (CheckBoxPreference) findPreference(KEY_AUTO_CONNECT_TYPE);
+        if (AutoPref != null) {
+            if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
+                AutoPref.setChecked(Settings.System.getInt(getContentResolver(),
+                        getResources().getString(R.string.wifi_autoconn_type),
+                        getResources().getInteger(R.integer.wifi_autoconn_type_auto)) ==
+                        getResources().getInteger(R.integer.wifi_autoconn_type_auto));
+                AutoPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(AutoPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get auto connect pref");
+        }
+
+        CheckBoxPreference wifi2cellPref =
+                (CheckBoxPreference) findPreference(KEY_WIFI_GSM_CONNECT_TYPE);
+        if (wifi2cellPref != null) {
+            if (SystemProperties.getBoolean(PROP_WIFI2CELL, false)) {
+                wifi2cellPref.setChecked(Settings.System.getInt(getContentResolver(),
+                        getResources().getString(R.string.wifi2cell_connect_type),
+                        getResources().getInteger(R.integer.wifi2cell_connect_type_ask))
+                        == getResources().getInteger(R.integer.wifi2cell_connect_type_ask));
+                wifi2cellPref.setOnPreferenceChangeListener(this);
+            } else {
+                getPreferenceScreen().removePreference(wifi2cellPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get wifi2cell pref");
+        }
+
+        CheckBoxPreference priorityTypePref = (CheckBoxPreference) findPreference(KEY_PRIORITY_TYPE);
+        Preference prioritySettingPref = findPreference(KEY_PRIORITY_SETTINGS);
+        if (priorityTypePref != null && prioritySettingPref != null) {
+            if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
+                priorityTypePref.setOnPreferenceChangeListener(this);
+                priorityTypePref.setChecked(Settings.System.getInt(getContentResolver(),
+                        getResources().getString(R.string.wifi_priority_type),
+                        getResources().getInteger(R.integer.wifi_priority_type_default))
+                        == getResources().getInteger(R.integer.wifi_priority_type_manual));
+            } else {
+                getPreferenceScreen().removePreference(priorityTypePref);
+                getPreferenceScreen().removePreference(prioritySettingPref);
+            }
+        } else {
+            Log.d(TAG, "Fail to get priority pref...");
+        }
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {
@@ -222,8 +302,43 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
             }
         }
 
+        if (KEY_SELECT_IN_SSIDS_TYPE.equals(key)) {
+            try {
+                String selectBySSIDKey = getActivity().getString(R.string.select_in_ssids_key);
+                Settings.System.putInt(getContentResolver(), selectBySSIDKey,
+                        Integer.parseInt(((String) newValue)));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        if (KEY_WIFI_GSM_CONNECT_TYPE.equals(key)) {
+            Log.d(TAG, "wifi2cell connect type is " + newValue);
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(),
+                    getResources().getString(R.string.wifi2cell_connect_type),
+                    checked ? getResources().getInteger(R.integer.wifi2cell_connect_type_ask)
+                            : getResources().getInteger(R.integer.wifi2cell_connect_type_auto));
+        }
+
+        if (KEY_AUTO_CONNECT_TYPE.equals(key)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(),
+                    getResources().getString(R.string.wifi_autoconn_type),
+                    checked ? getResources().getInteger(R.integer.wifi_autoconn_type_auto)
+                            : getResources().getInteger(R.integer.wifi_autoconn_type_manual));
+        }
+
+        if (KEY_PRIORITY_TYPE.equals(key)) {
+            boolean checked = ((Boolean) newValue).booleanValue();
+            Settings.System.putInt(getContentResolver(),
+                    getResources().getString(R.string.wifi_priority_type),
+                    checked ? getResources().getInteger(R.integer.wifi_priority_type_manual)
+                            : getResources().getInteger(R.integer.wifi_priority_type_default));
+        }
+
         return true;
     }
+
 
     private void refreshWifiInfo() {
         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
@@ -237,6 +352,37 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         String ipAddress = Utils.getWifiIpAddresses(getActivity());
         wifiIpAddressPref.setSummary(ipAddress == null ?
                 getActivity().getString(R.string.status_unavailable) : ipAddress);
+        Preference wifiGatewayPref = findPreference(KEY_CURRENT_GATEWAY);
+        String gateway = null;
+        Preference wifiNetmaskPref = findPreference(KEY_CURRENT_NETMASK);
+        String netmask = null;
+        if (SystemProperties.getBoolean("persist.env.settings.netinfo", false)) {
+            DhcpInfo dhcpInfo = mWifiManager.getDhcpInfo();
+            if (wifiInfo != null) {
+                if (dhcpInfo != null) {
+                    gateway = Formatter.formatIpAddress(dhcpInfo.gateway);
+                    netmask = Formatter.formatIpAddress(dhcpInfo.netmask);
+                }
+            }
+            if (wifiGatewayPref != null) {
+                wifiGatewayPref.setSummary(gateway == null ?
+                        getString(R.string.status_unavailable) : gateway);
+            }
+            if (wifiNetmaskPref != null) {
+                wifiNetmaskPref.setSummary(netmask == null ?
+                        getString(R.string.status_unavailable) : netmask);
+            }
+        } else {
+            PreferenceScreen screen = getPreferenceScreen();
+            if (screen != null) {
+                if (wifiGatewayPref != null) {
+                    screen.removePreference(wifiGatewayPref);
+                }
+                if (wifiNetmaskPref != null) {
+                    screen.removePreference(wifiNetmaskPref);
+                }
+            }
+        }
     }
 
 }

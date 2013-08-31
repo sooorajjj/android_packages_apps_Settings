@@ -42,6 +42,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFrameLayout;
@@ -58,12 +59,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -79,6 +82,11 @@ import com.android.settings.Utils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.text.Editable;
+import android.view.KeyEvent;
 
 final class CanBeOnSdCardChecker {
     final IPackageManager mPm;
@@ -168,6 +176,9 @@ public class ManageApplications extends Fragment implements
     public static final int SHOW_RUNNING_SERVICES = MENU_OPTIONS_BASE + 6;
     public static final int SHOW_BACKGROUND_PROCESSES = MENU_OPTIONS_BASE + 7;
     public static final int RESET_APP_PREFERENCES = MENU_OPTIONS_BASE + 8;
+    // add for new feature for search applications
+    public static final int SHOW_SEARCH_APPLICATIONS = MENU_OPTIONS_BASE + 9;
+
     // sort order
     private int mSortOrder = SORT_ORDER_ALPHA;
     
@@ -461,7 +472,9 @@ public class ManageApplications extends Fragment implements
     private ViewPager mViewPager;
 
     AlertDialog mResetDialog;
-
+    private LinearLayout mSearchView;
+    public EditText mTextView;
+    public TextView mSearchTitle;
     class MyPagerAdapter extends PagerAdapter
             implements ViewPager.OnPageChangeListener {
         int mCurPos = 0;
@@ -543,6 +556,12 @@ public class ManageApplications extends Fragment implements
         private int mWhichSize = SIZE_TOTAL;
         CharSequence mCurFilterPrefix;
 
+        public View mCurrentView = null;
+
+        public View getMyView() {
+            return mCurrentView;
+        }
+
         private Filter mFilter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
@@ -562,6 +581,14 @@ public class ManageApplications extends Fragment implements
                 mTab.updateStorageUsage();
             }
         };
+
+        public void setFilterPrefix(String prefix) {
+            Log.d(TAG,"setFilterPrefix:prefix="+prefix);
+            mCurFilterPrefix = prefix;
+            rebuild(true);
+            notifyDataSetChanged();
+            mTab.updateStorageUsage();
+        }
 
         public ApplicationsAdapter(ApplicationsState state, TabInfo tab, int filterMode) {
             mState = state;
@@ -804,6 +831,7 @@ public class ManageApplications extends Fragment implements
             }
             mActive.remove(convertView);
             mActive.add(convertView);
+            mCurrentView = convertView;
             return convertView;
         }
 
@@ -903,6 +931,26 @@ public class ManageApplications extends Fragment implements
         mContentContainer = container;
         mRootView = rootView;
 
+        mSearchView = (LinearLayout) rootView.findViewById(R.id.search);
+        mTextView = (EditText) rootView.findViewById(R.id.search_prefix);
+        mSearchTitle = (TextView) rootView.findViewById(R.id.search_title);
+        mTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (null != mCurTab && (null != mCurTab.mApplications)) {
+                    mCurTab.mApplications.setFilterPrefix(mTextView.getText().toString().trim());
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         MyPagerAdapter adapter = new MyPagerAdapter();
         mViewPager.setAdapter(adapter);
@@ -943,8 +991,8 @@ public class ManageApplications extends Fragment implements
     public void onResume() {
         super.onResume();
         mActivityResumed = true;
-        updateNumTabs();
         updateCurrentTab(mViewPager.getCurrentItem());
+        updateNumTabs();
         updateOptionsMenu();
     }
 
@@ -1033,11 +1081,14 @@ public class ManageApplications extends Fragment implements
         mOptionsMenu = menu;
         // note: icons removed for now because the cause the new action
         // bar UI to be very confusing.
+        if (SystemProperties.getBoolean("persist.env.settings.searchapp", false)) {
+            // add for new feature for search applications
+            menu.add(0, SHOW_SEARCH_APPLICATIONS, 1, R.string.show_search_function)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
         menu.add(0, SORT_ORDER_ALPHA, 1, R.string.sort_order_alpha)
-                //.setIcon(android.R.drawable.ic_menu_sort_alphabetically)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add(0, SORT_ORDER_SIZE, 2, R.string.sort_order_size)
-                //.setIcon(android.R.drawable.ic_menu_sort_by_size)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add(0, SHOW_RUNNING_SERVICES, 3, R.string.show_running_services)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -1047,7 +1098,7 @@ public class ManageApplications extends Fragment implements
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         updateOptionsMenu();
     }
-    
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         updateOptionsMenu();
@@ -1082,12 +1133,21 @@ public class ManageApplications extends Fragment implements
             mOptionsMenu.findItem(SHOW_RUNNING_SERVICES).setVisible(showingBackground);
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(!showingBackground);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(false);
-        } else {
+            if(SystemProperties.getBoolean("persist.env.settings.searchapp", false)) {
+                //add for new feature for search applications
+                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(false);
+            }
+        }
+        else {
             mOptionsMenu.findItem(SORT_ORDER_ALPHA).setVisible(mSortOrder != SORT_ORDER_ALPHA);
             mOptionsMenu.findItem(SORT_ORDER_SIZE).setVisible(mSortOrder != SORT_ORDER_SIZE);
             mOptionsMenu.findItem(SHOW_RUNNING_SERVICES).setVisible(false);
             mOptionsMenu.findItem(SHOW_BACKGROUND_PROCESSES).setVisible(false);
             mOptionsMenu.findItem(RESET_APP_PREFERENCES).setVisible(true);
+            if(SystemProperties.getBoolean("persist.env.settings.searchapp", false)) {
+                //add for new feature for search applications
+                mOptionsMenu.findItem(SHOW_SEARCH_APPLICATIONS).setVisible(true);
+            }
         }
     }
 
@@ -1199,6 +1259,10 @@ public class ManageApplications extends Fragment implements
             }
         } else if (menuId == RESET_APP_PREFERENCES) {
             buildResetDialog();
+        } else
+            //add for new feature for search applications
+            if(menuId == SHOW_SEARCH_APPLICATIONS){
+                showInputmethod();
         } else {
             // Handle the home button
             return false;
@@ -1240,6 +1304,10 @@ public class ManageApplications extends Fragment implements
         if (host != null) {
             host.invalidateOptionsMenu();
         }
+
+        if(mCurTab.mListType == LIST_TYPE_RUNNING) {
+            mSearchView.setVisibility(View.GONE);
+        }
     }
 
     private volatile IMediaContainerService mContainerService;
@@ -1258,4 +1326,14 @@ public class ManageApplications extends Fragment implements
             mContainerService = null;
         }
     };
+
+    // add for new feature for search applications
+    private void showInputmethod() {
+        if (mSearchView.getVisibility() != View.VISIBLE) {
+            if (mCurTab.mListType != LIST_TYPE_RUNNING) {
+                mSearchView.setVisibility(View.VISIBLE);
+                mTextView.requestFocus();
+            }
+        }
+    }
 }

@@ -392,18 +392,39 @@
     <item msgid="4042143101664725090">"超时"</item>
     <item msgid="7664124146786465092">"失败"</item>
   </string-array>
-  <string-array name="select_slot_items">
-    <item>卡1</item>
-    <item>卡2</item>
-    <item>总是询问</item>
-  </string-array>
-  <string-array name="select_slot_phone_info">
-    <item>卡1</item>
-    <item>卡2</item>
+  <!-- Display settings.  Entries for each type of Subscription. -->
+  <string-array name="multi_sim_entries">
+    <item> 卡 1 </item>
+    <item> 卡 2 </item>
+    <item> 卡 3 </item>
   </string-array>
   <string-array name="security_settings_premium_sms_values">
     <item msgid="7389829271787670252">"询问"</item>
     <item msgid="5077768429488260031">"永不允许"</item>
     <item msgid="1417929597727989746">"始终允许"</item>
+  </string-array>
+   <string-array name="preferred_network">
+    <item>WCDMA 优先</item>
+    <item>仅限 GSM</item>
+    <item>仅限 WCDMA</item>
+    <item>GSM 自动 (PRL)</item>
+    <item>CDMA 自动 (PRL)</item>
+    <item>仅限 自动</item>
+    <item>仅限 EvDo</item>
+    <item>GSM/CDMA 自动 (PRL)</item>
+    <item>LTE/CDMA/EvDo</item>
+    <item>LTE/GSM/WCDMA</item>
+    <item>全球</item>
+    <item>仅限 LTE</item>
+    <item>LTE/WCDMA</item>
+    <item>未知</item>
+   </string-array>
+  <string-array name="wifi_connect_type_entries">
+    <!-- auto connect to wifi -->
+    <item>自动连接</item>
+    <!-- manual connect to wifi -->
+    <item>手动连接</item>
+    <!-- always notify user when wifi is available -->
+    <item>总是询问</item>
   </string-array>
 </resources>

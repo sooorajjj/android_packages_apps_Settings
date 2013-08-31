@@ -1830,6 +1830,7 @@
     <string name="accelerometer_summary_off" product="default">Switch orientation automatically when rotating phone</string>
     <!-- Sound & display settings screen, setting option name to change brightness -->
     <string name="brightness">Brightness</string>
+    <string name="screencolor">Screen Color</string>
     <!-- Sound & display settings screen, setting option summary to change brightness -->
     <string name="brightness_summary">Adjust the brightness of the screen</string>
     <!-- Sound & display settings screen, setting option name to change screen timeout -->
@@ -1889,7 +1890,7 @@
     <!-- SIM card lock settings screen, setting option name to change the SIM PIN -->
     <string name="sim_pin_change">Change SIM PIN</string>
     <!-- SIM card lock settings screen, SIM PIN dialog message instruction -->
-    <string name="sim_enter_pin">SIM PIN</string>
+    <string name="sim_enter_pin">SIM PIN (Input 4-8 digitals)</string>
     <!-- SIM card lock settings screen, SIM PIN dialog message instruction -->
     <string name="sim_enable_sim_lock">Lock SIM card</string>
     <!-- SIM card lock settings screen, SIM PIN dialog message instruction -->
@@ -1989,6 +1990,8 @@
     <string name="status_msid_number">MSID</string>
     <!-- About phone, status item title.  The phone PRL Version of the current device.-->
     <string name="status_prl_version">PRL version</string>
+    <!-- About phone, status item title.  The phone ESN number of the current device.-->
+    <string name="status_esn_number">ESN</string>
     <!-- About phone, status item title.  The phone MEID number of the current LTE/CDMA device. [CHAR LIMIT=30] -->
     <string name="status_meid_number">MEID</string>
     <!-- About phone, status item title.  The ICCID of the current LTE device. [CHAR LIMIT=30] -->
@@ -2192,6 +2195,8 @@
     <string name="apn_protocol">APN protocol</string>
     <!-- Edit access point labels: The protocol of the APN when roaming, e.g., "IPv4", "IPv6", or "IPv4/IPv6". -->
     <string name="apn_roaming_protocol">APN roaming protocol</string>
+    <!-- Edit access point labels: PPP number -->
+    <string name="apn_ppp_number">APN PPP phone number</string>
     <!-- Edit enable/disable of APN -->
     <string name="carrier_enabled">APN enable/disable</string>
     <string name="carrier_enabled_summaryOn">APN enabled</string>
@@ -2364,6 +2369,21 @@
     <!-- Wireless controls, item title to go into the network settings -->
     <string name="network_settings_title">Mobile networks</string>
 
+    <!-- Manage mobile plan [CHAR LIMIT=35]-->
+    <string name="manage_mobile_plan_title" translatable="true">Manage mobile plan</string>
+
+    <!-- The SIM operator is not known [CHAR_ LIMIT=50]-->
+    <string name="mobile_unknown_sim_operator" translatable="true">Uknown SIM operator</string>
+
+    <!-- There is no mobile provisiong website for the operator which is the firat parameter [CHAR_ LIMIT=50]-->
+    <string name="mobile_no_provisioning_url" translatable="true">%1$s has no known provisioning website</string>
+
+    <!-- Ask user to insert a SIM card [CHAR_ LIMIT=50]-->
+    <string name="mobile_insert_sim_card" translatable="true">Please insert SIM card and restart</string>
+
+    <!-- Ask user to connect to the internet [CHAR_ LIMIT=50]-->
+    <string name="mobile_connect_to_internet" translatable="true">Please connect to the internet</string>
+
     <!-- Security & location settings screen, section header for settings relating to location -->
     <string name="location_title">My Location</string>
     <!-- [CHAR LIMIT=30] Security & location settings screen, setting check box label for Google location service (cell ID, wifi, etc.) -->
@@ -2383,7 +2403,36 @@
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is selected -->
     <string name="assisted_gps_enabled">Use server to assist GPS (uncheck to reduce network usage)</string>
     <!-- Security & location settings screen, setting summary when Assisted GPS check box is clear -->
-    <string name="assisted_gps_disabled">Use server to assist GPS (uncheck to improve GPS performance)</string>
+    <string name="assisted_gps_disabled">Use server to assist GPS (check to improve GPS performance)</string>
+    <!-- agps settings -->
+    <string name="location_agps_params_settings_title">AGPS settings</string>
+    <string name="location_agps_supl_settings">SUPL settings</string>
+    <string name="location_agps_supl_server_addr">Server address</string>
+    <string name="location_agps_supl_server_port">Server port</string>
+    <string name="location_agps_pref_si_title">Preferred mode</string>
+    <string name="location_agps_si_mode">AGPS SI mode</string>
+    <string name="location_agps_si_mode_summary">Choose preferred AGPS method</string>
+    <string name="location_agps_si_mode_dialog_title">AGPS method</string>
+    <string name="location_agps_pref_apn_title">Preferred apn</string>
+    <string name="location_agps_apn_type">Apn types</string>
+    <string name="location_agps_apn_summary">Choose preferred apn type</string>
+    <string name="location_agps_apn_choose_dialog_title">Apn types</string>
+    <string name="location_agps_pref_reset_type_title">Preferred reset type</string>
+    <string name="location_agps_reset_type">Reset types</string>
+    <string name="location_agps_reset_type_summary">Choose preferred reset type</string>
+    <string name="location_agps_reset_type_choose_dialog_title">Reset types</string>
+    <string name="location_agps_pref_network_title">Prefer network</string>
+    <string name="location_agps_register_network_type">Access network type</string>
+    <string name="location_agps_register_network_type_summary">Choose access network to enable AGPS...</string>
+    <string name="location_agps_register_network_type_dialog_title">Select network</string>
+    <string name="location_agps_roaming_help">Warning：Choose ALL NETWORK to open AGPS may loss of telephone charges when roaming！</string>
+    <string name="supl_not_set">&lt;Not set&gt;</string>
+    <string name="location_agps_def_supl_host">221.176.0.55</string>
+    <string name="location_agps_def_supl_port">7275</string>
+    <string name="location_agps_def_network_mode">HOME</string>
+    <string name="location_agps_def_reset_type">HOT</string>
+    <string name="location_agps_def_location_mode">MSB</string>
+
     <!-- [CHAR_LIMIT=30] Security & location settings screen, setting check box label for Google search -->
     <string name="use_location_title">Location &amp; Google search</string>
     <!-- [CHAR_LIMIT=100] Security & location settings screen, setting check box summary for Google search -->
@@ -2394,6 +2443,11 @@
     <string name="location_access_summary">Let apps that have asked your permission use your location information</string>
     <!-- [CHAR LIMIT=45] Section heading for location sources -->
     <string name="location_sources_heading">Location sources</string>
+    <string name="location_access_google_service_title">Location consent</string>
+    <string name="location_access_google_service_text">Allow Google\'s location service to collect anonymous location data.
+    Some data may be stored on your device. Collection may occur even when no apps are running.</string>
+    <string name="location_access_google_service_agree">Agree</string>
+    <string name="location_access_google_service_disagree">Disagree</string>
 
     <!-- About --> <skip />
     <!-- Main settings screen, setting title for the user to go into the About phone screen -->
@@ -2889,6 +2943,7 @@
     <!-- On Language & keyboard settings screen, heading. Inside the "Language & keyboard settings" screen, this is the header for settings that relate to language (select the system language, user dictionary for the language). -->
     <string name="language_settings_category">Language settings</string>
     <!-- On Language & keyboard settings screen, heading. Inside the "Language & keyboard settings" screen, this is the header for settings that relate to keyboard (enable/disable each keyboard, settings for each keyboard). -->
+    <string name="language_selection_title">Input languages</string>
     <string name="keyboard_settings_category">Keyboard &amp; input methods</string>
     <!-- On Text & language settings screen, setting option name. title of the setting to take the user to a screen to select the locale. -->
     <string name="phone_language">Language</string>
@@ -4575,7 +4630,7 @@
     <!-- User limits screen, user name rename text [CHAR LIMIT=15] -->
     <string name="user_rename">RENAME</string>
     <!-- Preference label for custom restrictions [CHAR LIMIT=35] -->
-    <string name="app_restrictions_custom_label">Set application limits</string>
+    <string name="app_restrictions_custom_label">Set app restrictions</string>
     <!-- Summary for app entries that are controlled by another entry [CHAR LIMIT=none] -->
     <string name="user_restrictions_controlled_by">Controlled by <xliff:g id="app">%1$s</xliff:g></string>
     <!-- Summary for apps that aren't supported in limited users [CHAR LIMIT=none] -->
@@ -4644,7 +4699,7 @@
     <string name="summary_call_settings">Set voice mail, call options for dual SIMs</string>
     <string name="sim_enabler_title">SIM card</string>
     <string name="sim_enabler">SIM card</string>
-    <string name="sim_enabler_summary">SIM is %1$s</string>
+    <string name="sim_enabler_summary">SIM is <xliff:g id="status">%1$s</xliff:g></string>
     <string name="sim_enabled">enabled</string>
     <string name="sim_disabled">disabled</string>
     <string name="sim_missing">missing or error</string>
@@ -4664,11 +4719,92 @@
     <string name="sub_not_changed">State not changed</string>
     <string name="title_sim_alias">Alias name</string>
     <string name="same_name_alert">Two sim cards can not be the same name!</string>
-    <string name="select_slot_always_ask">Always ask</string>
     <string name="slot_name">Slot <xliff:g id="sub">%d</xliff:g></string>
     <!-- Default names for sim cards -->
     <string name="default_sim1_name">SLOT1</string>
     <string name="default_sim2_name">SLOT2</string>
 
     <string name="dual_sim_configure">Subscriptions Configuration</string>
+    <!-- modify for usb settings end  -->
+    <string name="enhanced_brightness_summary">It is usually used to improve video quality and save more power when playing video clips. </string>
+    <string name="enhanced_brightness">Dynamic Brightness </string>
+    <string name="screencolor_save">Save</string>
+    <string name="screencolor_cancel">Cancel</string>
+    <string name="previous_str">Previous</string>
+    <string name="new_str">New</string>
+    <string name="restore_preview">View default picture</string>
+    <string name="selectnewfile_menu">View new picture from Gallery</string>
+    <string name="selectfile_menu">View picture from Gallery</string>
+    <string name="restore_default_str">Reset</string>
+    <string name="hue_str">Hue: <xliff:g id="hue_value">%1$s</xliff:g></string>
+    <string name="saturation_str">Saturation: <xliff:g id="saturation_value">%1$s</xliff:g></string>
+    <string name="contrast_str">Contrast: <xliff:g id="contrast_value">%1$s</xliff:g></string>
+    <string name="intensity_str">Intensity: <xliff:g id="intensity_str_value">%1$s</xliff:g></string>
+
+    <!--search function for application settings-->
+    <string name="show_search_function">Search</string>
+
+    <!-- modify for usb settings start -->
+    <!-- Storage setting.  Summary for SD card checkbox [CHAR LIMIT=NONE]-->
+    <string name="usb_sdcard_summary">Lets you transfer media files in the SD card on Windows</string>
+    <string name="usb_sdcard_title">Mount SD card</string>
+    <!-- Storage setting.  Title for SD card checkbox [CHAR LIMIT=30]-->
+    <string name="usb_charging_title">Charging</string>
+    <!-- Storage setting.  Summary for SD card checkbox [CHAR LIMIT=NONE]-->
+    <string name="usb_charging_summary">Lets you only charge the device</string>
+    <string name="internal_storage_turn_on">Internal storage has been turned on</string>
+    <string name="internal_storage_turn_off">Internal storage has been turned off</string>
+    <string name="external_storage_turn_on">External storage has been turned on</string>
+    <string name="external_storage_turn_off">External storage has been turned off</string>
+    <string name="message_waiting_true">true</string>
+    <string name="message_waiting_false">false</string>
+    <string name="message_callredirect_true">true</string>
+    <string name="message_callredirect_false">false</string>
+    <string name="smsc_update_error">update error</string>
+    <string name="smsc_refresh_error">refresh error</string>
+    <string name="dns_allowed">0.0.0.0 allowed</string>
+    <string name="dns_not_allowed">0.0.0.0 not allowed</string>
+    <string name="wifi_advanced_gateway">Gateway</string>
+    <string name="wifi_advanced_network_netmask">Netmask</string>
+    <!-- apn names for carriers -->
+    <string name="APN_NAME_CMNET">CMNET</string>
+    <string name="APN_NAME_CMWAP">CMWAP</string>
+    <string name="APN_NAME_CMMMS">CMMMS</string>
+    <string name="APN_NAME_CUWAP">China Unicom WAP</string>
+    <string name="APN_NAME_CUNET">China Unicom NET</string>
+    <string name="APN_NAME_CUMMS">China Unicom MMS</string>
+    <string name="APN_NAME_CUSUPL">China Unicom AGPS</string>
+    <string name="APN_NAME_CTNET">CTNET</string>
+    <string name="APN_NAME_CTWAP">CTWAP</string>
+
+    <!-- Roaming Date Settings -->
+    <string name="label_global_roaming_settings">Global roaming settings</string>
+
+    <string name="select_in_ssids_type_title">Reselection among SSID</string>
+    <string name="select_in_ssids_key">wifi_select_in_ssids_type</string>
+    <string name="select_in_ssids_value_auto">0</string>
+    <string name="select_in_ssids_value_manul">1</string>
+    <string name="select_in_ssids_value_ask">2</string>
+    <string name="wifi_auto_connect_type_title">Auto connect type</string>
+    <string name="wifi_auto_connect_type_summary">Specify network connection type</string>
+    <string name="wifi_menu_disconnect">Disconnect from network</string>
+    <string name="wifi_autoconn_type">wifi_auto_connect_type</string>
+    <string name="wifi_to_gsm_connect_type_title">WLAN->Cellular hint</string>
+    <string name="wifi2cell_connect_type">"wifi_gsm_connect_type"</string>
+    <string name="radio_info">Radio Info</string>
+    <string name="wifi_set_priority_type_title">Set AP priority manually</string>
+    <string name="wifi_set_priority_type_summary">Allow to set priority for each access point manually</string>
+    <string name="wifi_set_priority_settings_title">AP priority settings</string>
+    <string name="wifi_set_priority_settings_summary">Click to set priority of each access point</string>
+    <string name="wifi_priority_settings_label">Priority settings</string>
+    <string name="wifi_configured_ap_list">Remembered access point list</string>
+    <string name="wifi_priority_label">Priority</string>
+    <string name="wifi_priority_changed">Priority old value=<xliff:g id="old_value">%s</xliff:g>,new value=<xliff:g id="new_value">%s</xliff:g></string>
+    <string name="default_trust_access_points">Default credible access points</string>
+    <string name="configed_access_points">Credible access points</string>
+    <string name="unknown_access_points">Unknown access points</string>
+    <string name="carrier_ssid">CMCC</string>
+    <string name="carrier_edu_ssid">CMCC-EDU</string>
+    <string name="wifi_priority_type">wifi_priority_type</string>
+
 </resources>

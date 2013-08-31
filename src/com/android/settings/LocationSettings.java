@@ -17,12 +17,15 @@
 package com.android.settings;
 
 
+import android.app.AlertDialog;
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.LocationManager;
+import android.os.SystemProperties;
 import android.os.UserManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -30,11 +33,16 @@ import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Properties;
 
 /**
  * Gesture lock pattern settings.
@@ -47,11 +55,14 @@ public class LocationSettings extends SettingsPreferenceFragment
     private static final String KEY_LOCATION_NETWORK = "location_network";
     private static final String KEY_LOCATION_GPS = "location_gps";
     private static final String KEY_ASSISTED_GPS = "assisted_gps";
+    private static final String KEY_ASSISTED_GPS_PARAS = "assisted_gps_params";
+    private static final String AGPS_PROPERTY = "persist.env.settings.agps";
 
     private CheckBoxPreference mNetwork;
     private CheckBoxPreference mGps;
     private CheckBoxPreference mAssistedGps;
     private SwitchPreference mLocationAccess;
+    private Preference mAGpsParas;
 
     // These provide support for receiving notification when Location Manager settings change.
     // This is necessary because the Network Location Provider can change settings
@@ -59,6 +70,8 @@ public class LocationSettings extends SettingsPreferenceFragment
     private ContentQueryMap mContentQueryMap;
 
     private Observer mSettingsObserver;
+
+    private static final String PROPERTIES_FILE = "/etc/gps.conf";
 
     @Override
     public void onStart() {
@@ -93,6 +106,11 @@ public class LocationSettings extends SettingsPreferenceFragment
         mGps = (CheckBoxPreference) root.findPreference(KEY_LOCATION_GPS);
         mAssistedGps = (CheckBoxPreference) root.findPreference(KEY_ASSISTED_GPS);
 
+        if (!SystemProperties.getBoolean(AGPS_PROPERTY, false)) {
+            root.removePreference(mAssistedGps);
+            mAGpsParas = (Preference) root.findPreference(KEY_ASSISTED_GPS_PARAS);
+            root.removePreference(mAGpsParas);
+        }
         // Only enable these controls if this user is allowed to change location
         // sharing settings.
         final UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
@@ -146,6 +164,33 @@ public class LocationSettings extends SettingsPreferenceFragment
                 }
             }
         } else if (preference == mAssistedGps) {
+            if(mAssistedGps.isChecked()) {
+                if( Settings.Global.getString(cr, Settings.Global.ASSISTED_GPS_SUPL_HOST)==null
+                   || Settings.Global.getString(cr, Settings.Global.ASSISTED_GPS_SUPL_PORT)==null)
+                {
+                    FileInputStream stream = null;
+                    try {
+                        Properties properties = new Properties();
+                        File file = new File(PROPERTIES_FILE);
+                        stream = new FileInputStream(file);
+                        properties.load(stream);
+                        Settings.Global.putString(cr, Settings.Global.ASSISTED_GPS_SUPL_HOST,
+                                properties.getProperty("SUPL_HOST", null));
+                        Settings.Global.putString(cr, Settings.Global.ASSISTED_GPS_SUPL_PORT,
+                                properties.getProperty("SUPL_PORT", null));
+                    } catch (IOException e) {
+                        Log.e("LocationSettings", "Could not open GPS configuration file " +
+                              PROPERTIES_FILE + ", e=" + e);
+                    } finally {
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                }
+            }
             Settings.Global.putInt(cr, Settings.Global.ASSISTED_GPS_ENABLED,
                     mAssistedGps.isChecked() ? 1 : 0);
         } else {
@@ -198,10 +243,18 @@ public class LocationSettings extends SettingsPreferenceFragment
         updateLocationToggles();
     }
 
+    /**
+     * When the user turn on location access, pop up a dialog to let user choose
+     * whether allow Google service collect user location data.
+     */
     @Override
     public boolean onPreferenceChange(Preference pref, Object newValue) {
+        final boolean chooseValue = (Boolean) newValue;
         if (pref.getKey().equals(KEY_LOCATION_TOGGLE)) {
-            onToggleLocationAccess((Boolean) newValue);
+            if (!chooseValue) {
+                updateGoogleServiceAccess(false);
+            }
+            onToggleLocationAccess(chooseValue);
         }
         return true;
     }
@@ -210,6 +263,17 @@ public class LocationSettings extends SettingsPreferenceFragment
     public int getHelpResource() {
         return R.string.help_url_location_access;
     }
+
+    /**
+     * Enable or disable google service to collect anonymous location data.
+     */
+    private void updateGoogleServiceAccess(boolean newValue) {
+        ContentResolver cr = getContentResolver();
+        Settings.Secure.setLocationProviderEnabled(cr,
+                LocationManager.NETWORK_PROVIDER, newValue);
+        mNetwork.setChecked(newValue);
+    }
+
 }
 
 class WrappingSwitchPreference extends SwitchPreference {

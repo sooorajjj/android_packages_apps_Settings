@@ -42,6 +42,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemProperties;
 
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -84,7 +85,7 @@ public class MultiSimSettings extends PreferenceActivity {
 
     private PreferenceScreen mConfigSub;
     private static MultiSimEnablerPreference mSimOneEnabler,mSimTwoEnabler;
-    private boolean disableSlot2Data = false;
+    private boolean disableDataSub2 = false;
     private Switch mSwitchSub1,mSwitchSub2;
 
     private MultiSimDialog mDisableEnableProgressDialog = null;
@@ -113,6 +114,10 @@ public class MultiSimSettings extends PreferenceActivity {
     private static final String MENABLED_STR = "mEnabled";
     private static final String MESSAGE_STR = "message";
     private static final String NEEDDISMISS_STR = "needDismiss";
+
+    private static final String PROP_DISABLE_SUB2 = "persist.env.data.disable.sub2";
+    private static final String MCC_CHINA = "460";
+    private static final String MCC_MACAU = "455";
 
     //save states dialog whether need reshow.
     private static boolean mNeedReshowAlertDialog, mNeedReshowSetDataSubProDia,
@@ -163,28 +168,31 @@ public class MultiSimSettings extends PreferenceActivity {
     };
 
     private void initPreferences() {
-        disableSlot2Data = false;
-        // here need a feature judge of FEATURE_RESTRICT_SLOT2_DATA_SERVICE,default value is false
-        if (false) {
+
+        // if property persist.env.data.disable.sub2 is true , disable data
+        // selection for SUB2.
+        disableDataSub2 = false;
+        if (SystemProperties.getBoolean(PROP_DISABLE_SUB2,false)) {
+            Log.d(TAG,"prop persist.env.data.enable.sub2 true");
             boolean inChina = true;
-            if (SubscriptionManager.getInstance().isSubActive(1)) {
-                String operatorNumber = MSimPhoneFactory.getPhone(1).getServiceState()
+            if (SubscriptionManager.getInstance().isSubActive(MSimConstants.SUB2)) {
+                String operatorNumber = MSimPhoneFactory.getPhone(MSimConstants.SUB2).getServiceState()
                         .getOperatorNumeric();
                 Log.d(TAG,"operatorNumber: " + operatorNumber);
                 if (null != operatorNumber && operatorNumber.length() >= 3) {
                     String mcc = (String) operatorNumber.subSequence(0, 3);
                     // China mainland and Macau
-                    if (!mcc.equals("460") && !mcc.equals("455")) {
+                    if (!mcc.equals(MCC_CHINA) && !mcc.equals(MCC_MACAU)) {
                         inChina = false;
                     }
                 }
             }
             if (inChina) {
-                disableSlot2Data = true;
+                disableDataSub2 = true;
             }
         }
 
-        if (disableSlot2Data) {
+        if (disableDataSub2) {
             mPreferredSubLists = new PreferredSubscriptionListPreference[
                                          KEY_PREFERRED_SUBSCRIPTION_LIST_NO_DATA.length];
 
@@ -292,7 +300,7 @@ public class MultiSimSettings extends PreferenceActivity {
              subPref.resume();
         }
 
-        if (disableSlot2Data) {
+        if (disableDataSub2) {
             PreferredSubscriptionListPreference datalist = (PreferredSubscriptionListPreference)
                     findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST__DATA);
             datalist.setSummary(Settings.System.getString(
