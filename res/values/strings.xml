@@ -4806,5 +4806,11 @@
     <string name="carrier_ssid">CMCC</string>
     <string name="carrier_edu_ssid">CMCC-EDU</string>
     <string name="wifi_priority_type">wifi_priority_type</string>
+    <string name="wifi_setting_connect_type_error">There was a problem setting the connect type.</string>
+    <string name="gsm_to_wifi_connect_type_title">Cellular->WLAN</string>
+    <string name="data_to_wifi_connect_key">data_wifi_connect_type</string>
+    <string name="data_to_wifi_connect_value_auto">0</string>
+    <string name="data_to_wifi_connect_value_manul">1</string>
+    <string name="data_to_wifi_connect_value_ask">2</string>
 
 </resources>
