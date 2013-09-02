@@ -251,6 +251,15 @@ public class UsbSettings extends SettingsPreferenceFragment {
             return true;
         }
 
+        // Don't allow unchecking them.
+        if (preference instanceof CheckBoxPreference) {
+            CheckBoxPreference checkBox = (CheckBoxPreference)preference;
+            if (!checkBox.isChecked()) {
+                checkBox.setChecked(true);
+                return true;
+            }
+        }
+
         String function = "none";
         if (preference == mMtp && mMtp.isChecked()) {
             function = UsbManager.USB_FUNCTION_MTP;
