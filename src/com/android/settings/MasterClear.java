@@ -167,7 +167,7 @@ public class MasterClear extends Fragment {
 
             // If it's not emulated, it is on a separate partition but it means we're doing
             // a force wipe due to encryption.
-            mExternalStorage.setChecked(!isExtStorageMounted);
+            mExternalStorage.setChecked(isExtStorageMounted);
         } else {
             mExternalStorageContainer.setOnClickListener(new View.OnClickListener() {
 
