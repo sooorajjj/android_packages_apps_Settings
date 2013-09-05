@@ -811,6 +811,8 @@ public class ApnEditor extends PreferenceActivity
             getPreferenceScreen().setEnabled(false);
         } else {
             getPreferenceScreen().setEnabled(true);
+            mCarrierEnabled.setEnabled(false);
+            fillUi(getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
         }
     }
 
