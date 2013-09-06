@@ -185,9 +185,9 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
             mDeviceNameUpdated = false;
             mOkButton.setEnabled(false);
         } else {
-            mDeviceNameEdited = true;
+            mDeviceNameEdited = s.length() != 0 && !(s.toString().trim().isEmpty());
             if (mOkButton != null) {
-                mOkButton.setEnabled(s.length() != 0 && !(s.toString().trim().isEmpty()));
+                mOkButton.setEnabled(mDeviceNameEdited);
             }
         }
     }
