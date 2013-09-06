@@ -30,6 +30,7 @@
 package com.android.settings.multisimsettings;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -43,9 +44,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemProperties;
 
 import android.preference.PreferenceActivity;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.provider.Settings.System;
 
 import android.telephony.MSimTelephonyManager;
@@ -99,9 +102,60 @@ public class MultiSimSoundSettings extends PreferenceActivity {
                     } catch (SQLiteException sqle) {
                         // Unknown title for the ringtone
                     }
+                    CharSequence ringtoneUnknown = context
+                            .getString(com.android.internal.R.string.ringtone_unknown);
+                    if (summary.equals(ringtoneUnknown)) {
+                        CharSequence defaultRingtone = resetRingtoneToDefault(context);
+                        if (defaultRingtone != null) {
+                            summary = defaultRingtone;
+                        }
+                    }
                 }
                 mHandler.sendMessage(mHandler.obtainMessage(MSG_UPDATE_SUMMARY, summary));
             }
+        }
+
+        private CharSequence resetRingtoneToDefault(Context context) {
+            CharSequence summary = null;
+            Cursor c = null;
+            try {
+                String defaultRingtoneFilename = SystemProperties.get("ro.config."
+                        + Settings.System.RINGTONE);
+                c = context
+                        .getContentResolver()
+                        .acquireProvider("media")
+                        .query(context.getPackageName(),
+                                MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
+                                new String[] {
+                                        MediaStore.Audio.Media._ID,
+                                        MediaStore.Audio.Media.TITLE
+                                },
+                                MediaStore.Audio.Media.DISPLAY_NAME + "=?",
+                                new String[] {
+                                    defaultRingtoneFilename
+                                },
+                                null, null);
+                if (c != null) {
+                    if (c.getCount() > 0 && c.moveToFirst()) {
+                        int rowId = c.getInt(0);
+                        summary = c.getString(1);
+                        Uri defaultRingtoneUri = ContentUris.withAppendedId(
+                                MediaStore.Audio.Media.INTERNAL_CONTENT_URI, rowId);
+                        Settings.System.putString(
+                                context.getContentResolver(),
+                                Settings.System.RINGTONE,
+                                defaultRingtoneUri.toString());
+                    }
+                    c.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+            return summary;
         }
     };
 
