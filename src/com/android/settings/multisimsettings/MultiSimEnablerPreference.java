@@ -113,6 +113,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private boolean mIsShowingProgressDialog = false;
     private String mDialogString = null;
     private TextView mSubTitle, mSubSummary;
+    private int mSwitchVisibility = View.VISIBLE;
     private Switch mSwitch;
     private Handler mParentHandler = null;
     private AlertDialog mAlertDialog = null;
@@ -294,8 +295,8 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         mSwitch = (Switch) view.findViewById(R.id.subSwitchWidget);
         mSwitch.setOnCheckedChangeListener(this);
 
-        // now use other config screen to active/deactive sim card
-        mSwitch.setVisibility(View.INVISIBLE);
+        // now use other config screen to active/deactive sim card\
+        mSwitch.setVisibility(mSwitchVisibility);
 
         if (hasCard()) {
             mSwitch.setEnabled(false);
@@ -358,6 +359,10 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
 
     }
 
+    public void setSwitchVisibility (int visibility) {
+        mSwitchVisibility = visibility;
+    }
+
     private void setChecked(boolean state) {
         if (mSwitch != null) {
             mSwitch.setOnCheckedChangeListener(null);
@@ -383,11 +388,9 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
             subData.subscription[i].copyFrom(mSubscriptionManager.getCurrentSubscription(i));
         }
         if (enabled) {
-            subData.subscription[mSubscriptionId].slotId = mSubscriptionId;
-            subData.subscription[mSubscriptionId].subId = mSubscriptionId;
             // if need auto mapping,here need set
-            // mSubscriptionManager.setDefaultAppIndex(subData.subscription[mSubscriptionId]);
-            subData.subscription[mSubscriptionId].subStatus = SubscriptionStatus.SUB_ACTIVATE;
+            subData.subscription[mSubscriptionId] =
+                    mSubscriptionManager.setDefaultApp(mSubscriptionId);
             mSubscriptionManager.registerForSubscriptionActivated(
                     mSubscriptionId, mHandler, EVENT_SIM_ACTIVATE_DONE, null);
         } else {
