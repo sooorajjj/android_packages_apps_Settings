@@ -52,8 +52,10 @@ import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 
+import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Switch;
 
@@ -69,7 +71,7 @@ public class MultiSimSettings extends PreferenceActivity {
     private static final String[] KEY_PREFERRED_SUBSCRIPTION_LIST = {"voice_list", "data_list",
         "sms_list"};
 
-    private static final String KEY_COUNTDOWN_TIMER = "multi_sim_countdown";
+    private static final String KEY_MULTI_SIM_SETTINGS = "multi_sim_settings";
     private static final String KEY_CONFIG_SUB = "config_sub";
     private static final String CONFIG_SUB = "CONFIG_SUB";
     private static final String KEY_SIM_ONE_EBABLER = "sim_one_enabler_key";
@@ -235,15 +237,18 @@ public class MultiSimSettings extends PreferenceActivity {
                     findPreference("preferred_subscription_settings");
             preferredSubSettings.removePreference(smslist);
         }
+    }
 
-        mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
-        // now use this config screen to enable/deactive sim card
-        mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
-               if (isAirplaneModeOn()) {
-            Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
-            mConfigSub.setEnabled(false);
-        }
-
+    //when set app for , we need to use config screen , not disable/enable
+    //button to to active sub
+    private boolean isNullSub() {
+        SubscriptionManager subscriptionManager = SubscriptionManager.getInstance();
+        boolean getNullSub =
+                (MSimTelephonyManager.getDefault().hasIccCard(MSimConstants.SUB1) &&
+                null == subscriptionManager.setDefaultApp(MSimConstants.SUB1)) ||
+                (MSimTelephonyManager.getDefault().hasIccCard(MSimConstants.SUB2) &&
+                null == subscriptionManager.setDefaultApp(MSimConstants.SUB2));
+        return getNullSub;
     }
 
     private void initSIMEnalber(){
@@ -256,6 +261,25 @@ public class MultiSimSettings extends PreferenceActivity {
         sub2_intent.putExtra(MSimConstants.SUBSCRIPTION_KEY, MSimConstants.SUB2);
         mSimOneEnabler.setSubscription(MSimConstants.SUB1, mHandler);
         mSimTwoEnabler.setSubscription(MSimConstants.SUB2, mHandler);
+
+        //do not use button to diable/enable if get null Subscription in setDefaultApp() method
+        mConfigSub = (PreferenceScreen) findPreference(KEY_CONFIG_SUB);
+        if (isNullSub()) {
+            // now use this config screen to enable/deactive sim card
+            mConfigSub.getIntent().putExtra(CONFIG_SUB, true);
+            if (isAirplaneModeOn()) {
+                Log.d(TAG, "Airplane mode is ON, grayout the config subscription menu!!!");
+                mConfigSub.setEnabled(false);
+            }
+            mSimOneEnabler.setSwitchVisibility(View.INVISIBLE);
+            mSimTwoEnabler.setSwitchVisibility(View.INVISIBLE);
+        } else {
+            PreferenceCategory multiSimSettings =
+                    (PreferenceCategory)findPreference(KEY_MULTI_SIM_SETTINGS);
+            multiSimSettings.removePreference(mConfigSub);
+            mSimOneEnabler.setSwitchVisibility(View.VISIBLE);
+            mSimTwoEnabler.setSwitchVisibility(View.VISIBLE);
+        }
     }
 
     @Override
