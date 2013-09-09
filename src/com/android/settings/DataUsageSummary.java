@@ -1068,14 +1068,18 @@ public class DataUsageSummary extends Fragment {
             mNetworkSwitches.setVisibility(View.VISIBLE);
         }
 
+        final NetworkPolicy policy = mPolicyEditor.getPolicy(mTemplate);
         // TODO: move enabled state directly into policy
         if (TAB_MOBILE.equals(mCurrentTab) || mCurrentTab.startsWith(TAB_SIM)) {
             mBinding = true;
             mDataEnabled.setChecked(isMobileDataEnabled());
             mBinding = false;
+
+            if (policy == null && mDataEnabled.isChecked()) {
+                setPolicyWarningBytes(0);
+            }
         }
 
-        final NetworkPolicy policy = mPolicyEditor.getPolicy(mTemplate);
         if (isNetworkPolicyModifiable(policy)) {
             mDisableAtLimitView.setVisibility(View.VISIBLE);
             mDisableAtLimit.setChecked(policy != null && policy.limitBytes != LIMIT_DISABLED);
