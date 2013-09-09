@@ -2486,8 +2486,16 @@ public class DataUsageSummary extends Fragment {
         final ArrayList<CharSequence> limited = Lists.newArrayList();
 
         int sub = MSimTelephonyManager.getDefault().getPreferredDataSubscription();
-        MSimTelephonyManager msimTele = MSimTelephonyManager.from(context);
-        if (msimTele.getSimState(sub) == SIM_STATE_READY) {
+        MSimTelephonyManager msimTele = null;
+        TelephonyManager tele = null;
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+            msimTele = MSimTelephonyManager.from(context);
+        } else {
+            tele = TelephonyManager.from(context);
+        }
+
+        if ((msimTele != null && msimTele.getSimState(sub) == SIM_STATE_READY)
+            || (tele != null && tele.getSimState() == SIM_STATE_READY)) {
             final String subscriberId = getActiveSubscriberId(sub);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
