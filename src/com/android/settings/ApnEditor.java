@@ -808,10 +808,13 @@ public class ApnEditor extends PreferenceActivity
      * So we disable the screen.
      */
     private void setScreenEnabled() {
-        if (!isAPNNumericLoaded() || isAirplaneOn()) {
+        if (!isAPNNumericLoaded() || isAirplaneOn() || mDisableEditor) {
             getPreferenceScreen().setEnabled(false);
         } else {
             getPreferenceScreen().setEnabled(true);
+            mCarrierEnabled.setEnabled(false);
+            mFirstTime = true;
+            fillUi(getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
         }
     }
 
