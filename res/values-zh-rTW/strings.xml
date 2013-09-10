@@ -867,10 +867,10 @@
     <string name="storage_menu_usb" msgid="5708207885333243384">"USB 電腦連線"</string>
     <string name="storage_title_usb" msgid="679612779321689418">"USB 電腦連線"</string>
     <string name="usb_connection_category" msgid="7805945595165422882">"連線方式"</string>
-    <string name="usb_mtp_title" msgid="3399663424394065964">"媒體裝置 (MTP)"</string>
-    <string name="usb_mtp_summary" msgid="4617321473211391236">"讓您用 Windows 或 Mac 上的「Android 檔案傳輸」來傳輸媒體檔案 (下載網址：www.android.com/filetransfer)"</string>
-    <string name="usb_ptp_title" msgid="3852760810622389620">"相機 (PTP)"</string>
-    <string name="usb_ptp_summary" msgid="7673397474756664929">"讓您使用相機軟體傳輸相片，並在任何不支援 MTP 的電腦上傳輸檔案"</string>
+    <string name="usb_mtp_title" msgid="3399663424394065964">"媒體裝置(MTP)"</string>
+    <string name="usb_mtp_summary" msgid="4617321473211391236">"允許您在電腦和手機（包括內部和外部儲存）之間傳輸文件。在較新版本的windows 或 Mac 上使用。"</string>
+    <string name="usb_ptp_title" msgid="3852760810622389620">"相機(PTP)"</string>
+    <string name="usb_ptp_summary" msgid="7673397474756664929">"允許您在電腦和手機內部儲存之間傳輸，在較新版本的windows 或 Mac 上使用。"</string>
     <string name="usb_label_installer_cd" msgid="4331173824920630215">"安裝檔案傳輸工具"</string>
     <string name="storage_other_users" msgid="808708845102611856">"其他使用者"</string>
     <string name="battery_status_title" msgid="9159414319574976203">"電池狀態"</string>
@@ -1951,6 +1951,17 @@
     <string name="regulatory_info_text" msgid="5623087902354026557"></string>
     <string name="slot_name">卡 <xliff:g id="sub">%d</xliff:g></string>
     <string name="show_search_function">搜索</string>
+
+    <!-- modify for usb settings start -->
+    <string name="usb_sdcard_title">U盤模式</string>
+    <string name="usb_sdcard_summary">"允許您在電腦和手機外部儲存之間傳輸文件。可以在大多數電腦中使用。"</string>
+    <string name="usb_charging_title">充電模式</string>
+    <string name="usb_charging_summary">連接電腦時，對手機進行充電。</string>
+    <string name="internal_storage_turn_on">"內部存儲器已打開"</string>
+    <string name="internal_storage_turn_off">"內部存儲器已關閉"</string>
+    <string name="external_storage_turn_on">"外部存儲器已打開"</string>
+    <string name="external_storage_turn_off">"外部存儲器已關閉"</string>
+    <!-- modify for usb settings end  -->
 
     <!-- apn names for carriers -->
     <string name="APN_NAME_CMNET">中國移動互聯網設置 CMNET</string>
