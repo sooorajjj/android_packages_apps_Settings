@@ -43,6 +43,8 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
+import android.telephony.MSimTelephonyManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -85,11 +87,7 @@ public class DataEnabler {
     }
 
     public void resume() {
-        // Adjust the switch component's availability
-        // according to the "AirPlane" mode.
-        mSwitch.setEnabled(Settings.System.getInt(
-                mContext.getContentResolver(),
-                Settings.System.AIRPLANE_MODE_ON, 0) == 0);
+        updateSwitchState();
         mContext.registerReceiver(mReceiver, mIntentFilter);
         mSwitch.setOnCheckedChangeListener(mDataEnabledListener);
     }
@@ -104,15 +102,34 @@ public class DataEnabler {
         mSwitch.setOnCheckedChangeListener(null);
         mSwitch = switch_;
 
-        // Adjust the switch component's availability
-        // according to the "AirPlane" mode.
-        mSwitch.setEnabled(Settings.System.getInt(
-                mContext.getContentResolver(),
-                Settings.System.AIRPLANE_MODE_ON, 0) == 0);
+        updateSwitchState();
 
         mSwitch.setOnCheckedChangeListener(mDataEnabledListener);
         mMobileDataEnabled = mConnService.getMobileDataEnabled();
         mSwitch.setChecked(mMobileDataEnabled);
+    }
+
+    private void updateSwitchState() {
+        // Adjust the switch component's availability
+        // according to the "AirPlane" mode.
+        boolean airPlaneModeOff = Settings.System.getInt(
+                mContext.getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) == 0;
+        boolean hasIccCard = false;
+        MSimTelephonyManager multiSimManager = MSimTelephonyManager.getDefault();
+        if (multiSimManager.isMultiSimEnabled()) {
+            for (int i = 0; i < MAX_PHONE_COUNT_TRI_SIM; i++) {
+                if (multiSimManager.hasIccCard(i)) {
+                    hasIccCard = true;
+                }
+            }
+        } else {
+            TelephonyManager singleSimManager = TelephonyManager.getDefault();
+            if (singleSimManager.hasIccCard()) {
+                hasIccCard = true;
+            }
+        }
+        mSwitch.setEnabled(airPlaneModeOff && hasIccCard);
     }
 
     private OnCheckedChangeListener mDataEnabledListener = new OnCheckedChangeListener() {
