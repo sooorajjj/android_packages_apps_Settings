@@ -869,10 +869,10 @@
     <string name="storage_menu_usb" msgid="5708207885333243384">"USB 计算机连接"</string>
     <string name="storage_title_usb" msgid="679612779321689418">"USB 计算机连接"</string>
     <string name="usb_connection_category" msgid="7805945595165422882">"连接方式"</string>
-    <string name="usb_mtp_title" msgid="3399663424394065964">"媒体设备 (MTP)"</string>
-    <string name="usb_mtp_summary" msgid="4617321473211391236">"让您可以在 Windows 上传输媒体文件，或在 Mac 上使用 Android 文件传输应用来传输文件（请参见 www.android.com/filetransfer）"</string>
-    <string name="usb_ptp_title" msgid="3852760810622389620">"相机 (PTP)"</string>
-    <string name="usb_ptp_summary" msgid="7673397474756664929">"让您可以使用相机软件传输照片，并在不支持 MTP 的计算机上传输任何文件"</string>
+    <string name="usb_mtp_title" msgid="3399663424394065964">"媒体设备(MTP)"</string>
+  <string name="usb_mtp_summary" msgid="4617321473211391236">"允许您在电脑和手机（包括内部和外部储存）之间传输文件。在较新版本的 windows 或 Mac 上使用。"</string>
+    <string name="usb_ptp_title" msgid="3852760810622389620">"摄像头(PTP)"</string>
+    <string name="usb_ptp_summary" msgid="7673397474756664929">"允许您在电脑和手机内部储存之间传输。在较新版本的 windows 或 Mac 上使用。"</string>
     <string name="usb_label_installer_cd" msgid="4331173824920630215">"安装文件传输工具"</string>
     <string name="storage_other_users" msgid="808708845102611856">"其他用户"</string>
     <string name="battery_status_title" msgid="9159414319574976203">"电池状态"</string>
@@ -2028,10 +2028,10 @@
     <string name="selectfile_menu">从图库选择文件预览</string>
     <string name="restore_preview">恢复默认预览图片</string>
     <!-- modify for usb settings start -->
-    <string name="usb_sdcard_title">挂载SD 卡</string>
-    <string name="usb_sdcard_summary">"让您在 Windows 上传输SD 卡上的媒体文件"</string>
-    <string name="usb_charging_title">充电</string>
-    <string name="usb_charging_summary">使手机只处于充电状态</string>
+    <string name="usb_sdcard_title">U盘模式</string>
+    <string name="usb_sdcard_summary">"允许您在电脑和手机外部储存之间传输文件。可以在大多数电脑中使用。"</string>
+    <string name="usb_charging_title">充电模式</string>
+    <string name="usb_charging_summary">连接电脑时，对手机进行充电。</string>
     <string name="internal_storage_turn_on">"内部存储器已打开"</string>
     <string name="internal_storage_turn_off">"内部存储器已关闭"</string>
     <string name="external_storage_turn_on">"外部存储器已打开"</string>
