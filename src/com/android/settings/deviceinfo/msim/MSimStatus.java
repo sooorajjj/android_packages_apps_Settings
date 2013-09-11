@@ -189,9 +189,10 @@ public class MSimStatus extends PreferenceActivity {
                     return;
                 }
                 CellBroadcastMessage cbMessage = (CellBroadcastMessage) extras.get("message");
+                int subscriptionId = extras.getInt("subscription");
                 if (cbMessage != null && cbMessage.getServiceCategory() == 50) {
                     String latestAreaInfo = cbMessage.getMessageBody();
-                    updateAreaInfo(latestAreaInfo, cbMessage.getSubId());
+                    updateAreaInfo(latestAreaInfo, subscriptionId);
                 }
             }
         }
