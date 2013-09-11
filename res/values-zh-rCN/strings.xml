@@ -872,7 +872,7 @@
     <string name="usb_mtp_title" msgid="3399663424394065964">"媒体设备(MTP)"</string>
   <string name="usb_mtp_summary" msgid="4617321473211391236">"允许您在电脑和手机（包括内部和外部储存）之间传输文件。在较新版本的 windows 或 Mac 上使用。"</string>
     <string name="usb_ptp_title" msgid="3852760810622389620">"摄像头(PTP)"</string>
-    <string name="usb_ptp_summary" msgid="7673397474756664929">"允许您在电脑和手机内部储存之间传输。在较新版本的 windows 或 Mac 上使用。"</string>
+    <string name="usb_ptp_summary" msgid="7673397474756664929">"允许您在电脑和手机内部储存之间传输照片。在较新版本的 windows 或 Mac 上使用。"</string>
     <string name="usb_label_installer_cd" msgid="4331173824920630215">"安装文件传输工具"</string>
     <string name="storage_other_users" msgid="808708845102611856">"其他用户"</string>
     <string name="battery_status_title" msgid="9159414319574976203">"电池状态"</string>
