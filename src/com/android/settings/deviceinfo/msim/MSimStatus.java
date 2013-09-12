@@ -678,7 +678,7 @@ public class MSimStatus extends PreferenceActivity {
     private void updateAreaInfo(String areaInfo, int sub) {
         if (DEBUG) Log.i(TAG, "updateAreaInfo areaInfo="+areaInfo+" sub="+sub);
         if (areaInfo != null) {
-            areaInfoSummery[sub] = areaInfo;
+            areaInfoSummery[sub] = getSimSummery(sub, areaInfo);
             setMSimSummery(KEY_LATEST_AREA_INFO, areaInfoSummery);
         }
     }
