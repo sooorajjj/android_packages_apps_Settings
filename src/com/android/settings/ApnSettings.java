@@ -89,7 +89,7 @@ public class ApnSettings extends PreferenceActivity implements
     private static final String CHINA_UNION_PLMN = "46001";
     private static boolean mRestoreDefaultApnMode;
 
-    private static final String APN_TYPE_DM = "dm";
+    private static final String APN_TYPE_FILTER = "fota";
 
     private RestoreApnUiHandler mRestoreApnUiHandler;
     private RestoreApnProcessHandler mRestoreApnProcessHandler;
@@ -230,8 +230,8 @@ public class ApnSettings extends PreferenceActivity implements
                     continue;
                 }
 
-                //remove the test item
-                if(APN_TYPE_DM.equalsIgnoreCase(type)){
+                //remove the filtered items, no need to show in UI
+                if(APN_TYPE_FILTER.equalsIgnoreCase(type)){
                     cursor.moveToNext();
                     continue;
                 }

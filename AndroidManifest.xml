@@ -342,7 +342,8 @@
         <activity android:name="Settings$TetherSettingsActivity"
                 android:label="@string/wifi_hotspot_name"
                 android:taskAffinity=""
-                android:excludeFromRecents="true">
+                android:excludeFromRecents="true"
+                android:icon="@drawable/hotspot">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
