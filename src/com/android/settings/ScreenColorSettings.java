@@ -148,9 +148,9 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onBackPressed() {
         restoreSavedHSCI(true);
+        super.onBackPressed();
     }
 
     @Override
