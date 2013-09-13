@@ -999,6 +999,7 @@
         <!-- manual connect to wifi -->
         <item>1</item>
         <!-- always notify user when wifi is available -->
+        <item>2</item>
     </string-array>
 
     <string-array name="cellcular2wifi_entries">
