@@ -50,6 +50,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.EditText;
 
+import com.android.internal.telephony.MSimConstants;
 import com.android.internal.telephony.Phone;
 import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.PhoneFactory;
@@ -263,7 +264,18 @@ public class RadioInfo extends Activity {
             mMultiSimFlag = false;
         }
 
-        mPhone = PhoneFactory.getDefaultPhone();
+        if (mMultiSimFlag) {
+            Intent intent = getIntent();
+            if (intent != null) {
+                int subscription = intent.getIntExtra(MSimConstants.SUBSCRIPTION_KEY, -1);
+                if (subscription > -1) {
+                    mPhone = MSimPhoneFactory.getPhone(subscription);
+                }
+            }
+        }
+        if (mPhone == null) {
+            mPhone = PhoneFactory.getDefaultPhone();
+        }
 
         mDeviceId= (TextView) findViewById(R.id.imei);
         number = (TextView) findViewById(R.id.number);
