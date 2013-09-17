@@ -4813,5 +4813,4 @@
     <string name="data_to_wifi_connect_value_auto">0</string>
     <string name="data_to_wifi_connect_value_manul">1</string>
     <string name="data_to_wifi_connect_value_ask">2</string>
-
 </resources>
