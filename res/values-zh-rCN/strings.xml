@@ -566,7 +566,7 @@
     <string name="wifi_menu_wps_pbc" msgid="2668564692207863017">"WPS 按钮"</string>
     <string name="wifi_menu_more_options" msgid="2448097861752719396">"更多选项"</string>
     <string name="wifi_menu_wps_pin" msgid="6426448256268695933">"WPS PIN 输入"</string>
-    <string name="wifi_menu_p2p" msgid="7619851399250896797">"WLAN Direct"</string>
+    <string name="wifi_menu_p2p" msgid="7619851399250896797">"WLAN 直接连接"</string>
     <string name="wifi_menu_scan" msgid="1470911530412095868">"扫描"</string>
     <string name="wifi_menu_advanced" msgid="7522252991919573664">"高级"</string>
     <string name="wifi_menu_connect" msgid="4996220309848349408">"连接到网络"</string>
@@ -2086,5 +2086,4 @@
     <string name="unknown_access_points">未知接入点</string>
     <string name="gsm_to_wifi_connect_type_title">蜂窝网至 WLAN 重选</string>
     <string name="wifi_setting_connect_type_error">设置自动连接类型时出现错误。</string>
-
 </resources>
