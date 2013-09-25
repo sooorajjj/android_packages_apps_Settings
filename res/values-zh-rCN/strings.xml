@@ -932,6 +932,8 @@
     <string name="erase_external_storage" product="default" msgid="1397239046334307625">"格式化 SD 卡"</string>
     <string name="erase_external_storage_description" product="nosdcard" msgid="4728558173931599429">"清除该内部 USB 存储设备中的全部数据，例如音乐或照片"</string>
     <string name="erase_external_storage_description" product="default" msgid="1737638779582964966">"清除 SD 卡中的全部数据，例如音乐或照片"</string>
+    <string name="erase_internal_storage" product="default">"格式化内置 SD 卡"</string>
+    <string name="erase_internal_storage_description" product="default">"清除内部 SD 卡中的全部数据, 例如音乐或照片"</string>
     <string name="master_clear_button_text" product="tablet" msgid="3130786116528304116">"重置平板电脑"</string>
     <string name="master_clear_button_text" product="default" msgid="7550632653343157971">"重置手机"</string>
     <string name="master_clear_final_desc" msgid="7209547812233487345">"要清除所有个人信息和下载的应用吗？请注意，此操作无法撤消！"</string>

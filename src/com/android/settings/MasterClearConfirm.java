@@ -44,6 +44,7 @@ public class MasterClearConfirm extends Fragment {
 
     private View mContentView;
     private boolean mEraseSdCard;
+    private boolean mEraseInternalSdCard;
     private Button mFinalButton;
 
     /**
@@ -58,9 +59,11 @@ public class MasterClearConfirm extends Fragment {
                 return;
             }
 
-            if (mEraseSdCard) {
+            if (mEraseSdCard || mEraseInternalSdCard) {
                 Intent intent = new Intent(ExternalStorageFormatter.FORMAT_AND_FACTORY_RESET);
                 intent.setComponent(ExternalStorageFormatter.COMPONENT_NAME);
+                intent.putExtra(MasterClear.ERASE_EXTERNAL_EXTRA, mEraseSdCard);
+                intent.putExtra(MasterClear.ERASE_INTERNAL_EXTRA, mEraseInternalSdCard);
                 getActivity().startService(intent);
             } else {
                 getActivity().sendBroadcast(new Intent("android.intent.action.MASTER_CLEAR"));
@@ -91,5 +94,7 @@ public class MasterClearConfirm extends Fragment {
 
         Bundle args = getArguments();
         mEraseSdCard = args != null ? args.getBoolean(MasterClear.ERASE_EXTERNAL_EXTRA) : false;
+        mEraseInternalSdCard = args != null ?
+                               args.getBoolean(MasterClear.ERASE_INTERNAL_EXTRA) : false;
     }
 }
