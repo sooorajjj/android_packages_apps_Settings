@@ -182,11 +182,13 @@ public class WifiPrioritySettings extends SettingsPreferenceFragment implements
                 String backerSSID = (backer.SSID == null ? SSID_NULL : AccessPoint
                         .removeDoubleQuotes(backer.SSID));
                 if (!AccessPoint.CARRIER_SSID.equals(backerSSID)
-                        && !AccessPoint.CARRIER_EDU_SSID.equals(backerSSID)) {
+                        && !AccessPoint.CARRIER_EDU_SSID.equals(backerSSID)
+                        && !AccessPoint.CARRIER_AUTO_SSID.equals(backerSSID)) {
                     return true;
                 } else {
                     if (!AccessPoint.CARRIER_SSID.equals(formerSSID)
-                            && !AccessPoint.CARRIER_EDU_SSID.equals(formerSSID)) {
+                            && !AccessPoint.CARRIER_EDU_SSID.equals(formerSSID)
+                            && !AccessPoint.CARRIER_AUTO_SSID.equals(formerSSID)) {
                         return false;
                     } else {
                         return formerSSID.compareTo(backerSSID) <= 0;
