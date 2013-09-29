@@ -591,8 +591,8 @@ public class MSimStatus extends PreferenceActivity {
                 // parse the string to current language string in public resources
                 if (operatorName != null) {
                     operatorName = getLocalString(operatorName,
-                        com.android.internal.R.array.origin_carrier_names,
-                        com.android.internal.R.array.locale_carrier_names);
+                        com.android.internal.R.array.z_origin_carrier_names,
+                        com.android.internal.R.array.z_locale_carrier_names);
                 }
             }
             operatorNameSummery[subscription] = getSimSummery(subscription, operatorName);
