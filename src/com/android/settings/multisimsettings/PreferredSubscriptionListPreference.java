@@ -304,9 +304,12 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
                 //enable always ask
                 if (subscription == mNumPhones) {
                     MSimPhoneFactory.setPromptEnabled(true);
+                    MSimPhoneFactory.setSMSPromptEnabled(true);
                 } else {
                     MSimPhoneFactory.setPromptEnabled(false);
                     MSimPhoneFactory.setVoiceSubscription(subscription);
+                    MSimPhoneFactory.setSMSPromptEnabled(false);
+                    MSimPhoneFactory.setSMSSubscription(subscription);
                 }
                 handlePreferredSubscriptionChanged();
                 // msg.sendToTarget();

@@ -997,6 +997,8 @@
     <string name="preferred_subs_settings_title">"默认通道设置"</string>
     <!-- Multi Sim Settings screen, Voice box label -->
     <string name="voice_title">"语音"</string>
+    <!-- Multi Sim Settings screen, Voice box label DSDS-->
+    <string name="voice_title_dsds">"语音/短信"</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="voice_summary">"默认语音通道"</string>
 
