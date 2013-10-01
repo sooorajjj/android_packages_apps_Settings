@@ -110,7 +110,7 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
 
         CharSequence[] subString = mContext.getResources().getTextArray(R.array.multi_sim_entries);
         for (int i = 0; i < mNumPhones; i++) {
-            entries[i] = subString[i];
+            entries[i] = getMultiSimName(i);
             entryValues[i] = Integer.toString(i);
             summaries[i] = subString[i];
 
