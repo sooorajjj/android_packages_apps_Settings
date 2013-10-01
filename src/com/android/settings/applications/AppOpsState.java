@@ -27,9 +27,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
-
 import android.util.Log;
 import android.util.SparseArray;
+
 import com.android.settings.R;
 
 import java.io.File;
@@ -158,9 +158,15 @@ public class AppOpsState {
                     AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
                     AppOpsManager.OP_CAMERA,
                     AppOpsManager.OP_RECORD_AUDIO,
-                    AppOpsManager.OP_PLAY_AUDIO },
+                    AppOpsManager.OP_PLAY_AUDIO,
+                    AppOpsManager.OP_WIFI_CHANGE,
+                    AppOpsManager.OP_BLUETOOTH_CHANGE,
+                    AppOpsManager.OP_DATA_CONNECT_CHANGE },
             new boolean[] { false,
                     false,
+                    true,
+                    true,
+                    true,
                     true,
                     true,
                     true,
