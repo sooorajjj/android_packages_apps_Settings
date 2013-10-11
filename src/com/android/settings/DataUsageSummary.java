@@ -2492,15 +2492,17 @@ public class DataUsageSummary extends Fragment {
         int sub = MSimTelephonyManager.getDefault().getPreferredDataSubscription();
         MSimTelephonyManager msimTele = null;
         TelephonyManager tele = null;
+        String subscriberId = null;
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             msimTele = MSimTelephonyManager.from(context);
+            subscriberId = getActiveSubscriberId(sub);
         } else {
             tele = TelephonyManager.from(context);
+            subscriberId = getActiveSubscriberId(context);
         }
 
         if ((msimTele != null && msimTele.getSimState(sub) == SIM_STATE_READY)
             || (tele != null && tele.getSimState() == SIM_STATE_READY)) {
-            final String subscriberId = getActiveSubscriberId(sub);
             if (mPolicyEditor.hasLimitedPolicy(buildTemplateMobileAll(subscriberId))) {
                 limited.add(getText(R.string.data_usage_list_mobile));
             }
