@@ -285,6 +285,7 @@ public class ApnEditor extends PreferenceActivity
 
     @Override
     public void onPause() {
+        unregisterReceiver(mMobileStateReceiver);
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
@@ -818,12 +819,30 @@ public class ApnEditor extends PreferenceActivity
         } else {
             getPreferenceScreen().setEnabled(true);
             mCarrierEnabled.setEnabled(true);
-            mFirstTime = true;
-            fillUi(getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
+            updateItemEnableState();
         }
     }
 
-    /*
+    private void updateItemEnableState() {
+        String numeric = "";
+        if (mNewApn) {
+            numeric = getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA);
+        } else {
+            if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
+                numeric = mCursor.getString(NUMERIC_INDEX);
+            }
+        }
+        if (SystemProperties
+                .getBoolean("persist.env.settings.cfgmmsapn", false)
+                && CT_NUMERIC.equals(numeric)) {
+            mMmsProxy.setEnabled(false);
+            mMmsPort.setEnabled(false);
+            mMmsc.setEnabled(false);
+        }
+        mMvnoMatchData.setEnabled(false);
+    }
+
+     /*
      * Add the method to check the phone state is airplane mode or not.
      * Return true, if the phone state is airplane mode.
      */
