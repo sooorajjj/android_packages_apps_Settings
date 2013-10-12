@@ -647,6 +647,7 @@ public class ApnEditor extends PreferenceActivity
         values.put(Telephony.Carriers.SERVER, checkNotSet(mServer.getText()));
         values.put(Telephony.Carriers.PASSWORD, checkNotSet(mPassword.getText()));
         values.put(Telephony.Carriers.MMSC, checkNotSet(mMmsc.getText()));
+        values.put(Telephony.Carriers.CARRIER_ENABLED, mCarrierEnabled.isChecked() ? 1 : 0);
 
         String authVal = mAuthType.getValue();
         if (authVal != null) {
@@ -784,6 +785,8 @@ public class ApnEditor extends PreferenceActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference pref = findPreference(key);
         if (pref != null) {
+            if(pref.equals(mCarrierEnabled))
+               return;
             if (pref.equals(mPassword)){
                 pref.setSummary(starify(sharedPreferences.getString(key, "")));
             } else {
@@ -811,7 +814,7 @@ public class ApnEditor extends PreferenceActivity
             getPreferenceScreen().setEnabled(false);
         } else {
             getPreferenceScreen().setEnabled(true);
-            mCarrierEnabled.setEnabled(false);
+            mCarrierEnabled.setEnabled(true);
             mFirstTime = true;
             fillUi(getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
         }
