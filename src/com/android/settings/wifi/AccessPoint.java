@@ -423,9 +423,14 @@ class AccessPoint extends Preference {
             return false;
         }
 
-        if (CARRIER_SSID.equals(mAccessPoint.ssid) || CARRIER_EDU_SSID.equals(mAccessPoint.ssid)
-                || CARRIER_AUTO_SSID.equals(mAccessPoint.ssid)) {
+        if (CARRIER_SSID.equals(mAccessPoint.ssid) || CARRIER_EDU_SSID.equals(mAccessPoint.ssid)) {
             if (mAccessPoint.security == AccessPoint.SECURITY_NONE) {
+                return true;
+            }
+        }
+
+        if (CARRIER_AUTO_SSID.equals(mAccessPoint.ssid)) {
+            if (mAccessPoint.security == AccessPoint.SECURITY_EAP) {
                 return true;
             }
         }
