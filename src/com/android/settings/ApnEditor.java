@@ -293,6 +293,8 @@ public class ApnEditor extends PreferenceActivity
     private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
+        if (mCursor.getCount() == 0) return;
+            mCursor.moveToFirst();
             String numeric =  mCursor.getString(NUMERIC_INDEX);
             // Fill in all the values from the db in both text editor and summary
             mName.setText(mCursor.getString(NAME_INDEX));
