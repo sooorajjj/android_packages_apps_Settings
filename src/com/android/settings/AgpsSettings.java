@@ -146,7 +146,7 @@ public class AgpsSettings extends PreferenceActivity
             pref.setSummary(types[1]);
         } else {
             pref.setValue(ERR_MODE);
-            pref.setSummary(types[2]);
+            pref.setSummary("");
         }
     }
 
