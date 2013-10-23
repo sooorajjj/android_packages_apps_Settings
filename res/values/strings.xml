@@ -1831,6 +1831,7 @@
     <!-- Sound & display settings screen, setting option name to change brightness -->
     <string name="brightness">Brightness</string>
     <string name="screencolor">Screen Color</string>
+    <string name="custom_screencolor">Custom Screen Color</string>
     <!-- Sound & display settings screen, setting option summary to change brightness -->
     <string name="brightness_summary">Adjust the brightness of the screen</string>
     <!-- Sound & display settings screen, setting option name to change screen timeout -->
