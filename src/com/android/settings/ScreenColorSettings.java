@@ -99,6 +99,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
     private static final float SPOTLIGHT_X = 0;
     private static final float SPOTLIGHT_Y = 0;
 
+    private static final int INTENSITY_OFFSET = 55;
+
     private ImageView mImageView;
     private RelativeLayout mRLayout;
     private LinearLayout mScreenColorLayout;
@@ -383,8 +385,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 + mIntensityValue);
         try {
             if (null != mPPService && mPPService.getPPStatus()) {
-                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue,
-                                     mContrastValue);
+                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue
+                                     + INTENSITY_OFFSET, mContrastValue);
             }
         } catch (RemoteException e) {
             Log.e(TAG, "updateHSIC exception");
@@ -537,7 +539,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 + " contrastValue=" + contrastValue + " intensityValue=" + intensityValue);
         try {
             if (null != mPPService && mPPService.getPPStatus()) {
-                mPPService.updateHSIC(hueValue, saturationValue, intensityValue, contrastValue);
+                mPPService.updateHSIC(hueValue, saturationValue, intensityValue
+                        + INTENSITY_OFFSET, contrastValue);
             }
         } catch (RemoteException e) {
             Log.e(TAG, "updateHSIC exception");
@@ -554,8 +557,8 @@ public class ScreenColorSettings extends Activity implements SeekBar.OnSeekBarCh
                 + mIntensityValue);
         try {
             if (null != mPPService && mPPService.getPPStatus()) {
-                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue,
-                        mContrastValue);
+                mPPService.updateHSIC(mHueValue, mSaturationValue, mIntensityValue
+                        + INTENSITY_OFFSET, mContrastValue);
             }
         } catch (RemoteException e) {
             Log.e(TAG, "updateHSIC exception");

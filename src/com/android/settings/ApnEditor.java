@@ -285,6 +285,7 @@ public class ApnEditor extends PreferenceActivity
 
     @Override
     public void onPause() {
+        unregisterReceiver(mMobileStateReceiver);
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
@@ -293,6 +294,8 @@ public class ApnEditor extends PreferenceActivity
     private void fillUi(String defaultOperatorNumeric) {
         if (mFirstTime) {
             mFirstTime = false;
+        if (mCursor.getCount() == 0) return;
+            mCursor.moveToFirst();
             String numeric =  mCursor.getString(NUMERIC_INDEX);
             // Fill in all the values from the db in both text editor and summary
             mName.setText(mCursor.getString(NAME_INDEX));
@@ -648,6 +651,7 @@ public class ApnEditor extends PreferenceActivity
         values.put(Telephony.Carriers.SERVER, checkNotSet(mServer.getText()));
         values.put(Telephony.Carriers.PASSWORD, checkNotSet(mPassword.getText()));
         values.put(Telephony.Carriers.MMSC, checkNotSet(mMmsc.getText()));
+        values.put(Telephony.Carriers.CARRIER_ENABLED, mCarrierEnabled.isChecked() ? 1 : 0);
 
         String authVal = mAuthType.getValue();
         if (authVal != null) {
@@ -785,6 +789,8 @@ public class ApnEditor extends PreferenceActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference pref = findPreference(key);
         if (pref != null) {
+            if(pref.equals(mCarrierEnabled))
+               return;
             if (pref.equals(mPassword)){
                 pref.setSummary(starify(sharedPreferences.getString(key, "")));
             } else {
@@ -812,13 +818,31 @@ public class ApnEditor extends PreferenceActivity
             getPreferenceScreen().setEnabled(false);
         } else {
             getPreferenceScreen().setEnabled(true);
-            mCarrierEnabled.setEnabled(false);
-            mFirstTime = true;
-            fillUi(getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA));
+            mCarrierEnabled.setEnabled(true);
+            updateItemEnableState();
         }
     }
 
-    /*
+    private void updateItemEnableState() {
+        String numeric = "";
+        if (mNewApn) {
+            numeric = getIntent().getStringExtra(ApnSettings.OPERATOR_NUMERIC_EXTRA);
+        } else {
+            if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
+                numeric = mCursor.getString(NUMERIC_INDEX);
+            }
+        }
+        if (SystemProperties
+                .getBoolean("persist.env.settings.cfgmmsapn", false)
+                && CT_NUMERIC.equals(numeric)) {
+            mMmsProxy.setEnabled(false);
+            mMmsPort.setEnabled(false);
+            mMmsc.setEnabled(false);
+        }
+        mMvnoMatchData.setEnabled(false);
+    }
+
+     /*
      * Add the method to check the phone state is airplane mode or not.
      * Return true, if the phone state is airplane mode.
      */

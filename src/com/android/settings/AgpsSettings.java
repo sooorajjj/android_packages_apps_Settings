@@ -146,7 +146,7 @@ public class AgpsSettings extends PreferenceActivity
             pref.setSummary(types[1]);
         } else {
             pref.setValue(ERR_MODE);
-            pref.setSummary(types[2]);
+            pref.setSummary("");
         }
     }
 
@@ -244,6 +244,15 @@ public class AgpsSettings extends PreferenceActivity
     private String getPrefAgpsResetType() {
         String agps_reset_type = Settings.Global.getString(mContentResolver,
                 Settings.Global.ASSISTED_GPS_RESET_TYPE);
+        if ( agps_reset_type != null ) {
+            if ( agps_reset_type.compareTo("2") == 0 ) {
+                agps_reset_type = AGPS_START_MODE_HOT;
+            } else if (agps_reset_type.compareTo("1") == 0 ) {
+                agps_reset_type = AGPS_START_MODE_WARM;
+            } else {
+                agps_reset_type = AGPS_START_MODE_COLD;
+            }
+        }
         return (null != agps_reset_type) ? agps_reset_type :
                 getResources().getString(R.string.location_agps_def_reset_type);
     }
@@ -287,8 +296,14 @@ public class AgpsSettings extends PreferenceActivity
         bundle.putString(STRING_SUPL_PORT, checkNotSet(mPort.getText()));
         bundle.putString(STRING_PROVIDER_ID, mAssistedType);
         bundle.putString(STRING_ACCESS_NETWORK, mNetworkType);
-        bundle.putString(STRING_AGPS_RESET_TYPE, mResetType);
         SetValue(bundle);
+        if ( mResetType.compareTo(AGPS_START_MODE_HOT) == 0 ) {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "2");
+        } else if ( mResetType.compareTo(AGPS_START_MODE_WARM) == 0 ) {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "1");
+        } else {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "0");
+        }
         LocationManager objLocManager = (LocationManager)
                                         getSystemService(Context.LOCATION_SERVICE);
         boolean bRet = objLocManager.sendExtraCommand(LocationManager.GPS_PROVIDER,
@@ -327,6 +342,13 @@ public class AgpsSettings extends PreferenceActivity
         fillUi(true);
         LocationManager objLocManager = (LocationManager)
                                         getSystemService(Context.LOCATION_SERVICE);
+        if ( mResetType.compareTo(AGPS_START_MODE_HOT) == 0 ) {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "2");
+        } else if ( mResetType.compareTo(AGPS_START_MODE_WARM) == 0 ) {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "1");
+        } else {
+            bundle.putString(STRING_AGPS_RESET_TYPE, "0");
+        }
         boolean bRet = objLocManager.sendExtraCommand(LocationManager.GPS_PROVIDER,
                 "agps_parms_changed", bundle);
         Log.d(TAG, "sendExtraCommand ret=" + bRet);
@@ -356,6 +378,13 @@ public class AgpsSettings extends PreferenceActivity
                     agps_network);
         }
         if (null != agps_reset_type && agps_reset_type.length() > 0) {
+            if ( agps_reset_type.compareTo(AGPS_START_MODE_HOT) == 0 ) {
+                agps_reset_type = "2";
+            } else if ( agps_reset_type.compareTo(AGPS_START_MODE_WARM) == 0 ) {
+                agps_reset_type = "1";
+            } else {
+                agps_reset_type = "0";
+            }
             Settings.Global.putString(mContentResolver, Settings.Global.ASSISTED_GPS_RESET_TYPE,
                     agps_reset_type);
         }

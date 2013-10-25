@@ -28,8 +28,11 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.os.storage.IMountService;
 import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -60,11 +63,14 @@ public class MasterClear extends Fragment {
     private static final int KEYGUARD_REQUEST = 55;
 
     static final String ERASE_EXTERNAL_EXTRA = "erase_sd";
+    static final String ERASE_INTERNAL_EXTRA = "erase_internal_sd";
 
     private View mContentView;
     private Button mInitiateButton;
     private View mExternalStorageContainer;
     private CheckBox mExternalStorage;
+    private View mInternalStorageContainer;
+    private CheckBox mInternalStorage;
 
     /**
      * Keyguard validation is run using the standard {@link ConfirmLockPattern}
@@ -102,6 +108,7 @@ public class MasterClear extends Fragment {
         preference.setFragment(MasterClearConfirm.class.getName());
         preference.setTitle(R.string.master_clear_confirm_title);
         preference.getExtras().putBoolean(ERASE_EXTERNAL_EXTRA, mExternalStorage.isChecked());
+        preference.getExtras().putBoolean(ERASE_INTERNAL_EXTRA, mInternalStorage.isChecked());
         ((PreferenceActivity) getActivity()).onPreferenceStartFragment(null, preference);
     }
 
@@ -136,6 +143,8 @@ public class MasterClear extends Fragment {
         mInitiateButton.setOnClickListener(mInitiateListener);
         mExternalStorageContainer = mContentView.findViewById(R.id.erase_external_container);
         mExternalStorage = (CheckBox) mContentView.findViewById(R.id.erase_external);
+        mInternalStorageContainer = mContentView.findViewById(R.id.erase_internal_container);
+        mInternalStorage = (CheckBox) mContentView.findViewById(R.id.erase_internal);
 
         /*
          * If the external storage is emulated, it will be erased with a factory
@@ -146,25 +155,45 @@ public class MasterClear extends Fragment {
          */
         Context context = getActivity();
         StorageManager storageManager = StorageManager.from(context);
-        final ArrayList<StorageVolume> physicalVols =
-                storageManager.getPhysicalExternalVolume(storageManager.getVolumeList());
+        final StorageVolume[] storageVolumes = storageManager.getVolumeList();
+        int descriptionID = -1;
+        String description = null;
         String state = null;
-        if (physicalVols.size() != 0) {
-            String extStoragePath = null;
-            extStoragePath = physicalVols.get(0).getPath();
-            state = storageManager.getVolumeState(extStoragePath);
+        boolean isIntStorageMounted = false;
+        boolean isExtStorageMounted = false;
+        for (int i = 0; i < storageVolumes.length; i++) {
+            descriptionID = storageVolumes[i].getDescriptionId();
+            description = context.getResources().getResourceName(descriptionID);
+            if (description.contains("internal")) {
+                state = storageManager.getVolumeState(storageVolumes[i].getPath());
+                isIntStorageMounted = Environment.MEDIA_MOUNTED.equals(state);
+            } else if (description.contains("sd_card")) {
+                state = storageManager.getVolumeState(storageVolumes[i].getPath());
+                isExtStorageMounted = Environment.MEDIA_MOUNTED.equals(state);
+            }
         }
-        boolean isExtStorageMounted = Environment.MEDIA_MOUNTED.equals(state);
-        if (!isExtStorageMounted
-                || (!Environment.isExternalStorageRemovable() && isExtStorageEncrypted())) {
+
+        if (!isIntStorageMounted) {
+            mInternalStorageContainer.setVisibility(View.GONE);
+            mInternalStorage.setChecked(isIntStorageMounted);
+        } else {
+            mInternalStorageContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInternalStorage.toggle();
+                }
+            });
+        }
+        if (!isExtStorageMounted || isExtStorageEncrypted()) {
             mExternalStorageContainer.setVisibility(View.GONE);
 
-            final View externalOption = mContentView.findViewById(R.id.erase_external_option_text);
-            externalOption.setVisibility(View.GONE);
-
-            final View externalAlsoErased = mContentView.findViewById(R.id.also_erases_external);
-            externalAlsoErased.setVisibility(View.VISIBLE);
-
+            if (!isExtStorageMounted) {
+                final View externalOption =
+                    mContentView.findViewById(R.id.erase_external_option_text);
+                externalOption.setVisibility(View.GONE);
+                final View externalAlsoErased = mContentView.findViewById(R.id.also_erases_external);
+                externalAlsoErased.setVisibility(View.VISIBLE);
+            }
             // If it's not emulated, it is on a separate partition but it means we're doing
             // a force wipe due to encryption.
             mExternalStorage.setChecked(isExtStorageMounted);

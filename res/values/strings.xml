@@ -2255,10 +2255,14 @@
     <string name="erase_external_storage" product="nosdcard">Erase USB storage</string>
     <!-- SD card & phone storage settings screen, label for check box to erase SD card [CHAR LIMIT=30] -->
     <string name="erase_external_storage" product="default">Erase SD card</string>
+    <!-- SD card & phone storage settings screen, label for check box to erase internal SD card [CHAR LIMIT=30] -->
+    <string name="erase_internal_storage" product="default">Erase internal SD card</string>
     <!-- SD card & phone storage settings screen, description for check box to erase USB storage [CHAR LIMIT=NONE] -->
     <string name="erase_external_storage_description" product="nosdcard">Erase all the data on the internal USB storage, such as music or photos</string>
     <!-- SD card & phone storage settings screen, description for check box to erase USB storage [CHAR LIMIT=NONE] -->
     <string name="erase_external_storage_description" product="default">Erase all the data on the SD card, such as music or photos</string>
+    <!-- SD card & phone storage settings screen, button on screen after user selects Factory data reset -->
+    <string name="erase_internal_storage_description" product="default">Erase all the data on the internal SD card, such as music or photos</string>
     <!-- SD card & phone storage settings screen, button on screen after user selects Factory data reset -->
     <string name="master_clear_button_text" product="tablet">Reset tablet</string>
     <!-- SD card & phone storage settings screen, button on screen after user selects Factory data reset -->
@@ -2691,7 +2695,7 @@
         <li>Disabled apps</li>\n
         <li>Disabled app notifications</li>\n
         <li>Default applications for actions</li>\n
-        <li>Background data restrictions for apps</li>\n
+        <li>Background data restrictions for apps</li>\n\n
         <li>Any permission restrictions</li>\n\n
         You will not lose any app data.</string>
     <!-- [CHAR LIMIT=25] Manage applications screen, menu item.  Confirmation button of dialog to confirm resetting user's app preferences. -->
@@ -2843,6 +2847,8 @@
     <!-- App Ops Settings --> <skip />
     <!-- [CHAR LIMIT=NONE] App ops settings title, on main settings screen. If clicked, the user is taken to a settings screen for app operations -->
     <string name="app_ops_settings">App ops</string>
+    <!-- [CHAR LIMIT=NONE] App ops settings summary, on main settings screen. If clicked, the user is taken to a settings screen for app operations -->
+    <string name="app_ops_settings_summary">View or change app permissions</string>
     <!-- [CHAR LIMIT=NONE] Time label for an operation that is currently running. -->
     <string name="app_ops_running">Running</string>
     <!-- [CHAR LIMIT=NONE] Time label for an operation that has never executed. -->

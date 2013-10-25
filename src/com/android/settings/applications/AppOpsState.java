@@ -27,9 +27,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
-
 import android.util.Log;
 import android.util.SparseArray;
+
 import com.android.settings.R;
 
 import java.io.File;
@@ -130,15 +130,21 @@ public class AppOpsState {
 
     public static final OpsTemplate MESSAGING_TEMPLATE = new OpsTemplate(
             new int[] { AppOpsManager.OP_READ_SMS,
+                    AppOpsManager.OP_READ_MMS,
                     AppOpsManager.OP_RECEIVE_SMS,
                     AppOpsManager.OP_RECEIVE_EMERGECY_SMS,
                     AppOpsManager.OP_RECEIVE_MMS,
                     AppOpsManager.OP_RECEIVE_WAP_PUSH,
                     AppOpsManager.OP_WRITE_SMS,
+                    AppOpsManager.OP_WRITE_MMS,
                     AppOpsManager.OP_SEND_SMS,
+                    AppOpsManager.OP_SEND_MMS,
                     AppOpsManager.OP_READ_ICC_SMS,
                     AppOpsManager.OP_WRITE_ICC_SMS },
             new boolean[] { true,
+                    true,
+                    true,
+                    true,
                     true,
                     true,
                     true,
@@ -158,9 +164,15 @@ public class AppOpsState {
                     AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
                     AppOpsManager.OP_CAMERA,
                     AppOpsManager.OP_RECORD_AUDIO,
-                    AppOpsManager.OP_PLAY_AUDIO },
+                    AppOpsManager.OP_PLAY_AUDIO,
+                    AppOpsManager.OP_WIFI_CHANGE,
+                    AppOpsManager.OP_BLUETOOTH_CHANGE,
+                    AppOpsManager.OP_DATA_CONNECT_CHANGE },
             new boolean[] { false,
                     false,
+                    true,
+                    true,
+                    true,
                     true,
                     true,
                     true,
