@@ -4786,7 +4786,7 @@
     <string name="APN_NAME_CTWAP">CTWAP</string>
 
     <!-- Roaming Date Settings -->
-    <string name="label_global_roaming_settings">Global roaming settings</string>
+    <string name="label_global_roaming_settings">Roaming Settings</string>
 
     <string name="select_in_ssids_type_title">Reselection among SSID</string>
     <string name="select_in_ssids_key">wifi_select_in_ssids_type</string>
