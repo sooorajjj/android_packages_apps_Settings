@@ -234,7 +234,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
 
     private boolean isSubActivated() {
         //take sim state ready as actived state
-        return  TelephonyManager.SIM_STATE_READY ==
+        return  TelephonyManager.SIM_STATE_ABSENT !=
                 MSimTelephonyManager.getDefault().getSimState(mSubscription);
     }
 
