@@ -125,6 +125,8 @@ public class WifiSettings extends SettingsPreferenceFragment
     // Activity result when pressing the Skip button
     private static final int RESULT_SKIP = Activity.RESULT_FIRST_USER;
 
+    private static final int WIFI_AUTO_CONNECT_TYPE_AUTO = 0;
+
     private final IntentFilter mFilter;
     private final BroadcastReceiver mReceiver;
     private final Scanner mScanner;
@@ -452,9 +454,9 @@ public class WifiSettings extends SettingsPreferenceFragment
 
         if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
             mAutoConnect = Settings.System.getInt(getActivity().getContentResolver(),
-                    getResources().getString(R.string.wifi_autoconn_type),
-                    getResources().getInteger(R.integer.wifi_autoconn_type_auto)) ==
-                    getResources().getInteger(R.integer.wifi_autoconn_type_auto);
+                    Settings.System.WIFI_AUTO_CONNECT_TYPE,
+                    WIFI_AUTO_CONNECT_TYPE_AUTO) ==
+                    WIFI_AUTO_CONNECT_TYPE_AUTO;
         }
 
         getActivity().registerReceiver(mReceiver, mFilter);

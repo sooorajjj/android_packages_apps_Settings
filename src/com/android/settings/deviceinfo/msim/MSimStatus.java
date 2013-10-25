@@ -102,6 +102,7 @@ public class MSimStatus extends PreferenceActivity {
     private PhoneStateListener[] mPhoneStateListener;
     private Resources mRes;
     private Preference mUptime;
+    private boolean mShowLatestAreaInfo = false;
 
     private String mUnknown = null;
     private int mNumPhones = 0;
@@ -322,9 +323,18 @@ public class MSimStatus extends PreferenceActivity {
         for (int i = 0; i < mNumPhones; i++) {
             SIM[i] = getMultiSimName(i);
             mPhone[i] = MSimPhoneFactory.getPhone(i);
-            if ("CDMA".equals(mPhone[i].getPhoneName()))
+            if ("CDMA".equals(mPhone[i].getPhoneName())) {
                 indexOfCDMA = i;
+            } else {
+                // only show area info when SIM country is Brazil
+                if ("br".equals(mTelephonyManager.getSimCountryIso(i))) {
+                    mShowLatestAreaInfo = true;
+                }
+            }
             mPhoneStateListener[i] = getPhoneStateListener(i);
+        }
+        if (!mShowLatestAreaInfo) {
+            removePreferenceFromScreen(KEY_LATEST_AREA_INFO);
         }
 
         mBatteryLevel = findPreference(KEY_BATTERY_LEVEL);
@@ -427,7 +437,11 @@ public class MSimStatus extends PreferenceActivity {
                 } else {
                     prlVersionSummery[i] = null;
                     esnNumberSummery[i] = null;
-                    meidNumberSummery[i] = null;
+                    if (SystemProperties.getBoolean("persist.env.settings.showMEID", false)) {
+                        meidNumberSummery[i] = getSimSummery(i, mPhone[i].getMeid());
+                    } else {
+                        meidNumberSummery[i] = null;
+                    }
                     minNumberSummery[i] = null;
                     iccIdSummery[i] = null;
                     imeiSummery[i] = getSimSummery(i, mPhone[i].getDeviceId());

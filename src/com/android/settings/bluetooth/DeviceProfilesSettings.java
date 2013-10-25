@@ -260,7 +260,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         if (isConnected) {
             askDisconnect(getActivity(), profile);
         } else {
-            if (profile.isPreferred(device)) {
+            if (isPreferred(profile,device)) {
                 // profile is preferred but not connected: disable auto-connect
                 profile.setPreferred(device, false);
                 refreshProfilePreference(profilePref, profile);
@@ -338,7 +338,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
          * Gray out checkbox while connecting and disconnecting
          */
         profilePref.setEnabled(!mCachedDevice.isBusy());
-        profilePref.setChecked(profile.isPreferred(device));
+        profilePref.setChecked(isPreferred(profile,device));
         profilePref.setSummary(profile.getSummaryResourceForDevice(device));
     }
 
@@ -362,5 +362,8 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
 
     private void unpairDevice() {
         mCachedDevice.unpair();
+    }
+    private boolean isPreferred(LocalBluetoothProfile profile,BluetoothDevice device) {
+      return profile.getConnectionStatus(device) == BluetoothProfile.STATE_CONNECTED;
     }
 }
