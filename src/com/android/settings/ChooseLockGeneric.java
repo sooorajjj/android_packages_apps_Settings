@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.hardware.Camera.CameraInfo;
 
 import com.android.internal.widget.LockPatternUtils;
 
@@ -263,6 +264,23 @@ public class ChooseLockGeneric extends PreferenceActivity {
             return quality;
         }
 
+        private boolean cameraFrontExist() {
+            int mNumberOfCameras;
+            CameraInfo[] mInfo;
+            mNumberOfCameras = android.hardware.Camera.getNumberOfCameras();
+            mInfo = new CameraInfo[mNumberOfCameras];
+            for (int i = 0; i < mNumberOfCameras; i++) {
+                mInfo[i] = new CameraInfo();
+                android.hardware.Camera.getCameraInfo(i, mInfo[i]);
+            }
+            for (int i = 0; i < mNumberOfCameras; i++) {
+                if (mInfo[i].facing == CameraInfo.CAMERA_FACING_FRONT) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /***
          * Disables preferences that are less secure than required quality.
          *
@@ -309,6 +327,10 @@ public class ChooseLockGeneric extends PreferenceActivity {
                         pref.setEnabled(false);
                     }
                 }
+            }
+            if(!cameraFrontExist()){
+                Preference pref = findPreference(KEY_UNLOCK_SET_BIOMETRIC_WEAK);
+                entries.removePreference(pref);
             }
         }
 
