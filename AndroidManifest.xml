@@ -98,6 +98,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="nosensor">
         </activity>
+        <activity android:name=".CustomScreenColor" android:label="@string/custom_screencolor"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="nosensor">
+        </activity>
 
         <activity android:name="Settings"
                 android:label="@string/settings_label_launcher"
