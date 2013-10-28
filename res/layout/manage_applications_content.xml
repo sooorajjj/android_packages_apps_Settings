@@ -31,7 +31,7 @@
         <TextView android:id="@+id/search_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dip"
+            android:layout_marginStart="20dip"
             android:textSize="18sp"
             android:textStyle="bold"
             android:text="@string/show_search_function"
@@ -61,8 +61,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
                 android:textAppearance="@style/TextAppearance.PagerTabs"
-                android:paddingLeft="@dimen/pager_tabs_padding"
-                android:paddingRight="@dimen/pager_tabs_padding">
+                android:paddingStart="@dimen/pager_tabs_padding"
+                android:paddingEnd="@dimen/pager_tabs_padding">
         </android.support.v4.view.PagerTabStrip>
     </android.support.v4.view.ViewPager>
 
