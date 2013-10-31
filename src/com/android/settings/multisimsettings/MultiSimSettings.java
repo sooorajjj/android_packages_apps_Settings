@@ -274,9 +274,8 @@ public class MultiSimSettings extends PreferenceActivity {
             mSimOneEnabler.setSwitchVisibility(View.INVISIBLE);
             mSimTwoEnabler.setSwitchVisibility(View.INVISIBLE);
         } else {
-            PreferenceCategory multiSimSettings =
-                    (PreferenceCategory)findPreference(KEY_MULTI_SIM_SETTINGS);
-            multiSimSettings.removePreference(mConfigSub);
+            PreferenceScreen basePreferenceScreen = getPreferenceScreen();
+            basePreferenceScreen.removePreference(mConfigSub);
             mSimOneEnabler.setSwitchVisibility(View.VISIBLE);
             mSimTwoEnabler.setSwitchVisibility(View.VISIBLE);
         }
