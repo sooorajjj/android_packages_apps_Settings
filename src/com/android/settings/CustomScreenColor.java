@@ -150,7 +150,6 @@ public class CustomScreenColor extends Activity implements SeekBar.OnSeekBarChan
     @Override
     protected void onPause() {
         super.onPause();
-        restoreSavedHSCI(true);
     }
 
     @Override
