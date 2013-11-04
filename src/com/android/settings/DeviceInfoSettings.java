@@ -85,7 +85,8 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         setValueSummary(KEY_EQUIPMENT_ID, PROPERTY_EQUIPMENT_ID);
         setStringSummary(KEY_DEVICE_MODEL,
                 SystemProperties.get("persist.env.sys.modelName", Build.MODEL));
-        setStringSummary(KEY_BUILD_NUMBER, Build.DISPLAY);
+        setStringSummary(KEY_BUILD_NUMBER,
+                SystemProperties.get("persist.env.sys.displayId", Build.DISPLAY));
         findPreference(KEY_BUILD_NUMBER).setEnabled(true);
         findPreference(KEY_KERNEL_VERSION).setSummary(getFormattedKernelVersion());
 
