@@ -411,6 +411,21 @@ public class Settings extends PreferenceActivity
     public void onBuildHeaders(List<Header> headers) {
         loadHeadersFromResource(R.xml.settings_headers, headers);
         updateHeaderList(headers);
+        useApplicationSettingsIfNeeded(headers);
+    }
+
+    private void useApplicationSettingsIfNeeded(List<Header> target) {
+        if ("Xolo".equals(SystemProperties.get("persist.env.spec"))) {
+            Log.d(LOG_TAG, "useApplicationSettingsIfNeeded, myUserId = " + UserHandle.myUserId());
+            for (int i = 0; i < target.size(); i++) {
+                Header header = target.get(i);
+                if (header.id == R.id.application_settings) {
+                    header.fragment = "com.android.settings.ApplicationSettings";
+                    Log.d(LOG_TAG, "use ApplicationSettings instead");
+                    break;
+                }
+            }
+        }
     }
 
     private void updateHeaderList(List<Header> target) {

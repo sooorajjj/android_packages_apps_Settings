@@ -61,7 +61,7 @@ public class ApplicationSettings extends SettingsPreferenceFragment {
         mInstallLocation = (ListPreference) findPreference(KEY_APP_INSTALL_LOCATION);
         // Is app default install location set?
         boolean userSetInstLocation = (Settings.Global.getInt(getContentResolver(),
-                Settings.Global.SET_INSTALL_LOCATION, 0) != 0);
+                Settings.Global.SET_INSTALL_LOCATION, 1) != 0);
         if (!userSetInstLocation) {
             getPreferenceScreen().removePreference(mInstallLocation);
         } else {
