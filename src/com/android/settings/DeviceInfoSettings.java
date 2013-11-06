@@ -155,8 +155,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
                 R.bool.config_additional_system_update_setting_enable);
 
         // Remove regulatory information if not enabled.
-        removePreferenceIfBoolFalse(KEY_REGULATORY_INFO,
-                R.bool.config_show_regulatory_info);
+        if (!SystemProperties.getBoolean("presist.env.regulatory", false)) {
+            removePreferenceIfBoolFalse(KEY_REGULATORY_INFO,
+                    R.bool.config_show_regulatory_info);
+        }
     }
 
     @Override
