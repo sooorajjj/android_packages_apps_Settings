@@ -18,6 +18,7 @@ package com.android.settings.fuelgauge;
 
 import com.android.settings.R;
 
+import android.graphics.Rect;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -669,10 +670,14 @@ public class BatteryHistoryChart extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        
+        Rect rectSignal = new Rect();
+        Rect rectWake = new Rect();
+        Rect rectScreenOn = new Rect();
         final int width = getWidth();
         final int height = getHeight();
-        
+        mTextPaint.getTextBounds(mPhoneSignalLabel, 0, mPhoneSignalLabel.length() - 3, rectSignal);
+        mTextPaint.getTextBounds(mWakeLockLabel, 0, mWakeLockLabel.length() - 2, rectWake);
+        mTextPaint.getTextBounds(mScreenOnLabel, 0, mScreenOnLabel.length() - 4, rectScreenOn);
         canvas.drawPath(mBatLevelPath, mBatteryBackgroundPaint);
         if (mLargeMode) {
             canvas.drawText(mDurationString, 0, -mTextAscent + (mLineWidth/2),
@@ -716,32 +721,63 @@ public class BatteryHistoryChart extends View {
             canvas.drawPath(mWakeLockPath, mWakeLockPaint);
         }
 
-        if (mLargeMode) {
-            if (mHavePhoneSignal) {
-                canvas.drawText(mPhoneSignalLabel, 0,
-                        height - mPhoneSignalOffset - mTextDescent, mTextPaint);
+        // Change for RTL.
+        if (isLayoutRtl()) {
+            if (mLargeMode) {
+                if (mHavePhoneSignal) {
+                    canvas.drawText(mPhoneSignalLabel, width - rectSignal.width(), height
+                            - mPhoneSignalOffset - mTextDescent, mTextPaint);
+                }
+                if (mHaveGps) {
+                    canvas.drawText(mGpsOnLabel, width - mTextPaint.measureText(mGpsOnLabel),
+                            height - mGpsOnOffset - mTextDescent, mTextPaint);
+                }
+                if (mHaveWifi) {
+                    canvas.drawText(mWifiRunningLabel,
+                            width - mTextPaint.measureText(mWifiRunningLabel), height
+                                    - mWifiRunningOffset - mTextDescent, mTextPaint);
+                }
+                canvas.drawText(mWakeLockLabel, width - rectWake.width(), height - mWakeLockOffset
+                        - mTextDescent, mTextPaint);
+                canvas.drawText(mChargingLabel, width - mTextPaint.measureText(mChargingLabel),
+                        height - mChargingOffset - mTextDescent, mTextPaint);
+                canvas.drawText(mScreenOnLabel, width - rectScreenOn.width(), height
+                        - mScreenOnOffset - mTextDescent, mTextPaint);
+                canvas.drawLine(0, mLevelBottom + (mThinLineWidth / 2), width, mLevelBottom
+                        + (mThinLineWidth / 2), mTextPaint);
+                canvas.drawLine(0, mLevelTop, 0, mLevelBottom + (mThinLineWidth / 2), mTextPaint);
+                for (int i = 0; i < 10; i++) {
+                    int y = mLevelTop + ((mLevelBottom - mLevelTop) * i) / 10;
+                    canvas.drawLine(0, y, mThinLineWidth * 2, y, mTextPaint);
+                }
             }
-            if (mHaveGps) {
-                canvas.drawText(mGpsOnLabel, 0,
-                        height - mGpsOnOffset - mTextDescent, mTextPaint);
-            }
-            if (mHaveWifi) {
-                canvas.drawText(mWifiRunningLabel, 0,
-                        height - mWifiRunningOffset - mTextDescent, mTextPaint);
-            }
-            canvas.drawText(mWakeLockLabel, 0,
-                    height - mWakeLockOffset - mTextDescent, mTextPaint);
-            canvas.drawText(mChargingLabel, 0,
-                    height - mChargingOffset - mTextDescent, mTextPaint);
-            canvas.drawText(mScreenOnLabel, 0,
-                    height - mScreenOnOffset - mTextDescent, mTextPaint);
-            canvas.drawLine(0, mLevelBottom+(mThinLineWidth/2), width,
-                    mLevelBottom+(mThinLineWidth/2), mTextPaint);
-            canvas.drawLine(0, mLevelTop, 0,
-                    mLevelBottom+(mThinLineWidth/2), mTextPaint);
-            for (int i=0; i<10; i++) {
-                int y = mLevelTop + ((mLevelBottom-mLevelTop)*i)/10;
-                canvas.drawLine(0, y, mThinLineWidth*2, y, mTextPaint);
+        } else {
+            if (mLargeMode) {
+                if (mHavePhoneSignal) {
+                    canvas.drawText(mPhoneSignalLabel, 0, height - mPhoneSignalOffset
+                            - mTextDescent, mTextPaint);
+                }
+                if (mHaveGps) {
+                    canvas.drawText(mGpsOnLabel, 0, height - mGpsOnOffset - mTextDescent,
+                            mTextPaint);
+                }
+                if (mHaveWifi) {
+                    canvas.drawText(mWifiRunningLabel, 0, height - mWifiRunningOffset
+                            - mTextDescent, mTextPaint);
+                }
+                canvas.drawText(mWakeLockLabel, 0, height - mWakeLockOffset - mTextDescent,
+                        mTextPaint);
+                canvas.drawText(mChargingLabel, 0, height - mChargingOffset - mTextDescent,
+                        mTextPaint);
+                canvas.drawText(mScreenOnLabel, 0, height - mScreenOnOffset - mTextDescent,
+                        mTextPaint);
+                canvas.drawLine(0, mLevelBottom + (mThinLineWidth / 2), width, mLevelBottom
+                        + (mThinLineWidth / 2), mTextPaint);
+                canvas.drawLine(0, mLevelTop, 0, mLevelBottom + (mThinLineWidth / 2), mTextPaint);
+                for (int i = 0; i < 10; i++) {
+                    int y = mLevelTop + ((mLevelBottom - mLevelTop) * i) / 10;
+                    canvas.drawLine(0, y, mThinLineWidth * 2, y, mTextPaint);
+                }
             }
         }
     }
