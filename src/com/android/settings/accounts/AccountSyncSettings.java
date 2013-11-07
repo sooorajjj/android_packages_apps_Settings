@@ -263,7 +263,8 @@ public class AccountSyncSettings extends AccountPreferenceBase {
     }
 
     private boolean checkIsSyncingState(boolean isSyncActive) {
-        if (isSyncActive && mAccount != null) {
+        if (isSyncActive && mAccount != null
+                && ContentResolver.getCurrentSync().account != null) {
             if (ContentResolver.getCurrentSync().account.equals(mAccount)) {
                 return true;
             }

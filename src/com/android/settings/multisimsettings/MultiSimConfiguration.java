@@ -74,6 +74,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private static final String KEY_SIM_ENABLER = "sim_enabler_key";
     private static final String KEY_NETWORK_SETTING = "mobile_network_key";
     private static final String KEY_CALL_SETTING = "call_setting_key";
+    private static final String KEY_NET_SERVICE_PROVIDER = "net_service_provider_key";
 
     private static final int CHANNEL_NAME_MAX_LENGTH = 6;
     private static final int ALWAYS_ASK = 2;
@@ -81,6 +82,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private PreferenceScreen mPrefScreen;
     private PreferenceScreen mNetworkSetting;
     private PreferenceScreen mCallSetting;
+    private PreferenceScreen mNetServiceProvider;
 
     private int mSubscription;
     private EditTextPreference mNamePreference;
@@ -209,6 +211,15 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
                         .getString(R.string.call_settings));
 
         mIntentFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+
+        // network service provider info.
+        mNetServiceProvider = (PreferenceScreen) findPreference(KEY_NET_SERVICE_PROVIDER);
+        String netOperatorName = MSimTelephonyManager.getDefault().getNetworkOperatorName(
+                mSubscription);
+        String netTypeName = MSimTelephonyManager.getDefault()
+                .getNetworkTypeName(mSubscription);
+        mNetServiceProvider.setTitle(netOperatorName);
+        mNetServiceProvider.setSummary(netTypeName);
     }
 
     protected void onResume() {

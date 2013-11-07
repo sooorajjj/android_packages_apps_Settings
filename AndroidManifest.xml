@@ -98,6 +98,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="nosensor">
         </activity>
+        <activity android:name=".CustomScreenColor" android:label="@string/custom_screencolor"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="nosensor">
+        </activity>
 
         <activity android:name="Settings"
                 android:label="@string/settings_label_launcher"
@@ -185,7 +189,8 @@
         <activity android:name=".wifi.WifiPickerActivity"
                 android:uiOptions="splitActionBarWhenNarrow"
                 android:taskAffinity="com.android.settings"
-                android:parentActivityName="Settings">
+                android:parentActivityName="Settings"
+                android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.net.wifi.PICK_WIFI_NETWORK" />
