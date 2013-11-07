@@ -257,6 +257,16 @@ public class MultiSimSettings extends PreferenceActivity {
         sub1_intent.putExtra(MSimConstants.SUBSCRIPTION_KEY, MSimConstants.SUB1);
 
         mSimTwoEnabler = (MultiSimEnablerPreference) findPreference(KEY_SIM_TWO_EBABLER);
+        if(SystemProperties.getBoolean("persist.env.dualsim.checkbox",false))
+        {
+            mSimOneEnabler.setWidgetLayoutResource(R.layout.custom_checkbox_xolo);
+            mSimTwoEnabler.setWidgetLayoutResource(R.layout.custom_checkbox_xolo);
+        }
+        else
+        {
+            mSimOneEnabler.setWidgetLayoutResource(R.layout.custom_checkbox);
+            mSimTwoEnabler.setWidgetLayoutResource(R.layout.custom_checkbox);
+        }
         Intent sub2_intent = mSimTwoEnabler.getIntent();
         sub2_intent.putExtra(MSimConstants.SUBSCRIPTION_KEY, MSimConstants.SUB2);
         mSimOneEnabler.setSubscription(MSimConstants.SUB1, mHandler);

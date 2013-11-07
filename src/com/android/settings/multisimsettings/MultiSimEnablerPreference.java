@@ -114,7 +114,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private String mDialogString = null;
     private TextView mSubTitle, mSubSummary;
     private int mSwitchVisibility = View.VISIBLE;
-    private Switch mSwitch;
+    private CompoundButton mSwitch;
     private Handler mParentHandler = null;
     private AlertDialog mAlertDialog = null;
 
@@ -292,7 +292,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         super.onBindView(view);
         mSubTitle = (TextView) view.findViewById(R.id.subtitle);
         mSubSummary = (TextView) view.findViewById(R.id.subsummary);
-        mSwitch = (Switch) view.findViewById(R.id.subSwitchWidget);
+        mSwitch = (CompoundButton) view.findViewById(R.id.subSwitchWidget);
         mSwitch.setOnCheckedChangeListener(this);
 
         // now use other config screen to active/deactive sim card\
