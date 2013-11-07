@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.widget.TextView;
+import android.os.SystemProperties;
 
 /**
  * {@link Activity} that displays regulatory information for the "Regulatory information"
@@ -44,7 +45,11 @@ public class RegulatoryInfoDisplayActivity extends Activity implements
         super.onCreate(savedInstanceState);
         Resources resources = getResources();
 
-        if (!resources.getBoolean(R.bool.config_show_regulatory_info)) {
+        boolean isShowRegulatoryByProp
+                = SystemProperties.getBoolean("presist.env.regulatory", false);
+
+        if (!isShowRegulatoryByProp
+                    && !resources.getBoolean(R.bool.config_show_regulatory_info) ) {
             finish();   // no regulatory info to display for this device
         }
 
@@ -63,7 +68,12 @@ public class RegulatoryInfoDisplayActivity extends Activity implements
             regulatoryInfoDrawableExists = false;
         }
 
-        CharSequence regulatoryText = resources.getText(R.string.regulatory_info_text);
+        CharSequence regulatoryText = "";
+        if (isShowRegulatoryByProp) {
+            regulatoryText = SystemProperties.get("presist.env.sar", "");
+        } else {
+            regulatoryText = resources.getText(R.string.regulatory_info_text);
+        }
 
         if (regulatoryInfoDrawableExists) {
             builder.setView(getLayoutInflater().inflate(R.layout.regulatory_info, null));
