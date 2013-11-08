@@ -30,6 +30,14 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
 
+    <PreferenceScreen
+        android:key="net_service_provider_key"
+        android:title="@string/device_info_default"
+        android:summary="@string/device_info_default"
+        android:persistent="false"
+        android:enabled="false" >
+    </PreferenceScreen>
+
     <!--com.android.settings.multisimsettings.MultiSimNamePreference-->
     <EditTextPreference
         android:key="sim_name_key"

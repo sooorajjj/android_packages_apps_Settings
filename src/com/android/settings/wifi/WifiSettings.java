@@ -474,6 +474,14 @@ public class WifiSettings extends SettingsPreferenceFragment
     }
 
     @Override
+    public void onDestroy() {
+         super.onDestroy();
+         if(mDialog != null && mDialog.isShowing()) {
+             mDialog.dismiss();
+         }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // If the user is not allowed to configure wifi, do not show the menu.
         if (mUserManager.hasUserRestriction(DISALLOW_CONFIG_WIFI)) return;
@@ -1156,7 +1164,14 @@ public class WifiSettings extends SettingsPreferenceFragment
     /* package */ void onAddNetworkPressed() {
         // No exact access point is selected.
         mSelectedAccessPoint = null;
-        showDialog(null, true);
+        if (mDialog != null) {
+            mDialog.dismiss();
+            mDialog = null;
+        }
+        mDlgAccessPoint = null;
+        mDlgEdit = true;
+        mDialog = new WifiDialog(getActivity(), this, null, true);
+        mDialog.show();
     }
 
     /* package */ int getAccessPointsCount() {

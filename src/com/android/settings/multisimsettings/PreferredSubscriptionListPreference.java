@@ -273,13 +273,7 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
      * multi_sim_values return the string arrays get from arrays.xml
      */
     private CharSequence[] getEntityValues(int listType) {
-        int count = subManager.getActiveSubscriptionsCount();
-        if (count >= MSimConstants.MAX_PHONE_COUNT_DUAL_SIM &&
-            listType != MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
-            return entryValuesPrompt;
-        } else  {
-            return entryValues;
-        }
+        return entryValues;
     }
 
     /**
@@ -287,13 +281,7 @@ public class PreferredSubscriptionListPreference extends ListPreference implemen
      * language. return the string arrays get from arrays.xml
      */
     private CharSequence[] getMultiSimNamesFromRes(int listType) {
-        int count = subManager.getActiveSubscriptionsCount();
-        if (count >= MSimConstants.MAX_PHONE_COUNT_DUAL_SIM &&
-            listType != MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1]) {
-            return entriesPrompt;
-        } else  {
-            return entries;
-        }
+        return entries;
     }
 
     private CharSequence getMultiSimName(int subscription) {
