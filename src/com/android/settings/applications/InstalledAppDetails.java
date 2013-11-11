@@ -1219,6 +1219,10 @@ public class InstalledAppDetails extends Fragment
         @Override
         public void onReceive(Context context, Intent intent) {
             updateForceStopButton(getResultCode() != Activity.RESULT_CANCELED);
+
+            Intent i = new Intent("com.android.LEDFlashlight.processKilled");
+            i.putExtra(Intent.EXTRA_PACKAGES, mAppEntry.info.packageName);
+            getActivity().sendStickyBroadcast(i);
         }
     };
 
