@@ -78,6 +78,10 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
 
         addPreferencesFromResource(R.xml.device_info_settings);
 
+        if(SystemProperties.getBoolean("persist.env.ota",false))
+            findPreference(KEY_SYSTEM_UPDATE_SETTINGS).setIntent(new Intent("com.android.softwareupdateclient.LAVA_OTA_UPDATE"));
+        else
+            findPreference(KEY_SYSTEM_UPDATE_SETTINGS).setIntent(new Intent("android.settings.SYSTEM_UPDATE"));
         setStringSummary(KEY_FIRMWARE_VERSION, Build.VERSION.RELEASE);
         findPreference(KEY_FIRMWARE_VERSION).setEnabled(true);
         setValueSummary(KEY_BASEBAND_VERSION, "gsm.version.baseband");

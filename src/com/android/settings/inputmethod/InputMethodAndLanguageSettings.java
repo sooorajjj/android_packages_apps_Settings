@@ -35,6 +35,7 @@ import android.hardware.input.InputManager;
 import android.hardware.input.KeyboardLayout;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -254,6 +255,9 @@ public class InputMethodAndLanguageSettings extends SettingsPreferenceFragment
                 } else if (hasOnlyOneLanguageInstance(language,
                         Resources.getSystem().getAssets().getLocales())) {
                     localeString = conf.locale.getDisplayLanguage(conf.locale);
+                    if(SystemProperties.getBoolean("persist.env.language.country",false)) {
+                        localeString = localeString + " " + conf.locale.getCountry();
+                    }
                 } else {
                     localeString = conf.locale.getDisplayName(conf.locale);
                 }
