@@ -986,6 +986,7 @@
     <string name="tethering_help_button_text" msgid="656117495547173630">"帮助"</string>
     <string name="call_settings">"通话设置"</string>
     <string name="mobile_network_setting">"移动网络设置"</string>
+    <string name="sim_card_setting">"SIM卡设置"</string>
     <string name="summary_network_settings">"设置网络模式、接入点和运营商等"</string>
     <string name="summary_call_settings">"设置双卡的语音信箱、通话设置等"</string>
     <!-- Main settings screen, Multi Sim settings title for item to go into the Multi settings -->
