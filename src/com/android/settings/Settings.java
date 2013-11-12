@@ -63,6 +63,7 @@ import com.android.settings.wfd.WifiDisplaySettings;
 import com.android.settings.wifi.WifiEnabler;
 import com.android.settings.wifi.WifiSettings;
 import com.android.settings.wifi.p2p.WifiP2pSettings;
+import com.qualcomm.util.MpqUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -475,6 +476,15 @@ public class Settings extends PreferenceActivity
                 target.remove(i);
             }
 
+            // For MPQ targets, hide the battery related setting
+            if (id == R.id.battery_settings)
+            {
+               if (MpqUtils.isTargetMpq() == true)
+               {
+                  target.remove(header);
+               }
+            }
+
             // Increment if the current one wasn't removed by the Utils code.
             if (i < target.size() && target.get(i) == header) {
                 // Hold on to the first header, when we need to reset to the top-level
@@ -734,6 +744,17 @@ public class Settings extends PreferenceActivity
                         holder.summary.setVisibility(View.GONE);
                     }
                     break;
+            }
+
+
+            // For MPQ targets, rename the 'About Setting' appropriately
+            if (header.id == R.id.about_settings)
+            {
+              if (MpqUtils.isTargetMpq() == true)
+               {
+                  holder.title.setText(getContext().getResources()
+                           .getString(R.string.mpq_about_tv_settings));
+               }
             }
 
             return view;

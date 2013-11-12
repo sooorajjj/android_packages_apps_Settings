@@ -71,6 +71,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.qualcomm.util.MpqUtils;
+
 /*
  * Displays preferences for application developers.
  */
@@ -411,6 +413,12 @@ public class DevelopmentSettings extends PreferenceFragment
             mDisabledPrefs.add(mKeepScreenOn);
         } else {
             mDisabledPrefs.remove(mKeepScreenOn);
+        }
+
+        // Do the following for MPQ targets
+        if (MpqUtils.isTargetMpq() == true) {
+            // remove the 'stay awake' preference
+            getPreferenceScreen().removePreference(mKeepScreenOn);
         }
 
         final ContentResolver cr = getActivity().getContentResolver();
