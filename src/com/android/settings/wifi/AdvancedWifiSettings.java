@@ -242,6 +242,23 @@ public class AdvancedWifiSettings extends SettingsPreferenceFragment
         } else {
             Log.d(TAG, "Fail to get cellular2wifi pref");
         }
+
+        replaceWifiToWlan(frequencyPref);
+        replaceWifiToWlan(sleepPolicyPref);
+        poorNetworkDetection.setSummary(Utils.replaceAllWiFi(poorNetworkDetection.getSummary()
+                .toString()));
+        suspendOptimizations.setTitle(Utils.replaceAllWiFi(suspendOptimizations.getTitle()
+                .toString()));
+        suspendOptimizations.setSummary(Utils.replaceAllWiFi(suspendOptimizations.getSummary()
+                .toString()));
+
+    }
+
+    private void replaceWifiToWlan(ListPreference preference) {
+        if(null == preference) return ;
+        String prefString = Utils.replaceAllWiFi(preference.getTitle().toString());
+        preference.setTitle(prefString);
+        preference.setDialogTitle(prefString);
     }
 
     private void updateSleepPolicySummary(Preference sleepPolicyPref, String value) {

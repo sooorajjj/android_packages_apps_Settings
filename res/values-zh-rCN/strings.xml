@@ -566,7 +566,7 @@
     <string name="wifi_menu_wps_pbc" msgid="2668564692207863017">"WPS 按钮"</string>
     <string name="wifi_menu_more_options" msgid="2448097861752719396">"更多选项"</string>
     <string name="wifi_menu_wps_pin" msgid="6426448256268695933">"WPS PIN 输入"</string>
-    <string name="wifi_menu_p2p" msgid="7619851399250896797">"WLAN 直接连接"</string>
+    <string name="wifi_menu_p2p" msgid="7619851399250896797">"WLAN 直接联接"</string>
     <string name="wifi_menu_scan" msgid="1470911530412095868">"扫描"</string>
     <string name="wifi_menu_advanced" msgid="7522252991919573664">"高级"</string>
     <string name="wifi_menu_connect" msgid="4996220309848349408">"连接到网络"</string>
@@ -639,6 +639,7 @@
     <string name="wifi_connect_failed_message" product="tablet" msgid="4474691090681670156">"平板电脑无法连接到此 WLAN 网络。"</string>
     <string name="wifi_connect_failed_message" product="default" msgid="2185803140161396572">"手机无法连接到此 WLAN 网络。"</string>
     <string name="wifi_advanced_titlebar" msgid="4485841401774142908">"高级 WLAN"</string>
+    <string name="wlan_advanced_titlebar">"高级 WLAN"</string>
     <string name="wifi_setting_frequency_band_title" msgid="3655327399028584656">"WLAN 频带"</string>
     <string name="wifi_setting_frequency_band_summary" msgid="3250740757118009784">"指定操作的频率范围"</string>
     <string name="wifi_setting_frequency_band_error" msgid="837281974489794378">"设置频带时出现问题。"</string>
@@ -655,7 +656,8 @@
     <string name="wifi_dns2" msgid="1368601006824882659">"域名 2"</string>
     <string name="wifi_gateway" msgid="163914742461092086">"网关"</string>
     <string name="wifi_network_prefix_length" msgid="3028785234245085998">"网络前缀长度"</string>
-    <string name="wifi_p2p_settings_title" msgid="5444461191435291082">"WLAN Direct"</string>
+    <string name="wifi_p2p_settings_title" msgid="5444461191435291082">"WLAN 直接联接"</string>
+    <string name="wlan_p2p_settings_title">"WLAN 直接联接"</string>
     <string name="wifi_p2p_device_info" msgid="3191876744469364173">"设备信息"</string>
     <string name="wifi_p2p_persist_network" msgid="1646424791818168590">"记住该连接"</string>
     <string name="wifi_p2p_menu_search" msgid="3436429984738771974">"搜索设备"</string>
@@ -2092,4 +2094,10 @@
     <string name="unknown_access_points">未知接入点</string>
     <string name="gsm_to_wifi_connect_type_title">蜂窝网至 WLAN 重选</string>
     <string name="wifi_setting_connect_type_error">设置自动连接类型时出现错误。</string>
+
+    <string name="testing_wifi_info">WLAN 信息</string>
+    <string name="wifi_api_test">WLAN 接口</string>
+    <string name="wifi_status_test">WLAN 状态</string>
+    <string name="wifi_state_label">WLAN 状态:</string>
+    <string name="wifi_config_info">WLAN 配置</string>
 </resources>
