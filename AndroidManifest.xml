@@ -667,7 +667,7 @@
 
         <!-- Multi Sim (Subscription) Settings Widget for Tab Layout-->
         <activity android:name=".multisimsettings.MultiSimSettingTab"
-                android:label="@string/mobile_network_setting"
+                android:label="@string/sim_card_setting"
                 android:configChanges="orientation|screenSize|keyboardHidden"
                 android:parentActivityName=".multisimsettings.MultiSimSettings">
            <intent-filter>
