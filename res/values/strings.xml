@@ -4688,6 +4688,7 @@
 
     <!-- for multisim settings -->
     <string name="mobile_network_setting">Mobile network settings</string>
+    <string name="sim_card_setting">SIM card settings</string>
     <string name="call_settings">Call settings</string>
     <!-- Multi SIM settings screen, preferred subscription settings -->
     <string name="preferred_subs_settings_title">Preferred SIM settings</string>
