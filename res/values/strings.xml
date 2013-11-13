@@ -1533,6 +1533,7 @@
     <!-- Wi-Fi Advanced Settings --> <skip />
     <!-- Wi-Fi settings screen, advanced, settings section.  This is a header shown above advanced wifi settings. -->
     <string name="wifi_advanced_titlebar">Advanced Wi\u2011Fi</string>
+    <string name="wlan_advanced_titlebar">Advanced WLAN</string>
     <!-- Wi-Fi settings screen, setting title for setting the band [CHAR LIMIT=50]-->
     <string name="wifi_setting_frequency_band_title">Wi\u2011Fi frequency band</string>
     <!-- Wi-Fi settings screen, setting summary for setting the wifi frequency band [CHAR LIMIT=50]-->
@@ -1579,6 +1580,7 @@
     <!-- Wi-Fi p2p / Wi-Fi Direct settings -->
     <!-- Used in the 1st-level settings screen to launch Wi-fi Direct settings [CHAR LIMIT=25] -->
     <string name="wifi_p2p_settings_title">Wi\u2011Fi Direct</string>
+    <string name="wlan_p2p_settings_title">WLAN Direct</string>
     <string name="wifi_p2p_device_info">Device information</string>
     <string name="wifi_p2p_persist_network">Remember this connection</string>
     <!-- Menu option to discover peers-->
@@ -1630,7 +1632,7 @@
 
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Wi-Fi Testing on the diagnostic screen-->
-    <string name="testing_wifi_info" translatable="false">Wi-Fi information</string>
+    <string name="testing_wifi_info">Wi-Fi information</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Menu item for WifiManager disableNetwork API-->
     <string name="disableNetwork" translatable="false">disableNetwork</string>
@@ -1648,16 +1650,16 @@
     <string name="getConnectionInfo" translatable="false">getConnectionInfo</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Menu item on Wifi information screen-->
-    <string name="wifi_api_test" translatable="false">Wi-Fi API</string>
+    <string name="wifi_api_test">Wi-Fi API</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Menu item on Wifi information screen-->
-    <string name="wifi_status_test" translatable="false">Wi-Fi status</string>
+    <string name="wifi_status_test">Wi-Fi status</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Button text on Wifi Status screen-->
     <string name="wifi_update" translatable="false">Refresh stats</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Label on Wifi Status screen-->
-    <string name="wifi_state_label" translatable="false">Wi-Fi state:</string>
+    <string name="wifi_state_label">Wi-Fi state:</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Label on Wifi Status screen-->
     <string name="network_state_label" translatable="false">Network state:</string>
@@ -1706,7 +1708,7 @@
 
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Menu item on Wifi information screen-->
-    <string name="wifi_config_info" translatable="false">Wi-Fi config</string>
+    <string name="wifi_config_info">Wi-Fi config</string>
     <!-- Do not translate. Used for diagnostic screens, precise translation is not necessary
          Label on Wifi Configuration screen-->
     <string name="config_list_label" translatable="false">Configured networks</string>

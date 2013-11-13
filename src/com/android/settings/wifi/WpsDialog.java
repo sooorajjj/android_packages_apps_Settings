@@ -37,7 +37,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.android.settings.R;
-
+import com.android.settings.Utils;
 
 /**
  * Dialog to show WPS progress.
@@ -83,10 +83,11 @@ public class WpsDialog extends AlertDialog {
             public void onStartSuccess(String pin) {
                 if (pin != null) {
                     updateDialog(DialogState.WPS_START, String.format(
-                            mContext.getString(R.string.wifi_wps_onstart_pin), pin));
+                            Utils.replaceAllWiFi(mContext
+                            .getString(R.string.wifi_wps_onstart_pin)), pin));
                 } else {
-                    updateDialog(DialogState.WPS_START, mContext.getString(
-                            R.string.wifi_wps_onstart_pbc));
+                    updateDialog(DialogState.WPS_START, Utils.replaceAllWiFi(mContext
+                            .getString(R.string.wifi_wps_onstart_pbc)));
                 }
             }
             public void onCompletion() {
