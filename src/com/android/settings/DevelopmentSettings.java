@@ -42,6 +42,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcel;
+import android.content.ComponentName;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.StrictMode;
@@ -70,6 +71,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import com.lava.security.services.IExternalService;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
 /*
  * Displays preferences for application developers.
@@ -208,6 +212,18 @@ public class DevelopmentSettings extends PreferenceFragment
 
     private boolean mUnavailable;
 
+
+     private IExternalService service=null;
+     private ServiceConnection svcConn=new ServiceConnection() {
+         public void onServiceConnected(ComponentName className, IBinder binder) {
+             service=IExternalService.Stub.asInterface(binder);
+         }
+
+         public void onServiceDisconnected(ComponentName className) {
+             service=null;
+         }
+     };
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -310,6 +326,8 @@ public class DevelopmentSettings extends PreferenceFragment
             mAllPrefs.add(hdcpChecking);
         }
         removeHdcpOptionsForProduction();
+        getActivity().bindService(new Intent("com.lava.security.services.IExternalService"),
+            svcConn, Context.BIND_AUTO_CREATE);
     }
 
     private ListPreference addListPreference(String prefKey) {
@@ -1067,6 +1085,21 @@ public class DevelopmentSettings extends PreferenceFragment
         }
     }
 
+
+    private boolean isAdbEnabled()
+    {
+        if(service == null)
+            return true;
+        try {
+            boolean block = service.getAdb();
+            return !block;
+        }
+        catch (android.os.RemoteException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 
@@ -1078,8 +1111,17 @@ public class DevelopmentSettings extends PreferenceFragment
             if (mEnableAdb.isChecked()) {
                 mDialogClicked = false;
                 if (mAdbDialog != null) dismissDialogs();
+                int message = 0;
+                if(isAdbEnabled())
+                {
+                    message = R.string.adb_warning_message;
+                }
+                else
+                {
+                    message = R.string.adb_warning_security_message;
+                }
                 mAdbDialog = new AlertDialog.Builder(getActivity()).setMessage(
-                        getActivity().getResources().getString(R.string.adb_warning_message))
+                        getActivity().getResources().getString(message))
                         .setTitle(R.string.adb_warning_title)
                         .setIconAttribute(android.R.attr.alertDialogIcon)
                         .setPositiveButton(android.R.string.yes, this)
@@ -1218,11 +1260,21 @@ public class DevelopmentSettings extends PreferenceFragment
         if (dialog == mAdbDialog) {
             if (which == DialogInterface.BUTTON_POSITIVE) {
                 mDialogClicked = true;
-                Settings.Global.putInt(getActivity().getContentResolver(),
-                        Settings.Global.ADB_ENABLED, 1);
-                mVerifyAppsOverUsb.setEnabled(true);
-                updateVerifyAppsOverUsbOptions();
-                updateBugreportOptions();
+        if(isAdbEnabled())
+        {
+            Settings.Global.putInt(getActivity().getContentResolver(),
+                Settings.Global.ADB_ENABLED, 1);
+            mVerifyAppsOverUsb.setEnabled(true);
+            updateVerifyAppsOverUsbOptions();
+            updateBugreportOptions();
+        }
+        else
+        {
+            final Intent intent = new Intent();
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setComponent(new ComponentName("com.lava.security","com.lava.security.MainActivity"));
+            startActivity(intent);
+        }
             } else {
                 // Reset the toggle
                 mEnableAdb.setChecked(false);
@@ -1270,6 +1322,7 @@ public class DevelopmentSettings extends PreferenceFragment
     public void onDestroy() {
         dismissDialogs();
         super.onDestroy();
+        getActivity().unbindService(svcConn);
     }
 
     void pokeSystemProperties() {

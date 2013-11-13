@@ -44,6 +44,7 @@
             android:title="@string/personal_data_section_title"/>
         <!-- Factory reset -->
     <PreferenceScreen
+        android:key="master_clear"
         android:title="@string/master_clear_title"
         android:summary="@string/master_clear_summary"
         android:fragment="com.android.settings.MasterClear" />
