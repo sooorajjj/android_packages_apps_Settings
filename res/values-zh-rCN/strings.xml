@@ -1002,6 +1002,8 @@
 
     <!-- Multi Sim Settings screen, Data box label -->
     <string name="data_title">"数据"</string>
+    <!-- Multi Sim Settings screen, Data box label dsds -->
+    <string name="data_title_dsds">移动数据</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="data_summary">"默认数据通道"</string>
     <!-- Multi Sim Settings screen, SMS box label -->
