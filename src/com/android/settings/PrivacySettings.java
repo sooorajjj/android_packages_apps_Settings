@@ -17,6 +17,7 @@
 package com.android.settings;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.app.Dialog;
 import android.app.backup.IBackupManager;
 import android.content.ContentResolver;
@@ -26,31 +27,81 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.widget.Toast;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 
+import android.os.SystemProperties;
+import com.lava.security.services.IExternalService;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 /**
  * Gesture lock pattern settings.
  */
 public class PrivacySettings extends SettingsPreferenceFragment implements
-        DialogInterface.OnClickListener {
+        DialogInterface.OnClickListener, Preference.OnPreferenceClickListener{
 
     // Vendor specific
     private static final String GSETTINGS_PROVIDER = "com.google.settings";
     private static final String BACKUP_CATEGORY = "backup_category";
     private static final String BACKUP_DATA = "backup_data";
     private static final String AUTO_RESTORE = "auto_restore";
+    private static final String PERSONAL_DATA_CATEGORY = "personal_data";
+    private static final String DRM_RESET = "drm_settings";
+    private static final String MASTER_CLEAR = "master_clear";
+    private static final String TAG = "PrivacySettings";
     private static final String CONFIGURE_ACCOUNT = "configure_account";
     private IBackupManager mBackupManager;
     private CheckBoxPreference mBackup;
     private CheckBoxPreference mAutoRestore;
     private Dialog mConfirmDialog;
-    private PreferenceScreen mConfigure;
+    private PreferenceScreen mConfigure,mMasterClear;
 
     private static final int DIALOG_ERASE_BACKUP = 2;
     private int mDialogType;
+
+     public boolean onPreferenceClick(Preference preference)
+     {
+         if(preference == mMasterClear)
+         {
+             if(service != null && !isResetEnabled())
+             {
+                 showFactoryResetDisabledDialog();
+                 return true;
+                }
+         }
+         return false;
+     }
+     private IExternalService service=null;
+     private ServiceConnection svcConn=new ServiceConnection() {
+        public void onServiceConnected(ComponentName className,
+             IBinder binder) {
+             service=IExternalService.Stub.asInterface(binder);
+            if(isResetEnabled())
+            {
+                mMasterClear.setSummary(R.string.master_clear_summary);
+            }
+            else
+            {
+                mMasterClear.setSummary(R.string.master_clear_summary_disabled);
+            }
+        }
+         public void onServiceDisconnected(ComponentName className) {
+             service=null;
+         }
+     };
+
+
+     @Override
+     public void onDestroy() {
+        super.onDestroy();
+        getActivity().unbindService(svcConn);
+     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +115,8 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
         mBackup = (CheckBoxPreference) screen.findPreference(BACKUP_DATA);
         mAutoRestore = (CheckBoxPreference) screen.findPreference(AUTO_RESTORE);
         mConfigure = (PreferenceScreen) screen.findPreference(CONFIGURE_ACCOUNT);
+        mMasterClear = (PreferenceScreen) screen.findPreference(MASTER_CLEAR);
+        mMasterClear.setOnPreferenceClickListener(this);
 
         // Vendor specific
         if (getActivity().getPackageManager().
@@ -71,6 +124,8 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
             screen.removePreference(findPreference(BACKUP_CATEGORY));
         }
         updateToggles();
+        getActivity().bindService(new Intent("com.lava.security.services.IExternalService"),
+            svcConn, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -111,6 +166,24 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
+    private void showFactoryResetDisabledDialog() {
+        CharSequence msg = "Factory data reset is disabled by Xolo Secure.Do you want to launch "
+            + "Xolo Secure to turn off Factory Reset Lock" ;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(msg);
+        builder.setPositiveButton(R.string.dlg_ok,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    final Intent intent = new Intent();
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setComponent(new ComponentName("com.lava.security","com.lava.security.MainActivity"));
+                    startActivity(intent);
+                        }
+                    });
+        builder.setNegativeButton(R.string.dlg_cancel, null);
+        builder.show();
+    }
+
     private void showEraseBackupDialog() {
         mBackup.setChecked(true);
 
@@ -125,11 +198,37 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
                 .show();
     }
 
+
+    private boolean isResetEnabled() {
+        if(service == null)
+            return true;
+        try {
+            boolean block = service.getFactoryReset();
+            return !block;
+        }
+        catch (android.os.RemoteException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     /*
      * Creates toggles for each available location provider
      */
     private void updateToggles() {
         ContentResolver res = getContentResolver();
+        if(service == null)
+        {
+            mMasterClear.setSummary(R.string.master_clear_summary_waiting);
+        }
+        else if(isResetEnabled())
+        {
+            mMasterClear.setSummary(R.string.master_clear_summary);
+        }
+        else
+        {
+            mMasterClear.setSummary(R.string.master_clear_summary_disabled);
+        }
 
         boolean backupEnabled = false;
         Intent configIntent = null;
@@ -144,6 +243,18 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
             mBackup.setEnabled(false);
         }
         mBackup.setChecked(backupEnabled);
+
+        if (backupEnabled) {
+            // provision the backup manager.
+            IBackupManager bm = IBackupManager.Stub.asInterface(ServiceManager
+                    .getService(Context.BACKUP_SERVICE));
+            if (bm != null) {
+                try {
+                    bm.setBackupProvisioned(true);
+                } catch (RemoteException e) {
+                }
+            }
+        }
 
         mAutoRestore.setChecked(Settings.Secure.getInt(res,
                 Settings.Secure.BACKUP_AUTO_RESTORE, 1) == 1);
@@ -193,6 +304,7 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
         if (mBackupManager != null) {
             try {
                 mBackupManager.setBackupEnabled(enable);
+                mBackupManager.setBackupProvisioned(enable);
             } catch (RemoteException e) {
                 mBackup.setChecked(!enable);
                 mAutoRestore.setEnabled(!enable);

@@ -57,6 +57,9 @@ public class DeviceAdminAdd extends Activity {
     static final String TAG = "DeviceAdminAdd";
     
     static final int DIALOG_WARNING = 1;
+    static final int DIALOG_XOLOSEC = 2;
+
+    static final String EXTRA_DISABLE_XOLOSEC = "DISABLE_XOLOSEC";
 
     private static final int MAX_ADD_MSG_LINES_PORTRAIT = 5;
     private static final int MAX_ADD_MSG_LINES_LANDSCAPE = 2;
@@ -231,6 +234,14 @@ public class DeviceAdminAdd extends Activity {
                     }
                     finish();
                 } else {
+                    if(mDeviceAdmin.getPackageName() != null &&
+                            mDeviceAdmin.getPackageName().equals("com.lava.security")) {
+                        CharSequence msg = "Go to Xolo Secure to deactivate Device Admin" ;
+                        Bundle args = new Bundle();
+                        args.putCharSequence(EXTRA_DISABLE_XOLOSEC, msg);
+                        showDialog(DIALOG_XOLOSEC, args);
+                    }
+                    else {
                     try {
                         // Don't allow the admin to put a dialog up in front
                         // of us while we interact with the user.
@@ -260,6 +271,7 @@ public class DeviceAdminAdd extends Activity {
                             }
                         }
                     });
+                    }
                 }
             }
         });
@@ -284,6 +296,23 @@ public class DeviceAdminAdd extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         mDPM.removeActiveAdmin(mDeviceAdmin.getComponent());
                         finish();
+                    }
+                });
+                builder.setNegativeButton(R.string.dlg_cancel, null);
+                return builder.create();
+            }
+            case DIALOG_XOLOSEC: {
+                            CharSequence msg = args.getCharSequence(EXTRA_DISABLE_XOLOSEC);
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        DeviceAdminAdd.this);
+                builder.setMessage(msg);
+                builder.setPositiveButton(R.string.dlg_ok,
+                        new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Intent intent = new Intent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.setComponent(new ComponentName("com.lava.security","com.lava.security.MainActivity"));
+                        startActivity(intent);
                     }
                 });
                 builder.setNegativeButton(R.string.dlg_cancel, null);
