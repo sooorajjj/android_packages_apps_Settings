@@ -1222,7 +1222,9 @@ public class InstalledAppDetails extends Fragment
 
             Intent i = new Intent("com.android.LEDFlashlight.processKilled");
             i.putExtra(Intent.EXTRA_PACKAGES, mAppEntry.info.packageName);
-            getActivity().sendStickyBroadcast(i);
+            if (getActivity() != null) {
+                getActivity().sendStickyBroadcast(i);
+            }
         }
     };
 
