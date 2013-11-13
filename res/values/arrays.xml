@@ -366,6 +366,10 @@
         <item>TTLS</item>
         <!-- Do not translate. -->
         <item>PWD</item>
+        <!-- Do not translate. -->
+        <item>SIM</item>
+        <!-- Do not translate. -->
+        <item>AKA</item>
     </string-array>
 
    <!-- Wi-Fi WPS setup for p2p connections.  -->
@@ -476,6 +480,8 @@
         <item>TLS</item>
         <item>TTLS</item>
         <item>PWD</item>
+        <item>SIM</item>
+        <item>AKA</item>
     </string-array>
 
     <!-- Phase 2 options for PEAP -->
