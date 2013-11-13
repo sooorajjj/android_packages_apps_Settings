@@ -4438,6 +4438,8 @@
 
     <!-- Multi Sim Settings screen, Data box label -->
     <string name="data_title">Data Call</string>
+    <!-- Multi Sim Settings screen, Data box label dsds -->
+    <string name="data_title_dsds">Mobile Data</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="data_summary">Select Subscription for Data Call</string>
 
