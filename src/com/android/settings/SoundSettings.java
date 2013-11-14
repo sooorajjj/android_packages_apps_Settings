@@ -17,7 +17,8 @@
 package com.android.settings;
 
 import com.android.settings.bluetooth.DockEventReceiver;
-import com.qualcomm.util.MpqUtils;
+
+import org.codeaurora.util.MpqUtils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

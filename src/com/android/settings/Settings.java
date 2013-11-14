@@ -63,7 +63,8 @@ import com.android.settings.wfd.WifiDisplaySettings;
 import com.android.settings.wifi.WifiEnabler;
 import com.android.settings.wifi.WifiSettings;
 import com.android.settings.wifi.p2p.WifiP2pSettings;
-import com.qualcomm.util.MpqUtils;
+
+import org.codeaurora.util.MpqUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

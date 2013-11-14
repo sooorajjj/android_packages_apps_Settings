@@ -47,7 +47,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.widget.LockPatternUtils;
-import com.qualcomm.util.MpqUtils;
+
+import org.codeaurora.util.MpqUtils;
 
 import java.util.ArrayList;
 import java.util.List;

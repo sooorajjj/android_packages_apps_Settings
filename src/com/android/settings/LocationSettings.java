@@ -16,7 +16,7 @@
 
 package com.android.settings;
 
-import com.qualcomm.util.MpqUtils;
+import org.codeaurora.util.MpqUtils;
 
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
