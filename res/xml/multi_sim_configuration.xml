@@ -47,6 +47,13 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:maxLength="6"
         android:inputType="textNoSuggestions"/>
 
+    <com.android.settings.multisimsettings.ImageListPreference
+        android:key="sim_icon_key"
+        android:title="@string/sim_icon_title"
+        android:persistent="false"
+        settings:entries="@array/select_sim_icon_entries"
+        settings:entryValues="@array/select_sim_icon_values" />
+
     <PreferenceScreen
         android:key="mobile_network_key"
         android:title="@string/mobile_network_setting"

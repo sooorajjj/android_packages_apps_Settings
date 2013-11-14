@@ -81,4 +81,9 @@
         <attr name="fillColor" format="color" />
         <attr name="fillColorSecondary" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="ImageListPreference">
+        <attr name="entries" format="reference"/>
+        <attr name="entryValues" format="reference"/>
+    </declare-styleable>
 </resources>
