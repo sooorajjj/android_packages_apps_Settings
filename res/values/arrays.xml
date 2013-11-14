@@ -1048,4 +1048,28 @@
         <item>Vivid</item>
         <item>Custom</item>
     </string-array>
+
+    <!-- Used in choose sim icon -start-->
+    <string-array name="select_sim_icon_entries">
+        <item>SIM1</item>
+        <item>SIM2</item>
+        <item>CDMA</item>
+        <item>GSM</item>
+        <item>WCDMA</item>
+    </string-array>
+    <string-array name="select_sim_icon_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <array name="sim_icons">
+        <item>@drawable/ic_sim_icon_1</item>
+        <item>@drawable/ic_sim_icon_2</item>
+        <item>@drawable/ic_sim_icon_c</item>
+        <item>@drawable/ic_sim_icon_g</item>
+        <item>@drawable/ic_sim_icon_w</item>
+    </array>
+    <!-- Used in choose sim icon -end-->
 </resources>
