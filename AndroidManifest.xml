@@ -661,13 +661,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <!-- MultiSimSettings should be found by 'Voice Dialer'. -->
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
+                <category android:name="codeaurora.intent.filter.settings.multisim.SHORTCUT" />
             </intent-filter>
         </activity>
 
         <!-- Multi Sim (Subscription) Settings Widget for Tab Layout-->
         <activity android:name=".multisimsettings.MultiSimSettingTab"
-                android:label="@string/mobile_network_setting"
+                android:label="@string/sim_card_setting"
                 android:configChanges="orientation|screenSize|keyboardHidden"
                 android:parentActivityName=".multisimsettings.MultiSimSettings">
            <intent-filter>

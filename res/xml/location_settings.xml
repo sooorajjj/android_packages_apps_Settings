@@ -56,5 +56,10 @@
                     android:targetClass="com.android.settings.AgpsSettings" />
         </PreferenceScreen>
 
+        <com.android.settings.WrappingIZatCheckBoxPreference
+            android:key="location_izat"
+            android:dependency="location_toggle"
+            android:persistent="true" />
+
 
 </PreferenceScreen>
