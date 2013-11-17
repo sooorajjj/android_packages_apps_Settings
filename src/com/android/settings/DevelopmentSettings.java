@@ -67,11 +67,11 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import org.codeaurora.util.MpqUtils;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import com.qualcomm.util.MpqUtils;
 
 /*
  * Displays preferences for application developers.

@@ -19,7 +19,7 @@
 
 package com.android.settings;
 
-import com.qualcomm.util.MpqUtils;
+import org.codeaurora.util.MpqUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -67,7 +67,8 @@ import android.widget.TextView;
 import com.android.internal.content.PackageMonitor;
 import com.android.internal.view.RotationPolicy;
 import com.android.settings.AccessibilitySettings.ToggleSwitch.OnBeforeCheckedChangeListener;
-import com.qualcomm.util.MpqUtils;
+
+import org.codeaurora.util.MpqUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;

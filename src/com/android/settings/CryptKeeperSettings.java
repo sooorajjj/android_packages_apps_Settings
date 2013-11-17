@@ -17,7 +17,8 @@
 package com.android.settings;
 
 import com.android.internal.widget.LockPatternUtils;
-import com.qualcomm.util.MpqUtils;
+
+import org.codeaurora.util.MpqUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
