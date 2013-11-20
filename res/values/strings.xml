@@ -4442,6 +4442,8 @@
 
     <!-- Multi Sim Settings screen, Data box label -->
     <string name="data_title">Data Call</string>
+    <!-- Multi Sim Settings screen, Data box label dsds -->
+    <string name="data_title_dsds">Mobile Data</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="data_summary">Select Subscription for Data Call</string>
 
@@ -4691,7 +4693,9 @@
     <string name="regulatory_info_text"></string>
 
     <!-- for multisim settings -->
+    <string name="sim_icon_title">Icons</string>
     <string name="mobile_network_setting">Mobile network settings</string>
+    <string name="sim_card_setting">SIM card settings</string>
     <string name="call_settings">Call settings</string>
     <!-- Multi SIM settings screen, preferred subscription settings -->
     <string name="preferred_subs_settings_title">Preferred SIM settings</string>
