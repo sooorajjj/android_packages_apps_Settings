@@ -366,6 +366,10 @@
         <item>TTLS</item>
         <!-- Do not translate. -->
         <item>PWD</item>
+        <!-- Do not translate. -->
+        <item>SIM</item>
+        <!-- Do not translate. -->
+        <item>AKA</item>
     </string-array>
 
    <!-- Wi-Fi WPS setup for p2p connections.  -->
@@ -476,6 +480,8 @@
         <item>TLS</item>
         <item>TTLS</item>
         <item>PWD</item>
+        <item>SIM</item>
+        <item>AKA</item>
     </string-array>
 
     <!-- Phase 2 options for PEAP -->
@@ -1000,6 +1006,16 @@
     <item>Global</item>
     <item>LTE only</item>
     <item>LTE/WCDMA</item>
+    <item>TD-SCDMA only</item>
+    <item>TD-SCDMA and WCDMA</item>
+    <item>TD-SCDMA and LTE</item>
+    <item>TD-SCDMA and GSM</item>
+    <item>TD-SCDMA,GSM and LTE</item>
+    <item>TD-SCDMA, GSM/WCDMA</item>
+    <item>TD-SCDMA, WCDMA and LTE</item>
+    <item>TD-SCDMA, GSM/WCDMA and LTE</item>
+    <item>TD-SCDMA, GSM/WCDMA, CDMA and EvDo</item>
+    <item>TD-SCDMA, LTE, CDMA, EvDo GSM/WCDMA</item>
     <item>Unknown</item>
    </string-array>
 
@@ -1038,4 +1054,28 @@
         <item>Vivid</item>
         <item>Custom</item>
     </string-array>
+
+    <!-- Used in choose sim icon -start-->
+    <string-array name="select_sim_icon_entries">
+        <item>SIM1</item>
+        <item>SIM2</item>
+        <item>CDMA</item>
+        <item>GSM</item>
+        <item>WCDMA</item>
+    </string-array>
+    <string-array name="select_sim_icon_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <array name="sim_icons">
+        <item>@drawable/ic_sim_icon_1</item>
+        <item>@drawable/ic_sim_icon_2</item>
+        <item>@drawable/ic_sim_icon_c</item>
+        <item>@drawable/ic_sim_icon_g</item>
+        <item>@drawable/ic_sim_icon_w</item>
+    </array>
+    <!-- Used in choose sim icon -end-->
 </resources>
