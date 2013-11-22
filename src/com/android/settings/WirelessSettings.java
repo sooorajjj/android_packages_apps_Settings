@@ -322,7 +322,8 @@ public class WirelessSettings extends SettingsPreferenceFragment {
         // For MPQ targets, remove 'Airplane mode', 'Mobile networks' & 'Cell broadcasts'
         if( MpqUtils.isTargetMpq() == true) {
             getPreferenceScreen().removePreference(mAirplaneModePreference);
-            getPreferenceScreen().removePreference(findPreference(KEY_MOBILE_NETWORK_SETTINGS));
+            //Mobile network settings preference is removed already.
+            //getPreferenceScreen().removePreference(findPreference(KEY_MOBILE_NETWORK_SETTINGS));
             getPreferenceScreen().removePreference(findPreference(KEY_CELL_BROADCAST_SETTINGS));
         }
     }
