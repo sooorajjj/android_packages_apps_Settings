@@ -220,8 +220,9 @@ public class SecuritySettings extends SettingsPreferenceFragment
         mPowerButtonInstantlyLocks = (CheckBoxPreference) root.findPreference(
                 KEY_POWER_INSTANTLY_LOCKS);
 
-        // modify the screen titles for MPQ targets
-        if (MpqUtils.isTargetMpq() == true) {
+        // modify the screen titles for MPQ targets.
+        // This preference will be shown only to the primary user.
+        if (mIsPrimary && MpqUtils.isTargetMpq() == true) {
             PreferenceGroup securityCategory = (PreferenceGroup)root.findPreference(KEY_SECURITY_CATEGORY);
             securityCategory.setTitle(getResources().getString(R.string.mpq_crypt_keeper_encrypt_title));
             securityCategory.setSummary(getResources().getString(R.string.mpq_crypt_keeper_encrypt_summary));

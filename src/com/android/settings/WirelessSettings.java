@@ -324,7 +324,10 @@ public class WirelessSettings extends SettingsPreferenceFragment {
             getPreferenceScreen().removePreference(mAirplaneModePreference);
             //Mobile network settings preference is removed already.
             //getPreferenceScreen().removePreference(findPreference(KEY_MOBILE_NETWORK_SETTINGS));
-            getPreferenceScreen().removePreference(findPreference(KEY_CELL_BROADCAST_SETTINGS));
+
+            Preference cellBroadcastPreference = findPreference(KEY_CELL_BROADCAST_SETTINGS);
+            if(cellBroadcastPreference != null)
+                getPreferenceScreen().removePreference(cellBroadcastPreference);
         }
     }
 

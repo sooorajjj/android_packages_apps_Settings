@@ -78,7 +78,9 @@ public class PrivacySettings extends SettingsPreferenceFragment implements
         // for MPQ targets, do the following
         if (MpqUtils.isTargetMpq() == true) {
             Preference factoryReset = screen.findPreference(FACTORY_RESET);
-            factoryReset.setSummary(getResources().getString(R.string.mpq_master_clear_summary));
+
+            if(factoryReset != null)
+                factoryReset.setSummary(getResources().getString(R.string.mpq_master_clear_summary));
         }
 
         updateToggles();

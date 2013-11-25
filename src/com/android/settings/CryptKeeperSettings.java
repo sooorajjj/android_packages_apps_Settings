@@ -121,7 +121,8 @@ public class CryptKeeperSettings extends Fragment {
 
         if (MpqUtils.isTargetMpq() == true) {
             TextView descriptionTextView = (TextView)(mContentView.findViewById(R.id.crypt_description));
-            descriptionTextView.setText(getResources().getString(R.string.mpq_crypt_keeper_desc));
+            if(descriptionTextView != null)
+                descriptionTextView.setText(getResources().getString(R.string.mpq_crypt_keeper_desc));
         }
 
         return mContentView;
