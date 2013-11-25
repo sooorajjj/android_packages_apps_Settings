@@ -104,7 +104,7 @@ public class LocationSettings extends SettingsPreferenceFragment
         if (mAssistedGps != null) mAssistedGps.setEnabled(isToggleAllowed);
 
         // For MPQ targets, name the title appropriately
-        if( MpqUtils.isTargetMpq() == true) {
+        if( MpqUtils.isTargetMpq() == true && mNetwork != null) {
             mNetwork.setTitle(getResources().getString(R.string.mpq_location_network_based));
         }
 
