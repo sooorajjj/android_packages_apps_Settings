@@ -2080,6 +2080,7 @@
     <!-- Roaming Date Settings -->
     <string name="label_global_roaming_settings">国际漫游设置</string>
     <string name="select_in_ssids_type_title">不同 SSID 间重选</string>
+    <string name="wifi_auto_connect_type_title">自动连接类型</string>
     <string name="wifi_auto_connect_type_summary">设置网络连接方式</string>
     <string name="wifi_menu_disconnect">断开网络</string>
     <string name="wifi_to_gsm_connect_type_title">WLAN 至蜂窝网重选提示</string>
