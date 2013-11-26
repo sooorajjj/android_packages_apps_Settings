@@ -185,9 +185,8 @@ public class PhoneInfo extends PreferenceActivity implements
                 mTuneAway.setChecked(mTuneAwayValue);
                 mTuneAway.setSummary(mTuneAwayValue ? R.string.enable_text :
                     R.string.disable_text);
-                Settings.Global.putInt(getContentResolver(),
-                        Settings.Global.TUNE_AWAY_STATUS, mTuneAwayValue ? 1
-                                : 0);
+
+                MSimPhoneFactory.setTuneAway(mTuneAwayValue);
                 break;
 
             default:
