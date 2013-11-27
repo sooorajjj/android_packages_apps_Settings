@@ -67,7 +67,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <com.android.settings.multisimsettings.PreferredSubscriptionListPreference
             android:key="voice_list"
             android:persistent="false"
-            android:title="@string/voice_title" />
+            android:title="@string/voice_title_dsds" />
         <com.android.settings.multisimsettings.PreferredSubscriptionListPreference
             android:key="data_list"
             android:persistent="false"
