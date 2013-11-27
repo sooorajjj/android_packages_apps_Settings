@@ -34,7 +34,7 @@
             android:dependency="location_toggle"
             android:persistent="false" />
 
-        <com.android.settings.WrappingCheckBoxPreference
+        <CheckBoxPreference
             android:key="location_network"
             android:title="@string/location_network_based"
             android:summary="@string/location_neighborhood_level"
