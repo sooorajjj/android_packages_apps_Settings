@@ -4437,6 +4437,8 @@
 
     <!-- Multi Sim Settings screen, Voice box label -->
     <string name="voice_title">Voice/USSD/MMI</string>
+    <!-- Multi Sim Settings screen, Voice box label DSDS-->
+    <string name="voice_title_dsds">Voice/Messaging</string>
     <!-- Multi Sim Settings screen, Voice Summary label -->
     <string name="voice_summary">Select Subscription for Voice Call</string>
 
