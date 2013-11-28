@@ -35,7 +35,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:title="@string/device_info_default"
         android:summary="@string/device_info_default"
         android:persistent="false"
-        android:enabled="false" >
+        >
     </PreferenceScreen>
 
     <!--com.android.settings.multisimsettings.MultiSimNamePreference-->
@@ -46,6 +46,13 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:singleLine="true"
         android:maxLength="6"
         android:inputType="textNoSuggestions"/>
+
+    <com.android.settings.multisimsettings.ImageListPreference
+        android:key="sim_icon_key"
+        android:title="@string/sim_icon_title"
+        android:persistent="false"
+        settings:entries="@array/select_sim_icon_entries"
+        settings:entryValues="@array/select_sim_icon_values" />
 
     <PreferenceScreen
         android:key="mobile_network_key"

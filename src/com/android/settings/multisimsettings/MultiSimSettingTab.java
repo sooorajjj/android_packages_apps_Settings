@@ -99,7 +99,7 @@ public class MultiSimSettingTab extends TabActivity {
             log("Creating activity");
         mIntent = getIntent();
         String title = mIntent.getStringExtra("Title");
-        setTitle(TextUtils.isEmpty(title) ? getString(R.string.mobile_network_setting) : title);
+        setTitle(TextUtils.isEmpty(title) ? getString(R.string.sim_card_setting) : title);
 
         setContentView(R.layout.multi_sim_setting_tab);
         // Resource object to get Drawables

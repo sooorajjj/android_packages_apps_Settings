@@ -272,8 +272,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         // report the current size in the summary text
         final Resources res = getResources();
         String[] fontSizeNames = res.getStringArray(R.array.entries_font_size);
-        pref.setSummary(String.format(res.getString(R.string.summary_font_size),
-                fontSizeNames[index]));
+        pref.setSummary(fontSizeNames[index]);
     }
     
     @Override
