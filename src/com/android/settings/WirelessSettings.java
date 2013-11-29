@@ -207,7 +207,9 @@ public class WirelessSettings extends SettingsPreferenceFragment {
             // Mobile Networks menu will traverse to Select Subscription menu.
             PreferenceScreen manageSub =
                     (PreferenceScreen) findPreference(KEY_MOBILE_NETWORK_SETTINGS);
-
+            if (manageSub != null) {
+                getPreferenceScreen().removePreference(manageSub);
+            }
             if (manageSub != null) {
                 Intent intent = manageSub.getIntent();
                 intent.setClassName("com.android.settings",
@@ -265,18 +267,19 @@ public class WirelessSettings extends SettingsPreferenceFragment {
             findPreference(KEY_ANDROID_BEAM_SETTINGS).setDependency(KEY_TOGGLE_AIRPLANE);
         }
 
-        // Remove NFC if its not available
-        //mNfcAdapter = NfcAdapter.getDefaultAdapter(activity);
-        if (mNfcAdapter == null) {
+        // Remove NFC, Android_Beam, Manage Mobile
+        if (nfc != null)
+        {
             getPreferenceScreen().removePreference(nfc);
+        }
+        if (androidBeam != null)
+        {
             getPreferenceScreen().removePreference(androidBeam);
-            mNfcEnabler = null;
         }
 
         // Remove Mobile Network Settings and Manage Mobile Plan if it's a wifi-only device.
         if (isSecondaryUser || Utils.isWifiOnly(getActivity())) {
             removePreference(KEY_MOBILE_NETWORK_SETTINGS);
-            removePreference(KEY_MANAGE_MOBILE_PLAN);
         }
 
         // Enable Proxy selector settings if allowed.
