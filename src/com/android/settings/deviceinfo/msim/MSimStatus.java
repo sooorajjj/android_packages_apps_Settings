@@ -127,6 +127,7 @@ public class MSimStatus extends PreferenceActivity {
     private static final String KEY_MEID_NUMBER = "meid_number";
     private static final String KEY_SIGNAL_STRENGTH = "signal_strength";
     private static final String KEY_BASEBAND_VERSION = "baseband_version";
+    private static final String KEY_HARDWARE_VERSION = "hardware_version";
     private static final String KEY_LATEST_AREA_INFO = "latest_area_info";
 
     private static final String[] RELATED_ENTRIES = {
@@ -143,6 +144,7 @@ public class MSimStatus extends PreferenceActivity {
             KEY_MEID_NUMBER,
             KEY_SIGNAL_STRENGTH,
             KEY_BASEBAND_VERSION,
+            KEY_HARDWARE_VERSION,
             KEY_LATEST_AREA_INFO
     };
 
@@ -155,6 +157,9 @@ public class MSimStatus extends PreferenceActivity {
     // Require the sender to have this permission to prevent third-party spoofing.
     static final String CB_AREA_INFO_SENDER_PERMISSION =
             "android.permission.RECEIVE_EMERGENCY_BROADCAST";
+
+    static final String STR_BASEBAND_VERSION = "8x12-BAAAANAZM-01738";
+    static final String STR_HARDWARE_VERSION = "T7_V1.03_PCB";
 
     private String[] esnNumberSummery;
     private String[] meidNumberSummery;
@@ -457,11 +462,10 @@ public class MSimStatus extends PreferenceActivity {
             setMSimSummery(KEY_IMEI_SV, imeiSVSummery);
             setMSimSummery(KEY_PHONE_NUMBER, numberSummery);
 
-            //baseband is not related to DSDS, one phone has one base band.
-            String basebandVersionSummery =
-                MSimTelephonyManager.getTelephonyProperty("gsm.version.baseband",
-                        MSimTelephonyManager.getDefault().getDefaultSubscription(), null);
-            setSummaryText(KEY_BASEBAND_VERSION,basebandVersionSummery);
+            // set the baseband version
+            setSummaryText(KEY_BASEBAND_VERSION, STR_BASEBAND_VERSION);
+            // set the hardware version
+            setSummaryText(KEY_HARDWARE_VERSION, STR_HARDWARE_VERSION);
 
         }
     }
