@@ -1188,7 +1188,8 @@
                 android:theme="@android:style/Theme.Holo.DialogWhenLarge"/>
 
         <activity android:name="ApnEditor"
-                android:label="@string/apn_edit">
+                android:label="@string/apn_edit"
+                android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
