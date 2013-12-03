@@ -35,6 +35,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.SupplicantState;
@@ -43,8 +44,6 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.telephony.MSimTelephonyManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -61,6 +60,7 @@ import static com.android.internal.telephony.MSimConstants.MAX_PHONE_COUNT_TRI_S
 
 public class DataEnabler {
     private static final String TAG = "DataEnabler";
+    private static final String PRE_MOBILE_DATA_STATE = "dataState";
     private final Context mContext;
     private Switch mSwitch;
     private final IntentFilter mIntentFilter;
@@ -87,12 +87,17 @@ public class DataEnabler {
     }
 
     public void resume() {
-        updateSwitchState();
         mContext.registerReceiver(mReceiver, mIntentFilter);
         mSwitch.setOnCheckedChangeListener(mDataEnabledListener);
     }
 
     public void pause() {
+    }
+
+    public void destroy() {
+        // if unregister receiver on method pause,
+        // can't receive the broadcast when toggle airplane mode in
+        // Wireless&networks
         mContext.unregisterReceiver(mReceiver);
         mSwitch.setOnCheckedChangeListener(null);
     }
@@ -102,34 +107,9 @@ public class DataEnabler {
         mSwitch.setOnCheckedChangeListener(null);
         mSwitch = switch_;
 
-        updateSwitchState();
-
         mSwitch.setOnCheckedChangeListener(mDataEnabledListener);
         mMobileDataEnabled = mConnService.getMobileDataEnabled();
         mSwitch.setChecked(mMobileDataEnabled);
-    }
-
-    private void updateSwitchState() {
-        // Adjust the switch component's availability
-        // according to the "AirPlane" mode.
-        boolean airPlaneModeOff = Settings.System.getInt(
-                mContext.getContentResolver(),
-                Settings.System.AIRPLANE_MODE_ON, 0) == 0;
-        boolean hasIccCard = false;
-        MSimTelephonyManager multiSimManager = MSimTelephonyManager.getDefault();
-        if (multiSimManager.isMultiSimEnabled()) {
-            for (int i = 0; i < MAX_PHONE_COUNT_TRI_SIM; i++) {
-                if (multiSimManager.hasIccCard(i)) {
-                    hasIccCard = true;
-                }
-            }
-        } else {
-            TelephonyManager singleSimManager = TelephonyManager.getDefault();
-            if (singleSimManager.hasIccCard()) {
-                hasIccCard = true;
-            }
-        }
-        mSwitch.setEnabled(airPlaneModeOff && hasIccCard);
     }
 
     private OnCheckedChangeListener mDataEnabledListener = new OnCheckedChangeListener() {
@@ -138,6 +118,7 @@ public class DataEnabler {
             mMobileDataEnabled = mConnService.getMobileDataEnabled();
             if(mMobileDataEnabled != mSwitch.isChecked()){
                 mConnService.setMobileDataEnabled(isChecked);
+                mMobileDataEnabled = isChecked;
                 for (int i = 0; i < MAX_PHONE_COUNT_TRI_SIM; i++) {
                     Settings.Global.putInt(mContext.getContentResolver(),
                             Settings.Global.MOBILE_DATA + i, isChecked ? 1 : 0);
@@ -157,8 +138,35 @@ public class DataEnabler {
                  mMobileDataEnabled = mConnService.getMobileDataEnabled();
                  mSwitch.setChecked(mMobileDataEnabled);
              } else if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(actionStr)) {
-                 mSwitch.setEnabled(!intent.getBooleanExtra("state", false));
+                if (intent.getBooleanExtra("state", false)) {
+                    saveMobileDataState();
+                    if (mMobileDataEnabled) {
+                        mSwitch.setChecked(false);
+                    }
+
+                } else {
+                    if (getMobileDataState()) {
+                        mSwitch.setChecked(true);
+                    }
+                }
              }
          }
+    }
+
+    // save the state of mobile data when turn on airplane mode.
+    private void saveMobileDataState() {
+        SharedPreferences saveDataState = mContext.getSharedPreferences(
+                PRE_MOBILE_DATA_STATE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = saveDataState.edit();
+        editor.putBoolean(PRE_MOBILE_DATA_STATE, mMobileDataEnabled);
+        editor.commit();
+    }
+
+    // get the state of mobile data before turn on airplane mode.
+    private Boolean getMobileDataState() {
+        SharedPreferences getDataState = mContext.getSharedPreferences(
+                PRE_MOBILE_DATA_STATE, Context.MODE_PRIVATE);
+        Boolean dataState = getDataState.getBoolean(PRE_MOBILE_DATA_STATE, false);
+        return dataState;
     }
 }
