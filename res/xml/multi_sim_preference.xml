@@ -30,40 +30,35 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:settings="http://schemas.android.com/apk/res/com.android.settings" >
 
-    <PreferenceCategory
-        android:key="multi_sim_settings"
+    <PreferenceScreen
+        android:key="config_sub"
         android:persistent="false"
-        android:title="@string/dual_sim_configure" >
-        <PreferenceScreen
-            android:key="config_sub"
-            android:persistent="false"
-            android:summary="@string/sel_sub_summary"
-            android:title="@string/sel_sub_title" >
-            <intent
-                android:action="android.intent.action.MAIN"
-                android:targetClass="com.android.phone.SetSubscription"
-                android:targetPackage="com.android.phone" />
-        </PreferenceScreen>
+        android:summary="@string/sel_sub_summary"
+        android:title="@string/sel_sub_title" >
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetClass="com.android.phone.SetSubscription"
+            android:targetPackage="com.android.phone" />
+    </PreferenceScreen>
 
-        <com.android.settings.multisimsettings.MultiSimEnablerPreference
-            android:key="sim_one_enabler_key"
-            android:title="@string/sim_enabler"
-            android:widgetLayout="@layout/custom_checkbox" >
-            <intent
-                android:action="android.intent.action.MAIN"
-                android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"
-                android:targetPackage="com.android.settings" />
-        </com.android.settings.multisimsettings.MultiSimEnablerPreference>
-        <com.android.settings.multisimsettings.MultiSimEnablerPreference
-            android:key="sim_two_enabler_key"
-            android:title="@string/sim_enabler"
-            android:widgetLayout="@layout/custom_checkbox" >
-            <intent
-                android:action="android.intent.action.MAIN"
-                android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"
-                android:targetPackage="com.android.settings" />
-        </com.android.settings.multisimsettings.MultiSimEnablerPreference>
-    </PreferenceCategory>
+    <com.android.settings.multisimsettings.MultiSimEnablerPreference
+        android:key="sim_one_enabler_key"
+        android:title="@string/sim_enabler"
+        android:widgetLayout="@layout/custom_checkbox" >
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"
+            android:targetPackage="com.android.settings" />
+    </com.android.settings.multisimsettings.MultiSimEnablerPreference>
+    <com.android.settings.multisimsettings.MultiSimEnablerPreference
+        android:key="sim_two_enabler_key"
+        android:title="@string/sim_enabler"
+        android:widgetLayout="@layout/custom_checkbox" >
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetClass="com.android.settings.multisimsettings.MultiSimSettingTab"
+            android:targetPackage="com.android.settings" />
+    </com.android.settings.multisimsettings.MultiSimEnablerPreference>
 
     <PreferenceCategory
         android:key="preferred_subscription_settings"
@@ -72,7 +67,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <com.android.settings.multisimsettings.PreferredSubscriptionListPreference
             android:key="voice_list"
             android:persistent="false"
-            android:title="@string/voice_title" />
+            android:title="@string/voice_title_dsds" />
         <com.android.settings.multisimsettings.PreferredSubscriptionListPreference
             android:key="data_list"
             android:persistent="false"

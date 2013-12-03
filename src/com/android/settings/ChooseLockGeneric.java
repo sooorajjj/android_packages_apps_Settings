@@ -330,7 +330,9 @@ public class ChooseLockGeneric extends PreferenceActivity {
             }
             if(!cameraFrontExist()){
                 Preference pref = findPreference(KEY_UNLOCK_SET_BIOMETRIC_WEAK);
-                entries.removePreference(pref);
+                if (pref != null) {
+                    entries.removePreference(pref);
+                }
             }
         }
 

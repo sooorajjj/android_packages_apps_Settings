@@ -70,6 +70,12 @@ public class OwnerInfoSettings extends Fragment {
         boolean enabled = mLockPatternUtils.isOwnerInfoEnabled();
         mCheckbox = (CheckBox) mView.findViewById(R.id.show_owner_info_on_lockscreen_checkbox);
         mOwnerInfo = (EditText) mView.findViewById(R.id.owner_info_edit_text);
+
+        // If it allow show owner info on lock screen, EditText request focus to
+        // show inputmethods. else, not show inputmethods.
+        if (enabled) {
+            mOwnerInfo.requestFocus();
+        }
         mOwnerInfo.setText(info);
         mOwnerInfo.setEnabled(enabled);
         mNickname = (EditText) mView.findViewById(R.id.owner_info_nickname);
