@@ -26,6 +26,7 @@ import android.os.UserHandle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.provider.Settings;
+import android.telephony.ServiceState;
 
 import com.android.internal.telephony.PhoneStateIntentReceiver;
 import com.android.internal.telephony.TelephonyProperties;
@@ -92,6 +93,12 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
     }
 
     private void setAirplaneModeOn(boolean enabling) {
+
+        // turning on airplane mode, disabled this preference.
+        if (enabling) {
+            mCheckBoxPref.setEnabled(false);
+        }
+
         // Change the system setting
         Settings.Global.putInt(mContext.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 
                                 enabling ? 1 : 0);
@@ -114,6 +121,11 @@ public class AirplaneModeEnabler implements Preference.OnPreferenceChangeListene
      */
     private void onAirplaneModeChanged() {
         mCheckBoxPref.setChecked(isAirplaneModeOn(mContext));
+        if (!mCheckBoxPref.isEnabled() && mPhoneStateReceiver != null
+                && mPhoneStateReceiver.getServiceState()
+                        .getState() == ServiceState.STATE_POWER_OFF) {
+            mCheckBoxPref.setEnabled(true);
+        }
     }
     
     /**
