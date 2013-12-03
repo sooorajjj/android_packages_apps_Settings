@@ -81,6 +81,8 @@ public class MultiSimSettings extends PreferenceActivity {
     private CheckBoxPreference showDurationCheckBox;
     private static final String [] KEY_PREFERRED_SUBSCRIPTION_LIST_NO_DATA = {"voice_list",
         "sms_list"};
+    private static final String KEY_PREFERRED_SUBSCRIPTION_SETTINGS =
+            "preferred_subscription_settings";
     private static final String  KEY_PREFERRED_SUBSCRIPTION_LIST__DATA = "data_list";
     private static final String  PREFERRED_SUB_DATA_LIST_VALUE_SLOT_ONE = "0";
     private static final String [] PREFERRED_SUB_DATA_LIST_ENTRY_SLOT_ONE = {"SLOT1"};
@@ -228,15 +230,22 @@ public class MultiSimSettings extends PreferenceActivity {
             }
         }
 
-        //do this setting for CU version's
-        // here need a feature judge of FEATURE_MESSAGE_QUICK_RESPONSE,default value is true
-        if(false){
-            PreferredSubscriptionListPreference smslist = (PreferredSubscriptionListPreference)
-                    findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST[2]);
-            PreferenceCategory preferredSubSettings = (PreferenceCategory)
-                    findPreference("preferred_subscription_settings");
-            preferredSubSettings.removePreference(smslist);
+        // combine message item, so remove.
+        PreferredSubscriptionListPreference smslist = (PreferredSubscriptionListPreference)
+                findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST[2]);
+        PreferenceCategory preferredSubSettings = (PreferenceCategory)
+                findPreference(KEY_PREFERRED_SUBSCRIPTION_SETTINGS);
+        preferredSubSettings.removePreference(smslist);
+
+        // if two button style, remove voice preference.
+        if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
+            if (SystemProperties.getBoolean("persist.env.sys.btnstyle", true)) {
+                PreferredSubscriptionListPreference voicelist = (PreferredSubscriptionListPreference)
+                        findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST[0]);
+                preferredSubSettings.removePreference(voicelist);
+            }
         }
+
     }
 
     //when set app for , we need to use config screen , not disable/enable
@@ -284,9 +293,8 @@ public class MultiSimSettings extends PreferenceActivity {
             mSimOneEnabler.setSwitchVisibility(View.INVISIBLE);
             mSimTwoEnabler.setSwitchVisibility(View.INVISIBLE);
         } else {
-            PreferenceCategory multiSimSettings =
-                    (PreferenceCategory)findPreference(KEY_MULTI_SIM_SETTINGS);
-            multiSimSettings.removePreference(mConfigSub);
+            PreferenceScreen basePreferenceScreen = getPreferenceScreen();
+            basePreferenceScreen.removePreference(mConfigSub);
             mSimOneEnabler.setSwitchVisibility(View.VISIBLE);
             mSimTwoEnabler.setSwitchVisibility(View.VISIBLE);
         }
