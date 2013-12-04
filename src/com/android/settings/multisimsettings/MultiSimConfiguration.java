@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.TypedArray;
 
 import android.net.Uri;
 
@@ -48,6 +49,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.provider.Settings.Global;
 import android.provider.Settings.System;
 
@@ -55,6 +57,7 @@ import android.telephony.MSimTelephonyManager;
 import android.telephony.TelephonyManager;
 import android.text.TextWatcher;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -71,6 +74,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private static final String LOG_TAG = "MultiSimConfiguration";
 
     private static final String KEY_SIM_NAME = "sim_name_key";
+    private static final String KEY_SIM_ICON = "sim_icon_key";
     private static final String KEY_SIM_ENABLER = "sim_enabler_key";
     private static final String KEY_NETWORK_SETTING = "mobile_network_key";
     private static final String KEY_CALL_SETTING = "call_setting_key";
@@ -83,6 +87,7 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
     private PreferenceScreen mNetworkSetting;
     private PreferenceScreen mCallSetting;
     private PreferenceScreen mNetServiceProvider;
+    private ImageListPreference mIconPreference;
 
     private int mSubscription;
     private EditTextPreference mNamePreference;
@@ -194,6 +199,26 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
             }
         }
 
+        // sim icon preference
+        final TypedArray icons = this.getResources().obtainTypedArray(R.array.sim_icons);
+        mIconPreference = (ImageListPreference) findPreference(KEY_SIM_ICON);
+        mIconPreference.setTitle(R.string.sim_icon_title);
+        int iconIndex = getMultiSimIconIndex(mSubscription);
+        Log.i(LOG_TAG, "iconIndex=" + iconIndex);
+        mIconPreference.setDefaultValue(iconIndex);
+        mIconPreference.setIconEntries(icons);
+        mIconPreference.setSimIcon(icons.getDrawable(iconIndex));
+        mIconPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mIconPreference.setSimIcon(icons.getDrawable(Integer
+                        .parseInt((String) newValue)));
+
+                setMultiSimIconIndex(mSubscription, (String) newValue);
+                return true;
+            }
+        });
+
         mNetworkSetting = (PreferenceScreen) findPreference(KEY_NETWORK_SETTING);
         mNetworkSetting.getIntent().putExtra(MultiSimSettingsConstants.TARGET_PACKAGE,
                 MultiSimSettingsConstants.NETWORK_PACKAGE)
@@ -222,9 +247,54 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
         mNetServiceProvider.setSummary(netTypeName);
     }
 
+    private int getMultiSimIconIndex(int subscription) {
+        String simIconIndex = System.getString(getContentResolver(),
+                System.PREFERRED_SIM_ICON_INDEX);
+
+        Log.i(LOG_TAG, "simIconIndex=" + simIconIndex);
+        if (TextUtils.isEmpty(simIconIndex)) {
+            return subscription;
+        } else {
+            String[] indexs = simIconIndex.split(",");
+            if (subscription >= indexs.length) {
+                return subscription;
+            }
+            return Integer.parseInt(indexs[subscription]);
+        }
+    }
+
+    private void setMultiSimIconIndex(int subscription, String newIndex) {
+        String simIconIndex = System.getString(getContentResolver(),
+                System.PREFERRED_SIM_ICON_INDEX);
+
+        if (TextUtils.isEmpty(simIconIndex)) {
+            return;
+        } else {
+            String[] indexs = simIconIndex.split(",");
+            if (subscription >= indexs.length) {
+                return;
+            }
+
+            StringBuffer sb = new StringBuffer(simIconIndex);
+            sb.deleteCharAt(subscription * 2);
+            sb.insert(subscription * 2, newIndex);
+            Log.i(LOG_TAG, "newStringIndex=" + sb.toString());
+            System.putString(getContentResolver(),
+                    System.PREFERRED_SIM_ICON_INDEX, sb.toString());
+        }
+    }
+
     protected void onResume() {
         super.onResume();
         setScreenState();
+
+        // If an icon has been used by another slot, it'll be inactive in the
+        // pop.can't use the same icon for two slots.
+        int otherSlotIconIndex = getMultiSimIconIndex(Math.abs(mSubscription - 1));
+        Log.i(LOG_TAG, "otherSlotIconIndex=" + otherSlotIconIndex);
+        if (mIconPreference != null) {
+            mIconPreference.setOtherSlotValue(otherSlotIconIndex);
+        }
     }
 
     protected void onDestroy() {
