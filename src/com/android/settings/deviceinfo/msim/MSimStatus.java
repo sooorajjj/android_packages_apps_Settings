@@ -327,7 +327,7 @@ public class MSimStatus extends PreferenceActivity {
                 indexOfCDMA = i;
             } else {
                 // only show area info when SIM country is Brazil
-                if ("br".equals(mTelephonyManager.getSimCountryIso(i))) {
+                if ("br".equals(mTelephonyManager.getSimCountryIso(0))) {
                     mShowLatestAreaInfo = true;
                 }
             }
