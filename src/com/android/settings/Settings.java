@@ -246,6 +246,10 @@ public class Settings extends PreferenceActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ListAdapter listAdapter = getListAdapter();
+        if (listAdapter instanceof HeaderAdapter) {
+            ((HeaderAdapter) listAdapter).destroy();
+        }
         if (mListeningToAccountUpdates) {
             AccountManager.get(this).removeOnAccountsUpdatedListener(this);
         }
@@ -784,7 +788,10 @@ public class Settings extends PreferenceActivity
         public void pause() {
             mWifiEnabler.pause();
             mBluetoothEnabler.pause();
-            mDataEnabler.pause();
+        }
+
+        public void destroy() {
+            mDataEnabler.destroy();
         }
     }
 
