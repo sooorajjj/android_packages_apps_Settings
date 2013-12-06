@@ -638,6 +638,47 @@
     <string name="wifi_and_mobile_skipped_message" product="default" msgid="3773473163264984767">"警告：您必须连接到互联网，手机才能验证您所使用的软件是否为最新版本。"</string>
     <string name="wifi_connect_failed_message" product="tablet" msgid="4474691090681670156">"平板电脑无法连接到此 WLAN 网络。"</string>
     <string name="wifi_connect_failed_message" product="default" msgid="2185803140161396572">"手机无法连接到此 WLAN 网络。"</string>
+
+    <!-- Wi-Fi settings screen, connect to network dialog box, spinner -->
+    <string name="wifi_certificate">证书</string>
+
+    <!-- Title of the WAPI certificate manage -->
+    <string name="wifi_wapi_cert_mgmt_titlebar">WAPI证书管理</string>
+    <!-- Action message of the install WAPI certificate -->
+    <string name="wifi_wapi_cert_install">安装WAPI证书</string>
+    <!-- Button caption to install wapi certificate button -->
+    <string name="wifi_wapi_cert_install_button">安装</string>
+    <!-- Button caption to uninstall wapi certificate button -->
+    <string name="wifi_wapi_cert_uninstall_button">卸载</string>
+    <!-- Button caption to  cancel wapi certificate button -->
+    <string name="wifi_wapi_cert_cancel_button">取消</string>
+    <!-- Action message of the uninstall WAPI certificate -->
+    <string name="wifi_wapi_cert_uninstall">卸载WAPI证书</string>
+    <!-- Caption for entering the directroy of wapi certificate which you want to storage -->
+    <string name="wifi_wapi_cert_create_subdir">创建目录</string>
+    <!-- Caption for entering the directroy of wapi certificate which you want to delet -->
+    <string name="wifi_wapi_cert_delet_subdir">选择合适的证书</string>
+    <!-- Caption for the wapi as certificate -->
+    <string name="wifi_wapi_as_cert">AS证书</string>
+    <!-- Caption for the wapi user certificate -->
+    <string name="wifi_wapi_user_cert">用户证书</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_name_is_empty">请输入你要创建的文件夹名！</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_exist">名字已存在，请重输</string>
+    <string name="wifi_wapi_cert_mgmt_subdir_create_fail">创建文件夹失败</string>
+    <string name="wifi_wapi_cert_mgmt_as_name_is_empty">请输入AS证书名字tificate name</string>
+    <string name="wifi_wapi_cert_mgmt_as_dont_exist">内存卡没有AS证书，请检查！</string>
+    <string name="wifi_wapi_cert_mgmt_as_format_is_wrong">这个AS证书的格式错误，请重新安装</string>
+    <string name="wifi_wapi_cert_mgmt_user_format_is_wrong">用户证书错误，请重新安装</string>
+    <string name="wifi_wapi_cert_mgmt_user_name_is_empty">请输入用户证书名Please input the user certificate name</string>
+    <string name="wifi_wapi_cert_mgmt_user_dont_exist">内存卡没有用户证书，请检查！</string>
+    <!--Wi-Fi settings screen, network context menu item -->
+    <string name="wifi_context_menu_connect">Connect to network连接网络</string>
+    <!--Wi-Fi settings screen, network context menu item -->
+    <string name="wifi_context_menu_forget">取消保存网络</string>
+    <!--Wi-Fi settings screen, network context menu item -->
+    <string name="wifi_context_menu_change_password">修改密码</string>
+    <string name="wifi_context_menu_change_wapi_certificate">修改WAPI证书</string>
+
     <string name="wifi_advanced_titlebar" msgid="4485841401774142908">"高级 WLAN"</string>
     <string name="wifi_setting_frequency_band_title" msgid="3655327399028584656">"WLAN 频带"</string>
     <string name="wifi_setting_frequency_band_summary" msgid="3250740757118009784">"指定操作的频率范围"</string>
