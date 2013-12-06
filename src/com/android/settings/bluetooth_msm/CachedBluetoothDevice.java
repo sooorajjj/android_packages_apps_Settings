@@ -127,7 +127,17 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if (newProfileState == BluetoothProfile.STATE_CONNECTED) {
             if (!mProfiles.contains(profile)) {
                 mRemovedProfiles.remove(profile);
-                mProfiles.add(profile);
+                if (mProfiles.isEmpty()) {
+                    if (!updateProfiles()) {
+                        // If UUIDs are not available yet, connect will be happen
+                        // upon arrival of the ACTION_UUID intent.
+                        Log.d(TAG, "No profiles. Maybe we will connect later");
+                        return;
+                    }
+                }
+                if (!mProfiles.contains(profile)) {
+                    mProfiles.add(profile);
+                }
                 if (profile instanceof PanProfile &&
                         ((PanProfile) profile).isLocalRoleNap(mDevice)) {
                     // Device doesn't support NAP, so remove PanProfile on disconnect
