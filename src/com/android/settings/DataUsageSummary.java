@@ -68,6 +68,7 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -259,6 +260,7 @@ public class DataUsageSummary extends Fragment {
 
     private String mCurrentTab = null;
     private String mIntentTab = null;
+    private String mInitTab = null;
 
     private MenuItem mMenuDataRoaming;
     private MenuItem mMenuRestrictBackground;
@@ -766,6 +768,9 @@ public class DataUsageSummary extends Fragment {
         @Override
         public void onTabChanged(String tabId) {
             // user changed tab; update body
+            if(mInitTab == null) {
+                mInitTab = mTabHost.getCurrentTabTag();
+            }
             updateBody();
         }
     };
@@ -2592,5 +2597,10 @@ public class DataUsageSummary extends Fragment {
 
         // only as a default support, should not be hit.
         return 0;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        mTabHost.setCurrentTabByTag(mInitTab);
     }
 }

@@ -1229,8 +1229,10 @@ public class InstalledAppDetails extends Fragment
     };
 
     private void updateForceStopButton(boolean enabled) {
-        mForceStopButton.setEnabled(enabled);
-        mForceStopButton.setOnClickListener(InstalledAppDetails.this);
+        if(mForceStopButton != null) {
+            mForceStopButton.setEnabled(enabled);
+            mForceStopButton.setOnClickListener(InstalledAppDetails.this);
+        }
     }
     
     private void checkForceStop() {

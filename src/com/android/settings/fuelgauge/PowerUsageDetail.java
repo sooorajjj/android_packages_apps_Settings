@@ -130,6 +130,7 @@ public class PowerUsageDetail extends Fragment implements Button.OnClickListener
     private boolean mUsesGps;
 
     private static final String TAG = "PowerUsageDetail";
+    private static final int MAX_LINE = 2; // Max line of textview
     private String[] mPackages;
 
     ApplicationInfo mApp;
@@ -332,11 +333,24 @@ public class PowerUsageDetail extends Fragment implements Button.OnClickListener
                 ViewGroup item = (ViewGroup) inflater.inflate(R.layout.power_usage_detail_item_text,
                         null);
                 mDetailsParent.addView(item);
-                TextView labelView = (TextView) item.findViewById(R.id.label);
-                TextView valueView = (TextView) item.findViewById(R.id.value);
-                labelView.setText(label);
-                valueView.setText(value);
+                setItemDetails(item, label, value);
             }
+        }
+    }
+
+    private void setItemDetails(ViewGroup wifiItem, String label, String value) {
+        TextView labelView = (TextView) wifiItem.findViewById(R.id.label);
+        TextView valueView = (TextView) wifiItem.findViewById(R.id.value);
+
+        // If choice is wifi, use one textview to show usage
+        if (DrainType.WIFI == mDrainType) {
+            valueView.setVisibility(View.INVISIBLE);
+            labelView.setSingleLine(false);
+            labelView.setMaxLines(MAX_LINE);
+            labelView.setText(label + value);
+        } else {
+            labelView.setText(label);
+            valueView.setText(value);
         }
     }
 
