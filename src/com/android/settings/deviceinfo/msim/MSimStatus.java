@@ -442,6 +442,11 @@ public class MSimStatus extends PreferenceActivity {
                     } else {
                         meidNumberSummery[i] = null;
                     }
+                    if (SystemProperties.getBoolean("persist.env.settings.showESN", false)) {
+                        esnNumberSummery[i] = getSimSummery(i, mPhone[i].getEsn());
+                    } else {
+                        esnNumberSummery[i] = null;
+                    }
                     minNumberSummery[i] = null;
                     iccIdSummery[i] = null;
                     imeiSummery[i] = getSimSummery(i, mPhone[i].getDeviceId());
