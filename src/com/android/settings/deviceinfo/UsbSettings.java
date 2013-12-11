@@ -137,7 +137,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
             if (DEBUG)
                 Log.i(TAG, "onStorageStateChanged path= " + path
                         + " oldState = " + oldState + " newState= " + newState);
-            final boolean isExternalPath = (Environment.getExternalStorageDirectory().getPath()
+            final boolean isExternalPath = !(Environment.getExternalStorageDirectory().getPath()
                     .equals(path));
             if (newState.equals(Environment.MEDIA_SHARED)) {
                 if (isExternalPath) {
