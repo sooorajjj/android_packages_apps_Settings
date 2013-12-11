@@ -336,7 +336,6 @@ public class WifiConfigController implements TextWatcher,
         } else if (mAccessPoint.networkId == INVALID_NETWORK_ID) {
             config.SSID = AccessPoint.convertToQuotedString(
                     mAccessPoint.ssid);
-            config.BSSID = mAccessPoint.bssid;
         } else {
             config.networkId = mAccessPoint.networkId;
         }
