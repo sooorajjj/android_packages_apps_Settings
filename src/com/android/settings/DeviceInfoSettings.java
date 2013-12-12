@@ -60,11 +60,15 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
     private static final String KEY_DEVICE_MODEL = "device_model";
     private static final String KEY_SELINUX_STATUS = "selinux_status";
     private static final String KEY_BASEBAND_VERSION = "baseband_version";
+    private static final String KEY_HARDWARE_VERSION = "hardware_version";
     private static final String KEY_FIRMWARE_VERSION = "firmware_version";
     private static final String KEY_UPDATE_SETTING = "additional_system_update_settings";
     private static final String KEY_EQUIPMENT_ID = "fcc_equipment_id";
     private static final String PROPERTY_EQUIPMENT_ID = "ro.ril.fccid";
     private static final String KEY_STATUS = "status_info";
+
+    private static final String STR_BASEBAND_VERSION = "8x12-BAAAANAZM-01738";
+    private static final String STR_HARDWARE_VERSION = "T7_V1.03_PCB";
 
     static final int TAPS_TO_BE_A_DEVELOPER = 7;
 
@@ -80,13 +84,17 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
 
         setStringSummary(KEY_FIRMWARE_VERSION, Build.VERSION.RELEASE);
         findPreference(KEY_FIRMWARE_VERSION).setEnabled(true);
-        setValueSummary(KEY_BASEBAND_VERSION, "gsm.version.baseband");
         setStringSummary(KEY_DEVICE_MODEL, Build.MODEL + getMsvSuffix());
         setValueSummary(KEY_EQUIPMENT_ID, PROPERTY_EQUIPMENT_ID);
         setStringSummary(KEY_DEVICE_MODEL, Build.MODEL);
         setStringSummary(KEY_BUILD_NUMBER, Build.DISPLAY);
         findPreference(KEY_BUILD_NUMBER).setEnabled(true);
         findPreference(KEY_KERNEL_VERSION).setSummary(getFormattedKernelVersion());
+
+        // set the baseband version
+        findPreference(KEY_BASEBAND_VERSION).setSummary(STR_BASEBAND_VERSION);
+        // set the hardware version
+        findPreference(KEY_HARDWARE_VERSION).setSummary(STR_HARDWARE_VERSION);
 
         if (!SELinux.isSELinuxEnabled()) {
             String status = getResources().getString(R.string.selinux_status_disabled);
@@ -112,12 +120,6 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         // Remove Equipment id preference if FCC ID is not set by RIL
         removePreferenceIfPropertyMissing(getPreferenceScreen(), KEY_EQUIPMENT_ID,
                 PROPERTY_EQUIPMENT_ID);
-
-        // Remove Baseband version if wifi-only device
-        if (Utils.isWifiOnly(getActivity())
-                || (MSimTelephonyManager.getDefault().isMultiSimEnabled())) {
-            getPreferenceScreen().removePreference(findPreference(KEY_BASEBAND_VERSION));
-        }
 
         /*
          * Settings is a generic app and should not contain any device-specific
