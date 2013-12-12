@@ -151,7 +151,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             }
             if (profile instanceof MapProfile) {
                 profile.setPreferred(mDevice, true);
-                refresh();
             }
         } else if (profile instanceof MapProfile &&
                 newProfileState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -160,7 +159,6 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
                 mProfiles.remove(profile);
             }
             profile.setPreferred(mDevice, false);
-            refresh();
         } else if (mLocalNapRoleConnected && profile instanceof PanProfile &&
                 ((PanProfile) profile).isLocalRoleNap(mDevice) &&
                 newProfileState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -511,7 +509,8 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         ParcelUuid[] localUuids = mLocalAdapter.getUuids();
         if (localUuids == null) return false;
 
-        mProfileManager.updateProfiles(uuids, localUuids, mProfiles, mRemovedProfiles, mLocalNapRoleConnected);
+        mProfileManager.updateProfiles(uuids, localUuids, mProfiles, mRemovedProfiles,
+                                       mLocalNapRoleConnected, mDevice);
 
         if (DEBUG) {
             Log.e(TAG, "updating profiles for " + mDevice.getAliasName());
@@ -570,15 +569,38 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
             saveMessageRejectTimes();
         }
 
-        refresh();
+        if(DEBUG) Log.d(TAG, "onBondingStateChanged" + bondState);
 
-        if (bondState == BluetoothDevice.BOND_BONDED) {
-            if (mDevice.isBluetoothDock()) {
-                onBondingDockConnect();
-            } else if (mConnectAfterPairing) {
-                connect(false);
-            }
-            mConnectAfterPairing = false;
+        switch (bondState) {
+            case BluetoothDevice.BOND_NONE:
+                mProfiles.clear();
+                mConnectAfterPairing = false;  // cancel auto-connect
+                // fall through
+
+            case BluetoothDevice.BOND_BONDING:
+                //Sometimes Remote device is unpaired by itself & try to connect again.
+                //so permission should be reset for that particular device.
+                setPhonebookPermissionChoice(ACCESS_UNKNOWN);
+                setMessagePermissionChoice(ACCESS_UNKNOWN);
+                mPhonebookRejectedTimes = 0;
+                savePhonebookRejectTimes();
+                mMessageRejectedTimes = 0;
+                saveMessageRejectTimes();
+
+                refresh();
+                break;
+
+            case BluetoothDevice.BOND_BONDED:
+                if (mDevice.isBluetoothDock()) {
+                    onBondingDockConnect();
+                } else if (mConnectAfterPairing) {
+                    connect(false);
+                }
+                mConnectAfterPairing = false;
+                break;
+
+            default:
+                Log.e(TAG, "Incorrect Bond State received");
         }
     }
 
