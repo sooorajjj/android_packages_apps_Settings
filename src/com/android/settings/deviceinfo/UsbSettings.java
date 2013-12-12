@@ -140,7 +140,8 @@ public class UsbSettings extends SettingsPreferenceFragment {
             final boolean isExternalPath = !(Environment.getExternalStorageDirectory().getPath()
                     .equals(path));
             if (newState.equals(Environment.MEDIA_SHARED)) {
-                if (isExternalPath) {
+                //ExternalPath is storage/sdcard0
+                if (!isExternalPath) {
                     Toast.makeText(getActivity(), R.string.external_storage_turn_on,
                             Toast.LENGTH_SHORT).show();
                 } else {
@@ -149,7 +150,8 @@ public class UsbSettings extends SettingsPreferenceFragment {
                 }
             } else if (oldState.equals(Environment.MEDIA_SHARED)
                     && newState.equals(Environment.MEDIA_UNMOUNTED)) {
-                if (isExternalPath) {
+                //ExternalPath is storage/sdcard0
+                if (!isExternalPath) {
                     Toast.makeText(getActivity(), R.string.external_storage_turn_off,
                             Toast.LENGTH_SHORT).show();
                 } else {
