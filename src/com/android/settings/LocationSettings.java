@@ -21,7 +21,6 @@
 package com.android.settings;
 
 
-import android.app.AlertDialog;
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -75,6 +74,7 @@ public class LocationSettings extends SettingsPreferenceFragment
     private static final String KEY_ASSISTED_GPS_PARAS = "assisted_gps_params";
     private static final String AGPS_PROPERTY = "persist.env.settings.agps";
     private static final String TAG = "LocationSettings";
+
     private CheckBoxPreference mNetwork;
     private CheckBoxPreference mIZat;
     private CheckBoxPreference mGps;
@@ -89,6 +89,10 @@ public class LocationSettings extends SettingsPreferenceFragment
     private static final int POPUP_BOX_DISAGREE = 0;
     private static final int POPUP_BOX_AGREE = 1;
     private static final int PRINT = 1;
+
+    private IXTSrv mXTService = null;
+    private XTServiceConnection mServiceConn = null;
+
     // These provide support for receiving notification when Location Manager settings change.
     // This is necessary because the Network Location Provider can change settings
     // if the user does not confirm enabling the provider.
@@ -96,8 +100,6 @@ public class LocationSettings extends SettingsPreferenceFragment
 
     private Observer mSettingsObserver;
 
-    private IXTSrv mXTService = null;
-    private XTServiceConnection mServiceConn = null;
     //This variable is used to record the IZat service connection result
     private boolean izatConnResult = false;
     private static final String PROPERTIES_FILE = "/etc/gps.conf";
@@ -163,7 +165,7 @@ public class LocationSettings extends SettingsPreferenceFragment
                 if (VERBOSE_DBG)
                     Log.d(TAG,"Failed connecting service!");
                 }
-          }
+            }
 
         @Override
         public void onServiceDisconnected(ComponentName name){
