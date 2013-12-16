@@ -76,12 +76,6 @@ public class MultiSimSoundSettings extends PreferenceActivity {
                 Context context = MultiSimSoundSettings.this;
                 Uri ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context,
                         mRingtones[mSubscription]);
-
-                // Update ringtone Uri by getRingtone of RingtoneManager, and get the new ringtone
-                // Uri.
-                RingtoneManager.getRingtone(context, ringtoneUri);
-                ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context,
-                        mRingtones[mSubscription]);
                 CharSequence summary = context
                         .getString(com.android.internal.R.string.ringtone_unknown);
                 CharSequence ringtoneSummary;
