@@ -122,6 +122,8 @@ public class WifiConfigController implements TextWatcher,
 
     private static final String PROP_WIFIPRIOR = "persist.env.settings.wifiprior";
 
+    private static final String CARRIER_AUTO_SSID = "CMCC-AUTO";
+
     private Spinner mIpSettingsSpinner;
     private TextView mIpAddressView;
     private TextView mGatewayView;
@@ -255,6 +257,12 @@ public class WifiConfigController implements TextWatcher,
                 if (showAdvancedFields) {
                     ((CheckBox) mView.findViewById(R.id.wifi_advanced_togglebox)).setChecked(true);
                     mView.findViewById(R.id.wifi_advanced_fields).setVisibility(View.VISIBLE);
+                }
+            }
+
+            if (CARRIER_AUTO_SSID.equals(mAccessPoint.ssid) && mEdit) {
+                if (mAccessPoint.security == AccessPoint.SECURITY_EAP) {
+                    mView.findViewById(R.id.wifi_advanced_toggle).setVisibility(View.GONE);
                 }
             }
 
@@ -639,6 +647,16 @@ public class WifiConfigController implements TextWatcher,
             }
         } else {
             showEapFieldsByMethod(mEapMethodSpinner.getSelectedItemPosition());
+        }
+
+        if (mAccessPoint != null && CARRIER_AUTO_SSID.equals(mAccessPoint.ssid) && mEdit) {
+            if (mAccessPoint.security == AccessPoint.SECURITY_EAP) {
+                mView.findViewById(R.id.l_method).setVisibility(View.GONE);
+                setPhase2Invisible();
+                setCaCertInvisible();
+                setAnonymousIdentInvisible();
+                setUserCertInvisible();
+            }
         }
     }
 
