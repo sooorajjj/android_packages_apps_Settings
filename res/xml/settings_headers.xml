@@ -58,6 +58,13 @@
         android:fragment="com.android.settings.WirelessSettings"
         android:icon="@drawable/empty_icon" />
 
+   <!-- Ethernet -->
+   <header
+        android:id="@+id/ethernet_settings"
+        android:title="@string/eth_radio_ctrl_title"
+        android:icon="@drawable/ic_settings_ethernet"
+        android:fragment="com.android.settings.ethernet.EthernetSettings"/>
+
     <!-- DEVICE -->
     <header android:id="@+id/device_section"
         android:title="@string/header_category_device" />
