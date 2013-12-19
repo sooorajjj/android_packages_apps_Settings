@@ -47,6 +47,7 @@ Preference.OnPreferenceClickListener {
     private static final String KEY_DISCONNECT = "disconnect";
     private static final String KEY_DISABLE_NETWORK = "disable_network";
     private static final String KEY_ENABLE_NETWORK = "enable_network";
+    private static final int LENGTH_NETWORK_ID = 9;
 
     private Preference mWifiDisconnect;
     private Preference mWifiDisableNetwork;
@@ -107,11 +108,19 @@ Preference.OnPreferenceClickListener {
             // Set an EditText view to get user input
             final EditText input = new EditText(this);
             alert.setView(input);
+            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            input.setFilters(new android.text.InputFilter[] {
+                    new android.text.InputFilter.LengthFilter(LENGTH_NETWORK_ID)
+            });
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                    Editable value = input.getText();
-                    netid = Integer.parseInt(value.toString());
-                    mWifiManager.disableNetwork(netid);
+                    try {
+                        Editable value = input.getText();
+                        netid = Integer.parseInt(value.toString());
+                        mWifiManager.disableNetwork(netid);
+                    } catch (NumberFormatException e) {
+                        // Do nothing.
+                    }
                     }
                     });
             alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -127,11 +136,19 @@ Preference.OnPreferenceClickListener {
             // Set an EditText view to get user input
             final EditText input = new EditText(this);
             alert.setView(input);
+            input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            input.setFilters(new android.text.InputFilter[] {
+                    new android.text.InputFilter.LengthFilter(LENGTH_NETWORK_ID)
+            });
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                    Editable value = input.getText();
-                    netid =  Integer.parseInt(value.toString());
-                    mWifiManager.enableNetwork(netid, false);
+                    try {
+                        Editable value = input.getText();
+                        netid = Integer.parseInt(value.toString());
+                        mWifiManager.enableNetwork(netid, false);
+                    } catch (NumberFormatException e) {
+                        // Do nothing.
+                    }
                     }
                     });
             alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
