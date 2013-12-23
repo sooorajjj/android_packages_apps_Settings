@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -105,6 +106,7 @@ public class WifiSettings extends SettingsPreferenceFragment
     private static final int MENU_ID_FORGET = Menu.FIRST + 7;
     private static final int MENU_ID_MODIFY = Menu.FIRST + 8;
     private static final int MENU_ID_DISCONNECT = Menu.FIRST + 9;
+    private static final int MENU_ID_DELETE = Menu.FIRST + 10;
 
     private static final int WIFI_DIALOG_ID = 1;
     private static final int WPS_PBC_DIALOG_ID = 2;
@@ -169,6 +171,15 @@ public class WifiSettings extends SettingsPreferenceFragment
 
     // this boolean extra is set if we are being invoked by the Setup Wizard
     private static final String EXTRA_IS_FIRST_RUN = "firstRun";
+
+    // save the lable value of default credible ap
+    private static final String TABLE_DEFAULT_CREDIBLE = "default_credible";
+    // the ap is default credible ap
+    private static final int DEFAULT_CREDIBLE_LABLE = 1;
+    // the ap is't default credible ap
+    private static final int NOT_DEFAULT_CREDIBLE_LABLE = 0;
+    // the lable default value of default credible ap
+    private static final int DEFAULT_AP_LABLE = -1;
 
     // should Next button only be enabled when we have a connection?
     private boolean mEnableNextOnConnection;
@@ -608,8 +619,16 @@ public class WifiSettings extends SettingsPreferenceFragment
                 }
                 if (mSelectedAccessPoint.networkId != INVALID_NETWORK_ID) {
                     if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
-                        if(!AccessPoint.isCarrierAp(mSelectedAccessPoint)){
+                        if (!AccessPoint.isCarrierAp(mSelectedAccessPoint)) {
                             menu.add(Menu.NONE, MENU_ID_FORGET, 0, R.string.wifi_menu_forget);
+                        } else {
+                            SharedPreferences sharedPreference = getActivity().getSharedPreferences(
+                                    TABLE_DEFAULT_CREDIBLE, Context.MODE_PRIVATE);
+                            int isDefCredible = sharedPreference.getInt(mSelectedAccessPoint.ssid,
+                                    DEFAULT_AP_LABLE);
+                            if (isDefCredible == DEFAULT_CREDIBLE_LABLE) {
+                                menu.add(Menu.NONE, MENU_ID_DELETE, 0, R.string.wifi_menu_delete);
+                            }
                         }
                         menu.add(Menu.NONE, MENU_ID_MODIFY, 0, R.string.wifi_menu_modify);
                     }
@@ -657,6 +676,15 @@ public class WifiSettings extends SettingsPreferenceFragment
                         mWifiManager.reconnect();
                     }
                 }
+                return true;
+            }
+            case MENU_ID_DELETE: {
+                SharedPreferences sharedPreference = getActivity().getSharedPreferences(
+                        TABLE_DEFAULT_CREDIBLE, Context.MODE_PRIVATE);
+                sharedPreference.edit().putInt(mSelectedAccessPoint.ssid,
+                        NOT_DEFAULT_CREDIBLE_LABLE).commit();
+                mWifiManager.disconnect();
+                Log.d(TAG, "delete Default Credible ap:"  + mSelectedAccessPoint.ssid);
                 return true;
             }
         }
@@ -861,8 +889,26 @@ public class WifiSettings extends SettingsPreferenceFragment
                     accessPoints.add(accessPoint);
                     apMap.put(accessPoint.ssid, accessPoint);
                     if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
-                        if(AccessPoint.isCarrierAp(accessPoint)){
-                            mDefaultTrustAP.addPreference(accessPoint);
+                        if (AccessPoint.isCarrierAp(accessPoint)) {
+                            SharedPreferences sharedPreference = getActivity()
+                                    .getSharedPreferences(
+                                            TABLE_DEFAULT_CREDIBLE, Context.MODE_PRIVATE);
+                            int isDefCredible = sharedPreference.getInt(accessPoint.ssid,
+                                    DEFAULT_AP_LABLE);
+                            Log.d(TAG, "is Default Credible ap:"
+                                    + (isDefCredible == DEFAULT_CREDIBLE_LABLE));
+
+                            if (accessPoint.getState() != null
+                                    && accessPoint.getState() == DetailedState.CONNECTING) {
+                                mDefaultTrustAP.addPreference(accessPoint);
+                                sharedPreference.edit().putInt(accessPoint.ssid,
+                                        DEFAULT_CREDIBLE_LABLE).commit();
+                            } else if (isDefCredible == DEFAULT_CREDIBLE_LABLE) {
+                                mDefaultTrustAP.addPreference(accessPoint);
+                            } else {
+                                mConfigedAP.addPreference(accessPoint);
+                            }
+
                         } else {
                             mConfigedAP.addPreference(accessPoint);
                         }
@@ -895,8 +941,23 @@ public class WifiSettings extends SettingsPreferenceFragment
                     accessPoints.add(accessPoint);
                     apMap.put(accessPoint.ssid, accessPoint);
                     if (SystemProperties.getBoolean(PROP_WIFIPRIOR, false)) {
-                        if(AccessPoint.isCarrierAp(accessPoint)){
-                            mDefaultTrustAP.addPreference(accessPoint);
+                        if (AccessPoint.isCarrierAp(accessPoint)) {
+                            SharedPreferences sharedPreference = getActivity()
+                                    .getSharedPreferences(TABLE_DEFAULT_CREDIBLE,
+                                            Context.MODE_PRIVATE);
+                            int isDefCredible = sharedPreference.getInt(accessPoint.ssid,
+                                    DEFAULT_AP_LABLE);
+                            if (accessPoint.getState() != null
+                                    && accessPoint.getState() == DetailedState.CONNECTING) {
+                                mDefaultTrustAP.addPreference(accessPoint);
+                                sharedPreference.edit().putInt(accessPoint.ssid,
+                                        DEFAULT_CREDIBLE_LABLE).commit();
+                            } else if (isDefCredible == DEFAULT_CREDIBLE_LABLE) {
+                                mDefaultTrustAP.addPreference(accessPoint);
+                            } else {
+                                mUnKnownAP.addPreference(accessPoint);
+                            }
+
                         } else {
                             mUnKnownAP.addPreference(accessPoint);
                         }
