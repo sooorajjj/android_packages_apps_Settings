@@ -41,6 +41,11 @@
             android:dependency="location_toggle"
             android:persistent="false" />
 
+        <com.android.settings.WrappingIZatCheckBoxPreference
+            android:key="location_izat"
+            android:dependency="location_toggle"
+            android:persistent="true" />
+
 <!-- Disabled to avoid confusion on devices with no AGPS
      For Google experience devices we want AGPS on by default (if supported) so we don't really need this.
         <CheckBoxPreference
