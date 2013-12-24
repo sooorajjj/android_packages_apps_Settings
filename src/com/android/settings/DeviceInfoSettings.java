@@ -69,6 +69,7 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
 
     private static final String STR_BASEBAND_VERSION = "8x12-BAAAANAZM-01738";
     private static final String STR_HARDWARE_VERSION = "T7_V1.03_PCB";
+    private static final String STR_SOFTWARE_VERSION = "lephone_T700_V1.1";
 
     static final int TAPS_TO_BE_A_DEVELOPER = 7;
 
@@ -87,7 +88,8 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
         setStringSummary(KEY_DEVICE_MODEL, Build.MODEL + getMsvSuffix());
         setValueSummary(KEY_EQUIPMENT_ID, PROPERTY_EQUIPMENT_ID);
         setStringSummary(KEY_DEVICE_MODEL, Build.MODEL);
-        setStringSummary(KEY_BUILD_NUMBER, Build.DISPLAY);
+        // set the baseband version
+        findPreference(KEY_BUILD_NUMBER).setSummary(STR_SOFTWARE_VERSION);
         findPreference(KEY_BUILD_NUMBER).setEnabled(true);
         findPreference(KEY_KERNEL_VERSION).setSummary(getFormattedKernelVersion());
 
