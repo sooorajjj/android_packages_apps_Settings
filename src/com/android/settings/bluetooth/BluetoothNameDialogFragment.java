@@ -30,6 +30,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.settings.R;
 
@@ -65,6 +67,8 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
     private static final String KEY_NAME = "device_name";
     private static final String KEY_NAME_EDITED = "device_name_edited";
 
+    private TextWatcher mTextWatcher;
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -85,6 +89,7 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
         LocalBluetoothManager localManager = LocalBluetoothManager.getInstance(getActivity());
         mLocalAdapter = localManager.getBluetoothAdapter();
         String deviceName = mLocalAdapter.getName();
+        mTextWatcher = this;
         if (savedInstanceState != null) {
             deviceName = savedInstanceState.getString(KEY_NAME, deviceName);
             mDeviceNameEdited = savedInstanceState.getBoolean(KEY_NAME_EDITED, false);
@@ -96,6 +101,7 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
                 .setPositiveButton(R.string.bluetooth_rename_button,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                mDeviceNameView.removeTextChangedListener(mTextWatcher);
                                 String deviceName = mDeviceNameView.getText().toString();
                                 setDeviceName(deviceName);
                             }
@@ -190,6 +196,12 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
                 mOkButton.setEnabled(mDeviceNameEdited);
             }
         }
+        if (calculateLength(s.toString()) >= BLUETOOTH_NAME_MAX_LENGTH_BYTES) {
+            Toast toast = Toast.makeText(getActivity(), R.string.bluetooth_rename_input_full,
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
     }
 
     /* Not used */
@@ -198,5 +210,19 @@ public final class BluetoothNameDialogFragment extends DialogFragment implements
 
     /* Not used */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    /* The length of Chinese word is 3 and the length of English word is 1 */
+    private int calculateLength(CharSequence c) {
+        int len = 0;
+        for (int i = 0; i < c.length(); i++) {
+            int tmp = (int) c.charAt(i);
+            if (tmp > 0 && tmp < 127) {
+                len += 1;
+            } else {
+                len += 3;
+            }
+        }
+        return len;
     }
 }
