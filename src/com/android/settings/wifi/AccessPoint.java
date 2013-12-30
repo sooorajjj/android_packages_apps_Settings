@@ -411,7 +411,6 @@ class AccessPoint extends Preference {
             return;
         mConfig = new WifiConfiguration();
         mConfig.SSID = AccessPoint.convertToQuotedString(ssid);
-        mConfig.BSSID = bssid;
         mConfig.allowedKeyManagement.set(KeyMgmt.NONE);
     }
 
