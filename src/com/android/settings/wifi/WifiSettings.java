@@ -625,7 +625,7 @@ public class WifiSettings extends SettingsPreferenceFragment
                             SharedPreferences sharedPreference = getActivity().getSharedPreferences(
                                     TABLE_DEFAULT_CREDIBLE, Context.MODE_PRIVATE);
                             int isDefCredible = sharedPreference.getInt(mSelectedAccessPoint.ssid,
-                                    DEFAULT_AP_LABLE);
+                                    DEFAULT_CREDIBLE_LABLE);
                             if (isDefCredible == DEFAULT_CREDIBLE_LABLE) {
                                 menu.add(Menu.NONE, MENU_ID_DELETE, 0, R.string.wifi_menu_delete);
                             }
@@ -894,7 +894,7 @@ public class WifiSettings extends SettingsPreferenceFragment
                                     .getSharedPreferences(
                                             TABLE_DEFAULT_CREDIBLE, Context.MODE_PRIVATE);
                             int isDefCredible = sharedPreference.getInt(accessPoint.ssid,
-                                    DEFAULT_AP_LABLE);
+                                    DEFAULT_CREDIBLE_LABLE);
                             Log.d(TAG, "is Default Credible ap:"
                                     + (isDefCredible == DEFAULT_CREDIBLE_LABLE));
 
@@ -946,7 +946,7 @@ public class WifiSettings extends SettingsPreferenceFragment
                                     .getSharedPreferences(TABLE_DEFAULT_CREDIBLE,
                                             Context.MODE_PRIVATE);
                             int isDefCredible = sharedPreference.getInt(accessPoint.ssid,
-                                    DEFAULT_AP_LABLE);
+                                    DEFAULT_CREDIBLE_LABLE);
                             if (accessPoint.getState() != null
                                     && accessPoint.getState() == DetailedState.CONNECTING) {
                                 mDefaultTrustAP.addPreference(accessPoint);
