@@ -78,6 +78,7 @@ public class SelectSubscription extends  TabActivity {
         Intent intent =  getIntent();
         String pkg = intent.getStringExtra(PACKAGE);
         String targetClass = intent.getStringExtra(TARGET_CLASS);
+        if (pkg == null || targetClass == null) finish();
 
         int numPhones = MSimTelephonyManager.getDefault().getPhoneCount();
 
