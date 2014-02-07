@@ -386,7 +386,15 @@ public class IccLockSettings extends PreferenceActivity
                 }
                 Toast.makeText(this, mRes.getString(id),Toast.LENGTH_SHORT).show();
             } else {
-                displayRetryCounter(mRes.getString(R.string.sim_change_failed));
+                 if (requestType == MSG_ENABLE_ICC_PIN_COMPLETE) {
+                     if (mToState) {
+                         displayRetryCounter(mRes.getString(R.string.sim_pin_enable_failed));
+                     } else {
+                         displayRetryCounter(mRes.getString(R.string.sim_pin_disable_failed));
+                     }
+                 } else {
+                     displayRetryCounter(mRes.getString(R.string.sim_change_failed));
+                 }
             }
         } else if (exception instanceof RuntimeException) {
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show();
