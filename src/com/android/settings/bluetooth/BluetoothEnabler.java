@@ -17,6 +17,7 @@
 package com.android.settings.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.QBluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -64,7 +65,7 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
         } else {
             mLocalAdapter = manager.getBluetoothAdapter();
         }
-        mIntentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        mIntentFilter = new IntentFilter(QBluetoothAdapter.ACTION_BLE_STATE_CHANGED);
     }
 
     public void resume() {
@@ -135,6 +136,15 @@ public final class BluetoothEnabler implements CompoundButton.OnCheckedChangeLis
             case BluetoothAdapter.STATE_OFF:
                 setChecked(false);
                 mSwitch.setEnabled(true);
+                break;
+            case QBluetoothAdapter.STATE_BLE_TURNING_ON:
+                mSwitch.setEnabled(false);
+                break;
+            case QBluetoothAdapter.STATE_BLE_ON:
+                mSwitch.setEnabled(true);
+                break;
+            case QBluetoothAdapter.STATE_BLE_TURNING_OFF:
+                mSwitch.setEnabled(false);
                 break;
             default:
                 setChecked(false);
