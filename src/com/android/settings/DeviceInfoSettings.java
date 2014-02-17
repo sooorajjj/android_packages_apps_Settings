@@ -69,7 +69,7 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment {
 
     private static final String STR_BASEBAND_VERSION = "8x12-BAAAANAZM-01738";
     private static final String STR_HARDWARE_VERSION = "T7_V1.03_PCB";
-    private static final String STR_SOFTWARE_VERSION = "lephone_T700_V1.1";
+    private static final String STR_SOFTWARE_VERSION = "lephone_T700_V1.2";
 
     static final int TAPS_TO_BE_A_DEVELOPER = 7;
 
