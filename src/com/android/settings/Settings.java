@@ -668,7 +668,9 @@ public class Settings extends PreferenceActivity
                             label.toString());
                 }
             }
-            accountHeaders.add(accHeader);
+            if (showAccount(this, accountType)) {
+                accountHeaders.add(accHeader);
+            }
             mAuthenticatorHelper.preloadDrawableForType(this, accountType);
         }
 
@@ -1061,6 +1063,16 @@ public class Settings extends PreferenceActivity
 
     public static void requestHomeNotice() {
         sShowNoHomeNotice = true;
+    }
+
+    public static boolean showAccount(Context context, String accountType) {
+        String[] hideAccounts = context.getResources().getStringArray(R.array.hide_account_list);
+        if (hideAccounts == null || hideAccounts.length == 0) return true;
+
+        for (String account : hideAccounts) {
+            if (account.equals(accountType)) return false;
+        }
+        return true;
     }
 
     @Override
