@@ -251,7 +251,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
             t.set(1970, Calendar.JANUARY, 1);
             datePicker.getDatePicker().setMinDate(t.getTimeInMillis());
             t.clear();
-            t.set(2037, Calendar.DECEMBER, 31);
+            t.set(2036, Calendar.DECEMBER, 31);
             datePicker.getDatePicker().setMaxDate(t.getTimeInMillis());
             break;
         }
