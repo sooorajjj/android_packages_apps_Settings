@@ -32,6 +32,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.UserInfo;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.CheckBoxPreference;
@@ -82,10 +83,17 @@ public class SecuritySettings extends SettingsPreferenceFragment
     private static final String KEY_RESET_CREDENTIALS = "reset_credentials";
     private static final String KEY_TOGGLE_INSTALL_APPLICATIONS = "toggle_install_applications";
     private static final String KEY_TOGGLE_VERIFY_APPLICATIONS = "toggle_verify_applications";
+    private static final String KEY_TOGGLE_DM_AUTOBOOT = "toggle_dm_autoboot";
     private static final String KEY_POWER_INSTANTLY_LOCKS = "power_button_instantly_locks";
     private static final String KEY_CREDENTIALS_MANAGER = "credentials_management";
     private static final String KEY_NOTIFICATION_ACCESS = "manage_notification_access";
     private static final String PACKAGE_MIME_TYPE = "application/vnd.android.package-archive";
+    private static final String DM_AUTOBOOT_SETTING = "dm_selfregist_autoboot";
+    private static final String SPEC_PROP = "persist.env.spec";
+    private static final String DEFAULT_SPEC = "Default";
+    private static final String DM_SPEC = "ChinaMobile";
+    private static final int DM_AUTOBOOT_SETTING_ENABLE = 1;
+    private static final int DM_AUTOBOOT_SETTING_DISABLE = 0;
 
     private PackageManager mPM;
     DevicePolicyManager mDPM;
@@ -106,6 +114,7 @@ public class SecuritySettings extends SettingsPreferenceFragment
     private DialogInterface mWarnInstallApps;
     private CheckBoxPreference mToggleVerifyApps;
     private CheckBoxPreference mPowerButtonInstantlyLocks;
+    private CheckBoxPreference mDMAutoBoot;
 
     private Preference mNotificationAccess;
 
@@ -351,6 +360,19 @@ public class SecuritySettings extends SettingsPreferenceFragment
             }
         }
 
+        mDMAutoBoot = (CheckBoxPreference) findPreference(KEY_TOGGLE_DM_AUTOBOOT);
+        if (mDMAutoBoot != null) {
+            if (SystemProperties.get(SPEC_PROP,DEFAULT_SPEC).compareTo(DM_SPEC)==0) {
+                mDMAutoBoot.setEnabled(true);
+                mDMAutoBoot.setChecked(isDMAutoboot());
+            } else {
+                if (deviceAdminCategory != null) {
+                    deviceAdminCategory.removePreference(mDMAutoBoot);
+                } else {
+                    mDMAutoBoot.setEnabled(false);
+                }
+            }
+        }
         return root;
     }
 
@@ -394,6 +416,17 @@ public class SecuritySettings extends SettingsPreferenceFragment
     private boolean showVerifierSetting() {
         return Settings.Global.getInt(getContentResolver(),
                                       Settings.Global.PACKAGE_VERIFIER_SETTING_VISIBLE, 1) > 0;
+    }
+
+    private boolean isDMAutoboot() {
+        int enable = Settings.Global.getInt(getContentResolver(), DM_AUTOBOOT_SETTING,
+                DM_AUTOBOOT_SETTING_ENABLE);
+        return (enable == DM_AUTOBOOT_SETTING_ENABLE);
+    }
+
+    private void setDMAutoboot(boolean enable) {
+        Settings.Global.putInt(getContentResolver(), DM_AUTOBOOT_SETTING,
+                enable?DM_AUTOBOOT_SETTING_ENABLE:DM_AUTOBOOT_SETTING_DISABLE);
     }
 
     private void warnAppInstallation() {
@@ -575,6 +608,8 @@ public class SecuritySettings extends SettingsPreferenceFragment
         } else if (KEY_TOGGLE_VERIFY_APPLICATIONS.equals(key)) {
             Settings.Global.putInt(getContentResolver(), Settings.Global.PACKAGE_VERIFIER_ENABLE,
                     mToggleVerifyApps.isChecked() ? 1 : 0);
+        } else if (KEY_TOGGLE_DM_AUTOBOOT.equals(key)) {
+            setDMAutoboot(mDMAutoBoot.isChecked());
         } else {
             // If we didn't handle it, let preferences handle it.
             return super.onPreferenceTreeClick(preferenceScreen, preference);
