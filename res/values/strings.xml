@@ -4838,4 +4838,6 @@
     <string name="data_to_wifi_connect_value_auto">0</string>
     <string name="data_to_wifi_connect_value_manul">1</string>
     <string name="data_to_wifi_connect_value_ask">2</string>
+    <string name="dm_autoboot">DM Autoboot</string>
+    <string name="dm_autoboot_summary">Allow DM to boot up automatically</string>
 </resources>
