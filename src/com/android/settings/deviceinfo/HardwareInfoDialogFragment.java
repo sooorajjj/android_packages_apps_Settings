@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 The Android Open Source Project
+ * Copyright (C) 2020 Fairphone B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.os.SystemProperties;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -31,9 +33,17 @@ import com.android.internal.logging.nano.MetricsProto;
 import com.android.settings.R;
 import com.android.settings.core.instrumentation.InstrumentedDialogFragment;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
     public static final String TAG = "HardwareInfo";
+
+    private static final String FILENAME_PROC_CPUINFO = "/proc/cpuinfo";
 
     @Override
     public int getMetricsCategory() {
@@ -63,6 +73,9 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
         setText(content, R.id.hardware_rev_label, R.id.hardware_rev_value,
                 SystemProperties.get("ro.boot.hardware.revision"));
 
+        // Processor
+        setText(content, R.id.processor_label, R.id.processor_value, getProcessorInfo());
+
         return builder.setView(content).create();
     }
 
@@ -86,5 +99,39 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
     @VisibleForTesting
     String getSerialNumber() {
         return Build.getSerial();
+    }
+
+    /**
+     * Returns the Hardware value in /proc/cpuinfo, else returns "Unknown".
+     * @return a string that describes the processor
+     */
+    private static String getProcessorInfo() {
+        // Hardware : XYZ
+        final String PROC_HARDWARE_REGEX = "Hardware\\s*:\\s*(.*)$"; /* hardware string */
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(FILENAME_PROC_CPUINFO));
+            String cpuinfo;
+
+            try {
+                while (null != (cpuinfo = reader.readLine())) {
+                    if (cpuinfo.startsWith("Hardware")) {
+                        Matcher m = Pattern.compile(PROC_HARDWARE_REGEX).matcher(cpuinfo);
+                        if (m.matches()) {
+                            return m.group(1);
+                        }
+                    }
+                }
+                return "Unknown";
+            } finally {
+                reader.close();
+            }
+        } catch (IOException e) {
+            Log.e(TAG,
+                "IO Exception when getting cpuinfo for Device Info screen",
+                e);
+
+            return "Unknown";
+        }
     }
 }

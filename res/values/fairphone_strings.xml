@@ -34,4 +34,8 @@
     <string name="opengles3_title">Enhanced 3D graphics support</string>
     <!-- Maintenance settings screen, the summary for the item to take the user to the OpenGL ES settings. -->
     <string name="opengles3_summary">Enable OpenGL ES 3.0</string>
+
+    <!-- About --> <skip />
+    <!-- About phone, status item label.  The device's processor. -->
+    <string name="processor_info">Processor</string>
 </resources>

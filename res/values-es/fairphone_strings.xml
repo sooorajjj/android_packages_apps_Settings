@@ -20,4 +20,5 @@
     <string name="hiccup_summary">"Informe de estabilidad"</string>
     <string name="opengles3_title">"Sporte de gráficos 3D mejorado"</string>
     <string name="opengles3_summary">"Habilitar OpenGL ES 3.0"</string>
+    <string name="processor_info">"Procesador"</string>
 </resources>
