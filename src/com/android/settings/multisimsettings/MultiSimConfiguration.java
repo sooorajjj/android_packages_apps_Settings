@@ -243,6 +243,11 @@ public class MultiSimConfiguration extends PreferenceActivity implements TextWat
                 mSubscription);
         String netTypeName = MSimTelephonyManager.getDefault()
                 .getNetworkTypeName(mSubscription);
+        if (netOperatorName != null) {
+            netOperatorName = getLocalString(netOperatorName,
+                    com.android.internal.R.array.origin_carrier_names,
+                    com.android.internal.R.array.locale_carrier_names);
+        }
         mNetServiceProvider.setTitle(netOperatorName);
         mNetServiceProvider.setSummary(netTypeName);
     }
