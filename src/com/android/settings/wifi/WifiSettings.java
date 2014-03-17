@@ -672,6 +672,9 @@ public class WifiSettings extends SettingsPreferenceFragment
             case MENU_ID_DISCONNECT: {
                 if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
                     mWifiManager.disconnect();
+                    if (mAutoConnect) {
+                        mWifiManager.reconnect();
+                    }
                 }
                 return true;
             }
