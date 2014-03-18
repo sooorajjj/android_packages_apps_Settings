@@ -673,7 +673,7 @@ public class WifiSettings extends SettingsPreferenceFragment
                 if (SystemProperties.getBoolean(PROP_AUTOCON, false)) {
                     mWifiManager.disconnect();
                     if (mAutoConnect) {
-                        mWifiManager.reconnect();
+                        reconnect();
                     }
                 }
                 return true;
@@ -1331,5 +1331,20 @@ public class WifiSettings extends SettingsPreferenceFragment
         mDefaultTrustAP.removeAll();
         mConfigedAP.removeAll();
         mUnKnownAP.removeAll();
+    }
+
+    private void reconnect() {
+        if (mConfigedAP != null && mConfigedAP.getPreferenceCount() > 1) {
+            for (int i = 1; i < mConfigedAP.getPreferenceCount(); i++) {
+                Preference preference = mConfigedAP.getPreference(i);
+                if (preference instanceof AccessPoint) {
+                    final AccessPoint accessPoint = (AccessPoint) preference;
+                    if (accessPoint.networkId != INVALID_NETWORK_ID) {
+                        mWifiManager.connect(accessPoint.networkId, mConnectListener);
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
