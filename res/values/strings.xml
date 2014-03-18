@@ -5007,4 +5007,6 @@
 
     <!-- Text to display in regulatory info screen (from device overlay). -->
     <string name="regulatory_info_text"></string>
+    <string name="usb_charging_title">Charging</string>
+    <string name="usb_charging_summary">Lets you only charge the device</string>
 </resources>
