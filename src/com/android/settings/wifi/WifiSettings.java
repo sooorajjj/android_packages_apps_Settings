@@ -1334,17 +1334,56 @@ public class WifiSettings extends SettingsPreferenceFragment
     }
 
     private void reconnect() {
+        List<AccessPoint> availableNetworks = getAvaiConfigNetwork();
+        int highestPriority = 0;
+        if (availableNetworks.size() != 0) {
+            for (int index = 0; index < availableNetworks.size(); ++index) {
+                if (availableNetworks.get(index).getConfig().priority > availableNetworks.get(
+                        highestPriority).getConfig().priority) {
+                    highestPriority = index;
+                }
+            }
+        } else {
+            return;
+        }
+        final AccessPoint accessPoint = availableNetworks.get(highestPriority);
+        if (accessPoint.networkId != INVALID_NETWORK_ID) {
+            mWifiManager.connect(accessPoint.networkId, mConnectListener);
+        }
+    }
+
+    private List<AccessPoint> getAvaiConfigNetwork() {
+        ArrayList<AccessPoint> availableNetworks = new ArrayList<AccessPoint>();
         if (mConfigedAP != null && mConfigedAP.getPreferenceCount() > 1) {
-            for (int i = 1; i < mConfigedAP.getPreferenceCount(); i++) {
-                Preference preference = mConfigedAP.getPreference(i);
+            for (int index = 0; index < mConfigedAP.getPreferenceCount(); ++index) {
+                Preference preference = mConfigedAP.getPreference(index);
                 if (preference instanceof AccessPoint) {
                     final AccessPoint accessPoint = (AccessPoint) preference;
-                    if (accessPoint.networkId != INVALID_NETWORK_ID) {
-                        mWifiManager.connect(accessPoint.networkId, mConnectListener);
-                        return;
+                    if (accessPoint.getState() != null
+                            && (accessPoint.getState() == DetailedState.CONNECTING || accessPoint
+                                    .getState() == DetailedState.CONNECTED)) {
+                        continue;
+                    } else if (accessPoint.getLevel() != -1) {
+                        availableNetworks.add(accessPoint);
                     }
                 }
             }
         }
+        if (mDefaultTrustAP != null && mDefaultTrustAP.getPreferenceCount() > 1) {
+            for (int index = 0; index < mDefaultTrustAP.getPreferenceCount(); ++index) {
+                Preference preference = mDefaultTrustAP.getPreference(index);
+                if (preference instanceof AccessPoint) {
+                    final AccessPoint accessPoint = (AccessPoint) preference;
+                    if (accessPoint.getState() != null
+                            && (accessPoint.getState() == DetailedState.CONNECTING || accessPoint
+                                    .getState() == DetailedState.CONNECTED)) {
+                        continue;
+                    } else if (accessPoint.getLevel() != -1) {
+                        availableNetworks.add(accessPoint);
+                    }
+                }
+            }
+        }
+        return availableNetworks;
     }
 }
