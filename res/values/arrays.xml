@@ -646,6 +646,7 @@
         <item>Personal</item>
         <item>Messaging</item>
         <item>Device</item>
+        <item>Bootup</item>
     </string-array>
 
     <!-- User display names for app ops codes -->
@@ -687,6 +688,7 @@
         <item>send MMS</item>
         <item>read MMS</item>
         <item>write MMS</item>
+        <item>auto start</item>
     </string-array>
 
     <!-- User display names for app ops codes -->
@@ -728,6 +730,7 @@
         <item>Send MMS</item>
         <item>Read MMS</item>
         <item>Write MMS</item>
+        <item>Auto start</item>
     </string-array>
 
     <!-- Titles for the list of long press timeout options. -->
