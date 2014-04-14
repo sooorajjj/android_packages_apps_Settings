@@ -50,12 +50,6 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private static final String KEY_SDCARD = "usb_sdcard";
     private static final String KEY_CHARGING = "usb_charging";
 
-    // We could not know what's the usb charge mode config of each device, which
-    // may be defined in some sh source file. So here use a hard code for reference,
-    // you should modify this value according to device usb init config.
-    private static final String USB_FUNCTION_CHARGING =
-            "diag,serial_smd,serial_tty,rmnet_bam,mass_storage";
-
     private UsbManager mUsbManager;
     private CheckBoxPreference mMtp;
     private CheckBoxPreference mPtp;
@@ -88,8 +82,8 @@ public class UsbSettings extends SettingsPreferenceFragment {
 
     private void updateUsbFunctionState() {
         String functions = SystemProperties.get("persist.sys.usb.config", "");
-        if (functions.contains(USB_FUNCTION_CHARGING)) {
-            updateToggles(USB_FUNCTION_CHARGING);
+        if (functions.contains(UsbManager.USB_FUNCTION_CHARGING)) {
+            updateToggles(UsbManager.USB_FUNCTION_CHARGING);
         } else {
             updateToggles(mUsbManager.getDefaultFunction());
         }
@@ -203,7 +197,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mPtp.setChecked(false);
             mSDCard.setChecked(true);
             mCharging.setChecked(false);
-        } else if (USB_FUNCTION_CHARGING.equals(function)) {
+        } else if (UsbManager.USB_FUNCTION_CHARGING.equals(function)) {
             mMtp.setChecked(false);
             mPtp.setChecked(false);
             mSDCard.setChecked(false);
@@ -268,7 +262,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
         } else if (preference == mSDCard && mSDCard.isChecked()) {
             function = UsbManager.USB_FUNCTION_MASS_STORAGE;
         } else if (preference == mCharging && mCharging.isChecked()) {
-            function = USB_FUNCTION_CHARGING;
+            function = UsbManager.USB_FUNCTION_CHARGING;
         }
 
         operateInprogress = true;
