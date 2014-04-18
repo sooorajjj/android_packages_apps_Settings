@@ -259,9 +259,18 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
                 mMountTogglePreference.setTitle(mResources.getString(R.string.sd_mount));
                 mMountTogglePreference.setSummary(mResources.getString(R.string.sd_mount_summary));
             } else {
-                mMountTogglePreference.setEnabled(false);
-                mMountTogglePreference.setTitle(mResources.getString(R.string.sd_mount));
-                mMountTogglePreference.setSummary(mResources.getString(R.string.sd_insert_summary));
+                if (Environment.MEDIA_UNMOUNTING.equals(state)) {
+                    mMountTogglePreference.setEnabled(false);
+                    mMountTogglePreference.setTitle(
+                            mResources.getString(R.string.sd_ejecting_title));
+                    mMountTogglePreference.setSummary(
+                            mResources.getString(R.string.sd_ejecting_summary));
+                } else {
+                    mMountTogglePreference.setEnabled(false);
+                    mMountTogglePreference.setTitle(mResources.getString(R.string.sd_mount));
+                    mMountTogglePreference.setSummary(
+                            mResources.getString(R.string.sd_insert_summary));
+                }
             }
 
             removePreference(mUsageBarPreference);
