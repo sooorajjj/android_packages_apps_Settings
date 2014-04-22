@@ -241,6 +241,7 @@
     <item msgid="255608127647030286">"个人"</item>
     <item msgid="4588829735729884491">"短信"</item>
     <item msgid="8971765125227378270">"设备"</item>
+    <item>"启动"</item>
   </string-array>
   <string-array name="app_ops_summaries">
     <item msgid="4979188868761515915">"粗略位置"</item>
@@ -280,6 +281,7 @@
     <item>发送彩信</item>
     <item>读取彩信</item>
     <item>修改彩信</item>
+    <item>自启动</item>
   </string-array>
   <string-array name="app_ops_labels">
     <item msgid="6602854600289714121">"位置"</item>
@@ -319,6 +321,7 @@
     <item>发送彩信</item>
     <item>读取彩信</item>
     <item>修改彩信</item>
+    <item>自启动</item>
   </string-array>
   <string-array name="long_press_timeout_selector_titles">
     <item msgid="3511504869290423954">"短"</item>
