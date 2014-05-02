@@ -89,7 +89,7 @@ public class MultiSimSettings extends PreferenceActivity {
 
     private PreferenceScreen mConfigSub;
     private static MultiSimEnablerPreference mSimOneEnabler,mSimTwoEnabler;
-    private boolean disableDataSub2 = false;
+    private boolean mDisableDataSub2 = false;
     private Switch mSwitchSub1,mSwitchSub2;
 
     private MultiSimDialog mDisableEnableProgressDialog = null;
@@ -175,28 +175,8 @@ public class MultiSimSettings extends PreferenceActivity {
 
         // if property persist.env.data.disable.sub2 is true , disable data
         // selection for SUB2.
-        disableDataSub2 = false;
-        if (SystemProperties.getBoolean(PROP_DISABLE_SUB2,false)) {
-            Log.d(TAG,"prop persist.env.data.enable.sub2 true");
-            boolean inChina = true;
-            if (SubscriptionManager.getInstance().isSubActive(MSimConstants.SUB2)) {
-                String operatorNumber = MSimPhoneFactory.getPhone(MSimConstants.SUB2).getServiceState()
-                        .getOperatorNumeric();
-                Log.d(TAG,"operatorNumber: " + operatorNumber);
-                if (null != operatorNumber && operatorNumber.length() >= 3) {
-                    String mcc = (String) operatorNumber.subSequence(0, 3);
-                    // China mainland and Macau
-                    if (!mcc.equals(MCC_CHINA) && !mcc.equals(MCC_MACAU)) {
-                        inChina = false;
-                    }
-                }
-            }
-            if (inChina) {
-                disableDataSub2 = true;
-            }
-        }
-
-        if (disableDataSub2) {
+        mDisableDataSub2 = needDisableDataSub2();
+        if (mDisableDataSub2) {
             mPreferredSubLists = new PreferredSubscriptionListPreference[
                                          KEY_PREFERRED_SUBSCRIPTION_LIST_NO_DATA.length];
 
@@ -332,12 +312,18 @@ public class MultiSimSettings extends PreferenceActivity {
              subPref.resume();
         }
 
-        if (disableDataSub2) {
-            PreferredSubscriptionListPreference datalist = (PreferredSubscriptionListPreference)
-                    findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST__DATA);
+        mDisableDataSub2 = needDisableDataSub2();
+        PreferredSubscriptionListPreference datalist = (PreferredSubscriptionListPreference)
+                findPreference(KEY_PREFERRED_SUBSCRIPTION_LIST__DATA);
+        if (mDisableDataSub2) {
+            datalist.setValue(PREFERRED_SUB_DATA_LIST_VALUE_SLOT_ONE);
+            datalist.setEntries(PREFERRED_SUB_DATA_LIST_ENTRY_SLOT_ONE);
             datalist.setSummary(Settings.System.getString(
                     this.getContentResolver(),
                     Settings.System.MULTI_SIM_NAME[0]));
+            datalist.setEnabled(false);
+        } else {
+            datalist.setType(MultiSimSettingsConstants.PREFERRED_SUBSCRIPTION_LISTS[1], mHandler);
         }
     }
 
@@ -558,6 +544,19 @@ public class MultiSimSettings extends PreferenceActivity {
         mSimOneEnabler.setSubscription(MSimConstants.SUB1,null);
         mSimTwoEnabler.setSubscription(MSimConstants.SUB2,null);
         super.onDestroy();
+    }
+
+    protected boolean needDisableDataSub2() {
+        boolean disableDataSub2 = false;
+        if (SystemProperties.getBoolean(PROP_DISABLE_SUB2, false)) {
+            if (MSimTelephonyManager.getDefault().getMultiSimConfiguration()
+                    .equals(MSimTelephonyManager.MultiSimVariants.DSDS)) {
+                if (SubscriptionManager.getInstance().getActiveSubscriptionsCount() == 2) {
+                    disableDataSub2 = true;
+                }
+            }
+        }
+        return disableDataSub2;
     }
 }
 
