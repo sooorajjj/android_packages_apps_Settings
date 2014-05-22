@@ -1055,4 +1055,12 @@ public class ApplicationsState {
         }
 
     }
+
+    public void clearAllLists() {
+        mSessions.clear();
+        mRebuildingSessions.clear();
+        mEntriesMap.clear();
+        mAppEntries.clear();
+        mApplications.clear();
+    }
 }
