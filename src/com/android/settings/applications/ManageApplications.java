@@ -1114,6 +1114,19 @@ public class ManageApplications extends Fragment implements
     public void onDestroy() {
         getActivity().unbindService(mContainerConnection);
         super.onDestroy();
+        for (int i = mTabs.size() - 1; i > 0; i--) {
+            TabInfo tab = mTabs.get(i);
+            if (tab.mApplicationsState != null) {
+                tab.mApplicationsState.clearAllLists();
+            }
+            if (tab.mApplications != null && tab.mApplications.mState != null) {
+                tab.mApplications.mState.clearAllLists();
+            }
+        }
+        mTabs.clear();
+        if (mApplicationsState != null) {
+            mApplicationsState.clearAllLists();
+        }
     }
 
     void updateOptionsMenu() {
