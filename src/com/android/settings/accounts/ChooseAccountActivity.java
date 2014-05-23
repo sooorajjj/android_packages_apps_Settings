@@ -31,10 +31,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-
 import com.android.internal.util.CharSequences;
 import com.android.settings.R;
-import com.android.settings.Settings;
 import com.google.android.collect.Maps;
 
 import java.util.ArrayList;
@@ -132,7 +130,7 @@ public class ChooseAccountActivity extends PreferenceActivity {
                     && !mAccountTypesFilter.contains(accountType)) {
                 addAccountPref = false;
             }
-            if (addAccountPref && Settings.showAccount(this, accountType)) {
+            if (addAccountPref) {
                 mProviderList.add(new ProviderEntry(providerName, accountType));
             } else {
                 if (Log.isLoggable(TAG, Log.VERBOSE)) {

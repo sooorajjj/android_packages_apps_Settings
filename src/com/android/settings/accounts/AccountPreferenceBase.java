@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.android.settings.Settings;
 import com.android.settings.SettingsPreferenceFragment;
 import com.google.android.collect.Maps;
 
@@ -148,8 +147,7 @@ class AccountPreferenceBase extends SettingsPreferenceFragment
             AuthenticatorDescription desc = null;
             try {
                 desc = mAuthenticatorHelper.getAccountTypeDescription(accountType);
-                if (desc != null && desc.accountPreferencesId != 0
-                        && Settings.showAccount(getActivity(), accountType)) {
+                if (desc != null && desc.accountPreferencesId != 0) {
                     Context authContext = getActivity().createPackageContext(desc.packageName, 0);
                     prefs = getPreferenceManager().inflateFromResource(authContext,
                             desc.accountPreferencesId, parent);
