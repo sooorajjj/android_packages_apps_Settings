@@ -1194,10 +1194,4 @@
         <item> Subscription 3 </item>
     </string-array>
 
-    <!-- Defined the hide accounts' type -->
-    <string-array name="hide_account_list">
-        <item>com.android.localphone</item>
-        <item>com.android.sim</item>
-        <item>com.qualcomm.qti.calendarlocalaccount</item>
-    </string-array>
  </resources>
