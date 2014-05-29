@@ -147,10 +147,10 @@ public class AppOpsState {
                     AppOpsManager.OP_WRITE_ICC_SMS },
             new boolean[] { true,
                     true,
-                    true,
-                    true,
-                    true,
-                    true,
+                    false,
+                    false,
+                    false,
+                    false,
                     true,
                     true,
                     true,
@@ -202,10 +202,10 @@ public class AppOpsState {
                     AppOpsManager.OP_SYSTEM_ALERT_WINDOW,
                     AppOpsManager.OP_WAKE_LOCK },
             new boolean[] { false,
+                    false,
                     true,
-                    true,
-                    true,
-                    true,
+                    false,
+                    false,
                     true,  }
             );
 
