@@ -2095,6 +2095,8 @@
 
     <string name="roamingTextSearching">"正在搜索服务"</string>
     <!-- apn names for carriers -->
+    <string name="APN_NAME_CMNET">中国移动NET</string>
+    <string name="APN_NAME_CMWAP">中国移动WAP</string>
     <string name="APN_NAME_CMMMS">中国移动彩信设置</string>
     <string name="APN_NAME_CUWAP">沃3G手机上网</string>
     <string name="APN_NAME_CUNET">沃3G连接互联网</string>
@@ -2128,6 +2130,7 @@
     <string name="dm_autoboot">增强售后服务</string>
     <string name="dm_autoboot_summary">设置自动启动增强售后服务</string>
     <string name="wifi_ssid_input_limit">已经超出限制</string>
+    <string name="sim_pin_attempts">\n剩余次数 :</string>
     <string name="sim_pin_enabled">PIN1 已启用!</string>
     <string name="sim_pin_disabled">PIN1 已停用!</string>
     <string name="screencolor">"屏幕色彩"</string>
@@ -2201,4 +2204,6 @@
     <string name="uicc_media_format_gesture_explanation" product="default">"您需要绘制解锁图案以确认要格式化 UICC 存储设备。"</string>
     <string name="subs_settings">卡状态</string>
     <string name="processor_info">处理器信息</string>
+    <string name="software_version">软件版本</string>
+    <string name="lte_4g_settings_title">启用4G</string>
 </resources>

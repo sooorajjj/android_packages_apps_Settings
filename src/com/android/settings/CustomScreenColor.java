@@ -155,6 +155,7 @@ public class CustomScreenColor extends Activity implements SeekBar.OnSeekBarChan
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        restoreSavedHSCI(false);
         unbindService(mPPServiceConn);
     }
 
@@ -604,6 +605,8 @@ public class CustomScreenColor extends Activity implements SeekBar.OnSeekBarChan
             BitmapDrawable bd = new BitmapDrawable(bm);
             mRLayout.setBackgroundDrawable(bd);
         } catch (FileNotFoundException e) {
+            Log.e(TAG, "Can't find background drawable:" + e);
+            return;
         }
         canRestorePreview = true;
     }
