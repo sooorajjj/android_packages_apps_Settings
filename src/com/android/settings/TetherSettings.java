@@ -56,6 +56,8 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Locale;
 
+import com.android.settings.wifi.WifiSettings;
+
 /*
  * Displays preferences for Tethering.
  */
@@ -101,7 +103,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     private boolean mMassStorageActive;
 
     private boolean mBluetoothEnableForTether;
-
+    private Context mContext;
     private static final int INVALID             = -1;
     private static final int WIFI_TETHERING      = 0;
     private static final int USB_TETHERING       = 1;
@@ -218,6 +220,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     private class TetherChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context content, Intent intent) {
+            mContext = content;
             String action = intent.getAction();
             if (action.equals(ConnectivityManager.ACTION_TETHER_STATE_CHANGED)) {
                 // TODO - this should understand the interface types
@@ -410,6 +413,10 @@ public class TetherSettings extends SettingsPreferenceFragment
 
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         int btState = adapter.getState();
+        if(WifiSettings.needPrompt(mContext)){
+            mBluetoothTether.setEnabled(false);
+            return;
+        }
         if (btState == BluetoothAdapter.STATE_TURNING_OFF) {
             mBluetoothTether.setEnabled(false);
             mBluetoothTether.setSummary(R.string.bluetooth_turning_off);
