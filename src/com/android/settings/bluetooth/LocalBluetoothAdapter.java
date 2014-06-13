@@ -185,6 +185,9 @@ public final class LocalBluetoothAdapter {
                 mProfileManager.setBluetoothStateOn();
             }
         }
+        else if (state == BluetoothAdapter.STATE_OFF) {
+            isPairing = false;
+        }
     }
 
     // Returns true if the state changed; false otherwise.
