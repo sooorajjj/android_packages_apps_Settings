@@ -21,6 +21,7 @@ import com.android.settings.R;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -124,6 +125,16 @@ public final class BluetoothPairingRequest extends BroadcastReceiver {
             if((oldState == BluetoothDevice.BOND_BONDING) &&
                     (bondState == BluetoothDevice.BOND_NONE)) {
                 // Remove the notification
+                NotificationManager manager = (NotificationManager) context
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.cancel(NOTIFICATION_ID);
+            }
+        } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+            int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                    BluetoothAdapter.ERROR);
+            if (state == BluetoothAdapter.STATE_OFF ||
+                state == BluetoothAdapter.STATE_TURNING_OFF) {
+                // Remove the notification if BT is turned off in b/w
                 NotificationManager manager = (NotificationManager) context
                     .getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(NOTIFICATION_ID);
