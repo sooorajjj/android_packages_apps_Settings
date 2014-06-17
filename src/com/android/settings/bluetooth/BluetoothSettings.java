@@ -337,6 +337,9 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment {
             case BluetoothAdapter.STATE_TURNING_ON:
                 messageId = R.string.bluetooth_turning_on;
                 break;
+            default:
+                Log.d(TAG, "Default case: Do nothing");
+                return;
         }
 
         setDeviceListGroup(preferenceScreen);
