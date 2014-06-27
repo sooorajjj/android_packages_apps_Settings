@@ -361,7 +361,7 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment {
     public void onDeviceBondStateChanged(CachedBluetoothDevice cachedDevice, int bondState) {
         setDeviceListGroup(getPreferenceScreen());
         removeAllDevices();
-        updateContent(mLocalAdapter.getBluetoothState(), false);
+        updateContent(mLocalAdapter.getBluetoothState(), true);
     }
 
     private final View.OnClickListener mDeviceProfilesListener = new View.OnClickListener() {
