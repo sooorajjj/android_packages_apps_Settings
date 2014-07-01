@@ -39,6 +39,7 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.provider.Telephony;
 import android.text.TextUtils;
+import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.MSimTelephonyManager;
 import android.util.Log;
@@ -407,16 +408,14 @@ public class ApnSettings extends PreferenceActivity implements
                 result.add(mccMncForEhrpd);
             }
         }
-        String dataNetworkType;
+        int dataNetworkType;
         String mccMncFromSim;
         int activePhone;
         String apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC;
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
-            dataNetworkType = MSimTelephonyManager.getTelephonyProperty(
-                    TelephonyProperties.PROPERTY_DATA_NETWORK_TYPE, mSubscription, null);
+            dataNetworkType = MSimTelephonyManager.from(this).getDataNetworkType(mSubscription);
             activePhone = MSimTelephonyManager.from(this).getPhoneType(mSubscription);
-            if (activePhone == PhoneConstants.PHONE_TYPE_CDMA &&
-                    !dataNetworkType.equals("LTE")) {
+            if ( isRuimOperatorNumericRequired(activePhone, dataNetworkType) ) {
                 apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_RUIM_OPERATOR_NUMERIC;
             }
             mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
@@ -425,11 +424,9 @@ public class ApnSettings extends PreferenceActivity implements
                     " activePhone= " + activePhone + " mcc-mnc= " + mccMncFromSim +
                     " dataNetworkType: " + dataNetworkType);
         } else {
-            dataNetworkType = TelephonyManager.getTelephonyProperty(
-                    TelephonyProperties.PROPERTY_DATA_NETWORK_TYPE, mSubscription, null);
+            dataNetworkType = TelephonyManager.from(this).getDataNetworkType();
             activePhone = TelephonyManager.from(this).getPhoneType();
-            if (activePhone == PhoneConstants.PHONE_TYPE_CDMA &&
-                    !dataNetworkType.equals("LTE")) {
+            if ( isRuimOperatorNumericRequired(activePhone, dataNetworkType) ) {
                 apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_RUIM_OPERATOR_NUMERIC;
             }
             mccMncFromSim = TelephonyManager.getTelephonyProperty(
@@ -441,5 +438,11 @@ public class ApnSettings extends PreferenceActivity implements
             result.add(mccMncFromSim);
         }
         return result.toArray(new String[2]);
+    }
+
+    private boolean isRuimOperatorNumericRequired(int phoneType, int netType) {
+        return (phoneType == PhoneConstants.PHONE_TYPE_CDMA &&
+                netType != ServiceState.RIL_RADIO_TECHNOLOGY_LTE &&
+                netType != ServiceState.RIL_RADIO_TECHNOLOGY_EHRPD);
     }
 }
