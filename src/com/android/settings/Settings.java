@@ -515,7 +515,12 @@ public class Settings extends PreferenceActivity
             intent.putExtra(EXTRA_UI_OPTIONS, ActivityInfo.UIOPTION_SPLIT_ACTION_BAR_WHEN_NARROW);
         }
 
-        intent.setClass(this, SubSettings.class);
+        if (BluetoothSettings.class.getName().equals(fragmentName)) {
+            intent.setClass(this, SubSettings.BluetoothSubSettings.class);
+        } else {
+            intent.setClass(this, SubSettings.class);
+        }
+
         return intent;
     }
 
