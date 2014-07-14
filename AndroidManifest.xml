@@ -125,7 +125,6 @@
 
         <activity android:name=".SubSettings"
                 android:taskAffinity="com.android.settings"
-                android:configChanges="orientation|keyboardHidden|screenSize"
                 android:parentActivityName="Settings">
         </activity>
 
@@ -309,6 +308,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".SubSettings$BluetoothSubSettings"
+                android:taskAffinity="com.android.settings"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:parentActivityName="Settings">
         </activity>
 
         <activity android:name="Settings$BluetoothSettingsActivity"
@@ -1854,5 +1859,23 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <activity-alias
+            android:name=".wifi.HotspotSettings"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:clearTaskOnLaunch="true"
+            android:exported="true"
+            android:label="@string/wifi_tether_checkbox_text"
+            android:targetActivity="Settings$TetherSettingsActivity" >
+        </activity-alias>
+
+        <activity
+            android:name=".wifi.HotspotSettingsHelp"
+            android:clearTaskOnLaunch="true"
+            android:exported="true"
+            android:label="@string/hotspot_settings_menu_help"
+            android:targetActivity="Settings$TetherSettingsActivity" >
+        </activity>
+
     </application>
 </manifest>
