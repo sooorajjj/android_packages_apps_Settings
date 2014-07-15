@@ -5013,4 +5013,5 @@
     <string name="regulatory_info_text"></string>
     <string name="usb_charging_title">Charging</string>
     <string name="usb_charging_summary">Lets you only charge the device</string>
+    <string name="lte_select_title">Default 4G/3G Subscription</string>
 </resources>
