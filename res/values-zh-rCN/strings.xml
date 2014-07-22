@@ -2211,6 +2211,7 @@
     <string name="software_version">软件版本</string>
     <string name="lte_4g_settings_title">启用4G</string>
     <string name="lte_4g_switch_prompt">"手机将从3G/2G切换成4G网络，某些活动任务将被终止。"</string>
+    <string name="sim_pin_change_failed_enable_sim_lock">无法变更 SIM/RUIM PIN。\n 启用 SIM/RUIM 锁定。</string>
     <string name="bluetooth_profile_dun">"拨号网络存取"</string>
     <string name="bluetooth_dun_profile_summary_use_for">"使用拨号网络存取"</string>
 </resources>
