@@ -610,9 +610,9 @@
         <item>GPS</item>
         <item>vibrate</item>
         <item>read contacts</item>
-        <item>modify contacts</item>
+        <item>write contacts</item>
         <item>read call log</item>
-        <item>modify call log</item>
+        <item>write call log</item>
         <item>read calendar</item>
         <item>modify calendar</item>
         <item>wi-fi scan</item>
@@ -656,6 +656,10 @@
         <item>write MMS</item>
         <item>auto start</item>
         <item>nfc change</item>
+        <item>delete SMS</item>
+        <item>delete MMS</item>
+        <item>delete contacts</item>
+        <item>delete call log</item>
     </string-array>
 
     <!-- User display names for app ops codes -->
@@ -665,9 +669,9 @@
         <item>Location</item>
         <item>Vibrate</item>
         <item>Read contacts</item>
-        <item>Modify contacts</item>
+        <item>Write contacts</item>
         <item>Read call log</item>
-        <item>Modify call log</item>
+        <item>Write call log</item>
         <item>Read calendar</item>
         <item>Modify calendar</item>
         <item>Location</item>
@@ -711,6 +715,10 @@
         <item>Write MMS</item>
         <item>Auto start</item>
         <item>Nfc change</item>
+        <item>Delete SMS</item>
+        <item>Delete MMS</item>
+        <item>Delete contacts</item>
+        <item>Delete call log</item>
     </string-array>
 
     <!-- Titles for the list of long press timeout options. -->
