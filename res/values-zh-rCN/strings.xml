@@ -2203,4 +2203,5 @@
     <string name="uicc_media_format_gesture_explanation" product="default">"您需要绘制解锁图案以确认要格式化 UICC 存储设备。"</string>
     <string name="subs_settings">卡状态</string>
     <string name="processor_info">处理器信息</string>
+    <string name="sim_pin_change_failed_enable_sim_lock">无法变更 SIM/RUIM PIN。\n 启用 SIM/RUIM 锁定。</string>
 </resources>
