@@ -75,7 +75,8 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         public void afterTextChanged(Editable s) {
             Dialog d = mDeviceNamePref.getDialog();
             if (d instanceof AlertDialog) {
-                ((AlertDialog) d).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(s.length() > 0);
+                ((AlertDialog) d).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(s.length() > 0
+                                            && !(s.toString().trim().isEmpty()));
             }
         }
 
