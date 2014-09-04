@@ -43,10 +43,13 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
 import android.os.AsyncResult;
+import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
@@ -68,6 +71,9 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         OnDismissListener, DialogInterface.OnClickListener, Preference.OnPreferenceChangeListener  {
     private static final String TAG = "MultiSimSettings";
 
+    public static final String CONFIG_LTE_SUB_SELECT_MODE = "config_lte_sub_select_mode";
+
+    private static final String KEY_MULTI_SIM_SETTINGS = "multi_sim_settings";
     private static final String KEY_VOICE = "voice";
     private static final String KEY_DATA = "data";
     private static final String KEY_SMS = "sms";
@@ -76,6 +82,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     private static final String CONFIG_SUB = "CONFIG_SUB";
     private static final String TUNE_AWAY = "tune_away";
     private static final String PRIORITY_SUB = "priority_subscription";
+    private static final String KEY_PRIMARY_SUB_SELECT = "select_primary_sub";
 
     private static final int DIALOG_SET_DATA_SUBSCRIPTION_IN_PROGRESS = 100;
 
@@ -96,6 +103,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
     static final int SUBSCRIPTION_DUAL_STANDBY = 2;
     private final int MAX_SUBSCRIPTIONS = SubscriptionManager.NUM_SUBSCRIPTIONS;
 
+    private PreferenceCategory mMultiSimPreferenceCategory;
     private ListPreference mVoice;
     private ListPreference mData;
     private ListPreference mSms;
@@ -117,6 +125,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
 
     private CheckBoxPreference mTuneAway;
     private ListPreference mPrioritySub;
+    private Preference mPrimarySubSelect = null;
 
     private AirplaneModeBroadcastReceiver mReceiver = null;
     IntentFilter mIntentFilter =
@@ -132,6 +141,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
 
         addPreferencesFromResource(R.xml.multi_sim_settings);
 
+        mMultiSimPreferenceCategory = (PreferenceCategory)findPreference(KEY_MULTI_SIM_SETTINGS);
         mVoice = (ListPreference) findPreference(KEY_VOICE);
         mVoice.setOnPreferenceChangeListener(this);
         mData = (ListPreference) findPreference(KEY_DATA);
@@ -144,6 +154,8 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         mTuneAway.setOnPreferenceChangeListener(this);
         mPrioritySub = (ListPreference) findPreference(PRIORITY_SUB);
         mPrioritySub.setOnPreferenceChangeListener(this);
+        mPrimarySubSelect= (Preference) findPreference(KEY_PRIMARY_SUB_SELECT);
+
         mPhone = MSimPhoneFactory.getPhone(MSimConstants.SUB1);
 
         for (int subId = 0; subId < SubscriptionManager.NUM_SUBSCRIPTIONS; subId++) {
@@ -188,6 +200,7 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
         mIsForeground = true;
         registerForAirplaneMode();
         updateUi();
+        initLTEPreference();
     }
 
     /**
@@ -242,6 +255,50 @@ public class MultiSimSettings extends PreferenceActivity implements DialogInterf
             mData.setEnabled(false);
             mData.setSelectable(false);
         }
+    }
+
+    public int getCurrentPrimaryLteSub() {
+        for (int index = 0; index < SubscriptionManager.NUM_SUBSCRIPTIONS; index++) {
+            int current = getPreferredNetwork(index);
+            if (current == Phone.NT_MODE_TD_SCDMA_GSM_WCDMA_LTE
+                    || current == Phone.NT_MODE_TD_SCDMA_GSM_WCDMA) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    private int getPreferredNetwork(int sub) {
+        int nwMode = -1;
+        try {
+            nwMode = MSimTelephonyManager.getIntAtIndex(this.getContentResolver(),
+                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE, sub);
+        } catch (SettingNotFoundException snfe) {
+        }
+        return nwMode;
+    }
+
+    private void initLTEPreference() {
+        boolean isPrimarySubFeatureEnable = SystemProperties
+                .getBoolean("persist.radio.primarycard", false);
+        if (!isPrimarySubFeatureEnable){
+            mMultiSimPreferenceCategory.removePreference(mPrimarySubSelect);
+            return;
+        }
+
+        int primarySub = getCurrentPrimaryLteSub();
+
+        boolean isManualMode = Settings.Global.getInt(
+                this.getContentResolver(), CONFIG_LTE_SUB_SELECT_MODE, 1) == 0;
+
+        Log.d(TAG, "init LTE primarySub : " + primarySub + " isManualMode :" + isManualMode);
+        if (-1 != primarySub) {
+            CharSequence lteSummary = summaries[primarySub];
+            mPrimarySubSelect.setSummary(lteSummary);
+        } else {
+            mPrimarySubSelect.setSummary("");
+        }
+        mPrimarySubSelect.setEnabled(isManualMode);
     }
 
     /**
