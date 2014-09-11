@@ -30,6 +30,7 @@ import android.provider.Settings;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
+import android.util.Slog;
 
 import com.android.settings.R;
 import com.android.settings.WirelessSettings;
@@ -40,6 +41,7 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
     private final Context mContext;
     private Switch mSwitch;
     private AtomicBoolean mConnected = new AtomicBoolean(false);
+    private static final String TAG = "WifiEnabler";
 
     private final WifiManager mWifiManager;
     private boolean mStateMachineEvent;
@@ -117,7 +119,9 @@ public class WifiEnabler implements CompoundButton.OnCheckedChangeListener  {
         int wifiApState = mWifiManager.getWifiApState();
         if (isChecked && ((wifiApState == WifiManager.WIFI_AP_STATE_ENABLING) ||
                 (wifiApState == WifiManager.WIFI_AP_STATE_ENABLED))) {
-            mWifiManager.setWifiApEnabled(null, false);
+            if (!mWifiManager.getConcurrency()) {
+                mWifiManager.setWifiApEnabled(null, false);
+            }
         }
 
         mSwitch.setEnabled(false);

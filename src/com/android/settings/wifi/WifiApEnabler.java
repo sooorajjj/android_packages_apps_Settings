@@ -123,28 +123,30 @@ public class WifiApEnabler {
         /**
          * Disable Wifi if enabling tethering
          */
-        int wifiState = mWifiManager.getWifiState();
-        if (enable && ((wifiState == WifiManager.WIFI_STATE_ENABLING) ||
-                    (wifiState == WifiManager.WIFI_STATE_ENABLED))) {
-            mWifiManager.setWifiEnabled(false);
-            Settings.Global.putInt(cr, Settings.Global.WIFI_SAVED_STATE, 1);
-        }
-        /**
-         * Check if we have to wait for the WIFI_STATE_CHANGED intent
-         * before we re-enable the Checkbox.
-         */
-        if (!enable) {
-            try {
-                wifiSavedState = Settings.Global.getInt(cr, Settings.Global.WIFI_SAVED_STATE);
-            } catch (Settings.SettingNotFoundException e) {
-                ;
+        if (!mWifiManager.getConcurrency()) {
+            int wifiState = mWifiManager.getWifiState();
+            if (enable && ((wifiState == WifiManager.WIFI_STATE_ENABLING) ||
+                           (wifiState == WifiManager.WIFI_STATE_ENABLED))) {
+                mWifiManager.setWifiEnabled(false);
+                Settings.Global.putInt(cr, Settings.Global.WIFI_SAVED_STATE, 1);
             }
+            /**
+             * Check if we have to wait for the WIFI_STATE_CHANGED intent
+             * before we re-enable the Checkbox.
+             */
+            if (!enable) {
+                try {
+                    wifiSavedState =
+                        Settings.Global.getInt(cr, Settings.Global.WIFI_SAVED_STATE);
+                } catch (Settings.SettingNotFoundException e) {
+                    ;
+                }
 
-            if (wifiSavedState == 1) {
-                 mWaitForWifiStateChange = true;
+                if (wifiSavedState == 1) {
+                     mWaitForWifiStateChange = true;
+                }
             }
         }
-
         if (mWifiManager.setWifiApEnabled(null, enable)) {
             /* Disable here, enabled on receiving success broadcast */
             mCheckBox.setEnabled(false);
@@ -155,10 +157,12 @@ public class WifiApEnabler {
         /**
          * If needed, restore Wifi on tether disable
          */
-        if (!enable) {
-            if (wifiSavedState == 1) {
-                mWifiManager.setWifiEnabled(true);
-                Settings.Global.putInt(cr, Settings.Global.WIFI_SAVED_STATE, 0);
+        if (!mWifiManager.getConcurrency()) {
+            if (!enable) {
+                if (wifiSavedState == 1) {
+                    mWifiManager.setWifiEnabled(true);
+                    Settings.Global.putInt(cr, Settings.Global.WIFI_SAVED_STATE, 0);
+                }
             }
         }
     }

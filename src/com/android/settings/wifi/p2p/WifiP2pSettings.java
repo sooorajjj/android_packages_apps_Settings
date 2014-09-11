@@ -27,6 +27,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -56,6 +57,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
+import android.provider.Settings.Global;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
@@ -74,8 +76,10 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
     private static final boolean DBG = false;
     private static final int MENU_ID_SEARCH = Menu.FIRST;
     private static final int MENU_ID_RENAME = Menu.FIRST + 1;
+    private static final int MENU_ID_GO = Menu.FIRST + 2;
 
     private final IntentFilter mIntentFilter = new IntentFilter();
+    private WifiManager mWifiManager = null;
     private WifiP2pManager mWifiP2pManager;
     private WifiP2pManager.Channel mChannel;
     private OnClickListener mRenameListener;
@@ -92,6 +96,10 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
     private int mConnectedDevices;
     private WifiP2pGroup mConnectedGroup;
     private boolean mLastGroupFormed = false;
+    private boolean mGOAuto = false;
+    private boolean mGOStart = false;
+    private boolean mGOWait = false;
+    private MenuItem mGOMenu;
 
     private PreferenceGroup mPeersGroup;
     private PreferenceGroup mPersistentGroup;
@@ -102,6 +110,9 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
     private static final int DIALOG_RENAME = 3;
     private static final int DIALOG_DELETE_GROUP = 4;
 
+    private static final String CREATE_AUTO_GO = "Start GO";
+    private static final String REMOVE_AUTO_GO = "Stop GO";
+
     private static final String SAVE_DIALOG_PEER = "PEER_STATE";
     private static final String SAVE_DEVICE_NAME = "DEV_NAME";
     private static final String SAVE_SELECTED_GROUP = "GROUP_NAME";
@@ -110,6 +121,16 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
     private WifiP2pDeviceList mPeers = new WifiP2pDeviceList();
 
     private String mSavedDeviceName;
+
+    private int getAutoGoState() {
+        int AutoGo = 0;
+        try {
+            AutoGo = Global.getInt(getContentResolver(), Global.AUTO_GO);
+        } catch (android.provider.Settings.SettingNotFoundException  e) {
+            Log.e(TAG, "Failed to getAutoGoState");
+        }
+        return AutoGo;
+    }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -130,6 +151,7 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
                         WifiP2pManager.EXTRA_NETWORK_INFO);
                 WifiP2pInfo wifip2pinfo = (WifiP2pInfo) intent.getParcelableExtra(
                         WifiP2pManager.EXTRA_WIFI_P2P_INFO);
+                mGOWait = false;
                 if (mWifiP2pManager != null) {
                     mWifiP2pManager.requestGroupInfo(mChannel, WifiP2pSettings.this);
                 }
@@ -180,6 +202,9 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
 
         final Activity activity = getActivity();
         mWifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (getAutoGoState() != 0)
+            mGOStart = true;
         if (mWifiP2pManager != null) {
             mChannel = mWifiP2pManager.initialize(activity, getActivity().getMainLooper(), null);
             if (mChannel == null) {
@@ -336,6 +361,17 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
         menu.add(Menu.NONE, MENU_ID_RENAME, 0, R.string.wifi_p2p_menu_rename)
             .setEnabled(mWifiP2pEnabled)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        if (mWifiManager != null) {
+            if (mWifiManager.getConcurrency()
+                && mWifiManager.isP2pAutoGoSet()) {
+                menu.add(Menu.NONE, MENU_ID_GO, 0,
+                    mGOStart ?  REMOVE_AUTO_GO : CREATE_AUTO_GO)
+                    .setEnabled(mWifiP2pEnabled)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                mGOMenu = menu.findItem(MENU_ID_GO);
+                mGOAuto = true;
+            }
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -343,12 +379,25 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem searchMenu = menu.findItem(MENU_ID_SEARCH);
         MenuItem renameMenu = menu.findItem(MENU_ID_RENAME);
+        MenuItem goMenu     = menu.findItem(MENU_ID_GO);
         if (mWifiP2pEnabled) {
             searchMenu.setEnabled(true);
             renameMenu.setEnabled(true);
+            if (mGOAuto)
+                renameMenu.setEnabled(true);
         } else {
             searchMenu.setEnabled(false);
             renameMenu.setEnabled(false);
+            if (mGOAuto)
+                goMenu.setEnabled(false);
+        }
+
+        if (mGOAuto) {
+            if (mGOStart) {
+                goMenu.setTitle(REMOVE_AUTO_GO);
+            } else {
+                goMenu.setTitle(CREATE_AUTO_GO);
+            }
         }
 
         if (mWifiP2pSearching) {
@@ -367,6 +416,21 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
             case MENU_ID_RENAME:
                 showDialog(DIALOG_RENAME);
                 return true;
+            case MENU_ID_GO:
+                if ( !mGOWait ) {
+                    mGOMenu = item;
+                    /* WAIT UNTIL event receives, dont process other KEY */
+                    mGOWait = true;
+                    if (mGOStart) {
+                        if (DBG) Log.d(TAG, " Auto GO removed");
+                        stopAutoGO();
+                    } else {
+                        if (DBG) Log.d(TAG, " Auto GO Started");
+                        startAutoGO();
+                    }
+                }
+                return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -596,6 +660,59 @@ public class WifiP2pSettings extends SettingsPreferenceFragment
             mThisDevicePref.setPersistent(false);
             mThisDevicePref.setEnabled(true);
             mThisDevicePref.setSelectable(false);
+        }
+    }
+
+    private void startAutoGO() {
+        if (DBG) {
+             Log.d(TAG, "Starting Autonomous GO");
+        }
+        if (mWifiP2pManager != null) {
+            mWifiP2pManager.createGroup(mChannel,
+                new WifiP2pManager.ActionListener() {
+                public void onSuccess() {
+                    if (DBG) {
+                         Log.d(TAG, "Successfully started AutoGO");
+                    }
+                    mGOMenu.setTitle(REMOVE_AUTO_GO);
+                    Global.putInt(getContentResolver(), Global.AUTO_GO, 1);
+                    mGOStart = true;
+                    Toast.makeText(getActivity(), "P2P GO Started",
+                        Toast.LENGTH_SHORT).show();
+                }
+                public void onFailure(int reason) {
+                    Log.e(TAG,  "Failed to start P2P GO with reason "
+                        + reason + ".");
+                    mGOWait = false;
+                    Toast.makeText(getActivity(), "Failed to Start GO",
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void stopAutoGO() {
+        if (DBG) {
+             Log.d(TAG, "Stopping Autonomous GO");
+        }
+        if (mWifiP2pManager != null) {
+            mWifiP2pManager.removeGroup(mChannel,
+                new WifiP2pManager.ActionListener() {
+                public void onSuccess() {
+                    if (DBG) {
+                         Log.d(TAG, "Successfully stopped AutoGO");
+                    }
+                    mGOMenu.setTitle(CREATE_AUTO_GO);
+                    mGOStart = false;
+                    Global.putInt(getContentResolver(), Global.AUTO_GO, 0);
+                    Toast.makeText(getActivity(), "P2P GO Removed",
+                        Toast.LENGTH_SHORT).show();
+                }
+                public void onFailure(int reason) {
+                    Log.e(TAG,  "Failed to stop P2p GO with reason " + reason + ".");
+                    mGOWait = false;
+                }
+            });
         }
     }
 }
