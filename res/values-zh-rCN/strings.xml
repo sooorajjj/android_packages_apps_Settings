@@ -2050,4 +2050,5 @@
     <string name="regulatory_info_text" msgid="5623087902354026557"></string>
     <string name="usb_charging_title">充电模式</string>
     <string name="usb_charging_summary">连接电脑时，对手机进行充电</string>
+    <string name="lte_select_title">默认4G/3G SIM卡</string>
 </resources>
