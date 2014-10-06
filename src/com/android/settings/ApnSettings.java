@@ -407,35 +407,19 @@ public class ApnSettings extends PreferenceActivity implements
                 result.add(mccMncForEhrpd);
             }
         }
-        String dataNetworkType;
-        String mccMncFromSim;
-        int activePhone;
-        String apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_SIM_OPERATOR_NUMERIC;
+        String mccMncFromSim = null;
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
-            dataNetworkType = MSimTelephonyManager.getTelephonyProperty(
-                    TelephonyProperties.PROPERTY_DATA_NETWORK_TYPE, mSubscription, null);
-            activePhone = MSimTelephonyManager.from(this).getPhoneType(mSubscription);
-            if (activePhone == PhoneConstants.PHONE_TYPE_CDMA &&
-                    !dataNetworkType.equals("LTE")) {
-                apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_RUIM_OPERATOR_NUMERIC;
-            }
-            mccMncFromSim = MSimTelephonyManager.getTelephonyProperty(
-                    apnOperatorNumericProperty, mSubscription, null);
-            Log.d(TAG, "getOperatorNumeric: sub= " + mSubscription +
-                    " activePhone= " + activePhone + " mcc-mnc= " + mccMncFromSim +
-                    " dataNetworkType: " + dataNetworkType);
+            MSimTelephonyManager mSimTelephonyManager =
+                    (MSimTelephonyManager)getApplicationContext()
+                    .getSystemService(Context.MSIM_TELEPHONY_SERVICE);
+            mccMncFromSim = mSimTelephonyManager.getIccOperatorNumeric(mSubscription);
+            Log.d(TAG, "getIccOperatorNumeric: sub= " + mSubscription +
+                    " mcc-mnc= " + mccMncFromSim);
         } else {
-            dataNetworkType = TelephonyManager.getTelephonyProperty(
-                    TelephonyProperties.PROPERTY_DATA_NETWORK_TYPE, mSubscription, null);
-            activePhone = TelephonyManager.from(this).getPhoneType();
-            if (activePhone == PhoneConstants.PHONE_TYPE_CDMA &&
-                    !dataNetworkType.equals("LTE")) {
-                apnOperatorNumericProperty = TelephonyProperties.PROPERTY_APN_RUIM_OPERATOR_NUMERIC;
-            }
-            mccMncFromSim = TelephonyManager.getTelephonyProperty(
-                    apnOperatorNumericProperty, mSubscription, null);
-            Log.d(TAG, "getOperatorNumeric:  activePhone= " + activePhone +
-                    " mcc-mnc= " + mccMncFromSim + " dataNetworkType: " + dataNetworkType);
+            TelephonyManager mTelephonyManager = (TelephonyManager)getApplicationContext()
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            mccMncFromSim = mTelephonyManager.getIccOperatorNumeric();
+            Log.d(TAG, "getIccOperatorNumeric: mcc-mnc= " + mccMncFromSim);
         }
         if (mccMncFromSim != null && mccMncFromSim.length() > 0) {
             result.add(mccMncFromSim);
