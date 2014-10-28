@@ -31,6 +31,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -637,6 +638,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private class SimPreference extends Preference{
         private SubscriptionInfo mSubscriptionInfo;
         private int mSlotId;
+        private int[] colorArr;
 
         public SimPreference(Context context, SubscriptionInfo subInfoRecord, int slotId) {
             super(context);
@@ -645,6 +647,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             mSlotId = slotId;
             setKey("sim" + mSlotId);
             update();
+            colorArr = context.getResources().getIntArray(R.array.sim_colors);
         }
 
         public void update() {
@@ -683,6 +686,31 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
             nameText.setText(mSubscriptionInfo.getDisplayName());
             nameText.addTextChangedListener(SimSettings.this);
+
+            final Spinner colorSpinner = (Spinner) dialogLayout.findViewById(R.id.spinner);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                    R.array.color_picker, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            colorSpinner.setAdapter(adapter);
+
+            for (int i = 0; i < colorArr.length; i++) {
+                if (colorArr[i] == mSubInfoRecord.color) {
+                    colorSpinner.setSelection(i);
+                    break;
+                }
+            }
+
+            colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view,
+                    int pos, long id){
+                    colorSpinner.setSelection(pos);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
 
             TextView numberView = (TextView)dialogLayout.findViewById(R.id.number);
             final String rawNumber = getPhoneNumber(mSubscriptionInfo);
@@ -726,11 +754,17 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 @Override
                 public void onClick(DialogInterface dialog, int whichButton) {
                     final EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
-                    mSubscriptionInfo.setDisplayName(nameText.getText());
-                    SubscriptionManager.from(getActivity()).setDisplayName(
-                            mSubscriptionInfo.getDisplayName().toString(),
-                            mSubscriptionInfo.getSubscriptionId(),
-                            SubscriptionManager.NAME_SOURCE_USER_INPUT);
+
+                    mSubInfoRecord.displayName = nameText.getText().toString();
+                    SubscriptionManager.setDisplayName(mSubInfoRecord.displayName,
+                        mSubInfoRecord.subId);
+                    findRecordBySubId(mSubInfoRecord.subId).displayName =
+                        nameText.getText().toString();
+
+                    final int colorSelected = colorSpinner.getSelectedItemPosition();
+                    mSubInfoRecord.color = colorArr[colorSelected];
+                    SubscriptionManager.setColor(colorArr[colorSelected], mSubInfoRecord.subId);
+                    findRecordBySubId(mSubInfoRecord.subId).color = colorArr[colorSelected];
 
                     updateAllOptions();
                     update();
