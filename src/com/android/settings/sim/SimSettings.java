@@ -32,6 +32,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -638,12 +639,14 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private class SimPreference extends Preference{
         private SubscriptionInfo mSubscriptionInfo;
         private int mSlotId;
-        private int[] colorArr;
+        private int[] tintArr;
+        Context mContext;
 
         public SimPreference(Context context, SubscriptionInfo subInfoRecord, int slotId) {
             super(context);
 
             mSubscriptionInfo = subInfoRecord;
+            mContext = context;
             mSlotId = slotId;
             setKey("sim" + mSlotId);
             update();
@@ -660,6 +663,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                         mSubscriptionInfo.getDisplayName(),
                         mSubscriptionInfo.getNumber()));
                 setEnabled(true);
+                setIcon(new BitmapDrawable(res, (mSubInfoRecord.createIconBitmap(mContext))));
             } else {
                 setSummary(R.string.sim_slot_empty);
                 setFragment(null);
