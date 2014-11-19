@@ -2554,6 +2554,7 @@
     <string name="encrypt_talkback_dialog_message_pattern" msgid="4474332516537386384">"当您绘制解锁图案以启动此设备时，<xliff:g id="SERVICE">%1$s</xliff:g>等辅助功能服务还未开启。"</string>
     <string name="encrypt_talkback_dialog_message_password" msgid="8166099418487083927">"当您输入密码以启动此设备时，<xliff:g id="SERVICE">%1$s</xliff:g>等辅助功能服务还未开启。"</string>
     <string name="primary_sub_select_title">默认4G/3G SIM卡</string>
+    <string name="subs_settings">卡状态</string>
 
     <string name="show_search_function">搜索</string>
     <!-- string resources for USB OTG & UICC features -->
@@ -2626,6 +2627,8 @@
     <string name="selectnewfile_menu">从图库选择文件预览</string>
     <string name="selectfile_menu">从图库选择文件预览</string>
     <string name="restore_preview">恢复默认预览图片</string>
+    <string name="previous_str">以前</string>
+    <string name="new_str">最新</string>
     <string name="hue_str">色调: <xliff:g id="hue_value">%1$s</xliff:g></string>
     <string name="saturation_str">饱和度: <xliff:g id="saturation_value">%1$s</xliff:g></string>
     <string name="contrast_str">对比度: <xliff:g id="contrast_value">%1$s</xliff:g></string>
@@ -2643,6 +2646,7 @@
     <string name="sim_enabler_enabling">"启用中......"</string>
     <string name="sim_enabler_disabling">"禁用中......"</string>
     <string name="sub_activate_success">"启用成功。"</string>
+    <string name="switch_data_subscription">即将切换到卡%1$s进行数据业务.</string>
 
     <string name="wifi_ap_list_category">"已连接设备"</string>
     <string name="ap_device_name_default">"匿名"</string>
@@ -2655,4 +2659,6 @@
     <string name="hotspot_settings_indication_step3_all">"3. 选择“<xliff:g id="ssid_name">%s</xliff:g>”并输入密码“<xliff:g id="ssid_pwd">%s</xliff:g>”"</string>
     <string name="hotspot_settings_indication_step4">"4. 开始在电脑/移动设备上使用网络"</string>
     <string name="hotspot_turn_on_hint">"要使用 WLAN 热点，请先将其打开。"</string>
+    <string name="sim_pin_disable_failed">无法关闭PIN锁。</string>
+    <string name="sim_pin_attempts">\n您还有%s次尝试机会</string>
 </resources>
