@@ -57,6 +57,8 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.os.storage.StorageEventListener;
+import android.os.storage.StorageManager;
 import android.preference.PreferenceActivity;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -144,6 +146,8 @@ public class InstalledAppDetails extends Fragment
 
     private PackageMoveObserver mPackageMoveObserver;
 
+    private StorageManager mStorageManager = null;
+
     private final HashSet<String> mHomePackages = new HashSet<String>();
 
     private boolean mDisableAfterUninstall;
@@ -212,7 +216,29 @@ public class InstalledAppDetails extends Fragment
             }
         }
     };
-    
+
+    private StorageEventListener mStorageListener = new StorageEventListener() {
+        @Override
+        public void onStorageStateChanged(String path, String oldState,
+                String newState) {
+            Log.i(TAG, "onStorageStateChanged path= " + path
+                    + " oldState = " + oldState + " newState= " + newState);
+            final boolean isExternalPath = (Environment.getSecondaryStorageDirectory().getPath()
+                    .equals(path));
+            if (!isExternalPath) return;
+
+            if (!newState.equals(oldState)) {
+                if (newState.equals(Environment.MEDIA_UNMOUNTED) ||
+                            newState.equals(Environment.MEDIA_MOUNTED) ||
+                            oldState.equals(Environment.MEDIA_MOUNTED)  ||
+                            oldState.equals(Environment.MEDIA_UNMOUNTED)) {
+                                    refreshButtons();
+                }
+            }
+        }
+    };
+
+
     class ClearUserDataObserver extends IPackageDataObserver.Stub {
        public void onRemoveCompleted(final String packageName, final boolean succeeded) {
            final Message msg = mHandler.obtainMessage(CLEAR_USER_DATA);
@@ -303,6 +329,12 @@ public class InstalledAppDetails extends Fragment
             mCanBeOnSdCardChecker.init();
             moveDisable = !mCanBeOnSdCardChecker.check(mAppEntry.info);
         }
+
+        if (!Environment.getSecondaryStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Log.e(TAG, "external storage unmounted ");
+            moveDisable = true;
+        }
+
         if (moveDisable) {
             mMoveAppButton.setEnabled(false);
         } else {
@@ -423,6 +455,7 @@ public class InstalledAppDetails extends Fragment
         mSession = mState.newSession(this);
         mPm = getActivity().getPackageManager();
         mUserManager = (UserManager)getActivity().getSystemService(Context.USER_SERVICE);
+        mStorageManager = (StorageManager) getActivity().getSystemService(Context.STORAGE_SERVICE);
         IBinder b = ServiceManager.getService(Context.USB_SERVICE);
         mUsbManager = IUsbManager.Stub.asInterface(b);
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity());
@@ -584,12 +617,18 @@ public class InstalledAppDetails extends Fragment
         if (!refreshUi()) {
             setIntentAndFinish(true, true);
         }
+        if (mStorageManager != null) {
+            mStorageManager.registerListener(mStorageListener);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mSession.pause();
+        if (mStorageManager != null) {
+            mStorageManager.unregisterListener(mStorageListener);
+        }
     }
 
     @Override
