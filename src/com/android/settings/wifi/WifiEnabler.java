@@ -90,7 +90,7 @@ public class WifiEnabler implements SwitchBar.OnSwitchChangeListener  {
         mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
         mIntentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        // The order matters! We really should not depend on this. :(
+        // The order matters! We really should not depend on this.
         mIntentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 
@@ -207,7 +207,9 @@ public class WifiEnabler implements SwitchBar.OnSwitchChangeListener  {
         int wifiApState = mWifiManager.getWifiApState();
         if (isChecked && ((wifiApState == WifiManager.WIFI_AP_STATE_ENABLING) ||
                 (wifiApState == WifiManager.WIFI_AP_STATE_ENABLED))) {
-            mWifiManager.setWifiApEnabled(null, false);
+            if (!mWifiManager.getConcurrency()) {
+                mWifiManager.setWifiApEnabled(null, false);
+            }
         }
 
         if (!mWifiManager.setWifiEnabled(isChecked)) {
