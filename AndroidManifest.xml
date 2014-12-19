@@ -1102,7 +1102,7 @@
 
         <receiver android:name=".accessibility.LedFlashlightReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="com.android.settings.LED_FLASH_LIGHT" />
             </intent-filter>
         </receiver>
 
