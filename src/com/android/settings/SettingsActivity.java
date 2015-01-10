@@ -198,6 +198,8 @@ public class SettingsActivity extends Activity
     private static final String META_DATA_KEY_FRAGMENT_CLASS =
         "com.android.settings.FRAGMENT_CLASS";
 
+    private static final String ACTION_TIMER_SWITCH = "qualcomm.intent.action.TIMER_SWITCH";
+
     private static final String EXTRA_UI_OPTIONS = "settings:ui_options";
 
     private static final String EMPTY_QUERY = "";
@@ -1228,6 +1230,16 @@ public class SettingsActivity extends Activity
                 } else if (id == R.id.global_roaming_settings) {
                     if (!getResources().getBoolean(R.bool.config_roamingsettings_enabled)) {
                         removeTile = true;
+                    }
+                } else if (id == R.id.timer_switch_settings) {
+                    Intent intent = new Intent(ACTION_TIMER_SWITCH);
+                    List<ResolveInfo> infos = getBaseContext().getPackageManager()
+                        .queryIntentActivities(intent, 0);
+                    if (infos == null || infos.isEmpty()) {
+                        removeTile = true;
+                    } else {
+                        tile.title = infos.get(0).activityInfo.loadLabel(getPackageManager());
+                        tile.intent = intent;
                     }
                 }
 
