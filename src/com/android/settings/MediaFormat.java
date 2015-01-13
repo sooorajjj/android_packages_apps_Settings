@@ -53,8 +53,13 @@ public class MediaFormat extends Activity {
     private Button mFinalButton;
 
     public static boolean isUsbStorage(StorageVolume volumeObj, Context context) {
+        if (volumeObj == null || context == null) {
+            return false;
+        }
+
         // check if the supplied storage volume is of USB storage
         Resources resourcesObj = context.getResources();
+        if (resourcesObj == null) { return false; }
 
         boolean isUsb = volumeObj.getDescription(context).equalsIgnoreCase(
                 resourcesObj.getString(R.string.storage_usb));
