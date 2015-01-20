@@ -367,7 +367,9 @@ class AccessPoint extends Preference {
         if (info != null && networkId != WifiConfiguration.INVALID_NETWORK_ID
                 && networkId == info.getNetworkId()) {
             reorder = (mInfo == null);
-            mRssi = info.getRssi();
+            if (state == DetailedState.CONNECTED) {
+                mRssi = info.getRssi();
+            }
             mInfo = info;
             mState = state;
             refresh();
