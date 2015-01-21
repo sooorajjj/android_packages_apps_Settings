@@ -2296,6 +2296,7 @@
     <string name="restriction_menu_reset" msgid="2067644523489568173">"取消限制"</string>
     <string name="restriction_menu_change_pin" msgid="740081584044302775">"更改PIN码"</string>
     <string name="app_notifications_switch_label" msgid="9124072219553687583">"显示通知"</string>
+    <string name="app_restrict_switch_label">限制启动</string>
     <string name="help_label" msgid="6886837949306318591">"帮助和反馈"</string>
     <string name="user_account_title" msgid="1127193807312271167">"内容帐户"</string>
     <string name="user_picture_title" msgid="7297782792000291692">"照片 ID"</string>
