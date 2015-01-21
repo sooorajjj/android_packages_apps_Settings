@@ -144,6 +144,7 @@ public class InstalledAppDetails extends Fragment
     private Button mClearDataButton;
     private Button mMoveAppButton;
     private CompoundButton mNotificationSwitch;
+    private CompoundButton mRestrictSwitch;
 
     private PackageMoveObserver mPackageMoveObserver;
 
@@ -444,6 +445,18 @@ public class InstalledAppDetails extends Fragment
         }
     }
 
+    private boolean isRestricted() {
+        return mPm.isPackageRestricted(mAppEntry.info.packageName);
+    }
+
+    private void setRestricted(boolean restrict) {
+        if (isRestricted() == restrict) {
+            return;
+        }
+        mPm.setPackageRestrictState(mAppEntry.info.packageName, restrict);
+        mRestrictSwitch.setChecked(isRestricted());
+    }
+
     private void initNotificationButton() {
         INotificationManager nm = INotificationManager.Stub.asInterface(
                 ServiceManager.getService(Context.NOTIFICATION_SERVICE));
@@ -544,6 +557,11 @@ public class InstalledAppDetails extends Fragment
         mEnableCompatibilityCB = (CheckBox) view.findViewById(R.id.enable_compatibility_cb);
         
         mNotificationSwitch = (CompoundButton) view.findViewById(R.id.notification_switch);
+        mRestrictSwitch = (CompoundButton) view.findViewById(R.id.restrict_switch);
+        mRestrictSwitch.setOnCheckedChangeListener(this);
+        if (!mPm.isRestrictedAvailable(mAppEntry.info.packageName)) {
+            mRestrictSwitch.setVisibility(View.GONE);
+        }
 
         return view;
     }
@@ -967,6 +985,7 @@ public class InstalledAppDetails extends Fragment
         setAppLabelAndIcon(mPackageInfo);
         refreshButtons();
         refreshSizeInfo();
+        mRestrictSwitch.setChecked(isRestricted());
 
         if (!mInitialized) {
             // First time init: are we displaying an uninstalled app?
@@ -1377,10 +1396,10 @@ public class InstalledAppDetails extends Fragment
         if (mDpm.packageHasActiveAdmins(mPackageInfo.packageName)) {
             // User can't force stop device admin.
             updateForceStopButton(false);
-        } else if ((mAppEntry.info.flags&ApplicationInfo.FLAG_STOPPED) == 0) {
-            // If the app isn't explicitly stopped, then always show the
-            // force stop button.
-            updateForceStopButton(true);
+//        } else if ((mAppEntry.info.flags&ApplicationInfo.FLAG_STOPPED) == 0) {
+//            // If the app isn't explicitly stopped, then always show the
+//            // force stop button.
+//            updateForceStopButton(true);
         } else {
             Intent intent = new Intent(Intent.ACTION_QUERY_PACKAGE_RESTART,
                     Uri.fromParts("package", mAppEntry.info.packageName, null));
@@ -1523,6 +1542,8 @@ public class InstalledAppDetails extends Fragment
             } else {
                 setNotificationsEnabled(true);
             }
+        }else if (buttonView == mRestrictSwitch) {
+            setRestricted(isChecked);
         }
     }
 }
