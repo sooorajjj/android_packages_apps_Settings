@@ -383,6 +383,8 @@ public class ManageApplications extends Fragment implements
                         mFreeStorage = stats[1];
                     } catch (RemoteException e) {
                         Log.w(TAG, "Problem in container service", e);
+                    } catch (IllegalStateException e) {
+                        Log.w(TAG, "llegal state for container service", e);
                     }
                 }
 
