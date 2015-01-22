@@ -1083,7 +1083,9 @@ public class InstalledAppDetails extends Fragment
             Log.i(TAG, "Moved resources for " + packageName);
             // Refresh size information again.
             mState.requestSize(mAppEntry.info.packageName);
-        } else {
+        } else if (result == PackageManager.MOVE_FAILED_OPERATION_PENDING) {
+            Log.i(TAG, "Already have a  operation moving " + packageName);
+        }else {
             showDialogInner(DLG_MOVE_FAILED, result);
         }
         refreshUi();
