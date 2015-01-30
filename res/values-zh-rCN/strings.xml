@@ -2670,4 +2670,5 @@
     <string name="wifi_advanced_gateway">网关</string>
     <string name="wifi_advanced_network_netmask">子网掩码</string>
     <string name="data_disabled_in_active_call">通话过程中移动网络被禁用</string>
+    <string name="sim_enabler_both_inactive">不能同时禁用两张SIM卡！</string>
 </resources>
