@@ -32,6 +32,7 @@ import android.preference.Preference;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 class AccessPoint extends Preference {
     static final String TAG = "Settings.AccessPoint";
@@ -225,6 +226,8 @@ class AccessPoint extends Preference {
             signal.setImageState((security != SECURITY_NONE) ?
                     STATE_SECURED : STATE_NONE, true);
         }
+        TextView title = (TextView)view.findViewById(com.android.internal.R.id.title);
+        title.setSingleLine(false);
     }
 
     @Override
