@@ -104,4 +104,7 @@
 
     <!-- Whether notify user in cellular to wlan feature -->
     <bool name="cellular_wlan_hint">false</bool>
+
+    <!-- Whether to add SIM/AKA in EAP method for adding network -->
+    <bool name="config_eap_sim_function">false</bool>
 </resources>
