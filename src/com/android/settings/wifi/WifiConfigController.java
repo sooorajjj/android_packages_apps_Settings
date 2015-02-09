@@ -244,7 +244,10 @@ public class WifiConfigController implements TextWatcher,
             int level = mAccessPoint.getLevel();
             if (level != -1) {
                 String[] signal = resources.getStringArray(R.array.wifi_signal);
-                addRow(group, R.string.wifi_signal, signal[level]);
+                if (!(CARRIER_SSID.equals(mAccessPoint.ssid) &&
+                        (mAccessPoint.security == AccessPoint.SECURITY_EAP))) {
+                    addRow(group, R.string.wifi_signal, signal[level]);
+                }
             }
 
             WifiInfo info = mAccessPoint.getInfo();
@@ -306,7 +309,7 @@ public class WifiConfigController implements TextWatcher,
                 }
             }
 
-            if (CARRIER_SSID.equals(mAccessPoint.ssid) && mEdit) {
+            if (CARRIER_SSID.equals(mAccessPoint.ssid)) {
                 if (mAccessPoint.security == AccessPoint.SECURITY_EAP) {
                     mView.findViewById(R.id.wifi_advanced_toggle).setVisibility(View.GONE);
                 }
