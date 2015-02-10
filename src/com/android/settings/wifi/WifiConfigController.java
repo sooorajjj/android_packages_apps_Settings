@@ -44,6 +44,7 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.security.Credentials;
 import android.security.KeyStore;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -776,7 +777,13 @@ public class WifiConfigController implements TextWatcher,
     }
 
     private void checkEapSimInfo() {
-        for(int i = 0; i < mWifiEapSimInfo.mNumOfSims; i++) {
+        int numOfSims;
+        if (TelephonyManager.getDefault().isMultiSimEnabled()) {
+            numOfSims = mWifiEapSimInfo.mNumOfSims;
+        } else {
+            numOfSims = 1;
+        }
+        for (int i = 0; i < numOfSims; i++) {
             String displayname = MultiSimSettingTab.getMultiSimName(mContext, i);
             mSimDisplayNames.add(displayname);
             if (mWifiEapSimInfo.mSimTypes.get(i) == WifiEapSimInfo.SIM_2G) {
