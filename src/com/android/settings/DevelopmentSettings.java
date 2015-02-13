@@ -247,6 +247,7 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
     private final HashSet<Preference> mDisabledPrefs = new HashSet<Preference>();
     // To track whether a confirmation dialog was clicked.
     private boolean mDialogClicked;
+    private boolean mPasswordDialogClicked;
     private Dialog mEnableDialog;
     private Dialog mAdbDialog;
 
@@ -1343,6 +1344,7 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
     }
 
     private void showPasswordDialog() {
+        mPasswordDialogClicked = false;
         AlertDialog.Builder passworddialog = new AlertDialog.Builder(getActivity());
         View createlayout = LayoutInflater.from(getActivity()).inflate(
                 R.layout.dialog_edittext, null);
@@ -1358,6 +1360,7 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        mPasswordDialogClicked = true;
                         if ( edittext.getText().toString().equals(Build.MODEL)) {
                             mAdbDialog = new AlertDialog.Builder(getActivity())
                                     .setMessage(message)
@@ -1387,7 +1390,9 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
         passworddialog.setOnDismissListener(
                 new DialogInterface.OnDismissListener() {
                     public void onDismiss(DialogInterface dialog) {
-                        mEnableAdb.setChecked(false);
+                        if (!mPasswordDialogClicked) {
+                            mEnableAdb.setChecked(false);
+                        }
                 }
         });
         passworddialog.show();
