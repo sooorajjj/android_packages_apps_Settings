@@ -109,7 +109,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
 
         if (device == null) {
             Log.w(TAG, "Activity started without a remote Bluetooth device");
-            finish();
+            getActivity().finish();
             return;  // TODO: test this failure path
         }
         mRenameDeviceNamePref = new RenameEditTextPreference();
@@ -120,7 +120,7 @@ public final class DeviceProfilesSettings extends SettingsPreferenceFragment
         mCachedDevice = deviceManager.findDevice(device);
         if (mCachedDevice == null) {
             Log.w(TAG, "Device not found, cannot connect to it");
-            finish();
+            getActivity().finish();
             return;  // TODO: test this failure path
         }
 
