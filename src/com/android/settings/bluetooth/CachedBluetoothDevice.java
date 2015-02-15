@@ -83,6 +83,9 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     // User has rejected the connection and let Settings app remember the decision
     public final static int ACCESS_REJECTED = 2;
 
+    // PBAP Client has sent pbap connection request
+    public final static int PBAP_CONNECT_RECEIVED = 3;
+
     // How many times user should reject the connection to make the choice persist.
     private final static int MESSAGE_REJECTION_COUNT_LIMIT_TO_PERSIST = 2;
 
@@ -140,6 +143,8 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if (newProfileState == BluetoothProfile.STATE_CONNECTED) {
             if (profile instanceof MapProfile) {
                 profile.setPreferred(mDevice, true);
+                mRemovedProfiles.remove(profile);
+                mProfiles.add(profile);
             } else if (!mProfiles.contains(profile)) {
                 mRemovedProfiles.remove(profile);
                 mProfiles.add(profile);
@@ -277,13 +282,16 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
         if (!ensurePaired()) {
             return;
         }
-        if (profile.connect(mDevice)) {
+        if (profile != null && profile.connect(mDevice)) {
             if (Utils.D) {
                 Log.d(TAG, "Command sent successfully:CONNECT " + describe(profile));
             }
             return;
         }
-        Log.i(TAG, "Failed to connect " + profile.toString() + " to " + mName);
+        if (profile != null)
+            Log.i(TAG, "Failed to connect " + profile.toString() + " to " + mName);
+        else
+            Log.i(TAG, "Failed to connect. No profile specified");
     }
 
     private boolean ensurePaired() {
@@ -343,8 +351,7 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     }
 
     int getProfileConnectionState(LocalBluetoothProfile profile) {
-        if (mProfileConnectionState == null ||
-                mProfileConnectionState.get(profile) == null) {
+        if (mProfileConnectionState.get(profile) == null) {
             // If cache is empty make the binder call to get the state
             int state = profile.getConnectionStatus(mDevice);
             mProfileConnectionState.put(profile, state);
@@ -712,23 +719,12 @@ final class CachedBluetoothDevice implements Comparable<CachedBluetoothDevice> {
     }
 
     int getPhonebookPermissionChoice() {
-        int permission = mDevice.getPhonebookAccessPermission();
-        if (permission == BluetoothDevice.ACCESS_ALLOWED) {
-            return ACCESS_ALLOWED;
-        } else if (permission == BluetoothDevice.ACCESS_REJECTED) {
-            return ACCESS_REJECTED;
-        }
-        return ACCESS_UNKNOWN;
+        return mDevice.getPhonebookAccessPermission();
     }
 
     void setPhonebookPermissionChoice(int permissionChoice) {
-        int permission = BluetoothDevice.ACCESS_UNKNOWN;
-        if (permissionChoice == ACCESS_ALLOWED) {
-            permission = BluetoothDevice.ACCESS_ALLOWED;
-        } else if (permissionChoice == ACCESS_REJECTED) {
-            permission = BluetoothDevice.ACCESS_REJECTED;
-        }
-        mDevice.setPhonebookAccessPermission(permission);
+        Log.d(TAG,"setPhonebookPermissionChoice, permissionChoice = " + permissionChoice);
+        mDevice.setPhonebookAccessPermission(permissionChoice);
     }
 
     // Migrates data from old data store (in Settings app's shared preferences) to new (in Bluetooth

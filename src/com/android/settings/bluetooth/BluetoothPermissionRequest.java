@@ -202,6 +202,10 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
         }
 
         LocalBluetoothManager bluetoothManager = LocalBluetoothManager.getInstance(mContext);
+        if (bluetoothManager == null) {
+            Log.e(TAG, "Error: Can't get LocalBluetoothManager");
+            return false;
+        }
         CachedBluetoothDeviceManager cachedDeviceManager =
             bluetoothManager.getCachedDeviceManager();
         CachedBluetoothDevice cachedDevice = cachedDeviceManager.findDevice(mDevice);
@@ -217,7 +221,8 @@ public final class BluetoothPermissionRequest extends BroadcastReceiver {
 
             if (phonebookPermission == CachedBluetoothDevice.ACCESS_UNKNOWN) {
                 // Leave 'processed' as false.
-            } else if (phonebookPermission == CachedBluetoothDevice.ACCESS_ALLOWED) {
+            } else if (phonebookPermission == CachedBluetoothDevice.ACCESS_ALLOWED ||
+                phonebookPermission == CachedBluetoothDevice.PBAP_CONNECT_RECEIVED) {
                 sendReplyIntentToReceiver(true);
                 processed = true;
             } else if (phonebookPermission == CachedBluetoothDevice.ACCESS_REJECTED) {
