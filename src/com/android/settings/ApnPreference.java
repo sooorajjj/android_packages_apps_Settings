@@ -78,7 +78,7 @@ public class ApnPreference extends Preference implements
             }
         }
 
-        View textLayout = view.findViewById(R.id.text_layout);
+        View textLayout = view.findViewById(R.id.apn_text_layout);
         if ((textLayout != null) && textLayout instanceof RelativeLayout) {
             textLayout.setOnClickListener(this);
         }
@@ -114,7 +114,7 @@ public class ApnPreference extends Preference implements
     }
 
     public void onClick(android.view.View v) {
-        if ((v != null) && (R.id.text_layout == v.getId())) {
+        if ((v != null) && (R.id.apn_text_layout == v.getId())) {
             Context context = getContext();
             if (context != null) {
                 int pos = Integer.parseInt(getKey());
