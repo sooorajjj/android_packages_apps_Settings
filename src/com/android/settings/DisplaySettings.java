@@ -113,7 +113,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         mScreenTimeoutPreference = (ListPreference) findPreference(KEY_SCREEN_TIMEOUT);
         long currentTimeout = Settings.System.getLong(resolver, SCREEN_OFF_TIMEOUT,
                 FALLBACK_SCREEN_TIMEOUT_VALUE);
-        long timeoutValue = (currentTimeout == Integer.MAX_VALUE) ? -1 : currentTimeout;
+        //long timeoutValue = (currentTimeout == Integer.MAX_VALUE) ? -1 : currentTimeout;
+        long timeoutValue = -1;
         mScreenTimeoutPreference.setValue(String.valueOf(timeoutValue));
         mScreenTimeoutPreference.setOnPreferenceChangeListener(this);
         disableUnusableTimeouts(mScreenTimeoutPreference);
