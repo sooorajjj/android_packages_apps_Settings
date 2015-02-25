@@ -247,14 +247,11 @@ public class DevelopmentSettings extends RestrictedSettingsFragment
         }
 
         addPreferencesFromResource(R.xml.development_prefs);
-        String meta = getMetaInfoFromSharedPref();
-        if(meta.equals("")){
-            try {
-                meta = readLine(FILENAME_META_VERSION);
-            }catch (IOException e) {
-                Log.e(TAG, "IO Exception when getting meta version", e);
-            }
-            saveMetaInfoToSharedPref(meta);
+        String meta = "";
+        try {
+            meta = readLine(FILENAME_META_VERSION);
+        }catch (IOException e) {
+            Log.e(TAG, "IO Exception when getting meta version", e);
         }
         setStringSummary(KEY_SOFTWARE_VERSION, meta);
 
