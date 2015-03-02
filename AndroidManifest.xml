@@ -2080,6 +2080,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="SubSettings$BluetoothSubSettings"
+        android:taskAffinity="com.android.settings"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:parentActivityName="Settings">
+        </activity>
+
         <provider
             android:name=".search.SettingsSearchIndexablesProvider"
             android:authorities="com.android.settings"

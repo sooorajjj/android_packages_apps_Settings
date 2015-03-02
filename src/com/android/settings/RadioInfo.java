@@ -1002,6 +1002,50 @@ public class RadioInfo extends Activity {
         return SystemProperties.getBoolean(PROPERTY_SMS_OVER_IMS, false);
     }
 
+    private Button imsVoLteProvisionedButton;
+    OnClickListener mImsVoLteProvisionedHandler = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            log(String.format("toggle VoLTE provisioned: currently %s",
+                    (isImsVoLteProvisioned() ? "on":"off")));
+            final boolean newValue = !isImsVoLteProvisioned();
+            if (phone != null) {
+                final ImsManager imsManager = ImsManager.getInstance(phone.getContext(), phone.getSubId());
+                if (imsManager != null) {
+                    QueuedWork.singleThreadExecutor().submit(new Runnable() {
+                        public void run() {
+                            try {
+                                imsManager.getConfigInterface().setProvisionedValue(
+                                        ImsConfig.ConfigConstants.VLT_SETTING_ENABLED,
+                                        newValue? 1 : 0);
+                            } catch (ImsException e) {
+                                Log.e(TAG, "setImsVoLteProvisioned() exception:", e);
+                            }
+                        }
+                    });
+                }
+            }
+            updateImsVoLteProvisionedState();
+        }
+    };
+
+    private boolean isImsVoLteProvisioned() {
+        if (phone != null) {
+            ImsManager imsManager = ImsManager.getInstance(phone.getContext(), phone.getSubId());
+            //FIXME L-MR1-INTERNAL
+            //return imsManager.isVolteProvisionedOnDevice(phone.getContext());
+        }
+        return false;
+    }
+
+    private void updateImsVoLteProvisionedState() {
+        log("updateImsVoLteProvisionedState isImsVoLteProvisioned()=" + isImsVoLteProvisioned());
+        String buttonText = isImsVoLteProvisioned() ?
+                getString(R.string.volte_provisioned_flag_off) :
+                getString(R.string.volte_provisioned_flag_on);
+        imsVoLteProvisionedButton.setText(buttonText);
+    }
+
     private void updateSmsOverImsState() {
         log("updateSmsOverImsState isSmsOverImsEnabled()=" + isSmsOverImsEnabled());
         String buttonText = isSmsOverImsEnabled() ?

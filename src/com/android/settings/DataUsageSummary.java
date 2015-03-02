@@ -973,7 +973,7 @@ public class DataUsageSummary extends HighlightingFragment implements Indexable 
                     android.provider.Settings.Global.MOBILE_DATA + phoneId, enabled ? 1 : 0);
 
             int[] subId = SubscriptionManager.getSubId(phoneId);
-            mTelephonyManager.setDataEnabledUsingSubId(subId[0], enabled);
+            mTelephonyManager.setDataEnabled(subId[0], enabled);
         } else {
             mTelephonyManager.setDataEnabled(enabled);
             mMobileDataEnabled = enabled;
