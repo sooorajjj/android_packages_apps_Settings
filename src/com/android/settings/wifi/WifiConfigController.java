@@ -708,25 +708,6 @@ public class WifiConfigController implements TextWatcher,
         }
     }
 
-    private void checkEapSimInfo() {
-        for(int i = 0; i < mWifiEapSimInfo.mNumOfSims; i++) {
-            SubscriptionInfo sir =
-                SubscriptionManager.from(mContext).getActiveSubscriptionInfoForSimSlotIndex(i);
-            String displayname = (sir != null) ? sir.getDisplayName().toString()
-                    : "Default Sub " + (i+1);
-            mSimDisplayNames.add(displayname);
-            if (mWifiEapSimInfo.mSimTypes.get(i) == WifiEapSimInfo.SIM_2G) {
-                Log.d(TAG, "Sim " + (i+1) + " type is SIM_2G");
-                mEapSimAvailableSimName.add(displayname);
-            } else if (mWifiEapSimInfo.mSimTypes.get(i) == WifiEapSimInfo.SIM_3G) {
-                Log.d(TAG, "Sim " + (i+1) + " type is SIM_3G");
-                mEapSimAvailableSimName.add(displayname);
-                mEapAkaAvailableSimName.add(displayname);
-            } else {
-                Log.d(TAG, "Sim " + (i+1) + " type is Unknown");
-            }
-        }
-    }
 
     /**
      * EAP-PWD valid fields include
