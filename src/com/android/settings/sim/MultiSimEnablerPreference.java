@@ -56,7 +56,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.android.internal.telephony.SubscriptionController;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.settings.R;
 import com.android.settings.Utils;
@@ -247,11 +246,9 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         int activeSubInfoCount = 0;
         List<SubscriptionInfo> subInfoLists = SubscriptionManager.from(context)
                 .getActiveSubscriptionInfoList();
-        SubscriptionController subController = SubscriptionController.getInstance();
         if (subInfoLists != null) {
             for (SubscriptionInfo subInfo : subInfoLists) {
-                if (subController.getSubState(subInfo.getSubscriptionId())
-                        == SubscriptionManager.ACTIVE) activeSubInfoCount++;
+                if (subInfo.mStatus == SubscriptionManager.ACTIVE) activeSubInfoCount++;
             }
         }
         return activeSubInfoCount;
