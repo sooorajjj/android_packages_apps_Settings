@@ -1923,5 +1923,21 @@
             android:targetActivity="Settings$TetherSettingsActivity" >
         </activity>
 
+        <receiver android:name="UsbSecurityReceiver">
+            <intent-filter>
+                 <action android:name="android.hardware.usb.action.USB_STATE" />
+                 <action android:name="android.intent.action.SIM_STATE_CHANGED" />
+                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+       </receiver>
+        <activity
+            android:name=".UsbSecurityActivity"
+            android:clearTaskOnLaunch="true"
+            android:exported="true"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:theme="@*android:style/Theme.Holo.Dialog.Alert" >
+        </activity>
     </application>
 </manifest>

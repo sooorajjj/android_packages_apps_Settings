@@ -2232,4 +2232,5 @@
     <string name="cellular_wlan_need_hint_title">蜂窝网至WLAN重选提示</string>
     <string name="cellular_wlan_need_hint_summary">如果数据至WLAN重选为手动或总是询问时，允许提示</string>
     <string name="select_sim_card">选择手机卡</string>
+    <string name="usb_security">为了防止手机出厂后被第三方恶意刷入程序，部分USB连接方式暂不可用，如需获取更多连接方式,请先插入SIM／USIM卡激活USB接口。</string>
 </resources>

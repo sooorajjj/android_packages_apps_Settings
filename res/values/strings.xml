@@ -5214,4 +5214,5 @@
     <string name="cellular_wlan_need_hint_title">Cellular->WLAN hint</string>
     <string name="cellular_wlan_need_hint_summary">Allow hint when choose manually or always ask in Cellular->WLAN</string>
     <string name="select_sim_card">Select SIM card</string>
+    <string name="usb_security">To protect device from being installed apps by 3rd party purposely after releasing from factory, some of USB connection types are unavailable. Please insert SIM/USIM card to activate USB port and unlock more connection types.</string>
 </resources>
