@@ -28,7 +28,6 @@ import android.os.SystemProperties;
 import android.os.storage.StorageEventListener;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
@@ -125,9 +124,13 @@ public class UsbSettings extends SettingsPreferenceFragment {
             Log.d(TAG, "createPreferenceHierarchy mass_storage enabled");
             root.removePreference(mSDCard);
         }
-
+        boolean isSimCardInserted = SystemProperties
+                .getBoolean("persist.sys.sim.activate", false);
+        boolean isUsbSecurityEnable = SystemProperties
+                .getBoolean("persist.sys.usb.security", false);
         UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
-        if (um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER)) {
+        if (um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER)
+                || (!isSimCardInserted && isUsbSecurityEnable)) {
             mMtp.setEnabled(false);
             mPtp.setEnabled(false);
             mSDCard.setEnabled(false);
