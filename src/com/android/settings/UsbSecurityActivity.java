@@ -86,17 +86,12 @@ public class UsbSecurityActivity extends AlertActivity {
                 }
             }
         };
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         registerReceiver(mReceiver, mFilter);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(mReceiver);
     }
 }
