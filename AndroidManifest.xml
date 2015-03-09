@@ -1927,7 +1927,6 @@
             <intent-filter>
                  <action android:name="android.hardware.usb.action.USB_STATE" />
                  <action android:name="android.intent.action.SIM_STATE_CHANGED" />
-                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
        </receiver>
         <activity
