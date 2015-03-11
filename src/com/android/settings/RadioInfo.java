@@ -17,6 +17,7 @@
 package com.android.settings;
 
 import android.app.Activity;
+import android.app.QueuedWork;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -55,6 +56,10 @@ import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.telephony.PhoneFactory;
 import com.android.internal.telephony.PhoneStateIntentReceiver;
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.ims.ImsConfig;
+import com.android.ims.ImsException;
+import com.android.ims.ImsManager;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;

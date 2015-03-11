@@ -192,6 +192,7 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
     private SwitchPreference mEnableOemUnlock;
     private SwitchPreference mAllowMockLocation;
     private SwitchPreference mDebugViewAttributes;
+    private SwitchPreference mQuickBoot;
 
     private PreferenceScreen mPassword;
     private String mDebugApp;
