@@ -280,7 +280,8 @@ public class WifiConfigController implements TextWatcher,
                 }
             }
 
-            if (mAccessPoint.networkId == INVALID_NETWORK_ID || mEdit) {
+            if ((mAccessPoint.networkId == INVALID_NETWORK_ID && !mAccessPoint.isActive())
+                    || mEdit) {
                 showSecurityFields();
                 showIpConfigFields();
                 showProxyFields();
@@ -311,7 +312,8 @@ public class WifiConfigController implements TextWatcher,
                 } else {
                     if (state != null) {
                         addRow(group, R.string.wifi_status, Summary.get(mConfigUi.getContext(),
-                                state));
+                                state, mAccessPoint.networkId ==
+                                WifiConfiguration.INVALID_NETWORK_ID));
                     }
 
                     if (signalLevel != null) {
@@ -351,7 +353,8 @@ public class WifiConfigController implements TextWatcher,
             }
         }
 
-        if (mEdit || (mAccessPoint.getState() == null && mAccessPoint.getLevel() != -1)){
+        if ((mEdit) || (mAccessPoint != null
+                && mAccessPoint.getState() == null && mAccessPoint.getLevel() != -1)){
             mConfigUi.setCancelButton(res.getString(R.string.wifi_cancel));
         }else{
             mConfigUi.setCancelButton(res.getString(R.string.wifi_display_options_done));
@@ -694,15 +697,15 @@ public class WifiConfigController implements TextWatcher,
         if (mEapMethodSpinner == null) {
             if (mContext.getResources().getBoolean(R.bool.config_eap_sim_function)) {
                 checkEapSimInfo();
-                ArrayList<String> methodArray = new ArrayList<String>();
-                Collections.addAll(methodArray, mEapMethods);
+                ArrayList<String> methodarray = new ArrayList<String>();
+                Collections.addAll(methodarray, mEapMethods);
                 if (mEapSimAvailableSimName.size() > 0) {
-                    methodArray.add(EAP_SIM_METHOD_STRING);
+                    methodarray.add(EAP_SIM_METHOD_STRING);
                 }
                 if (mEapAkaAvailableSimName.size() > 0) {
-                    methodArray.add(EAP_AKA_METHOD_STRING);
+                    methodarray.add(EAP_AKA_METHOD_STRING);
                 }
-                mEapMethods = methodArray.toArray(new String[methodArray.size()]);
+                mEapMethods = methodarray.toArray(new String[methodarray.size()]);
             }
             mEapMethodAdapter = new ArrayAdapter<String>(
                     mContext, android.R.layout.simple_spinner_item,
@@ -787,14 +790,14 @@ public class WifiConfigController implements TextWatcher,
             String displayname = MultiSimSettingTab.getMultiSimName(mContext, i);
             mSimDisplayNames.add(displayname);
             if (mWifiEapSimInfo.mSimTypes.get(i) == WifiEapSimInfo.SIM_2G) {
-                Log.d(TAG, "SIM " + (i+1) + " type is SIM_2G");
+                Log.d(TAG, "Sim " + (i + 1) + " type is SIM_2G");
                 mEapSimAvailableSimName.add(displayname);
             } else if (mWifiEapSimInfo.mSimTypes.get(i) == WifiEapSimInfo.SIM_3G) {
-                Log.d(TAG, "SIM " + (i+1) + " type is SIM_3G");
+                Log.d(TAG, "Sim " + (i + 1) + " type is SIM_3G");
                 mEapSimAvailableSimName.add(displayname);
                 mEapAkaAvailableSimName.add(displayname);
             } else {
-                Log.d(TAG, "SIM " + (i+1) + " type is Unknow");
+                Log.d(TAG, "Sim " + (i + 1) + " type is Unknow");
             }
         }
     }

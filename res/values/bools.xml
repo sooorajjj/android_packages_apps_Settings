@@ -64,7 +64,7 @@
 
     <bool name="disable_data_sub2">false</bool>
 
-    <!-- Whether to show abridged dialog for carrier AP -->
+    <!-- Whether to show abridged dialog connecting carrier AP -->
     <bool name="show_abridged_connecting_wifi_dialog">false</bool>
 
     <!-- Whether enable CABL service -->
@@ -86,6 +86,9 @@
 
     <!-- Whether to hide wifi hotspot -->
     <bool name="hide_wifi_hotspot">false</bool>
+
+    <!-- Whether to hide cast screen -->
+    <bool name="hide_cast_screen">false</bool>
 
     <!-- Whether notify user that current connected ap is CMCC -->
     <bool name="connect_to_cmcc_notify">false</bool>

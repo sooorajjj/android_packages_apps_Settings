@@ -22,11 +22,14 @@ import com.android.settings.R;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
-import android.content.Intent;
 import android.content.Context;
+import android.content.ContentUris;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,34 +37,44 @@ import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.provider.SearchIndexableResource;
 import android.provider.Settings.SettingNotFoundException;
-import android.telephony.SubInfoRecord;
+import android.provider.Telephony;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telecom.PhoneAccount;
 import android.telephony.CellInfo;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.telephony.PhoneStateListener;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.settings.MultiSimSettingTab;
+import android.app.Dialog;
 import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneFactory;
 import com.android.internal.telephony.TelephonyIntents;
+
+import com.android.settings.notification.DropDownPreference;
 import com.android.settings.RestrictedSettingsFragment;
 import com.android.settings.Utils;
-import com.android.settings.notification.DropDownPreference;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settings.search.Indexable;
 import com.android.settings.search.Indexable.SearchIndexProvider;
+import com.android.settings.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SimSettings extends RestrictedSettingsFragment implements Indexable, TextWatcher {
@@ -82,7 +95,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private static final String KEY_PRIMARY_SUB_SELECT = "select_primary_sub";
     private static final String SETTING_USER_PREF_DATA_SUB = "user_preferred_data_sub";
 
-    private long mPreferredDataSubscription;
+    private int mPreferredDataSubscription;
 
     private static final int EVT_UPDATE = 1;
     private static int mNumSlots = 0;
@@ -92,17 +105,19 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
      * By UX design we have use only one Subscription Information(SubInfo) record per SIM slot.
      * mAvalableSubInfos is the list of SubInfos we present to the user.
      * mSubInfoList is the list of all SubInfos.
+     * mSelectableSubInfos is the list of SubInfos that a user can select for data, calls, and SMS.
      */
-    private List<SubInfoRecord> mAvailableSubInfos = null;
-    private List<SubInfoRecord> mSubInfoList = null;
+    private List<SubscriptionInfo> mAvailableSubInfos = null;
+    private List<SubscriptionInfo> mSubInfoList = null;
     private Preference mPrimarySubSelect = null;
     private boolean needUpdate = false;
 
     private static List<MultiSimEnablerPreference> mSimEnablers = null;
+    private List<SubscriptionInfo> mSelectableSubInfos = null;
 
-    private SubInfoRecord mCellularData = null;
-    private SubInfoRecord mCalls = null;
-    private SubInfoRecord mSMS = null;
+    private SubscriptionInfo mCellularData = null;
+    private SubscriptionInfo mCalls = null;
+    private SubscriptionInfo mSMS = null;
 
     private int mNumSims;
     private int mPhoneCount;
@@ -116,6 +131,9 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private int mChangeStartPos;
     private int mChangeCount;
 
+    private SubscriptionManager mSubscriptionManager;
+    private Utils mUtils;
+
     public SimSettings() {
         super(DISALLOW_CONFIG_SIM);
     }
@@ -127,9 +145,12 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         final TelephonyManager tm =
                     (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
 
+        mSubscriptionManager = SubscriptionManager.from(getActivity());
+
         if (mSubInfoList == null) {
-            mSubInfoList = SubscriptionManager.getActiveSubInfoList();
+            mSubInfoList = SubscriptionManager.from(getActivity()).getActiveSubscriptionInfoList();
         }
+        if (DBG) log("[onCreate] mSubInfoList=" + mSubInfoList);
 
         mNumSlots = tm.getSimCount();
         mPhoneCount = TelephonyManager.getDefault().getPhoneCount();
@@ -190,7 +211,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             Log.d(TAG, "Intent received: " + action);
             if (TelephonyIntents.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED.equals(action)) {
                 updateCellularDataValues();
-                long preferredDataSubscription = SubscriptionManager.getDefaultDataSubId();
+                int preferredDataSubscription = SubscriptionManager.getDefaultDataSubId();
                 if (preferredDataSubscription != mPreferredDataSubscription) {
                     mPreferredDataSubscription = preferredDataSubscription;
                     String status = getResources().getString(R.string.switch_data_subscription,
@@ -201,11 +222,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     || TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED.equals(action)) {
                 mAvailableSubInfos.clear();
                 mNumSims = 0;
-                mSubInfoList = SubscriptionManager.getActiveSubInfoList();
+                mSubInfoList = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
                 for (int i = 0; i < mNumSlots; ++i) {
-                    final SubInfoRecord sir = findRecordBySlotId(i);
+                    final SubscriptionInfo sir = Utils.findRecordBySlotId(getActivity(), i);
                     // Do not display deactivated subInfo in preference list
-                    if ((sir != null) && (sir.mStatus == SubscriptionManager.ACTIVE)) {
+                    if ((sir != null) && (sir.getStatus() == SubscriptionManager.ACTIVE)) {
                         mNumSims++;
                         mAvailableSubInfos.add(sir);
                     }
@@ -238,10 +259,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         final PreferenceCategory simEnablers =
                 (PreferenceCategory)findPreference(SIM_ENABLER_CATEGORY);
 
-        mAvailableSubInfos = new ArrayList<SubInfoRecord>(mNumSlots);
+        mAvailableSubInfos = new ArrayList<SubscriptionInfo>(mNumSlots);
+        mSelectableSubInfos = new ArrayList<SubscriptionInfo>();
         mSimEnablers = new ArrayList<MultiSimEnablerPreference>(mNumSlots);
         for (int i = 0; i < mNumSlots; ++i) {
-            final SubInfoRecord sir = findRecordBySlotId(i);
+            final SubscriptionInfo sir = Utils.findRecordBySlotId(getActivity(), i);
             simCards.addPreference(new SimPreference(getActivity(), sir, i));
             if (mNumSlots > 1) {
                 mSimEnablers.add(i, new MultiSimEnablerPreference(
@@ -251,9 +273,10 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 removePreference(SIM_ENABLER_CATEGORY);
             }
             // Do not display deactivated subInfo in preference list
-            if ((sir != null) && (sir.mStatus == SubscriptionManager.ACTIVE)) {
+            if ((sir != null) && (sir.getStatus() == SubscriptionManager.ACTIVE)) {
                 mNumSims++;
                 mAvailableSubInfos.add(sir);
+                mSelectableSubInfos.add(sir);
             }
         }
 
@@ -263,7 +286,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
     private void updateAllOptions() {
         Log.d(TAG,"updateAllOptions");
-        mSubInfoList = SubscriptionManager.getActiveSubInfoList();
+        mSubInfoList = SubscriptionManager.from(getActivity()).getActiveSubscriptionInfoList();
         updateSimSlotValues();
         updateActivitesCategory();
         updateSimEnablers();
@@ -273,7 +296,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         TelephonyManager tm =
                 (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
         for (int i = 0; i < mPhoneCount; i++) {
-            long[] subId = SubscriptionManager.getSubId(i);
+            int[] subId = SubscriptionManager.getSubId(i);
             if (subId != null) {
                 if (subId[0] > 0) {
                     mCallState[i] = tm.getCallState(subId[0]);
@@ -284,7 +307,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         }
     }
 
-    private PhoneStateListener getPhoneStateListener(int phoneId, long subId) {
+    private PhoneStateListener getPhoneStateListener(int phoneId, int subId) {
         final int i = phoneId;
         mPhoneStateListener[phoneId]  = new PhoneStateListener(subId) {
             @Override
@@ -325,6 +348,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
      }
 
     private void updateActivitesCategory() {
+        mAvailableSubInfos =
+                SubscriptionManager.from(getActivity()).getActiveSubscriptionInfoList();
         createDropDown((DropDownPreference) findPreference(KEY_CELLULAR_DATA));
         createDropDown((DropDownPreference) findPreference(KEY_CALLS));
         createDropDown((DropDownPreference) findPreference(KEY_SMS));
@@ -333,56 +358,25 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         updateSmsValues();
     }
 
-    /**
-     * finds a record with subId.
-     * Since the number of SIMs are few, an array is fine.
-     */
-    private SubInfoRecord findRecordBySubId(final long subId) {
-        final int availableSubInfoLength = mAvailableSubInfos.size();
-
-        for (int i = 0; i < availableSubInfoLength; ++i) {
-            final SubInfoRecord sir = mAvailableSubInfos.get(i);
-            if (sir != null && sir.subId == subId) {
-                return sir;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * finds a record with slotId.
-     * Since the number of SIMs are few, an array is fine.
-     */
-    private SubInfoRecord findRecordBySlotId(final int slotId) {
-        if (mSubInfoList != null) {
-            final int availableSubInfoLength = mSubInfoList.size();
-
-            for (int i = 0; i < availableSubInfoLength; ++i) {
-                final SubInfoRecord sir = mSubInfoList.get(i);
-                if (sir.slotId == slotId) {
-                    //Right now we take the first subscription on a SIM.
-                    return sir;
-                }
-            }
-        }
-
-        return null;
-    }
-
     private void updateSmsValues() {
-        final DropDownPreference simPref = (DropDownPreference) findPreference(KEY_SMS);
-        long subId = SubscriptionManager.isSMSPromptEnabled() ?
-                0 : SubscriptionManager.getDefaultSmsSubId();
-        final SubInfoRecord sir = findRecordBySubId(subId);
+        final Preference simPref = findPreference(KEY_SMS);
+        final SubscriptionInfo sir = Utils.findRecordBySubId(getActivity(),
+                mSubscriptionManager.getDefaultSmsSubId());
+        simPref.setTitle(R.string.sms_messages_title);
+        if (DBG) log("[updateSmsValues] mSubInfoList=" + mSubInfoList);
+
         if (sir != null) {
-            simPref.setSelectedValue(sir, false);
+            simPref.setSummary(sir.getDisplayName());
+        } else if (sir == null) {
+            simPref.setSummary(R.string.sim_selection_required_pref);
         }
-        simPref.setEnabled(mNumSims > 1);
+        simPref.setEnabled(mSelectableSubInfos.size() >= 1);
     }
 
     private void updateCellularDataValues() {
-        final DropDownPreference simPref = (DropDownPreference) findPreference(KEY_CELLULAR_DATA);
-        final SubInfoRecord sir = findRecordBySubId(SubscriptionManager.getDefaultDataSubId());
+        final DropDownPreference simPref = (DropDownPreference)findPreference(KEY_CELLULAR_DATA);
+        final SubscriptionInfo sir = Utils.findRecordBySubId(getActivity(),
+                SubscriptionManager.getDefaultDataSubId());
         boolean isCellularDataEnabled = false;
         if (sir != null) {
             simPref.setSelectedValue(sir, false);
@@ -425,14 +419,15 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     }
 
     private void updateCallValues() {
-        final DropDownPreference simPref = (DropDownPreference) findPreference(KEY_CALLS);
-        long subId = SubscriptionManager.isVoicePromptEnabled() ?
-                0 : SubscriptionManager.getDefaultVoiceSubId();
-        final SubInfoRecord sir = findRecordBySubId(subId);
-        if (sir != null) {
-            simPref.setSelectedValue(sir, false);
-        }
-        simPref.setEnabled(mNumSims > 1);
+        final Preference simPref = findPreference(KEY_CALLS);
+        final TelecomManager telecomManager = TelecomManager.from(getActivity());
+        final PhoneAccountHandle phoneAccount =
+            telecomManager.getUserSelectedOutgoingPhoneAccount();
+
+        simPref.setTitle(R.string.calls_title);
+        simPref.setSummary(phoneAccount == null
+                ? getResources().getString(R.string.sim_calls_ask_first_prefs_title)
+                : (String)telecomManager.getPhoneAccount(phoneAccount).getLabel());
     }
 
     @Override
@@ -480,8 +475,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
         logd("init LTE primary slot : " + primarySlot + " isManualMode :" + isManualMode);
         if (-1 != primarySlot) {
-            SubInfoRecord subInfo = findRecordBySlotId(primarySlot);
-            CharSequence lteSummary = (subInfo == null ) ? null : subInfo.displayName;
+            SubscriptionInfo subInfo = Utils.findRecordBySlotId(getActivity(), primarySlot);
+            CharSequence lteSummary = (subInfo == null ) ? null : subInfo.getDisplayName();
             mPrimarySubSelect.setSummary(lteSummary);
         } else {
             mPrimarySubSelect.setSummary("");
@@ -537,8 +532,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         simPref.clearItems();
 
         //Get num of activated Subs
-        for (SubInfoRecord subInfo : mSubInfoList) {
-            if (subInfo != null && subInfo.mStatus == SubscriptionManager.ACTIVE) mActCount++;
+        if (mSubInfoList != null) {
+            for (SubscriptionInfo subInfo : mSubInfoList) {
+                if (subInfo != null && subInfo.getStatus()
+                        == SubscriptionManager.ACTIVE) mActCount++;
+            }
         }
 
         if (askFirst && mActCount > 1) {
@@ -548,27 +546,27 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
         final int subAvailableSize = mAvailableSubInfos.size();
         for (int i = 0; i < subAvailableSize; ++i) {
-            final SubInfoRecord sir = mAvailableSubInfos.get(i);
+            final SubscriptionInfo sir = mAvailableSubInfos.get(i);
             if(sir != null){
-                simPref.addItem(sir.displayName, sir);
+                simPref.addItem(sir.getDisplayName().toString(), sir);
             }
         }
 
         simPref.setCallback(new DropDownPreference.Callback() {
             @Override
             public boolean onItemSelected(int pos, Object value) {
-                final long subId = value == null ? 0 : ((SubInfoRecord)value).subId;
+                final int subId = value == null ? 0 : ((SubscriptionInfo)value).getSubscriptionId();
 
                 Log.d(TAG,"calling setCallback: " + simPref.getKey() + "subId: " + subId +
                         " defaultSubId: " + SubscriptionManager.getDefaultDataSubId());
                 if (simPref.getKey().equals(KEY_CELLULAR_DATA)) {
                     if (SubscriptionManager.getDefaultDataSubId() != subId) {
-                        SubscriptionManager.setDefaultDataSubId(subId);
+                        SubscriptionManager.from(getActivity()).setDefaultDataSubId(subId);
                         Log.d(TAG,"subAvailableSize: "+ subAvailableSize);
                         if(subAvailableSize > 1) {
                             setUserPrefDataSubIdInDb(subId);
                         }
-                   }
+                    }
                 } else if (simPref.getKey().equals(KEY_CALLS)) {
                     //subId 0 is meant for "Ask First"/"Prompt" option as per AOSP
                     if (subId == 0) {
@@ -576,7 +574,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     } else {
                         SubscriptionManager.setVoicePromptEnabled(false);
                         if (SubscriptionManager.getDefaultVoiceSubId() != subId) {
-                            SubscriptionManager.setDefaultVoiceSubId(subId);
+                            SubscriptionManager.from(getActivity()).setDefaultVoiceSubId(subId);
                         }
                     }
                 } else if (simPref.getKey().equals(KEY_SMS)) {
@@ -585,7 +583,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     } else {
                         SubscriptionManager.setSMSPromptEnabled(false);
                         if (SubscriptionManager.getDefaultSmsSubId() != subId) {
-                            SubscriptionManager.setDefaultSmsSubId(subId);
+                            SubscriptionManager.from(getActivity()).setDefaultSmsSubId(subId);
                         }
                     }
                 }
@@ -601,7 +599,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         logd("updating data subId: " + subId + " in DB");
     }
 
-    private void setActivity(Preference preference, SubInfoRecord sir) {
+    private void setActivity(Preference preference, SubscriptionInfo sir) {
         final String key = preference.getKey();
 
         if (key.equals(KEY_CELLULAR_DATA)) {
@@ -616,40 +614,32 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     }
 
     private class SimPreference extends Preference{
-        private SubInfoRecord mSubInfoRecord;
+        private SubscriptionInfo mSubscriptionInfo;
         private int mSlotId;
 
-        public SimPreference(Context context, SubInfoRecord subInfoRecord, int slotId) {
+        public SimPreference(Context context, SubscriptionInfo subInfoRecord, int slotId) {
             super(context);
 
-            mSubInfoRecord = subInfoRecord;
+            mSubscriptionInfo = subInfoRecord;
             mSlotId = slotId;
             setKey("sim" + mSlotId);
             update();
         }
 
         public void update() {
-            mSubInfoRecord = findRecordBySlotId(mSlotId);
+            mSubscriptionInfo = Utils.findRecordBySlotId(getActivity(), mSlotId);
             final Resources res = getResources();
 
             setTitle(res.getString(R.string.sim_card_number_title, mSlotId + 1));
-            if (mSubInfoRecord != null) {
+            if (mSubscriptionInfo != null) {
                 setSummary(res.getString(R.string.sim_settings_summary,
-                            mSubInfoRecord.displayName, mSubInfoRecord.number));
+                        mSubscriptionInfo.getDisplayName(),
+                        mSubscriptionInfo.getNumber()));
                 setEnabled(true);
             } else {
                 setSummary(R.string.sim_slot_empty);
                 setFragment(null);
                 setEnabled(false);
-            }
-        }
-
-        @Override
-        protected void onAttachedToActivity() {
-            super.onAttachedToActivity();
-            if (needUpdate) {
-                needUpdate = false;
-                updateAllOptions();
             }
         }
 
@@ -660,15 +650,21 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     R.layout.multi_sim_dialog, null);
             builder.setView(dialogLayout);
 
-            nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
-            nameText.setText(mSubInfoRecord.displayName);
+            EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
+            nameText.setText(mSubscriptionInfo.getDisplayName());
             nameText.addTextChangedListener(SimSettings.this);
 
             TextView numberView = (TextView)dialogLayout.findViewById(R.id.number);
-            numberView.setText(mSubInfoRecord.number);
+            final String rawNumber = getPhoneNumber(mSubscriptionInfo);
+            if (TextUtils.isEmpty(rawNumber)) {
+                numberView.setText(getResources().getString(
+                        com.android.internal.R.string.unknownName));
+            } else {
+                numberView.setText(PhoneNumberUtils.formatNumber(rawNumber));
+            }
 
             TextView carrierView = (TextView)dialogLayout.findViewById(R.id.carrier);
-            carrierView.setText(mSubInfoRecord.displayName);
+            carrierView.setText(mSubscriptionInfo.getDisplayName());
 
             builder.setTitle(R.string.sim_editor_title);
 
@@ -679,14 +675,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     final Spinner displayNumbers =
                         (Spinner)dialogLayout.findViewById(R.id.display_numbers);
 
-                    SubscriptionManager.setDisplayNumberFormat(
-                        displayNumbers.getSelectedItemPosition() == 0
-                            ? SubscriptionManager.DISPLAY_NUMBER_LAST
-                            : SubscriptionManager.DISPLAY_NUMBER_FIRST, mSubInfoRecord.subId);
-
-                    mSubInfoRecord.displayName = nameText.getText().toString();
-                    SubscriptionManager.setDisplayName(mSubInfoRecord.displayName,
-                        mSubInfoRecord.subId, SubscriptionManager.NAME_SOURCE_USER_INPUT);
+                    mSubscriptionInfo.setDisplayName(nameText.getText());
+                    SubscriptionManager.from(getActivity()).setDisplayName(
+                            mSubscriptionInfo.getDisplayName().toString(),
+                            mSubscriptionInfo.getSubscriptionId(),
+                            SubscriptionManager.NAME_SOURCE_USER_INPUT);
 
                     updateAllOptions();
                     update();
@@ -824,6 +817,18 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             MultiSimEnablerPreference simEnabler = mSimEnablers.get(i);
             if (simEnabler != null) simEnabler.update();
         }
+    }
+
+    // Returns the line1Number. Line1number should always be read from TelephonyManager since it can
+    // be overridden for display purposes.
+    private String getPhoneNumber(SubscriptionInfo info) {
+        final TelephonyManager tm =
+            (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        return tm.getLine1NumberForSubscriber(info.getSubscriptionId());
+    }
+
+    private void log(String s) {
+        Log.d(TAG, s);
     }
 
     private void logd(String msg) {
