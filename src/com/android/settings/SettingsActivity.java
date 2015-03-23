@@ -36,6 +36,7 @@ import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.INetworkManagementService;
@@ -187,6 +188,11 @@ public class SettingsActivity extends Activity
      * that fragment.
      */
     public static final String EXTRA_SHOW_FRAGMENT_TITLE = ":settings:show_fragment_title";
+    /**
+     * The package name used to resolve the title resource id.
+     */
+    public static final String EXTRA_SHOW_FRAGMENT_TITLE_RES_PACKAGE_NAME =
+            ":settings:show_fragment_title_res_package_name";
     public static final String EXTRA_SHOW_FRAGMENT_TITLE_RESID =
             ":settings:show_fragment_title_resid";
     public static final String EXTRA_SHOW_FRAGMENT_AS_SHORTCUT =
@@ -203,6 +209,10 @@ public class SettingsActivity extends Activity
     private static final String EXTRA_UI_OPTIONS = "settings:ui_options";
 
     private static final String EMPTY_QUERY = "";
+
+    private static final String ACTION_GESTURE = "qualcomm.intent.action.GESTURE_SETTINGS";
+
+    private static CharSequence MODEL_8909 = "8909";
 
     private static boolean sShowNoHomeNotice = false;
 
@@ -686,7 +696,23 @@ public class SettingsActivity extends Activity
         if (initialTitleResId > 0) {
             mInitialTitle = null;
             mInitialTitleResId = initialTitleResId;
-            setTitle(mInitialTitleResId);
+
+            final String initialTitleResPackageName = intent.getStringExtra(
+                    EXTRA_SHOW_FRAGMENT_TITLE_RES_PACKAGE_NAME);
+            if (initialTitleResPackageName != null) {
+                try {
+                    Context authContext = createPackageContextAsUser(initialTitleResPackageName,
+                            0 /* flags */, new UserHandle(UserHandle.myUserId()));
+                    mInitialTitle = authContext.getResources().getText(mInitialTitleResId);
+                    setTitle(mInitialTitle);
+                    mInitialTitleResId = -1;
+                    return;
+                } catch (NameNotFoundException e) {
+                    Log.w(LOG_TAG, "Could not find package" + initialTitleResPackageName);
+                }
+            } else {
+                setTitle(mInitialTitleResId);
+            }
         } else {
             mInitialTitleResId = -1;
             final String initialTitle = intent.getStringExtra(EXTRA_SHOW_FRAGMENT_TITLE);
@@ -1232,6 +1258,17 @@ public class SettingsActivity extends Activity
                 } else if (id == R.id.global_roaming_settings) {
                     if (!getResources().getBoolean(R.bool.config_roamingsettings_enabled)) {
                         removeTile = true;
+                    }
+                } else if (id == R.id.gestures_settings) {
+                    Intent intent = new Intent(ACTION_GESTURE);
+                    List<ResolveInfo> infos = getBaseContext().getPackageManager()
+                            .queryIntentActivities(intent, 0);
+
+                    if (infos == null || infos.isEmpty() || !Build.MODEL.contains(MODEL_8909)) {
+                        removeTile = true;
+                    } else {
+                        tile.title = infos.get(0).activityInfo.loadLabel(getPackageManager());
+                        tile.intent = intent;
                     }
                 } else if (id == R.id.timer_switch_settings) {
                     Intent intent = new Intent(ACTION_TIMER_SWITCH);

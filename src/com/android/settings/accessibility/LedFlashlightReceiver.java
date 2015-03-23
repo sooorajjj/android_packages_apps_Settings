@@ -41,7 +41,7 @@ import java.io.IOException;
 
 public class LedFlashlightReceiver extends BroadcastReceiver {
     public static final String LED_SWITCH = "LedSwitch";
-    public static final String LED_FLASH_LIGHT_ACTION = "com.android.settings.LED_FLASH_LIGHT";
+    public static final String LED_SWITCH_ACTION = "android.intent.action.ACTION_SHUTDOWN";
     private static final String TAG = "LedFlashlightReceiver";
     // LED light on/off values.
     private static final byte[] LIGHTE_OFF = {
@@ -69,7 +69,7 @@ public class LedFlashlightReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null &&
-                LED_FLASH_LIGHT_ACTION.equals(intent.getAction())) {
+                LED_SWITCH_ACTION.equals(intent.getAction())) {
             boolean isLightsOn = intent.getBooleanExtra(LED_SWITCH, false);
             setLEDWakeLock(context, isLightsOn);
             setLEDStatus(isLightsOn);
