@@ -587,6 +587,8 @@ class AccessPoint extends Preference {
 
         if (mState != null) { // This is the active connection
             summary.append(Summary.get(context, mState));
+        } else if (mConfig != null && mConfig.hasNoInternetAccess()) {
+            summary.append(context.getString(R.string.wifi_no_internet));
         } else if (mConfig != null && ((mConfig.status == WifiConfiguration.Status.DISABLED &&
                 mConfig.disableReason != WifiConfiguration.DISABLED_UNKNOWN_REASON)
                || mConfig.autoJoinStatus
@@ -642,6 +644,9 @@ class AccessPoint extends Preference {
                     summary.append( Long.toString(sec) + "s ");
                 }
                 summary.append(")");
+            }
+            if (mConfig != null && mConfig.numNoInternetAccessReports > 0) {
+                summary.append(" noInt=").append(mConfig.numNoInternetAccessReports);
             }
         }
 

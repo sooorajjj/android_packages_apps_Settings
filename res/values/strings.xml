@@ -1624,6 +1624,8 @@
     <string name="wifi_disabled_password_failure">Authentication problem</string>
     <!-- Summary for the remembered network but currently not in range. -->
     <string name="wifi_not_in_range">Not in range</string>
+    <!-- Summary for the remembered network but no internet connection was detected. -->
+    <string name="wifi_no_internet">No Internet Access Detected, won\'t automatically reconnect.</string>
     <!-- Substring of status line when Wi-Fi Protected Setup (WPS) is available and
          string is listed first [CHAR LIMIT=20]-->
     <string name="wifi_wps_available_first_item">WPS available</string>
