@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010 The Android Open Source Project
- * Copyright (c) 2013, The Linux Foundation. All Rights Reserved.
+ * Copyright (c) 2013-2015, The Linux Foundation. All Rights Reserved.
  *
  * Not a Contribution.
  *
@@ -31,6 +31,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -62,15 +63,19 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
     private static final String KEY_BRIGHTNESS = "brightness";
     private static final String KEY_CABL_BRIGHTNESS = "cabl_brightness";
+    private static final String KEY_SCREENCOLOR = "screencolor_settings";
+
+    private static final String SET_VALUE = "1";
+    private static final String DEFAULT_VALUE = "0";
 
     private Preference mBrightnessSettingsPreference;
+    private Preference mScreenColorPreference;
 
     private CheckBoxPreference mAccelerometer;
     private WarnedListPreference mFontSizePref;
     private CheckBoxPreference mNotificationPulse;
 
     private final Configuration mCurConfig = new Configuration();
-    
     private ListPreference mScreenTimeoutPreference;
     private Preference mScreenSaverPreference;
 
@@ -105,6 +110,21 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                 && getResources().getBoolean(
                         com.android.internal.R.bool.config_dreamsSupported) == false) {
             getPreferenceScreen().removePreference(mScreenSaverPreference);
+        }
+
+        mScreenColorPreference = findPreference(KEY_SCREENCOLOR);
+        if (mScreenColorPreference != null) {
+            if (DEFAULT_VALUE.equals(SystemProperties.get("ro.qcom.screencolor",
+                    DEFAULT_VALUE))) {
+                getPreferenceScreen().removePreference(mScreenColorPreference);
+            } else {
+                if (SET_VALUE.equals(SystemProperties.get(
+                        "ro.qcom.screencolor", DEFAULT_VALUE))
+                        && SET_VALUE.equals(SystemProperties.get(
+                        "persist.tuning.qdcm", DEFAULT_VALUE))) {
+                    getPreferenceScreen().removePreference(mScreenColorPreference);
+                }
+            }
         }
 
         mScreenTimeoutPreference = (ListPreference) findPreference(KEY_SCREEN_TIMEOUT);
