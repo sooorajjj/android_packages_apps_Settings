@@ -205,6 +205,7 @@ public class BluetoothPermissionActivity extends AlertActivity implements
         }
 
         sendReplyIntentToReceiver(false, always);
+        finish();
     }
 
     private void sendReplyIntentToReceiver(final boolean allowed, final boolean always) {
