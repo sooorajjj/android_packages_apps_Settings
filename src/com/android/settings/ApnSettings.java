@@ -286,8 +286,7 @@ public class ApnSettings extends PreferenceActivity implements
             }
         }
 
-        //UI should filter APN by bearer and enable status
-        where += " and (bearer=\"" + getRadioTechnology() + "\" or bearer =\"" + 0 + "\")";
+        //UI should filter APN enable status
         where += " and carrier_enabled = 1";
         Log.d(TAG, "fillList: where= " + where);
 
