@@ -227,6 +227,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     || TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED.equals(action)) {
                 mAvailableSubInfos.clear();
                 mNumSims = 0;
+                mSelectableSubInfos.clear();
                 mSubInfoList = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
                 for (int i = 0; i < mNumSlots; ++i) {
                     final SubscriptionInfo sir = Utils.findRecordBySlotId(getActivity(), i);
@@ -234,6 +235,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     if ((sir != null) && (sir.getStatus() == SubscriptionManager.ACTIVE)) {
                         mNumSims++;
                         mAvailableSubInfos.add(sir);
+                        mSelectableSubInfos.add(sir);
                     }
                 }
                 // Refresh UI whenever subinfo record gets changed
@@ -375,7 +377,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         } else if (sir == null) {
             simPref.setSummary(R.string.sim_selection_required_pref);
         }
-        simPref.setEnabled(mSelectableSubInfos.size() >= 1);
+        simPref.setEnabled(mSelectableSubInfos.size() > 1);
     }
 
     private void updateCellularDataValues() {
@@ -433,6 +435,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         simPref.setSummary(phoneAccount == null
                 ? getResources().getString(R.string.sim_calls_ask_first_prefs_title)
                 : (String)telecomManager.getPhoneAccount(phoneAccount).getLabel());
+        simPref.setEnabled(mSelectableSubInfos.size() > 1);
     }
 
     @Override
@@ -645,6 +648,15 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 setSummary(R.string.sim_slot_empty);
                 setFragment(null);
                 setEnabled(false);
+            }
+        }
+
+        @Override
+        protected void onAttachedToActivity() {
+            super.onAttachedToActivity();
+            if (needUpdate) {
+                needUpdate = false;
+                updateAllOptions();
             }
         }
 
