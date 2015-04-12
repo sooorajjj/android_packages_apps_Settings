@@ -96,6 +96,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private int mSlotId;
     private SubscriptionInfo mSir;
     private boolean mCurrentState;
+    private boolean mRequest;
 
     private boolean mCmdInProgress = false;
     private int mSwitchVisibility = View.VISIBLE;
@@ -265,7 +266,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        mCurrentState = isChecked;
+        mRequest = isChecked;
         logd("onClick: " + isChecked);
 
         synchronized (mSyncLock) {
@@ -290,7 +291,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
             }
         }
 
-        if (!mCurrentState) {
+        if (!mRequest) {
             if (getActivatedSubInfoCount(mContext) > 1) {
                 logd("More than one sub is active, Deactivation possible.");
                 showAlertDialog(CONFIRM_ALERT_DLG_ID, 0);
@@ -314,7 +315,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
 
         showProgressDialog();
         setEnabled(false);
-        if (mCurrentState) {
+        if (mRequest) {
             SubscriptionManager.activateSubId(mSir.getSubscriptionId());
         } else {
             SubscriptionManager.deactivateSubId(mSir.getSubscriptionId());
@@ -368,7 +369,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private void showProgressDialog() {
         String title = mSir == null ? "SUB" : mSir.getDisplayName().toString();
 
-        String msg = mContext.getString(mCurrentState ? R.string.sim_enabler_enabling
+        String msg = mContext.getString(mRequest ? R.string.sim_enabler_enabling
                 : R.string.sim_enabler_disabling);
         dismissDialog(sProgressDialog);
         sProgressDialog = new ProgressDialog(mContext);
