@@ -409,19 +409,22 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         final TelecomManager telecomManager = TelecomManager.from(getActivity());
         final PhoneAccountHandle phoneAccount =
             telecomManager.getUserSelectedOutgoingPhoneAccount();
-        int subId = mSubscriptionManager.getDefaultVoiceSubId();
-        int slotId = mSubscriptionManager.getSlotId(subId);
-        if (phoneAccount != null
-                && (slotId >= SubscriptionManager.MIN_SUBSCRIPTION_ID_VALUE &&
-                slotId <= SubscriptionManager.MAX_SUBSCRIPTION_ID_VALUE)) {
+        final int subId = mSubscriptionManager.getDefaultVoiceSubId();
+        final int slotId = mSubscriptionManager.getSlotId(subId);
+        final SubscriptionInfo sir = Utils.findRecordBySubId(getActivity(),
+                subId);
+        if(sir == null) {
+            simPref.setSummary(R.string.sim_selection_required_pref);
+            simPref.setEnabled(false);
+            return;
+        }
+        if (phoneAccount != null && SubscriptionManager.isValidSlotId(slotId)) {
             ((DropDownPreference) simPref).setSelectedValue(slotId, false);
         } else if (phoneAccount == null) {
             ((DropDownPreference) simPref).setSelectedValue(ASK_VALUE, false);
         }
         simPref.setTitle(R.string.calls_title);
-        simPref.setSummary((phoneAccount == null ||
-                (slotId >= SubscriptionManager.MIN_SUBSCRIPTION_ID_VALUE &&
-                slotId <= SubscriptionManager.MAX_SUBSCRIPTION_ID_VALUE))
+        simPref.setSummary((phoneAccount == null || !SubscriptionManager.isValidSlotId(slotId))
                         ? getResources().getString(R.string.sim_calls_ask_first_prefs_title)
                         : (String) telecomManager.getPhoneAccount(phoneAccount).getLabel());
         simPref.setEnabled(mSelectableSubInfos == null ? false : mSelectableSubInfos.size() > 1);
