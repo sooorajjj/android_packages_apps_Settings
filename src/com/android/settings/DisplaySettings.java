@@ -91,7 +91,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
     private final Configuration mCurConfig = new Configuration();
 
-    private ListPreference mScreenTimeoutPreference;
+    private ScreenTimeoutPreference mScreenTimeoutPreference;
     private Preference mScreenSaverPreference;
     private SwitchPreference mLiftToWakePreference;
     private SwitchPreference mDozePreference;
@@ -131,7 +131,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             }
         }
 
-        mScreenTimeoutPreference = (ListPreference) findPreference(KEY_SCREEN_TIMEOUT);
+        mScreenTimeoutPreference = (ScreenTimeoutPreference) findPreference(KEY_SCREEN_TIMEOUT);
         long currentTimeout = Settings.System.getLong(resolver, SCREEN_OFF_TIMEOUT,
                 FALLBACK_SCREEN_TIMEOUT_VALUE);
         long timeoutValue = (currentTimeout == Integer.MAX_VALUE) ? -1 : currentTimeout;
