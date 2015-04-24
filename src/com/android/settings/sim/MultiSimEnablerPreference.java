@@ -537,7 +537,8 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
             }
         });
 
-        builder.setTitle(R.string.sim_editor_title);
+        final Resources res = mContext.getResources();
+        builder.setTitle(res.getString(R.string.sim_editor_title, mSlotId + 1));
 
         builder.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
             @Override
