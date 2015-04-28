@@ -2757,4 +2757,6 @@
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI相关信息"</string>
     <string name="slot_number" msgid="3762676044904653577">"（插槽<xliff:g id="SLOT_NUM">%1$d</xliff:g>）"</string>
 
+    <string name="data_usage_menu_show_time_range">显示时间区间</string>
+    <string name="data_usage_menu_hide_time_range">隐藏时间区间</string>
 </resources>
