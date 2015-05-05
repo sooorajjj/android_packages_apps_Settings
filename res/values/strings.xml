@@ -6365,4 +6365,6 @@
    <string name="slot_number">(Slot<xliff:g id="slot_num">%1$d</xliff:g>)</string>
 
     <string name="meta_info">Software version</string>
+
+    <string name="voice_over_LTE">Voice over LTE</string>
 </resources>

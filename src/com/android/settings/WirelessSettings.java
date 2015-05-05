@@ -59,6 +59,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import android.preference.SwitchPreference;
+import android.telephony.SubscriptionManager;
+import com.android.ims.ImsManager;
+import com.android.ims.ImsException;
 
 public class WirelessSettings extends SettingsPreferenceFragment
         implements OnPreferenceChangeListener, Indexable {
@@ -79,6 +83,10 @@ public class WirelessSettings extends SettingsPreferenceFragment
 
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
+
+    private static final String VOICE_OVER_LTE = "voice_over_LTE";
+    private SwitchPreference mVoLtePreference;
+    private ImsManager mImsManager = null;
 
     private AirplaneModeEnabler mAirplaneModeEnabler;
     private SwitchPreference mAirplaneModePreference;
@@ -114,6 +122,21 @@ public class WirelessSettings extends SettingsPreferenceFragment
         } else if (preference == findPreference(KEY_MANAGE_MOBILE_PLAN)) {
             onManageMobilePlanClick();
         }
+
+        else if (preference == mVoLtePreference) {
+            boolean translateValue = mVoLtePreference.isChecked();
+            Log.d(TAG, "mVoLtePreference.isChecked(): " + mVoLtePreference.isChecked());
+            try{
+                if(mImsManager != null){
+                    mImsManager.setAdvanced4GMode(translateValue?true:false);
+                    Settings.Global.putInt(WirelessSettings.this.getActivity().getContentResolver(),
+                       "VoLTE", translateValue?1:0);
+                }
+            }catch(ImsException e){
+                Log.e(TAG , "ImsException " + e);
+            }
+        }
+
         // Let the intents be launched by the Preference manager
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
@@ -310,6 +333,23 @@ public class WirelessSettings extends SettingsPreferenceFragment
         } else {
             mSmsApplicationPreference.setOnPreferenceChangeListener(this);
             initSmsApplicationSetting();
+        }
+
+        mVoLtePreference = (SwitchPreference) findPreference(VOICE_OVER_LTE);
+        boolean volteSwitchEnable = getActivity().getResources().getBoolean(
+            com.android.internal.R.bool.config_regional_volte_switch_enable);
+
+        if(volteSwitchEnable){
+            //get current setting from database, default to 1 (ON).
+            int value = Settings.Global.getInt(getActivity().getContentResolver(),
+                                "VoLTE", 1);
+            mVoLtePreference.setChecked(value==1?true:false);
+            mImsManager = ImsManager.getInstance(this.getActivity(),
+                    SubscriptionManager.getDefaultSubId());
+            Log.d(TAG, "DefaultVoiceSubId: " + SubscriptionManager.getDefaultVoiceSubId()
+                    + "; DefaultSubId: " + SubscriptionManager.getDefaultSubId());
+        }else{
+            getPreferenceScreen().removePreference(mVoLtePreference);
         }
 
         // Remove NSD checkbox by default
