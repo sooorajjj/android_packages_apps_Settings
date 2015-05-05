@@ -6367,4 +6367,6 @@
     <string name="meta_info">Software version</string>
 
     <string name="wifi_calling_settings_title">Wifi Calling Settings</string>
+
+    <string name="voice_over_LTE">Voice over LTE</string>
 </resources>
