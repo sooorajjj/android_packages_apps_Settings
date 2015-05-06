@@ -46,6 +46,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.content.IntentFilter;
 
 import com.android.internal.telephony.SmsApplication;
 import com.android.internal.telephony.SmsApplication.SmsApplicationData;
@@ -80,6 +81,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
     private static final String KEY_SMS_APPLICATION = "sms_application";
     private static final String KEY_TOGGLE_NSD = "toggle_nsd"; //network service discovery
     private static final String KEY_CELL_BROADCAST_SETTINGS = "cell_broadcast_settings";
+    private static final String KEY_WIFI_CALLING_SETTINGS = "wifi_call_settings";
 
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
@@ -472,6 +474,13 @@ public class WirelessSettings extends SettingsPreferenceFragment
             PreferenceScreen root = getPreferenceScreen();
             Preference ps = findPreference(KEY_CELL_BROADCAST_SETTINGS);
             if (ps != null) root.removePreference(ps);
+        }
+        if(findPreference(KEY_WIFI_CALLING_SETTINGS) != null){
+            Resources res = getResources();
+            if(!res.getBoolean(com.android.internal.R.bool.config_regional_wifi_calling_menu_enable)){
+                removePreference(KEY_WIFI_CALLING_SETTINGS);
+            }
+            //FIX ME : init the wificallswitch status
         }
     }
 
