@@ -6394,4 +6394,64 @@
     <string name="mobile_hotspot_help_dialog_text"></string>
     <string name="tethering_help_dialog_title">Help</string>
     <string name="tethering_help_dialog_text"></string>
+    <string name="data_usage_menu_show_time_range">Show time range</string>
+    <string name="data_usage_menu_hide_time_range">Hide time range</string>
+    <string name="wifi_call_setting_title">Wi-Fi Calling</string>
+    <string name="wifi_call_preferrd_setting_title">Wi-Fi Calling Preferences</string>
+        <string-array name="wifi_call_preferences_entries_title">
+        <item>Wi-Fi Preferred</item>
+        <item>Cellular Network Preferred</item>
+        <item>Never use Cellular Network</item>
+    </string-array>
+    <string-array name="wifi_call_preferences_entries_summary">
+        <item>Use Wi-Fi for calls. If Wi-Fi is unavailable, use Cellular Network. (Default)</item>
+        <item>Use Cellular Network for calls. If Cellular Network is unavailable, use Wi-Fi.</item>
+        <item>Use only Wi-Fi for calls.</item>
+    </string-array>
+    <string name="wifi_calling_registration_success_for_user">Registration Success</string>
+    <string name="wifi_calling_registration_success_cause">Registration Success</string>
+    <string name="wifi_calling_registration_unknow_error_for_user">Unknow error</string>
+    <string name="wifi_calling_registration_unknow_cause">Unknow error</string>
+    <string name="wifi_calling_registration_error02_for_user">DNS Error</string>
+    <string name="wifi_calling_registration_error_cause_02">Unable to receive response to NAPTR query</string>
+    <string name="wifi_calling_registration_error03_for_user">DNS Error</string>
+    <string name="wifi_calling_registration_error_cause_03">Unable to receive response to SRV query</string>
+    <string name="wifi_calling_registration_error04_for_user">DNS Error</string>
+    <string name="wifi_calling_registration_error_cause_04">Unable to receive response to A query</string>
+    <string name="wifi_calling_registration_error041_for_user">DNS Error</string>
+    <string name="wifi_calling_registration_error_cause_041">ePDG Wi-Fi calling- Device is unable to resolve FQDN for the ePDG to an IP Address</string>
+    <string name="wifi_calling_registration_error05_for_user">Invalid SIM card</string>
+    <string name="wifi_calling_registration_error_cause_05">Incorrect SIM card used (ex: no UICC with GBA support being used)he error will be displayed when the SIM card inserted is not GBA capable or is not a TMO SIM card</string>
+    <string name="wifi_calling_registration_error07_for_user">Unable to connect</string>
+    <string name="wifi_calling_registration_error_cause_07">Error shown when the device experiences a Null pointer Exception error or an error local to the device before registration attempts are made</string>
+    <string name="wifi_calling_registration_error081_for_user">Unable to connect</string>
+    <string name="wifi_calling_registration_error_cause_081">Device is not able to connect to ePDG or experiences a Null pointer error or an error local to the device before registration attempts are made</string>
+    <string name="wifi_calling_registration_error082_for_user">Unable to connect</string>
+    <string name="wifi_calling_registration_error_cause_082">Device is unable to establish an IP sec tunnel with the ePDG for any reason other than timeout or certificate validation</string>
+    <string name="wifi_calling_registration_error08_for_user">Unable to connect</string>
+    <string name="wifi_calling_registration_error_cause_08">Device is unable to establish a TLS connection for reasons other than certificate verifications failures. This includes timeout to TCP connection</string>
+    <string name="wifi_calling_registration_error10_for_user">Invalid Certificate</string>
+    <string name="wifi_calling_registration_error_cause_10">Unable to validate the server certificate (this would happen if the URL for certificate revocation cannot be resolved to IP or the server cannot be reached in case of a firewall or captive portal)</string>
+    <string name="wifi_calling_registration_error101_for_user">Invalid Certificate</string>
+    <string name="wifi_calling_registration_error_cause_101">Unable to validate the server certificate for IP sec tunnel establishment</string>
+    <string name="wifi_calling_registration_error011_for_user">Invalid Certificate</string>
+    <string name="wifi_calling_registration_error_cause_011">The certificate is invalid: certificate is revoked, certificate expired</string>
+    <string name="wifi_calling_registration_error111_for_user">Invalid Certificate</string>
+    <string name="wifi_calling_registration_error_cause_111">The certificate during IP sec tunnel establishment is invalid: certificate is revoked or has expired</string>
+    <string name="wifi_calling_registration_reg91_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg91_cause">Error 500: Internal server error</string>
+    <string name="wifi_calling_registration_reg09_for_user">Missing 911 Address</string>
+    <string name="wifi_calling_registration_reg09_cause">No 911 address on file</string>
+    <string name="wifi_calling_registration_reg99_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg99_cause">All other failures</string>
+    <string name="wifi_calling_registration_reg901_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg901_cause">This will happen in case of SIM card does not exist (e.g. already deleted) from HLR/HSS</string>
+    <string name="wifi_calling_registration_reg902_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg902_cause">Non-TMO SIM in the phone or For future use, if MVNO were not allowed on our IMS network</string>
+    <string name="wifi_calling_registration_reg903_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg903_cause">IMPI and IMPU do not match or OTA to the SIM did not happen or MSISDN change in HSS will be needed</string>
+    <string name="wifi_calling_registration_reg904_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg904_cause">Error would happen if username and password used instead of SIM based authentication or Unlikely scenario, but potentially happen with tablets</string>
+    <string name="wifi_calling_registration_reg905_for_user">Unable to Connect</string>
+    <string name="wifi_calling_registration_reg905_cause">Based on EEIR check, handset is blacklisted</string>
 </resources>
