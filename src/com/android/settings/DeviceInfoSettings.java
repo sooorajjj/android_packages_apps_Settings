@@ -38,9 +38,11 @@ import android.preference.PreferenceScreen;
 import android.provider.SearchIndexableResource;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+import com.android.internal.telephony.PhoneFactory;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settings.search.Index;
 import com.android.settings.search.Indexable;
@@ -113,6 +115,8 @@ public class DeviceInfoSettings extends SettingsPreferenceFragment implements In
         }
         setStringSummary(KEY_FIRMWARE_VERSION, Build.VERSION.RELEASE);
         findPreference(KEY_FIRMWARE_VERSION).setEnabled(true);
+        setStringSummary(KEY_BASEBAND_VERSION, TelephonyManager.getTelephonyProperty(
+                SubscriptionManager.MIN_SUBSCRIPTION_ID_VALUE, "gsm.version.baseband", null));
         setValueSummary(KEY_BASEBAND_VERSION, "gsm.version.baseband");
         setStringSummary(KEY_DEVICE_MODEL, Build.MODEL + getMsvSuffix());
         setStringSummary(KEY_DEVICE_PROCESSOR, getDeviceProcessorInfo());
