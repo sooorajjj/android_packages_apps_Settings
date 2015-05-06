@@ -46,6 +46,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.content.IntentFilter;
 
 import com.android.internal.telephony.SmsApplication;
 import com.android.internal.telephony.SmsApplication.SmsApplicationData;
@@ -477,6 +478,13 @@ public class WirelessSettings extends SettingsPreferenceFragment
 
         if (!isWifiCallingSettingsSupported()) {
             removePreference(KEY_WIFI_CALLING_SETTINGS);
+        }
+
+        if(findPreference(KEY_WIFI_CALLING_SETTINGS) != null){
+            Resources res = getResources();
+            if(!res.getBoolean(com.android.internal.R.bool.config_regional_wifi_calling_menu_enable)){
+                removePreference(KEY_WIFI_CALLING_SETTINGS);
+            }
         }
     }
 
