@@ -229,7 +229,11 @@ public class ApnSettings extends SettingsPreferenceFragment implements
         if (SystemProperties.getBoolean("persist.sys.hideapn", true)) {
             //remove the filtered items, no need to show in UI
             where += " and type <>\"" + PhoneConstants.APN_TYPE_IA + "\"";
-
+            if (getActivity().getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hide_ims_and_dun_apns)) {
+                where += " and type <>\"" + PhoneConstants.APN_TYPE_DUN + "\"";
+                where += " and type <>\"" + PhoneConstants.APN_TYPE_IMS + "\"";
+            }
             // Filer fota and dm for specail carrier
             if (getResources().getBoolean(R.bool.config_hide_dm_enabled)) {
                 String operatorMccMnc = TelephonyManager.getDefault().getIccOperatorNumeric(mSubId);
