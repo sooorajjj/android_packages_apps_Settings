@@ -363,7 +363,19 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
                 .setTitle(title);
         switch(dialogId) {
             case CONFIRM_ALERT_DLG_ID:
-                builder.setMessage(mContext.getString(R.string.sim_enabler_need_disable_sim));
+                String message;
+                if (mContext.getResources().getBoolean(R.bool.confirm_to_switch_data_service)) {
+                    if (SubscriptionManager.getDefaultDataSubId() == mSir.getSubscriptionId()) {
+                        message = mContext.getString(R.string.sim_enabler_need_switch_data_service,
+                                getActivatedSlotId(mContext));
+                    } else {
+                        message = mContext.getString(R.string.sim_enabler_need_disable_sim);
+                    }
+                    builder.setTitle(R.string.sim_enabler_will_disable_sim_title);
+                } else {
+                    message = mContext.getString(R.string.sim_enabler_need_disable_sim);
+                }
+                builder.setMessage(message);
                 builder.setPositiveButton(android.R.string.ok, mDialogClickListener);
                 builder.setNegativeButton(android.R.string.no, mDialogClickListener);
                 builder.setOnCancelListener(mDialogCanceListener);
@@ -386,6 +398,20 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         sAlertDialog = builder.create();
         sAlertDialog.setCanceledOnTouchOutside(false);
         sAlertDialog.show();
+    }
+
+    private int getActivatedSlotId(Context context) {
+        int activeSlotId = -1;
+        List<SubscriptionInfo> subInfoLists =
+                SubscriptionManager.from(context).getActiveSubscriptionInfoList();
+        if (subInfoLists != null) {
+            for (SubscriptionInfo subInfo : subInfoLists) {
+                if (subInfo.getStatus() == SubscriptionManager.ACTIVE
+                        && subInfo.getSubscriptionId() != mSir.getSubscriptionId())
+                    activeSlotId = subInfo.getSimSlotIndex() + 1;
+            }
+        }
+        return activeSlotId;
     }
 
     private void showProgressDialog() {
