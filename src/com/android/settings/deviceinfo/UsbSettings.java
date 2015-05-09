@@ -16,11 +16,14 @@
 
 package com.android.settings.deviceinfo;
 
+import java.util.ArrayList;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.os.Environment;
@@ -37,6 +40,7 @@ import android.widget.Toast;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
+import com.android.settings.TetherSettings;
 import com.android.settings.Utils;
 
 /**
@@ -51,6 +55,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private static final String KEY_PTP = "usb_ptp";
     private static final String KEY_CHARGING = "usb_charging";
     private static final String KEY_SDCARD = "usb_sdcard";
+    private static final String KEY_USB_TETHERING = "usb_tethering";
 
     // We could not know what's the usb default mode config of each device, which
     // may be defined in some sh source file. So here use a hard code for reference,
@@ -63,10 +68,17 @@ public class UsbSettings extends SettingsPreferenceFragment {
     private CheckBoxPreference mPtp;
     private CheckBoxPreference mCharging;
     private CheckBoxPreference mSDCard;
+
     private boolean mUsbAccessoryMode;
     private boolean operateInprogress = false;
 
     private StorageManager mStorageManager = null;
+
+    private boolean mUsbConnected;
+    private boolean mMassStorageActive;
+    private String[] mUsbRegexs;
+    private CheckBoxPreference mUsbTethering;
+    private BroadcastReceiver mTetherChangeReceiver;
 
     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
         public void onReceive(Context content, Intent intent) {
@@ -119,6 +131,7 @@ public class UsbSettings extends SettingsPreferenceFragment {
         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
         mCharging = (CheckBoxPreference)root.findPreference(KEY_CHARGING);
         mSDCard = (CheckBoxPreference)root.findPreference(KEY_SDCARD);
+        mUsbTethering = (CheckBoxPreference)root.findPreference(KEY_USB_TETHERING);
         //not to show this mode if mass storage is not supported
         if (!isMassStorageEnabled()) {
             Log.d(TAG, "createPreferenceHierarchy mass_storage enabled");
@@ -134,6 +147,20 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mMtp.setEnabled(false);
             mPtp.setEnabled(false);
             mSDCard.setEnabled(false);
+        }
+
+        if(getResources().getBoolean(
+            com.android.internal.R.bool.config_regional_usb_tethering_quick_start_enable)){
+            ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            mUsbRegexs = cm.getTetherableUsbRegexs();
+            final boolean usbAvailable = mUsbRegexs.length != 0;
+            if (!usbAvailable || Utils.isMonkeyRunning()) {
+                root.removePreference(mUsbTethering);
+            }
+            updateState();
+        } else {
+            root.removePreference(mUsbTethering);
         }
 
         return root;
@@ -176,6 +203,11 @@ public class UsbSettings extends SettingsPreferenceFragment {
         if (mStorageManager != null) {
             mStorageManager.unregisterListener(mStorageListener);
         }
+
+        if(mTetherChangeReceiver != null){
+            getActivity().unregisterReceiver(mTetherChangeReceiver);
+            mTetherChangeReceiver = null;
+        }
     }
 
     @Override
@@ -193,6 +225,23 @@ public class UsbSettings extends SettingsPreferenceFragment {
             mStorageManager.registerListener(mStorageListener);
         }
         updateUsbFunctionState();
+
+        if(getResources().getBoolean(
+            com.android.internal.R.bool.config_regional_usb_tethering_quick_start_enable)) {
+            mTetherChangeReceiver = new TetherChangeReceiver();
+            IntentFilter filter = new IntentFilter(ConnectivityManager.ACTION_TETHER_STATE_CHANGED);
+            Intent intent = getActivity().registerReceiver(mTetherChangeReceiver, filter);
+
+            filter = new IntentFilter();
+            filter.addAction(UsbManager.ACTION_USB_STATE);
+            getActivity().registerReceiver(mTetherChangeReceiver, filter);
+
+            filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_MEDIA_SHARED);
+            filter.addAction(Intent.ACTION_MEDIA_UNSHARED);
+            filter.addDataScheme("file");
+            getActivity().registerReceiver(mTetherChangeReceiver, filter);
+        }
     }
 
     private void updateToggles(String function) {
@@ -264,6 +313,11 @@ public class UsbSettings extends SettingsPreferenceFragment {
             function = UsbManager.USB_FUNCTION_CHARGING;
         } else if (preference == mSDCard && mSDCard.isChecked()) {
             function = UsbManager.USB_FUNCTION_MASS_STORAGE;
+        } else if (preference == mUsbTethering){
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), TetherSettings.class);
+            getActivity().startActivity(intent);
+            return true;
         }
 
         operateInprogress = true;
@@ -271,5 +325,98 @@ public class UsbSettings extends SettingsPreferenceFragment {
         updateToggles(function);
 
         return true;
+    }
+
+    private void updateUsbState(String[] available, String[] tethered,
+            String[] errored) {
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        boolean usbAvailable = mUsbConnected && !mMassStorageActive;
+        int usbError = ConnectivityManager.TETHER_ERROR_NO_ERROR;
+        for (String s : available) {
+            for (String regex : mUsbRegexs) {
+                if (s.matches(regex)) {
+                    if (usbError == ConnectivityManager.TETHER_ERROR_NO_ERROR) {
+                        usbError = cm.getLastTetherError(s);
+                    }
+                }
+            }
+        }
+        boolean usbTethered = false;
+        for (String s : tethered) {
+            for (String regex : mUsbRegexs) {
+                if (s.matches(regex)) usbTethered = true;
+            }
+        }
+        boolean usbErrored = false;
+        for (String s: errored) {
+            for (String regex : mUsbRegexs) {
+                if (s.matches(regex)) usbErrored = true;
+            }
+        }
+
+        if (usbTethered) {
+            mUsbTethering.setSummary(R.string.usb_tethering_active_subtext);
+            mUsbTethering.setEnabled(true);
+            mUsbTethering.setChecked(true);
+        } else if (usbAvailable) {
+            if (usbError == ConnectivityManager.TETHER_ERROR_NO_ERROR) {
+                mUsbTethering.setSummary(R.string.usb_tethering_available_subtext);
+            } else {
+                mUsbTethering.setSummary(R.string.usb_tethering_errored_subtext);
+            }
+            mUsbTethering.setEnabled(true);
+            mUsbTethering.setChecked(false);
+        } else if (usbErrored) {
+            mUsbTethering.setSummary(R.string.usb_tethering_errored_subtext);
+            mUsbTethering.setEnabled(false);
+            mUsbTethering.setChecked(false);
+        } else if (mMassStorageActive) {
+            mUsbTethering.setSummary(R.string.usb_tethering_storage_active_subtext);
+            mUsbTethering.setEnabled(false);
+            mUsbTethering.setChecked(false);
+        } else {
+            mUsbTethering.setSummary(R.string.usb_tethering_unavailable_subtext);
+            mUsbTethering.setEnabled(false);
+            mUsbTethering.setChecked(false);
+        }
+    }
+
+    private void updateState() {
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        String[] available = cm.getTetherableIfaces();
+        String[] tethered = cm.getTetheredIfaces();
+        String[] errored = cm.getTetheringErroredIfaces();
+        updateUsbState(available, tethered, errored);
+    }
+
+    private class TetherChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context content, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(ConnectivityManager.ACTION_TETHER_STATE_CHANGED)) {
+                // this should understand the interface types
+                ArrayList<String> available = intent.getStringArrayListExtra(
+                        ConnectivityManager.EXTRA_AVAILABLE_TETHER);
+                ArrayList<String> active = intent.getStringArrayListExtra(
+                        ConnectivityManager.EXTRA_ACTIVE_TETHER);
+                ArrayList<String> errored = intent.getStringArrayListExtra(
+                        ConnectivityManager.EXTRA_ERRORED_TETHER);
+                updateUsbState(available.toArray(new String[available.size()]),
+                        active.toArray(new String[active.size()]),
+                        errored.toArray(new String[errored.size()]));
+            } else if (action.equals(Intent.ACTION_MEDIA_SHARED)) {
+                mMassStorageActive = true;
+                updateState();
+            } else if (action.equals(Intent.ACTION_MEDIA_UNSHARED)) {
+                mMassStorageActive = false;
+                updateState();
+            } else if (action.equals(UsbManager.ACTION_USB_STATE)) {
+                mUsbConnected = intent.getBooleanExtra(UsbManager.USB_CONNECTED, false);
+                updateState();
+            }
+        }
     }
 }
