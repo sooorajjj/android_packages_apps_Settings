@@ -6463,4 +6463,6 @@
     <string name="wifi_call_status_wifi_off">Wi-Fi Turned Off</string>
     <string name="app_ops_permiss_name">App network access</string>
     <string name="meta_info">Software version</string>
+    <string name="usb_tethering_title">USB tethering</string>
+    <string name="usb_tethering_summary">Share network via usb connection</string>
 </resources>
