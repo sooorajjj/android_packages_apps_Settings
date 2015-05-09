@@ -6369,4 +6369,6 @@
     <string name="wifi_calling_settings_title">Wifi Calling Settings</string>
 
     <string name="voice_over_LTE">Voice over LTE</string>
+    <string name="usb_tethering_title">USB tethering</string>
+    <string name="usb_tethering_summary">Share network via usb connection</string>
 </resources>
