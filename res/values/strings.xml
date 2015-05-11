@@ -6458,4 +6458,6 @@
     <string name="wifi_calling_wizard_content_step_1">This is tutorial of wi-fi calling. \n \"Skip\" will skip the wizard this time. \n \"Learn more\" will show more info about it</string>
     <string name="wifi_calling_wizard_content_step_2">When turn on the wi-fi calling switch, you can make call or message over wifi.\n \"Next\" to last wizard</string>
     <string name="wifi_calling_wizard_content_step_3">There is wifi calling preferences menu. \n Settings --->  More ---> Wifi Calling</string>
+    <string name="wifi_calling_notification_title">Calls will be made over Wi-Fi</string>
+    <string name="wifi_calling_notification_subtitle">Tap here to access preferences</string>
 </resources>
