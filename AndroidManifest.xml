@@ -2339,7 +2339,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name="com.android.settings.wificall.WifiCallPreferenceActivity" >
+        <activity android:name="com.android.settings.wificall.WifiCallPreferenceActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"></action>
             </intent-filter>
