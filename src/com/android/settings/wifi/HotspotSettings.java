@@ -453,6 +453,7 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         catalogPick.setMaxValue(8);
         catalogPick.setMinValue(1);
         catalogPick.setValue(niSelectedMaximum);// default set 8
+        catalogPick.setDescendantFocusability(catalogPick.FOCUS_BLOCK_DESCENDANTS);
         dialog.setView(catalogPick);
         dialog.show();
     }
