@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
@@ -243,6 +244,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                 com.android.internal.R.array.config_mobile_hotspot_provision_app);
         if (mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             accountHandler = new AccountHandler();
         }
     }
