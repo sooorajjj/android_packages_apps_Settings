@@ -39,6 +39,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.SharedPreferences;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -144,6 +145,11 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            final Activity activity = getActivity();
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         if (getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_hotspot_show_allowed_devices_enable)) {
