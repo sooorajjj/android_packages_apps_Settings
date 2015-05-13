@@ -6390,4 +6390,6 @@
     <string name="service_upgrade_title">Service upgrade</string>
     <string name="service_upgrade">Upgrade</string>
     <string name="service_msg"></string>
+    <string name="tethering_no_sim_alert_title">No SIM card</string>
+    <string name="tethering_no_sim_card_text">Please install SIM card in order to share your data connection with other devices using Mobile Wi-Fi HotSpot or USB tethering for Internet access.</string>
 </resources>
