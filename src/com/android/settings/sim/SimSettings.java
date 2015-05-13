@@ -17,6 +17,7 @@
 package com.android.settings.sim;
 
 import android.provider.SearchIndexableResource;
+import android.provider.Settings;
 
 import com.android.settings.R;
 
@@ -368,6 +369,17 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         return null;
     }
 
+    private boolean isAPMOnAndSIMPowerDown(Context context) {
+        if (context == null) {
+            return false;
+        }
+        boolean isAirPlaneMode = Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) == 1;
+        boolean isSIMPowerDown = SystemProperties.getInt(
+                "persist.radio.apm_sim_not_pwdn", 0) == 0;
+        return isAirPlaneMode && isSIMPowerDown;
+    }
+
     private void updateSmsValues() {
         final DropDownPreference simPref = (DropDownPreference) findPreference(KEY_SMS);
         long subId = SubscriptionManager.isSMSPromptEnabled() ?
@@ -376,7 +388,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         if (sir != null) {
             simPref.setSelectedValue(sir, false);
         }
-        simPref.setEnabled(mNumSims > 1);
+        simPref.setEnabled(mNumSims > 1 && !isAPMOnAndSIMPowerDown(getActivity()));
     }
 
     private void updateCellularDataValues() {
@@ -398,7 +410,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         boolean callStateIdle = isCallStateIdle();
         // Enable data preference in msim mode and call state idle
         boolean disableCellulardata = getResources().getBoolean(R.bool.disbale_cellular_data);
-        simPref.setEnabled((mNumSims > 1) && callStateIdle && (!disableCellulardata));
+        simPref.setEnabled((mNumSims > 1) && callStateIdle && (!disableCellulardata)
+                && !isAPMOnAndSIMPowerDown(getActivity()));
         // Display toast only once when the user enters the activity even though the call moves
         // through multiple call states (eg - ringing to offhook for incoming calls)
         if (callStateIdle == false && inActivity && dataDisableToastDisplayed == false) {
@@ -431,7 +444,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         if (sir != null) {
             simPref.setSelectedValue(sir, false);
         }
-        simPref.setEnabled(mNumSims > 1);
+        simPref.setEnabled(mNumSims > 1 && !isAPMOnAndSIMPowerDown(getActivity()));
     }
 
     @Override
