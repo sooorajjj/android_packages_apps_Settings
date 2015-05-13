@@ -634,10 +634,16 @@ public class TetherSettings extends SettingsPreferenceFragment
         mTetherChoice = choice;
         if (mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
-            if(BLUETOOTH_TETHERING != choice && AccountCheck.isCarrierSimCard(mContext)) {
-                AccountCheck.getInstance().checkAccount(mContext,
-                        accountHandler.obtainMessage(1));
-                return;
+            if (BLUETOOTH_TETHERING != choice) {
+                if (AccountCheck.showNoSimCardDialog(mContext)) {
+                    setTetheringOff();
+                    return;
+                }
+                if(AccountCheck.isCarrierSimCard(mContext)) {
+                    AccountCheck.getInstance().checkAccount(mContext,
+                            accountHandler.obtainMessage(1));
+                    return;
+                }
             }
         }
         if (isProvisioningNeeded(mProvisionApp)) {

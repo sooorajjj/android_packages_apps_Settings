@@ -53,6 +53,7 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import static android.content.Context.TELEPHONY_SERVICE;
 
 public class AccountCheck  {
     public static final String TAG = "AccountCheck";
@@ -171,6 +172,24 @@ public class AccountCheck  {
         builder.create().show();
     }
 
+    public static boolean showNoSimCardDialog(Context ctx) {
+        TelephonyManager tm = (TelephonyManager) ctx.getSystemService(TELEPHONY_SERVICE);
+        if (!isSimCardReady(tm)) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+            alert.setTitle(R.string.tethering_no_sim_alert_title);
+            alert.setMessage(R.string.tethering_no_sim_card_text);
+            alert.setPositiveButton("Ok", null);
+            alert.show();
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isSimCardReady(
+        TelephonyManager telephonyManager) {
+        return (telephonyManager.getSimState()
+            == TelephonyManager.SIM_STATE_READY);
+    }
     public static boolean isCarrierSimCard(Context ctx) {
         boolean isCarrierSimCard = false;
         String[] carrierMccMncs = ctx.getResources().getStringArray(
@@ -243,6 +262,7 @@ public class AccountCheck  {
             return getHttpResponse();
         }
     }
+
     public static boolean isHotspotAutoTurnOffEnabled(Context ctx) {
         boolean isHotspotAutoTurnOffEnabled = false;
         if (ctx != null) {
@@ -251,6 +271,7 @@ public class AccountCheck  {
         }
         return isHotspotAutoTurnOffEnabled;
     }
+
     public static boolean isServiceRunning(Context context, String className) {
         boolean isRunning = false;
         if (context != null && (!TextUtils.isEmpty(className))) {

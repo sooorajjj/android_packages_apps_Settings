@@ -226,10 +226,16 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
         }
         if (mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
-            if(isChecked && AccountCheck.isCarrierSimCard(mContext)) {
-                AccountCheck.getInstance().checkAccount(mContext,
-                        accountHandler.obtainMessage(1));
-                return;
+            if (isChecked) {
+                if (AccountCheck.showNoSimCardDialog(mContext)) {
+                    mSwitch.setChecked(false);
+                    return;
+                }
+                if (AccountCheck.isCarrierSimCard(mContext)) {
+                    AccountCheck.getInstance().checkAccount(mContext,
+                            accountHandler.obtainMessage(1));
+                    return;
+                }
             }
         }
         if (isChecked) {
