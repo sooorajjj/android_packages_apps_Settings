@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ * Not a Contribution.
+ *
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -624,10 +627,16 @@ public class TetherSettings extends SettingsPreferenceFragment
         mTetherChoice = choice;
         if (mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
-            if(BLUETOOTH_TETHERING != choice && AccountCheck.isCarrierSimCard(mContext)) {
-                AccountCheck.getInstance().checkAccount(mContext,
-                        accountHandler.obtainMessage(1));
-                return;
+            if (BLUETOOTH_TETHERING != choice) {
+                if (AccountCheck.showNoSimCardDialog(mContext)) {
+                    setTetheringOff();
+                    return;
+                }
+                if(AccountCheck.isCarrierSimCard(mContext)) {
+                    AccountCheck.getInstance().checkAccount(mContext,
+                            accountHandler.obtainMessage(1));
+                    return;
+                }
             }
         }
         if (isProvisioningNeeded(mProvisionApp)) {
