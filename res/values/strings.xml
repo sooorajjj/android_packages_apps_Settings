@@ -6387,4 +6387,8 @@
     <string name="service_msg">Your current rate plan does not support sharing your phone’s data connection with other devices using Mobile Wi-Fi HotSpot for internet access. Do you want to add the Smartphone Mobile HotSpot service to your rate plan now? You can add it later through MyAccount application on your phone or online at https://my.t-mobile.com under Manage > Plans and Services.</string>    
     <string name="tethering_no_sim_alert_title">No SIM card</string>
     <string name="tethering_no_sim_card_text">Please install SIM card in order to share your phone’s data connection with other devices using Mobile Wi-Fi HotSpot or USB tethering for Internet access.</string>
+    <string name="dialog_not_show_again">Do not show again</string>
+    <string name="ssid_broadcast_dialog_title">Your HotSpot is not visible now</string>
+    <string name="ssid_broadcast_dialog_text">If you switch the Broadcast Network Name (SSID) option off, your phone will not be visible to other devices and will not appear in the list of available Wi-Fi networks. Other devices can still connect to your HotSpot by entering its network name manually.</string>
+    <string name="wifi_ap_broadcast_ssid">Broadcast network name(SSID)</string>
 </resources>
