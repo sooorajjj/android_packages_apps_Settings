@@ -16,9 +16,12 @@
 
 package com.android.settings.wifi;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiConfiguration.AuthAlgorithm;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
@@ -27,8 +30,10 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -50,11 +55,14 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     public static final int WPA2_INDEX = 1;
 
     private View mView;
+    private View mshowAgainView;
     private TextView mSsid;
     private int mSecurityTypeIndex = OPEN_INDEX;
     private EditText mPassword;
     private CheckBox mCheckBox;
 
+    private CheckBox mShowAgain;
+    private CheckBox mBroadcastSsid;
     WifiConfiguration mWifiConfig;
 
     public WifiApDialog(Context context, DialogInterface.OnClickListener listener,
@@ -86,6 +94,11 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
          */
         config.SSID = mSsid.getText().toString();
 
+        Context context = getContext();
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_broadcast_ssid_checkbox)) {
+            config.hiddenSSID = !(mBroadcastSsid.isChecked());
+        }
         switch (mSecurityTypeIndex) {
             case OPEN_INDEX:
                 config.allowedKeyManagement.set(KeyMgmt.NONE);
@@ -126,6 +139,12 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
 
         if (mWifiConfig != null) {
             mSsid.setText(mWifiConfig.SSID);
+            if (context.getResources().getBoolean(
+                    com.android.internal.R.bool
+                    .config_regional_hotspot_show_broadcast_ssid_checkbox)) {
+                mBroadcastSsid = (CheckBox) mView.findViewById(R.id.broadcast_ssid);
+                mBroadcastSsid.setChecked(!mWifiConfig.hiddenSSID);
+            }
             mSecurity.setSelection(mSecurityTypeIndex);
             if (mSecurityTypeIndex == WPA2_INDEX) {
                   mPassword.setText(mWifiConfig.preSharedKey);
@@ -141,6 +160,24 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
 
         showSecurityFields();
         validate();
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_broadcast_ssid_checkbox)) {
+            mBroadcastSsid.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (!isChecked) {
+                        final Context context = getContext();
+                        mshowAgainView = getLayoutInflater().inflate(R.layout.not_show_again, null);
+                        mShowAgain = (CheckBox)mshowAgainView.findViewById(R.id.check);
+                        SharedPreferences sharedpreferences = context.getSharedPreferences(
+                                "ShowAgain", Context.MODE_PRIVATE);
+                        boolean showagain = sharedpreferences.getBoolean("SsidBroadcast", true);
+                        if (showagain) {
+                            BroadcastSsidDialog();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -193,10 +230,41 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     }
 
     private void showSecurityFields() {
+        final Context context = getContext();
+        if ((!context.getResources().getBoolean(
+                    com.android.internal.R.bool
+                    .config_regional_hotspot_show_broadcast_ssid_checkbox))) {
+            mView.findViewById(R.id.checkbox).setVisibility(View.GONE);
+        } else {
+            mView.findViewById(R.id.checkbox).setVisibility(View.VISIBLE);
+        }
         if (mSecurityTypeIndex == OPEN_INDEX) {
             mView.findViewById(R.id.fields).setVisibility(View.GONE);
             return;
         }
         mView.findViewById(R.id.fields).setVisibility(View.VISIBLE);
+    }
+
+    private void BroadcastSsidDialog() {
+        final Context context = getContext();
+        AlertDialog.Builder alertdialog =  new AlertDialog.Builder(context);
+        alertdialog.setTitle(R.string.ssid_broadcast_dialog_title);
+        alertdialog.setMessage(R.string.ssid_broadcast_dialog_text);
+        alertdialog.setView(mshowAgainView);
+        alertdialog.setPositiveButton("close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick( DialogInterface dialog, int which) {
+                SharedPreferences sharedpreferences = context.getSharedPreferences(
+                        "ShowAgain", Context.MODE_PRIVATE);
+                Editor editor = sharedpreferences.edit();
+                if (mShowAgain.isChecked()) {
+                    editor.putBoolean("SsidBroadcast", false);
+                } else {
+                    editor.putBoolean("SsidBroadcast", true);
+                }
+                editor.commit();
+            }
+        });
+        alertdialog.show();
     }
 }

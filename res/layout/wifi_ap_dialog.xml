@@ -105,5 +105,18 @@
                     style="@style/wifi_item_content"
                     android:text="@string/wifi_show_password" />
         </LinearLayout>
+        <LinearLayout android:id="@+id/checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/wifi_item"
+                android:orientation="vertical"
+                android:visibility="gone">
+            <CheckBox
+                    android:id="@+id/broadcast_ssid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/wifi_item_content"
+                    android:text="@string/wifi_ap_broadcast_ssid" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
