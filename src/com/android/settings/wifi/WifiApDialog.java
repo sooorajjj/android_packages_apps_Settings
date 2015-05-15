@@ -221,6 +221,16 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         mSecurityTypeIndex = position;
+        final Context context = getContext();
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_open_security_dialog)) {
+            if (mSecurityTypeIndex == OPEN_INDEX) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.setMessage(R.string.open_security_settings_note);
+                alert.setPositiveButton("Ok", null);
+                alert.show();
+            }
+        }
         showSecurityFields();
         validate();
     }

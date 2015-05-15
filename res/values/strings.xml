@@ -6382,4 +6382,5 @@
     <string name="ssid_broadcast_dialog_title">Your HotSpot is not visible now</string>
     <string name="ssid_broadcast_dialog_text">If you switch the Broadcast Network Name (SSID) option off, your phone will not be visible to other devices and will not appear in the list of available Wi-Fi networks. Other devices can still connect to your HotSpot by entering its network name manually.</string>
     <string name="wifi_ap_broadcast_ssid">Broadcast network name(SSID)</string>
+    <string name="open_security_settings_note">With Open security, any device can connect to your Mobile HotSpot and use your mobile data connection.</string>
 </resources>
