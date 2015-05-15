@@ -35,12 +35,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Message;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
 import com.android.settings.R;
 import java.io.IOException;
 import java.util.Arrays;
@@ -64,6 +69,8 @@ public class AccountCheck  {
     private static final int WIFI_TETHERING      = 0;
     private static final int USB_TETHERING       = 1;
     private static AccountCheck thisInstance = null;
+    private static View mshowAgainView;
+    private static CheckBox mShowAgain;
 
     public String mServerUrl = "";
     public String upsellUrl = "";
@@ -218,6 +225,36 @@ public class AccountCheck  {
             Log.d(TAG,"is home Carrier SIM Card? " + isCarrierSimCard);
         }
         return isCarrierSimCard;
+    }
+    public static void showTurnOffWifiDialog(final Context ctx) {
+        LayoutInflater inflater = (LayoutInflater)ctx.getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+        mshowAgainView = inflater.inflate(R.layout.not_show_again, null);
+        mShowAgain = (CheckBox)mshowAgainView.findViewById(R.id.check);
+        SharedPreferences sharedpreferences = ctx.getSharedPreferences(
+                "ShowAgain", Context.MODE_PRIVATE);
+        boolean showagain = sharedpreferences.getBoolean("SsidBroadcast", true);
+        if (showagain) {
+            AlertDialog.Builder alertdialog =  new AlertDialog.Builder(ctx);
+            alertdialog.setTitle(R.string.turn_off_wifi_dialog_title);
+            alertdialog.setMessage(R.string.turn_off_wifi_dialog_text);
+            alertdialog.setView(mshowAgainView);
+            alertdialog.setPositiveButton("close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick( DialogInterface dialog, int which) {
+                    SharedPreferences sharedpreferences = ctx.getSharedPreferences(
+                        "TurnOffWifiShowAgain", Context.MODE_PRIVATE);
+                    Editor editor = sharedpreferences.edit();
+                    if (mShowAgain.isChecked()) {
+                        editor.putBoolean("SsidBroadcast", false);
+                    } else {
+                        editor.putBoolean("SsidBroadcast", true);
+                    }
+                    editor.commit();
+                }
+            });
+            alertdialog.show();
+        }
     }
 
     private class AccoutCheckTask extends AsyncTask<Void, Integer, Boolean>{
