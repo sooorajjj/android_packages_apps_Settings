@@ -231,6 +231,10 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                     mSwitch.setChecked(false);
                     return;
                 }
+                mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+                if (mWifiManager.isWifiEnabled()) {
+                    AccountCheck.showTurnOffWifiDialog(mContext);
+                }
                 if (AccountCheck.isCarrierSimCard(mContext)) {
                     AccountCheck.getInstance().checkAccount(mContext,
                             accountHandler.obtainMessage(1));
