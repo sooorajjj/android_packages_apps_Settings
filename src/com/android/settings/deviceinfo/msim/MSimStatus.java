@@ -441,7 +441,8 @@ public class MSimStatus extends PreferenceActivity {
 
             //baseband is not related to DSDS, one phone has one base band.
             String basebandVersionSummery =
-                TelephonyManager.getTelephonyProperty(PhoneFactory.getDefaultSubscription(),
+                TelephonyManager.getTelephonyProperty(
+                        SubscriptionManager.MIN_SUBSCRIPTION_ID_VALUE,
                         "gsm.version.baseband", null);
             setSummaryText(KEY_BASEBAND_VERSION,basebandVersionSummery);
         }
