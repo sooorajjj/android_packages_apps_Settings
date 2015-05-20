@@ -106,4 +106,8 @@
             android:targetClass="com.android.cellbroadcastreceiver.CellBroadcastSettings" />
     </PreferenceScreen>
 
+    <SwitchPreference
+        android:key="voice_over_LTE"
+        android:title="@string/voice_over_LTE"/>
+
 </PreferenceScreen>
