@@ -371,7 +371,10 @@ public class DataUsageSummary extends HighlightingFragment implements Indexable 
             mDataEnabledView.setClickable(true);
             mDataEnabledView.setFocusable(true);
             mDataEnabledView.setOnClickListener(mDataEnabledListener);
-            mNetworkSwitches.addView(mDataEnabledView);
+            if (!getActivity().getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_dataUsage_enable_default)) {
+                mNetworkSwitches.addView(mDataEnabledView);
+            }
 
             mDisableAtLimit = new Switch(inflater.getContext());
             mDisableAtLimit.setClickable(false);
