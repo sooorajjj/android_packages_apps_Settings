@@ -51,6 +51,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+import com.android.settings.AccountCheck;
 
 public class WifiApEnablerSwitch {
 
@@ -229,6 +230,14 @@ public class WifiApEnablerSwitch {
                 /**
                  * Summary on enable is handled by tether broadcast notice
                  */
+                if (AccountCheck.isHotspotAutoTurnOffEnabled(mContext)) {
+                    String hotsoptServiceClassName = HotsoptService.class.getName();
+                    if (!AccountCheck.isServiceRunning(mContext, hotsoptServiceClassName)) {
+                        Intent intent = new Intent().setClassName(mContext,
+                                hotsoptServiceClassName);
+                        mContext.startService(intent);
+                    }
+                }
                 mCheckBox.setChecked(true);
                 /* Doesnt need the airplane check */
                 mCheckBox.setEnabled(true);
