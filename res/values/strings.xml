@@ -6365,4 +6365,8 @@
     <string name="add_device_name_text">Device Name:</string>
     <string name="add_device_dialog_split">:</string>
     <string name="add_devices_summary"> allowed</string>
+    <string name="maximum_connections_button_text">Maximum Connections</string>
+    <string name="maximum_connections_dialog_title_text">Set Maximum Connections</string>
+    <string name="maximum_connections_dialog_positive_text">Yes</string>
+    <string name="maximum_connections_dialog_negative_text">No</string>
 </resources>
