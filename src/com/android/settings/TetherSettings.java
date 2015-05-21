@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
@@ -131,7 +132,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     public static final int PROVISION_REQUEST = 0;
     private boolean mShowHotspotSetting;
     private boolean mUnavailable;
-    private Handler accountHandler = null;
+    private TetherSettingsAccountHandler mAccountHandler = null;
 
     public String[] getProvisionApp() {
         return mProvisionApp;
@@ -209,7 +210,10 @@ public class TetherSettings extends SettingsPreferenceFragment
         if (!usbAvailable || Utils.isMonkeyRunning()) {
             getPreferenceScreen().removePreference(mUsbTether);
         }
-
+        if (getResources().getBoolean(
+               com.android.internal.R.bool.config_regional_hotspot_default_ssid_with_imei_enable)) {
+            TetherSettingsAccountHandler.checkDefaultSSID(activity);
+        }
         if (wifiAvailable && !Utils.isMonkeyRunning()) {
             if (mShowHotspotSetting) {
                 mWifiApEnablerSwitch = new WifiApEnablerSwitch(activity, mEnableWifiApSwitch);
@@ -253,7 +257,7 @@ public class TetherSettings extends SettingsPreferenceFragment
         if (mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            accountHandler = new TetherSettingsAccountHandler(this);
+            mAccountHandler = new TetherSettingsAccountHandler(this);
         }
     }
 
@@ -638,7 +642,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                     com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
             if (BLUETOOTH_TETHERING != choice) {
                 if (AccountCheck.showNoSimCardDialog(mContext)) {
-                    setTetheringOff();
+                    mAccountHandler.setTetheringOff();
                     return;
                 }
                 if (USB_TETHERING != choice) {
@@ -649,7 +653,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                 }
                 if(AccountCheck.isCarrierSimCard(mContext)) {
                     AccountCheck.getInstance().checkAccount(mContext,
-                            accountHandler.obtainMessage(1));
+                            mAccountHandler.obtainMessage(1));
                     return;
                 }
             }

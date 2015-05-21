@@ -34,6 +34,12 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiConfiguration;
 
 public class TetherSettingsAccountHandler extends Handler {
 
@@ -59,7 +65,7 @@ public class TetherSettingsAccountHandler extends Handler {
        }
     }
 
-    private void setTetheringOff() {
+    public void setTetheringOff() {
         if(mTetherSettings.getTetherChoice() == TetherSettings.USB_TETHERING) {
             mTetherSettings.setUsbTethering(false);
         } else if(mTetherSettings.getTetherChoice() == TetherSettings.WIFI_TETHERING) {
@@ -77,5 +83,36 @@ public class TetherSettingsAccountHandler extends Handler {
         } else {
             setTetheringOff();
         }
+    }
+
+    public static void checkDefaultSSID(final Activity activity) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(
+                "MY_PERFS",Activity.MODE_PRIVATE);
+        boolean hasSetDefaultSSID = sharedPreferences.getBoolean("has_set_default_ssid",false);
+        if (hasSetDefaultSSID) {
+            return;
+        }
+        TelephonyManager tm = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+        String deviceId = tm.getDeviceId();
+        String lastFourDigits = "";
+        if ((deviceId != null) && (deviceId.length() >3)) {
+            lastFourDigits =  deviceId.substring(deviceId.length()-4);
+        }
+        if (TextUtils.isEmpty(lastFourDigits)) {
+            return;
+        }
+        WifiManager wifiManager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager == null) {
+            return;
+        }
+        WifiConfiguration wifiAPConfig = wifiManager.getWifiApConfiguration();
+        if (wifiAPConfig == null || wifiAPConfig.SSID.indexOf(lastFourDigits) >0) {
+            return;
+        }
+        wifiAPConfig.SSID = wifiAPConfig.SSID + " " + lastFourDigits;
+        wifiManager.setWifiApConfiguration(wifiAPConfig);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("has_set_default_ssid",true);
+        editor.commit();
     }
 }
