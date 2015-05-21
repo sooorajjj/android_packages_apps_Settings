@@ -33,7 +33,11 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:key="wifi_ap_ssid_and_security"
         android:persistent="false"
         android:title="@string/wifi_tether_configure_ap_text" />
-
+    <PreferenceScreen
+        android:fragment="com.android.settings.AllowedDevicesInfoList"
+        android:key="allowed_devices"
+        android:title="@string/allowed_devices_title" >
+    </PreferenceScreen>
     <PreferenceCategory
         android:key="ap_device_list"
         android:persistent="false"

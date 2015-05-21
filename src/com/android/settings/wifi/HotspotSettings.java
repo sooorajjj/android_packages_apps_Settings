@@ -63,6 +63,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.android.settings.adddevicesinfo.db.AddDevicesInfoDBManager;
 
 /*
  * Displays preferences for Tethering.
@@ -77,7 +78,7 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     private static final int DIALOG_AP_SETTINGS = 1;
     private static final int CONFIG_SUBTEXT = R.string.wifi_tether_configure_subtext;
     private static final int MENU_HELP = Menu.FIRST;
-
+    private static final String ALLOWED_DEVICES_PREFERENCE = "allowed_devices";
     private static final String WIFI_AP_SSID_AND_SECURITY = "wifi_ap_ssid_and_security";
     private static final String AP_CONNECTED_STATE_CHANGED_ACTION =
             "android.net.conn.TETHER_CONNECT_STATE_CHANGED";
@@ -101,6 +102,8 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     private WifiConfiguration mWifiApConfig = null;
     private String[] mProvisionApp;
     private Preference mCreateNetworkPref;
+    private PreferenceScreen mAllowedDevice;
+    private AddDevicesInfoDBManager mdbManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,6 +130,15 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
 
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_allowed_devices_enable)) {
+            mAllowedDevice = (PreferenceScreen)findPreference(ALLOWED_DEVICES_PREFERENCE);
+            mdbManager = new AddDevicesInfoDBManager(getActivity());
+            mAllowedDevice.setSummary(mdbManager.getDevicesCount() + " "
+                    + getActivity().getResources().getString(R.string.add_devices_summary));
+        } else {
+            getPreferenceScreen().removePreference(findPreference(ALLOWED_DEVICES_PREFERENCE));
+        }
         initWifiTethering();
     }
 
@@ -167,6 +179,11 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         super.onResume();
         log("onResume..");
         mWifiApSwitch.resume();
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_allowed_devices_enable)) {
+            mAllowedDevice.setSummary(mdbManager.getDevicesCount() + " "
+                + getActivity().getResources().getString(R.string.add_devices_summary));
+        }
         getActivity().registerReceiver(mReceiver, mFilter);
     }
 

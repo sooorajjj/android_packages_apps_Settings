@@ -6365,4 +6365,13 @@
    <string name="slot_number">(Slot<xliff:g id="slot_num">%1$d</xliff:g>)</string>
 
     <string name="meta_info">Software version</string>
+    <string name="allowed_devices_title">Allowed Devices</string>
+    <string name="add_allowed_devices">Add</string>
+    <string name="add_device_dialog_title">Allowed Devices List</string>
+    <string name="add_device_dialog_title">Allowed Devices List</string>
+    <string name="add_device_btn_ok">OK</string>
+    <string name="delete_device">Delete</string>
+    <string name="add_device_name_text">Device Name:</string>
+    <string name="add_device_dialog_split">:</string>
+    <string name="add_devices_summary"> allowed</string>
 </resources>
