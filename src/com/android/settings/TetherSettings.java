@@ -39,6 +39,8 @@ import android.net.wifi.WifiDevice;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemProperties;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
@@ -48,6 +50,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -55,6 +58,7 @@ import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+import com.android.settings.AccountCheck;
 import com.android.settings.wifi.WifiApDialog;
 import com.android.settings.wifi.WifiApEnabler;
 
@@ -71,7 +75,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     private static final String ENABLE_WIFI_AP = "enable_wifi_ap";
     private static final String ENABLE_WIFI_AP_SWITCH = "enable_wifi_ap_switch";
     private static final String ENABLE_BLUETOOTH_TETHERING = "enable_bluetooth_tethering";
-    private static final String TETHER_CHOICE = "TETHER_TYPE";
+    public static final String TETHER_CHOICE = "TETHER_TYPE";
     private static final String KEY_HOTSPOT_MODE = "wifi_hotsopt_mode";
 
     private static final int DIALOG_AP_SETTINGS = 1;
@@ -123,9 +127,23 @@ public class TetherSettings extends SettingsPreferenceFragment
 
     /* Stores the package name and the class name of the provisioning app */
     private String[] mProvisionApp;
-    private static final int PROVISION_REQUEST = 0;
+    public static final int PROVISION_REQUEST = 0;
     private boolean mShowHotspotSetting;
     private boolean mUnavailable;
+    private Handler accountHandler = null;
+
+    public String[] getProvisionApp() {
+        return mProvisionApp;
+    }
+
+    public int getTetherChoice() {
+        return mTetherChoice;
+    }
+
+    public HotspotPreference getEnableWifiApSwitch() {
+        return mEnableWifiApSwitch;
+    }
+
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -231,6 +249,10 @@ public class TetherSettings extends SettingsPreferenceFragment
         }
         mProvisionApp = getResources().getStringArray(
                 com.android.internal.R.array.config_mobile_hotspot_provision_app);
+        if (mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            accountHandler = new TetherSettingsAccountHandler(this);
+        }
     }
 
     @Override
@@ -600,8 +622,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                 PackageManager.MATCH_DEFAULT_ONLY).size() > 0);
     }
 
-
-    private static boolean isProvisioningNeeded(String[] provisionApp) {
+    public static boolean isProvisioningNeeded(String[] provisionApp) {
         if (SystemProperties.getBoolean("net.tethering.noprovisioning", false)
                 || provisionApp == null) {
             return false;
@@ -611,6 +632,14 @@ public class TetherSettings extends SettingsPreferenceFragment
 
     private void startProvisioningIfNecessary(int choice) {
         mTetherChoice = choice;
+        if (mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            if(BLUETOOTH_TETHERING != choice && AccountCheck.isCarrierSimCard(mContext)) {
+                AccountCheck.getInstance().checkAccount(mContext,
+                        accountHandler.obtainMessage(1));
+                return;
+            }
+        }
         if (isProvisioningNeeded(mProvisionApp)) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.setClassName(mProvisionApp[0], mProvisionApp[1]);
@@ -643,7 +672,7 @@ public class TetherSettings extends SettingsPreferenceFragment
         }
     }
 
-    private void startTethering() {
+    public void startTethering() {
         switch (mTetherChoice) {
             case WIFI_TETHERING:
                 if (mShowHotspotSetting) {
@@ -675,7 +704,7 @@ public class TetherSettings extends SettingsPreferenceFragment
         }
     }
 
-    private void setUsbTethering(boolean enabled) {
+    public void setUsbTethering(boolean enabled) {
         ConnectivityManager cm =
             (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         mUsbTether.setChecked(false);
