@@ -397,7 +397,13 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
             intent.setClassName(mProvisionApp[0], mProvisionApp[1]);
             getActivity().startActivityForResult(intent, PROVISION_REQUEST);
         } else {
-            mWifiApSwitch.setSoftapEnabled(true);
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_show_help)
+                    && needShowHelp()) {
+                showHelpDialog();
+            } else {
+                mWifiApSwitch.setSoftapEnabled(true);
+            }
         }
     }
 
@@ -449,5 +455,32 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         catalogPick.setValue(niSelectedMaximum);// default set 8
         dialog.setView(catalogPick);
         dialog.show();
+    }
+
+    private void showHelpDialog() {
+        final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
+        build.setTitle(getActivity().getResources().getString(
+            R.string.tether_settings_launch_title));
+        build.setMessage(getActivity().getResources().getString(
+            R.string.wifi_tether_first_use_message));
+        build.setNegativeButton(R.string.later,null);
+        build.setPositiveButton(R.string.add_device_btn_ok,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        showDialog(DIALOG_AP_SETTINGS);
+                    }
+                });
+        build.show();
+    }
+
+    private boolean needShowHelp() {
+        boolean isFirstUse = sharedPreferences.getBoolean("FirstLaunchWifiHotspot",true);
+        if(isFirstUse) {
+           editor = sharedPreferences.edit();
+           editor.putBoolean("FirstLaunchWifiHotspot", false);
+           editor.commit();
+        }
+        return isFirstUse;
     }
 }
