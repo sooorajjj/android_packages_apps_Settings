@@ -6369,4 +6369,7 @@
     <string name="maximum_connections_dialog_title_text">Set Maximum Connections</string>
     <string name="maximum_connections_dialog_positive_text">Yes</string>
     <string name="maximum_connections_dialog_negative_text">No</string>
+    <string name="wifi_tether_first_use_message">Set up Wi-Fi hotspot at the First Use</string>
+    <string name="tether_settings_launch_title">Mobile HotSpot</string>
+    <string name="later">Later</string>
 </resources>
