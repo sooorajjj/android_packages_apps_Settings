@@ -1,6 +1,7 @@
 
 package com.android.settings;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.util.Log;
 import com.android.settings.R;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -214,5 +216,31 @@ public class AccountCheck  {
          protected Boolean doInBackground(Void... params) {
             return getHttpResponse();
         }
+    }
+    public static boolean isHotspotAutoTurnOffEnabled(Context ctx) {
+        boolean isHotspotAutoTurnOffEnabled = false;
+        if (ctx != null) {
+            isHotspotAutoTurnOffEnabled = ctx.getResources().getBoolean(
+                    R.bool.def_wifi_hotspot_enable);
+        }
+        return isHotspotAutoTurnOffEnabled;
+    }
+    public static boolean isServiceRunning(Context context, String className) {
+        boolean isRunning = false;
+        if (context != null && (!TextUtils.isEmpty(className))) {
+            ActivityManager activityManager = (ActivityManager)
+                    context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningServiceInfo> serviceList = activityManager
+                    .getRunningServices(100);
+            if (serviceList != null) {
+                for (int i = 0; i < serviceList.size(); i++) {
+                    if (serviceList.get(i).service.getClassName().equals(className)) {
+                        isRunning = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return isRunning;
     }
 }

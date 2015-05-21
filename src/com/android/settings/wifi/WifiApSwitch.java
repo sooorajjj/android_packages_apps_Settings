@@ -181,6 +181,15 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                 /**
                  * Summary on enable is handled by tether broadcast notice
                  */
+                if (AccountCheck.isHotspotAutoTurnOffEnabled(mContext)) {
+                    String hotsoptServiceClassName = HotsoptService.class.getName();
+                    if (!AccountCheck.isServiceRunning(mContext, hotsoptServiceClassName)) {
+                        Intent intent = new Intent().setClassName(mContext,
+                                hotsoptServiceClassName);
+                        mContext.startService(intent);
+                    }
+                }
+
                 setSwitchChecked(true);
                 /* Doesnt need the airplane check */
                 mSwitch.setEnabled(true);

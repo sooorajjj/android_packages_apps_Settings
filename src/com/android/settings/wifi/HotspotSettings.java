@@ -431,9 +431,9 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
             public void onClick(DialogInterface dialog, int which) {
                 System.putInt(getContentResolver(),
                     WIFI_HOTSPOT_MAX_CLIENT_NUM, (catalogPick.getValue()));
-                if (mWifiConfig != null&&mWifiManager.isWifiApEnabled()) {
+                if (mWifiApConfig != null&&mWifiManager.isWifiApEnabled()) {
                     mWifiManager.setWifiApEnabled(null, false);
-                    mWifiManager.setWifiApEnabled(mWifiConfig, true);
+                    mWifiManager.setWifiApEnabled(mWifiApConfig, true);
                 }
                 dialog.dismiss();
                 Log.i("sysout","item:"+catalogPick.getValue());
