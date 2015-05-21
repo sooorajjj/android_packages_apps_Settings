@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
@@ -201,7 +202,10 @@ public class TetherSettings extends SettingsPreferenceFragment
         if (!usbAvailable || Utils.isMonkeyRunning()) {
             getPreferenceScreen().removePreference(mUsbTether);
         }
-
+        if (getResources().getBoolean(
+               com.android.internal.R.bool.config_regional_hotspot_default_ssid_with_imei_enable)) {
+            checkDefaultSSID();
+        }
         if (wifiAvailable && !Utils.isMonkeyRunning()) {
             if (mShowHotspotSetting) {
                 mWifiApEnablerSwitch = new WifiApEnablerSwitch(activity, mEnableWifiApSwitch);
@@ -852,5 +856,37 @@ public class TetherSettings extends SettingsPreferenceFragment
                 setTetheringOff();
             }
         }
+    }
+
+    private void checkDefaultSSID() {
+        final Activity activity = getActivity();
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(
+                "MY_PERFS",Activity.MODE_PRIVATE);
+        boolean hasSetDefaultSSID = sharedPreferences.getBoolean("has_set_default_ssid",false);
+        if (hasSetDefaultSSID) {
+            return;
+        }
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        String deviceId = tm.getDeviceId();
+        String lastFourDigits = "";
+        if ((deviceId != null) && (deviceId.length() >3)) {
+            lastFourDigits =  deviceId.substring(deviceId.length()-4);
+        }
+        if (TextUtils.isEmpty(lastFourDigits)) {
+            return;
+        }
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager == null) {
+            return;
+        }
+        WifiConfiguration wifiAPConfig = wifiManager.getWifiApConfiguration();
+        if (wifiAPConfig == null || wifiAPConfig.SSID.indexOf(lastFourDigits) >0) {
+            return;
+        }
+        wifiAPConfig.SSID = wifiAPConfig.SSID + " " + lastFourDigits;
+        wifiManager.setWifiApConfiguration(wifiAPConfig);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("has_set_default_ssid",true);
+        editor.commit();
     }
 }
