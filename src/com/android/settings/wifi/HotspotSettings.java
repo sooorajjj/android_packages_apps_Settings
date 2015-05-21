@@ -33,11 +33,13 @@ import com.android.settings.SettingsPreferenceFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
@@ -48,6 +50,7 @@ import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.provider.Settings.System;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.Gravity;
@@ -61,6 +64,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import android.widget.NumberPicker;
 import java.util.ArrayList;
 import java.util.List;
 import com.android.settings.adddevicesinfo.db.AddDevicesInfoDBManager;
@@ -74,6 +78,16 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     public static final String TAG = "HotspotSettings";
     private static final boolean DEBUG = true;
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private int niSelectedMaximum = 8;
+    private String maximumConnectionsDialogTitle = null;
+    private String maximumConnectionsPositive = null;
+    private String maximumConnectionsNegative = null;
+    private WifiConfiguration mWifiConfig = null;
+
+    private static final String MAXIMUM_CONNECTIONS_BUTTON = "maximum_connections";
+    private static final String WIFI_HOTSPOT_MAX_CLIENT_NUM = "WIFI_HOTSPOT_MAX_CLIENT_NUM";
     private static final int PROVISION_REQUEST = 0;
     private static final int DIALOG_AP_SETTINGS = 1;
     private static final int CONFIG_SUBTEXT = R.string.wifi_tether_configure_subtext;
@@ -104,6 +118,7 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     private Preference mCreateNetworkPref;
     private PreferenceScreen mAllowedDevice;
     private AddDevicesInfoDBManager mdbManager;
+    private PreferenceScreen mMaximumConnections;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,6 +153,23 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                     + getActivity().getResources().getString(R.string.add_devices_summary));
         } else {
             getPreferenceScreen().removePreference(findPreference(ALLOWED_DEVICES_PREFERENCE));
+        }
+        if (getResources().getBoolean(
+                com.android.internal.R.bool
+                .config_regional_hotspot_show_maximum_connection_enable)) {
+            final Activity activity = getActivity();
+            sharedPreferences = activity.getSharedPreferences("MY_PERFS",Activity.MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+            mMaximumConnections = (PreferenceScreen) findPreference(MAXIMUM_CONNECTIONS_BUTTON);
+            maximumConnectionsDialogTitle = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_title_text);
+            maximumConnectionsPositive = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_positive_text);
+            maximumConnectionsNegative = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_negative_text);
+            mMaximumConnections.setSummary(""+(sharedPreferences.getInt("maximum",8)));
+        } else {
+            getPreferenceScreen().removePreference(findPreference(MAXIMUM_CONNECTIONS_BUTTON));
         }
         initWifiTethering();
     }
@@ -244,6 +276,12 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
 
         if (preference == mCreateNetworkPref) {
             showDialog(DIALOG_AP_SETTINGS);
+        } else if (getResources().getBoolean(
+                com.android.internal.R.bool
+                .config_regional_hotspot_show_maximum_connection_enable)) {
+            if (preference == mMaximumConnections) {
+                showMaximumConnectionsDialog();
+            }
         }
 
         return super.onPreferenceTreeClick(screen, preference);
@@ -374,5 +412,42 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         if (DEBUG) {
             Log.d(TAG, msg);
         }
+    }
+    public void showMaximumConnectionsDialog() {
+        niSelectedMaximum = sharedPreferences.getInt("maximum", 8);
+
+        final Activity activity = getActivity();
+        final AlertDialog dialog = new AlertDialog.Builder(activity).create();
+        dialog.setTitle(maximumConnectionsDialogTitle);
+        final NumberPicker catalogPick = new NumberPicker(activity);
+        dialog.setButton(maximumConnectionsPositive, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                System.putInt(getContentResolver(),
+                    WIFI_HOTSPOT_MAX_CLIENT_NUM, (catalogPick.getValue()));
+                if (mWifiConfig != null&&mWifiManager.isWifiApEnabled()) {
+                    mWifiManager.setWifiApEnabled(null, false);
+                    mWifiManager.setWifiApEnabled(mWifiConfig, true);
+                }
+                dialog.dismiss();
+                Log.i("sysout","item:"+catalogPick.getValue());
+                editor.putInt("maximum",catalogPick.getValue());
+                editor.commit();
+                mMaximumConnections.setSummary(""+(catalogPick.getValue()));
+            }
+        });
+
+        dialog.setButton2(maximumConnectionsNegative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        catalogPick.setMaxValue(8);
+        catalogPick.setMinValue(1);
+        catalogPick.setValue(niSelectedMaximum);// default set 8
+        dialog.setView(catalogPick);
+        dialog.show();
     }
 }

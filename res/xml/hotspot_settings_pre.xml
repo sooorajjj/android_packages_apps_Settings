@@ -34,6 +34,10 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:persistent="false"
         android:title="@string/wifi_tether_configure_ap_text" />
     <PreferenceScreen
+        android:key="maximum_connections"
+        android:title="@string/maximum_connections_button_text" >
+    </PreferenceScreen>
+    <PreferenceScreen
         android:fragment="com.android.settings.AllowedDevicesInfoList"
         android:key="allowed_devices"
         android:title="@string/allowed_devices_title" >
