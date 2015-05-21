@@ -29,6 +29,7 @@
 
 package com.android.settings;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -255,6 +256,80 @@ public class AccountCheck  {
             });
             alertdialog.show();
         }
+    }
+
+    public static boolean isNeedShowHelp(final Context ctx, int type) {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(
+                "MY_PERFS", Activity.MODE_PRIVATE);
+        String strKey = type == 0? "FirstLaunchHotspotTethering":"FirstLaunchUsbTethering";
+        Editor editor = sharedPreferences.edit();
+        boolean isFirstUse = sharedPreferences.getBoolean(strKey, true);
+        if (isFirstUse) {
+            editor = sharedPreferences.edit();
+            editor.putBoolean(strKey, false);
+            editor.commit();
+        }
+        return isFirstUse;
+    }
+
+    public static void showHelpDialog(final Context ctx, DialogInterface.OnClickListener Listener) {
+        final AlertDialog.Builder build = new AlertDialog.Builder(ctx);
+        build.setTitle(R.string.tether_settings_launch_title);
+        build.setMessage(R.string.wifi_tether_first_use_message);
+        build.setNegativeButton(R.string.later,null);
+        build.setPositiveButton(R.string.add_device_btn_ok, Listener);
+        build.show();
+    }
+
+    public static boolean isNeedShowActivated (Context ctx, final int type) {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(
+                "MY_PERFS", Activity.MODE_PRIVATE);
+        Editor editor = sharedPreferences.edit();
+        String strKey = type == 0? "FirstHotspotActivated":"FirstUSBActivated";
+        boolean isFirstUse = sharedPreferences.getBoolean(strKey,true);
+        if (isFirstUse) {
+            editor = sharedPreferences.edit();
+            editor.putBoolean(strKey, false);
+            editor.commit();
+        }
+        return isFirstUse;
+    }
+
+    public static void showActivatedDialog(final Context ctx, final int type) {
+        if (!isNeedShowActivated(ctx, type)) {
+            return;
+        }
+        final AlertDialog.Builder build = new AlertDialog.Builder(ctx);
+        if (USB_TETHERING == type) {
+            build.setTitle(R.string.learn_usb_dialog_title);
+            build.setMessage(R.string.learn_usb_dialog_text);
+        } else {
+            build.setTitle(R.string.learn_hotspot_dialog_title);
+            build.setMessage(R.string.learn_hotspot_dialog_text);
+        }
+        build.setPositiveButton("yes",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        showMoreAboutActivation(ctx,type);
+                    }
+                });
+        build.setNegativeButton("skip",null);
+        build.show();
+
+    }
+
+    public static void showMoreAboutActivation(final Context ctx,int type) {
+        final AlertDialog.Builder build = new AlertDialog.Builder(ctx);
+        if (USB_TETHERING == type) {
+            build.setTitle(R.string.mobile_tether_help_dialog_title);
+            build.setMessage(R.string.mobile_usb_help_dialog_text);
+        } else {
+            build.setTitle(R.string.mobile_tether_help_dialog_title);
+            build.setMessage(R.string.mobile_hotspot_help_dialog_text);
+        }
+        build.setPositiveButton("ok",null);
+        build.show();
     }
 
     private class AccoutCheckTask extends AsyncTask<Void, Integer, Boolean>{

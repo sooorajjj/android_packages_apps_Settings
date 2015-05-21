@@ -66,6 +66,8 @@ public class WifiApEnablerSwitch {
     private WifiManager mWifiManager;
     private final IntentFilter mIntentFilter;
 
+    private static final int WIFI_TETHERING = 0;
+
     ConnectivityManager mCm;
     private String[] mWifiRegexs;
     /* Indicates if we have to wait for WIFI_STATE_CHANGED intent */
@@ -237,6 +239,11 @@ public class WifiApEnablerSwitch {
                                 hotsoptServiceClassName);
                         mContext.startService(intent);
                     }
+                }
+
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+                    AccountCheck.showActivatedDialog(mContext, WIFI_TETHERING);
                 }
                 mCheckBox.setChecked(true);
                 /* Doesnt need the airplane check */
