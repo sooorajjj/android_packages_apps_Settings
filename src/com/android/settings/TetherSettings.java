@@ -25,6 +25,7 @@ import com.android.settings.wifi.WifiApEnablerSwitch;
 import com.android.settings.wifi.WifiApDialog;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothPan;
@@ -82,6 +83,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     private static final String ENABLE_BLUETOOTH_TETHERING = "enable_bluetooth_tethering";
     private static final String TETHER_CHOICE = "TETHER_TYPE";
     private static final String KEY_HOTSPOT_MODE = "wifi_hotsopt_mode";
+    private static final String TETHERING_HELP = "tethering_help";
 
     private static final int DIALOG_AP_SETTINGS = 1;
 
@@ -92,6 +94,7 @@ public class TetherSettings extends SettingsPreferenceFragment
     private WifiApEnablerSwitch mWifiApEnablerSwitch;
     private SwitchPreference mEnableWifiAp;
     private HotspotPreference mEnableWifiApSwitch;
+    private PreferenceScreen mTetherHelp;
 
     private SwitchPreference mBluetoothTether;
     private StorageManager mStorageManager = null;
@@ -183,6 +186,12 @@ public class TetherSettings extends SettingsPreferenceFragment
             }
         }
 
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_tether_help_enable)) {
+            mTetherHelp = (PreferenceScreen) findPreference(TETHERING_HELP);
+        } else {
+            getPreferenceScreen().removePreference(findPreference(TETHERING_HELP));
+        }
         mUsbTether = (SwitchPreference) findPreference(USB_TETHER_SETTINGS);
         mHotsoptMode = (ListPreference) findPreference(KEY_HOTSPOT_MODE);
         mBluetoothTether = (SwitchPreference) findPreference(ENABLE_BLUETOOTH_TETHERING);
@@ -792,6 +801,14 @@ public class TetherSettings extends SettingsPreferenceFragment
             }
         } else if (preference == mCreateNetwork) {
             showDialog(DIALOG_AP_SETTINGS);
+        } else if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_tether_help_enable)
+                && preference == mTetherHelp) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+            alert.setTitle(R.string.tethering_help_dialog_title);
+            alert.setMessage(R.string.tethering_help_dialog_text);
+            alert.setPositiveButton(R.string.okay, null);
+            alert.show();
         }
 
         return super.onPreferenceTreeClick(screen, preference);

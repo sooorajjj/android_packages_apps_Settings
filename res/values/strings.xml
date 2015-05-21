@@ -6401,4 +6401,6 @@
     <string name="mobile_tether_help_dialog_title">Mobile HotSpot Help</string>
     <string name="mobile_usb_help_dialog_text">Mobile phone connects to the computer via USB, when you open the USB sharing, mobile phone acts as a wireless network card and computer can connect to the Internet.</string>
     <string name="mobile_hotspot_help_dialog_text"></string>
+    <string name="tethering_help_dialog_title">Help</string>
+    <string name="tethering_help_dialog_text"></string>
 </resources>
