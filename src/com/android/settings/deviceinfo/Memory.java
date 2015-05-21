@@ -204,6 +204,11 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         final MenuItem usb = menu.findItem(R.id.storage_usb);
+        String title = getActivity().getResources().getString(
+                com.android.internal.R.string.config_regional_connection_menu_option);
+        if (title != null && !title.equals("")) {
+            usb.setTitle(title);
+        }
         UserManager um = (UserManager)getActivity().getSystemService(Context.USER_SERVICE);
         boolean usbItemVisible = !isMassStorageEnabled()
                 && !um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER);
