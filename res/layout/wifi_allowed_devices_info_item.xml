@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   Copyright (c) 2014, The Linux Foundation. All Rights Reserved.
+     Copyright (c) 2015, The Linux Foundation. All Rights Reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
@@ -26,22 +26,19 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall">
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <TextView
+        android:id="@+id/wifi_allowed_device_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="#000000"
+        android:textSize="18dp"
+        android:clickable="true">
+    </TextView>
 
-    <Preference
-        android:key="wifi_ap_ssid_and_security"
-        android:persistent="false"
-        android:title="@string/wifi_tether_configure_ap_text" />
-    <PreferenceScreen
-        android:fragment="com.android.settings.AllowedDevicesInfoList"
-        android:key="allowed_devices"
-        android:title="@string/allowed_devices_title" >
-    </PreferenceScreen>
-    <PreferenceCategory
-        android:key="ap_device_list"
-        android:persistent="false"
-        android:title="@string/wifi_ap_list_category" >
-    </PreferenceCategory>
-
-</PreferenceScreen>
+</RelativeLayout>

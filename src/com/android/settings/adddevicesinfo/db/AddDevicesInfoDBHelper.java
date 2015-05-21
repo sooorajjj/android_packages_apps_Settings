@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-   Copyright (c) 2014, The Linux Foundation. All Rights Reserved.
+/*
+     Copyright (c) 2015, The Linux Foundation. All Rights Reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
@@ -25,23 +24,32 @@ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
+*/
+package com.android.settings.adddevicesinfo.db;
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
-    <Preference
-        android:key="wifi_ap_ssid_and_security"
-        android:persistent="false"
-        android:title="@string/wifi_tether_configure_ap_text" />
-    <PreferenceScreen
-        android:fragment="com.android.settings.AllowedDevicesInfoList"
-        android:key="allowed_devices"
-        android:title="@string/allowed_devices_title" >
-    </PreferenceScreen>
-    <PreferenceCategory
-        android:key="ap_device_list"
-        android:persistent="false"
-        android:title="@string/wifi_ap_list_category" >
-    </PreferenceCategory>
+public class AddDevicesInfoDBHelper extends SQLiteOpenHelper{
+    private static final String DB_NAME = "alloweddevicesinfo.db";
+    private static final int DB_VERSION = 1;
 
-</PreferenceScreen>
+    public AddDevicesInfoDBHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        // TODO Auto-generated method stub
+        db.execSQL("CREATE TABLE IF NOT EXISTS devices" +
+            "(_id INTEGER PRIMARY KEY AUTOINCREMENT, mac TEXT, dev_name TEXT)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO Auto-generated method stub
+    }
+
+}
