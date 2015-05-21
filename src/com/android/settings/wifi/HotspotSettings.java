@@ -274,8 +274,13 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                     getString(com.android.internal.R.string.wifi_tether_configure_ssid_default),
                     getSecurityTypeIndexToString()));
         } else {
-            mCreateNetworkPref.setSummary(String.format(getString(CONFIG_SUBTEXT),
-                    getApSsid(), getSecurityTypeIndexToString()));
+            String ssid = getString(R.string.mobile_hotspot_default_ssid);
+            if (ssid != null && !ssid.equals("")) {
+                mCreateNetworkPref.setSummary(ssid);
+            } else {
+                mCreateNetworkPref.setSummary(String.format(getString(CONFIG_SUBTEXT),
+                        getApSsid(), getSecurityTypeIndexToString()));
+            }
         }
     }
 

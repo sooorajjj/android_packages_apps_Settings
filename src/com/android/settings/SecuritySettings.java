@@ -710,8 +710,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
         }
 
         if (mShowPassword != null) {
-            mShowPassword.setChecked(Settings.System.getInt(getContentResolver(),
-                    Settings.System.TEXT_SHOW_PASSWORD, 1) != 0);
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_security_show_password_enable)) {
+                mShowPassword.setChecked(Settings.System.getInt(getContentResolver(),
+                        Settings.System.TEXT_SHOW_PASSWORD, 0) != 0);
+            } else {
+                mShowPassword.setChecked(Settings.System.getInt(getContentResolver(),
+                        Settings.System.TEXT_SHOW_PASSWORD, 1) != 0);
+            }
         }
 
         if (mResetCredentials != null) {

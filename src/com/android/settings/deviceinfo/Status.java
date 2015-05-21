@@ -320,6 +320,13 @@ public class Status extends PreferenceActivity {
                     removePreferenceFromScreen(KEY_ICC_ID);
                 }
             } else {
+                boolean displayIccid = getResources().getBoolean(
+                        com.android.internal.R.bool.config_regional_display_icc_id_enable);
+                if (displayIccid) {
+                    setSummaryText(KEY_ICC_ID, mPhone.getIccSerialNumber());
+                } else {
+                    removePreferenceFromScreen(KEY_ICC_ID);
+                }
                 setSummaryText(KEY_IMEI, mPhone.getDeviceId());
 
                 setSummaryText(KEY_IMEI_SV,
@@ -331,7 +338,6 @@ public class Status extends PreferenceActivity {
                 removePreferenceFromScreen(KEY_PRL_VERSION);
                 removePreferenceFromScreen(KEY_MEID_NUMBER);
                 removePreferenceFromScreen(KEY_MIN_NUMBER);
-                removePreferenceFromScreen(KEY_ICC_ID);
 
                 // only show area info when SIM country is Brazil
                 if ("br".equals(mTelephonyManager.getSimCountryIso())) {

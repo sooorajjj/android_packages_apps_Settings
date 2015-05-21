@@ -83,4 +83,5 @@
 
     <!-- show locale timezone separator, leave null to use default one-->
     <string name="timezone_separator_locale"></string>
+    <string name="mobile_hotspot_default_ssid"></string>
 </resources>
