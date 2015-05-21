@@ -39,6 +39,8 @@ import android.net.wifi.WifiDevice;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemProperties;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
@@ -48,6 +50,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -55,6 +58,7 @@ import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+import com.android.settings.AccountCheck;
 import com.android.settings.wifi.WifiApDialog;
 import com.android.settings.wifi.WifiApEnabler;
 
@@ -126,6 +130,8 @@ public class TetherSettings extends SettingsPreferenceFragment
     private static final int PROVISION_REQUEST = 0;
     private boolean mShowHotspotSetting;
     private boolean mUnavailable;
+    private Handler accountHandler = null;
+    private CharSequence mOriginalSummary;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -157,6 +163,7 @@ public class TetherSettings extends SettingsPreferenceFragment
         if (mShowHotspotSetting) {
             mEnableWifiApSwitch =
                     (HotspotPreference) findPreference(ENABLE_WIFI_AP_SWITCH);
+            mOriginalSummary = mEnableWifiApSwitch.getSummary();
             getPreferenceScreen().removePreference(findPreference(ENABLE_WIFI_AP));
             getPreferenceScreen().removePreference(findPreference(WIFI_AP_SSID_AND_SECURITY));
         } else {
@@ -231,6 +238,10 @@ public class TetherSettings extends SettingsPreferenceFragment
         }
         mProvisionApp = getResources().getStringArray(
                 com.android.internal.R.array.config_mobile_hotspot_provision_app);
+        if (mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            accountHandler = new AccountHandler();
+        }
     }
 
     @Override
@@ -611,6 +622,14 @@ public class TetherSettings extends SettingsPreferenceFragment
 
     private void startProvisioningIfNecessary(int choice) {
         mTetherChoice = choice;
+        if (mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            if(BLUETOOTH_TETHERING != choice && AccountCheck.isCarrierSimCard(mContext)) {
+                AccountCheck.getInstance().checkAccount(mContext,
+                        accountHandler.obtainMessage(1));
+                return;
+            }
+        }
         if (isProvisioningNeeded(mProvisionApp)) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.setClassName(mProvisionApp[0], mProvisionApp[1]);
@@ -693,7 +712,6 @@ public class TetherSettings extends SettingsPreferenceFragment
 
         if (preference == mUsbTether) {
             boolean newState = mUsbTether.isChecked();
-
             if (newState) {
                 startProvisioningIfNecessary(USB_TETHERING);
             } else {
@@ -785,5 +803,37 @@ public class TetherSettings extends SettingsPreferenceFragment
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final boolean isSecondaryUser = UserHandle.myUserId() != UserHandle.USER_OWNER;
         return !isSecondaryUser && cm.isTetheringSupported();
+    }
+
+    public void turnOnTethering() {
+       if (isProvisioningNeeded(mProvisionApp)) {
+           Intent intent = new Intent(Intent.ACTION_MAIN);
+           intent.setClassName(mProvisionApp[0], mProvisionApp[1]);
+           intent.putExtra(TETHER_CHOICE, mTetherChoice);
+           startActivityForResult(intent, PROVISION_REQUEST);
+       } else {
+           startTethering();
+       }
+    }
+
+    public void setTetheringOff() {
+        if(mTetherChoice == USB_TETHERING) {
+            setUsbTethering(false);
+        } else if(mTetherChoice == WIFI_TETHERING) {
+            mEnableWifiApSwitch.setChecked(false);
+            mEnableWifiApSwitch.setSummary(mOriginalSummary);
+        }
+    }
+    private class AccountHandler extends Handler {
+        @Override
+        @SuppressWarnings("unchecked")
+        public void handleMessage(Message message) {
+            Log.d("AccountCheck","message.arg1 in AccountHandler:"+message.arg1);
+            if(message.arg1 == 1) {
+                turnOnTethering();
+            } else {
+                setTetheringOff();
+            }
+        }
     }
 }
