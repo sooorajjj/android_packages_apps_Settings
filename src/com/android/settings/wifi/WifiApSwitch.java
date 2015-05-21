@@ -189,7 +189,10 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                         mContext.startService(intent);
                     }
                 }
-
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+                    AccountCheck.showActivatedDialog(mContext, WIFI_TETHERING);
+                }
                 setSwitchChecked(true);
                 /* Doesnt need the airplane check */
                 mSwitch.setEnabled(true);
