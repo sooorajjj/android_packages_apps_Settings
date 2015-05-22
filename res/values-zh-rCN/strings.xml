@@ -2760,7 +2760,4 @@
     <string name="slot_number" msgid="3762676044904653577">"（插槽<xliff:g id="SLOT_NUM">%1$d</xliff:g>）"</string>
     <string name="meta_info">软件版本</string>
 
-    <!-- Profiles -->
-    <string name="profile_remove_dialog_message">删除配置文件 %1$s 吗？</string>
-    <string name="meta_info">软件版本</string>
 </resources>

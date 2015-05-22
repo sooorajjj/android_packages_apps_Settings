@@ -203,6 +203,8 @@
     <string name="profile_triggers_header">触发将激活这个设置</string>
     <string name="no_triggers_configured_nfc">按一下来设置新的NFC触发</string>
     <string name="profile_menu_fill_from_state">导入当前设备设置</string>
+    <string name="profile_remove_dialog_message">删除配置文件 %1$s 吗？</string>
+    <string name="profile_remove_current_profile">无法删除当前使用的情景模式!</string>
 
     <string name="lockscreen_settings_title">锁屏</string>
     <string name="lockscreen_targets_message">锁屏快捷方式</string>
