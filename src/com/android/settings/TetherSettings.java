@@ -714,15 +714,22 @@ public class TetherSettings extends SettingsPreferenceFragment
                             com.android.internal.R.bool.config_regional_hotspot_show_help)
                             && AccountCheck.isNeedShowHelp(mContext, WIFI_TETHERING)) {
                         initWifiTethering();
-                        DialogInterface.OnClickListener Listener =
+                        DialogInterface.OnClickListener okListener =
                                 new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
                                 showDialog(DIALOG_AP_SETTINGS);
                             }
                         };
+                        DialogInterface.OnClickListener laterListener =
+                                new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                mEnableWifiApSwitch.setChecked(false);
+                            }
+                        };
                         mIsShowhelp = true;
-                        AccountCheck.showHelpDialog(mContext, Listener);
+                        AccountCheck.showHelpDialog(mContext, okListener, laterListener);
                     } else {
                         mWifiApEnablerSwitch.setSoftapEnabled(true);
                     }
@@ -862,6 +869,11 @@ public class TetherSettings extends SettingsPreferenceFragment
                         mWifiConfig.SSID,
                         mSecurityType[index]));
             }
+        } else if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_help)
+                && mIsShowhelp) {
+            mEnableWifiApSwitch.setChecked(false);
+            mIsShowhelp = false;
         }
     }
 

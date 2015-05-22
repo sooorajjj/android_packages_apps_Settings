@@ -270,12 +270,14 @@ public class AccountCheck  {
         return isFirstUse;
     }
 
-    public static void showHelpDialog(final Context ctx, DialogInterface.OnClickListener Listener) {
+    public static void showHelpDialog(final Context ctx,
+            DialogInterface.OnClickListener okListener,
+            DialogInterface.OnClickListener laterListener) {
         final AlertDialog.Builder build = new AlertDialog.Builder(ctx);
         build.setTitle(R.string.tether_settings_launch_title);
         build.setMessage(R.string.wifi_tether_first_use_message);
-        build.setNegativeButton(R.string.later,null);
-        build.setPositiveButton(R.string.add_device_btn_ok, Listener);
+        build.setNegativeButton(R.string.later, laterListener);
+        build.setPositiveButton(R.string.add_device_btn_ok, okListener);
         build.show();
     }
 

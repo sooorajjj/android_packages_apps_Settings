@@ -252,6 +252,11 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
         }
     }
 
+    public void setWifiApSwitchChecked(boolean checked) {
+        mSwitch.setChecked(checked);
+        mSwitch.setEnabled(true);
+    }
+
     private void setSwitchChecked(boolean checked) {
         if (checked != mSwitch.isChecked()) {
             mStateMachineEvent = true;
