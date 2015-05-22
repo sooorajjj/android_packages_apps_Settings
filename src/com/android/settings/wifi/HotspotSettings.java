@@ -311,6 +311,12 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
 
     public void onClick(DialogInterface dialogInterface, int button) {
         if (button != DialogInterface.BUTTON_POSITIVE) {
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_show_help)
+                    && mIsShowhelp) {
+                mWifiApSwitch.setWifiApSwitchChecked(false);
+                mIsShowhelp = false;
+            }
             return;
         }
         mWifiApConfig = mDialog.getConfig();
@@ -420,14 +426,22 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
             if (getResources().getBoolean(
                     com.android.internal.R.bool.config_regional_hotspot_show_help)
                     && AccountCheck.isNeedShowHelp(activity, WIFI_TETHERING)) {
-                DialogInterface.OnClickListener Listener = new DialogInterface.OnClickListener() {
+                DialogInterface.OnClickListener okListener =
+                        new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
                         showDialog(DIALOG_AP_SETTINGS);
                     }
                 };
+                DialogInterface.OnClickListener laterListener =
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        mWifiApSwitch.setWifiApSwitchChecked(false);
+                    }
+                };
                 mIsShowhelp = true;
-                AccountCheck.showHelpDialog(activity, Listener);
+                AccountCheck.showHelpDialog(activity, okListener, laterListener);
             } else {
                 mWifiApSwitch.setSoftapEnabled(true);
             }
