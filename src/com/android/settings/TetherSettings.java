@@ -214,8 +214,12 @@ public class TetherSettings extends SettingsPreferenceFragment
             getPreferenceScreen().removePreference(mUsbTether);
         }
         if (getResources().getBoolean(
-               com.android.internal.R.bool.config_regional_hotspot_default_ssid_with_imei_enable)) {
-            checkDefaultSSID();
+               com.android.internal.R.bool.
+               config_regional_hotspot_default_ssid_with_imei_enable)
+               || getResources().getBoolean(
+               com.android.internal.R.bool.
+               config_regional_use_empty_password_default)) {
+            checkDefaultValue();
         }
         if (wifiAvailable && !Utils.isMonkeyRunning()) {
             if (mShowHotspotSetting) {
@@ -904,21 +908,12 @@ public class TetherSettings extends SettingsPreferenceFragment
         }
     }
 
-    private void checkDefaultSSID() {
+    private void checkDefaultValue() {
         final Activity activity = getActivity();
         SharedPreferences sharedPreferences = activity.getSharedPreferences(
                 "MY_PERFS",Activity.MODE_PRIVATE);
-        boolean hasSetDefaultSSID = sharedPreferences.getBoolean("has_set_default_ssid",false);
-        if (hasSetDefaultSSID) {
-            return;
-        }
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = tm.getDeviceId();
-        String lastFourDigits = "";
-        if ((deviceId != null) && (deviceId.length() >3)) {
-            lastFourDigits =  deviceId.substring(deviceId.length()-4);
-        }
-        if (TextUtils.isEmpty(lastFourDigits)) {
+        boolean hasSetDefaultValue = sharedPreferences.getBoolean("has_set_default_value",false);
+        if (hasSetDefaultValue) {
             return;
         }
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -926,13 +921,31 @@ public class TetherSettings extends SettingsPreferenceFragment
             return;
         }
         WifiConfiguration wifiAPConfig = wifiManager.getWifiApConfiguration();
-        if (wifiAPConfig == null || wifiAPConfig.SSID.indexOf(lastFourDigits) >0) {
+        if (wifiAPConfig == null) {
             return;
         }
-        wifiAPConfig.SSID = wifiAPConfig.SSID + " " + lastFourDigits;
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.
+                config_regional_hotspot_default_ssid_with_imei_enable)) {
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String deviceId = tm.getDeviceId();
+            String lastFourDigits = "";
+            if ((deviceId != null) && (deviceId.length() >3)) {
+                lastFourDigits =  deviceId.substring(deviceId.length()-4);
+            }
+            if ((!TextUtils.isEmpty(lastFourDigits)) && (wifiAPConfig.SSID != null)
+                    && (wifiAPConfig.SSID.indexOf(lastFourDigits) <0)) {
+                wifiAPConfig.SSID = wifiAPConfig.SSID + " " + lastFourDigits;
+            }
+        }
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.
+                config_regional_use_empty_password_default)) {
+            wifiAPConfig.preSharedKey = "";
+        }
         wifiManager.setWifiApConfiguration(wifiAPConfig);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("has_set_default_ssid",true);
+        editor.putBoolean("has_set_default_value",true);
         editor.commit();
     }
 }
