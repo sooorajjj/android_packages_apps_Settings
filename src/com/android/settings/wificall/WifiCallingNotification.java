@@ -43,8 +43,6 @@ public class WifiCallingNotification {
 
     private static final String TAG = "WifiCallingNotification";
     private static final boolean DEBUG = true;
-    private static final int REGIONGAL_FLAG =
-            com.android.internal.R.bool.config_regional_wifi_calling_notificaion_enable;
     private static final int WIFI_CALLING_NOTIFICAION_ID = 1;
     private static final int UPDATE_NOTIFICAION_TURN_ON = 1;
     private static final int UPDATE_NOTIFICAION_TURN_OFF = 2;
@@ -66,8 +64,13 @@ public class WifiCallingNotification {
         return mWifiCallNoti;
     }
 
+    private static boolean getWifiCallingNotifiEnable(Context context){
+        return context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_wifi_calling_notificaion_enable);
+    }
+
     public static void updateWFCStatusChange(Context context, boolean turnon){
-        if (!context.getResources().getBoolean(REGIONGAL_FLAG)) {
+        if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         NotificationManager notiManager =
@@ -83,7 +86,7 @@ public class WifiCallingNotification {
     }
 
     public static void updateWFCCallStateChange(Context context, int callState){
-        if (!context.getResources().getBoolean(REGIONGAL_FLAG)) {
+        if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         if (mCallState != callState) {
@@ -96,7 +99,7 @@ public class WifiCallingNotification {
     }
 
     public static void updateRegistrationError(Context context, int error){
-        if (!context.getResources().getBoolean(REGIONGAL_FLAG)) {
+        if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         mError = WifiCallRegistrationErrorUtil.matchRegistrationError(error, context);
@@ -112,7 +115,7 @@ public class WifiCallingNotification {
     }
 
     private static void cancelNotification(Context context, int id){
-        if (!context.getResources().getBoolean(REGIONGAL_FLAG)) {
+        if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         NotificationManager notiManager =
