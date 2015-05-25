@@ -6382,7 +6382,7 @@
     <string name="tether_settings_launch_title">Mobile HotSpot</string>
     <string name="later">Later</string>
     <string name="account_check_msg">Please wait while we verify your account.</string>
-    <string name="service_upgrade_title">Service upgrade</string>
+    <string name="service_upgrade_title">Service upgrade required</string>
     <string name="service_upgrade">Upgrade</string>
     <string name="service_msg">Your current rate plan does not support sharing your phone’s data connection with other devices using Mobile Wi-Fi HotSpot for internet access. Do you want to add the Smartphone Mobile HotSpot service to your rate plan now? You can add it later through MyAccount application on your phone or online at https://my.t-mobile.com under Manage > Plans and Services.</string>    
     <string name="tethering_no_sim_alert_title">No SIM card</string>
