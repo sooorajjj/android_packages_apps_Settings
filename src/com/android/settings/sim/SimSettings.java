@@ -168,6 +168,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 new IntentFilter(TelephonyIntents.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
         intentFilter.addAction(TelephonyIntents.ACTION_SUBINFO_CONTENT_CHANGE);
         intentFilter.addAction(TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED);
+        intentFilter.addAction(TelephonyIntents.ACTION_SUBSCRIPTION_SET_UICC_RESULT);
 
         getActivity().registerReceiver(mDdsSwitchReceiver, intentFilter);
 
@@ -221,7 +222,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     Toast.makeText(getActivity(), status, Toast.LENGTH_SHORT).show();
                 }
             } else if (TelephonyIntents.ACTION_SUBINFO_CONTENT_CHANGE.equals(action)
-                    || TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED.equals(action)) {
+                    || TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED.equals(action)
+                    || TelephonyIntents.ACTION_SUBSCRIPTION_SET_UICC_RESULT.equals(action)) {
                 mSelectableSubInfos.clear();
                 mSubInfoList = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
                 for (int i = 0; i < mNumSlots; ++i) {
@@ -378,6 +380,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         if (sir != null) {
             ((DropDownPreference) simPref).setSelectedValue(sir.getSimSlotIndex(), false);
             simPref.setSummary(sir.getDisplayName());
+        } else {
+            simPref.setSummary(R.string.sim_selection_required_pref);
         }
         Log.d(TAG, "updateCellularDataValues" + sir);
         if (mSelectableSubInfos.size() > 1 && !needDisableDataSub2()) {

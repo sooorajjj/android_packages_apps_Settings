@@ -111,7 +111,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private static Object mSyncLock = new Object();
 
     private IntentFilter mIntentFilter = new IntentFilter(
-            TelephonyIntents.ACTION_SUBINFO_CONTENT_CHANGE);
+            TelephonyIntents.ACTION_SUBSCRIPTION_SET_UICC_RESULT);
 
     public MultiSimEnablerPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -135,6 +135,11 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
 
     private void sendMessage(int event, Handler handler, int delay) {
         Message message = handler.obtainMessage(event);
+        handler.sendMessageDelayed(message, delay);
+    }
+
+    private void sendMessage(int event, Handler handler, int delay, int arg1, int arg2) {
+        Message message = handler.obtainMessage(event, arg1, arg2);
         handler.sendMessageDelayed(message, delay);
     }
 
@@ -324,9 +329,9 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         mContext.registerReceiver(mReceiver, mIntentFilter);
     }
 
-    private void processSetUiccDone() {
+    private void processSetUiccDone(int result, int newSubState) {
         sendMessage(EVT_UPDATE, mParentHandler, MSG_DELAY_TIME);
-        sendMessage(EVT_SHOW_RESULT_DLG, mHandler, MSG_DELAY_TIME);
+        sendMessage(EVT_SHOW_RESULT_DLG, mHandler, MSG_DELAY_TIME, result, newSubState);
         mCmdInProgress = false;
         unregisterReceiver();
     }
@@ -426,20 +431,18 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (TelephonyIntents.ACTION_SUBINFO_CONTENT_CHANGE.equals(action)) {
-                int subId = intent.getIntExtra(SubscriptionManager.UNIQUE_KEY_SUBSCRIPTION_ID,
+            if (TelephonyIntents.ACTION_SUBSCRIPTION_SET_UICC_RESULT.equals(action)) {
+                int subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY,
                         SubscriptionManager.INVALID_SUBSCRIPTION_ID);
-                String column = intent.getStringExtra(TelephonyIntents.EXTRA_COLUMN_NAME);
-                int intValue = intent.getIntExtra(TelephonyIntents.EXTRA_INT_CONTENT, 0);
-                logd("Received ACTION_SUBINFO_CONTENT_CHANGE on subId: " + subId
-                        + "for " + column + " intValue: " + intValue);
-                if (mCmdInProgress && column != null
-                        && column.equals(SubscriptionManager.SUB_STATE)
-                        && mSir.getSubscriptionId() == subId) {
-                    if ((intValue == SubscriptionManager.ACTIVE && mCurrentState == true) ||
-                            (intValue == SubscriptionManager.INACTIVE && mCurrentState == false)) {
-                        processSetUiccDone();
-                    }
+                int result = intent.getIntExtra(TelephonyIntents.EXTRA_RESULT,
+                        PhoneConstants.FAILURE);
+                int newSubState = intent.getIntExtra(TelephonyIntents.EXTRA_NEW_SUB_STATE,
+                        SubscriptionManager.INACTIVE);
+
+                logd("Received ACTION_SUBSCRIPTION_SET_UICC_RESULT on subId: " + subId
+                        + "result " + result + " new sub state " + newSubState);
+                if (mCmdInProgress && mSir.getSubscriptionId() == subId) {
+                    processSetUiccDone(result, newSubState);
                 }
             }
         }
@@ -466,9 +469,18 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
             public void handleMessage(Message msg) {
                 switch(msg.what) {
                     case EVT_SHOW_RESULT_DLG:
-                        logd("EVT_SHOW_RESULT_DLG");
+                        int result = msg.arg1;
+                        int newSubState = msg.arg2;
+                        logd("EVT_SHOW_RESULT_DLG result: " + result +
+                                " new sub state " + newSubState);
                         update();
-                        showAlertDialog(RESULT_ALERT_DLG_ID, 0);
+                        if (result == PhoneConstants.FAILURE) {
+                            int msgId = (newSubState == SubscriptionManager.ACTIVE) ?
+                                    R.string.sub_activate_failed : R.string.sub_deactivate_failed;
+                            showAlertDialog(ERROR_ALERT_DLG_ID, msgId);
+                        } else {
+                            showAlertDialog(RESULT_ALERT_DLG_ID, 0);
+                        }
                         mHandler.removeMessages(EVT_PROGRESS_DLG_TIME_OUT);
                         break;
                     case EVT_SHOW_PROGRESS_DLG:
