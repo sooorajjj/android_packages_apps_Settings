@@ -3,15 +3,23 @@ package com.android.settings.wificall;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.android.settings.ImsDisconnectedReceiver;
+
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.os.Parcelable;
 import android.preference.SwitchPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.CompoundButton;
+import android.widget.SearchView.OnSuggestionListener;
 import android.widget.Switch;
+import com.android.ims.ImsReasonInfo;
 
 public class WifiCallSwitchPreference extends SwitchPreference {
 
@@ -21,6 +29,27 @@ public class WifiCallSwitchPreference extends SwitchPreference {
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_wifi_calling_registration_errorcode)) {
+            IntentFilter filter = new IntentFilter(
+                    ImsDisconnectedReceiver.IMSDICONNECTED_ACTION);
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Parcelable bundle = intent.getParcelableExtra("result");
+                    if (bundle != null && bundle instanceof ImsReasonInfo) {
+                        int errorCode = ((ImsReasonInfo) bundle).getExtraCode();
+                        Log.i(TAG, "get errorcode : " + errorCode);
+                        if (WifiCallRegistrationErrorUtil
+                                .isWifiCallingRegistrationError(errorCode)) {
+                            setSummaryOn(WifiCallRegistrationErrorUtil
+                                    .matchRegistrationError(errorCode, getContext()));
+                        }
+                    }
+                }
+            };
+            context.registerReceiver(receiver, filter);
+        }
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs,

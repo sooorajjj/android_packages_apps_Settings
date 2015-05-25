@@ -2351,5 +2351,10 @@
                 <action android:name="android.intent.action.MAIN"></action>
             </intent-filter>
         </activity>
+        <receiver android:name="com.android.settings.ImsDisconnectedReceiver">
+            <intent-filter>
+                <action android:name="com.android.imscontection.DISCONNECTED"></action>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
