@@ -6373,7 +6373,7 @@
     <string name="tether_settings_launch_title">Mobile HotSpot</string>
     <string name="later">Later</string>
     <string name="account_check_msg">Please wait while we verify your account.</string>
-    <string name="service_upgrade_title">Service upgrade</string>
+    <string name="service_upgrade_title">Service upgrade required</string>
     <string name="service_upgrade">Upgrade</string>
     <string name="service_msg"></string>
     <string name="tethering_no_sim_alert_title">No SIM card</string>
