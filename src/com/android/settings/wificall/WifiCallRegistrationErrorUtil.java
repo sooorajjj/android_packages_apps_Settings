@@ -78,6 +78,36 @@ public class WifiCallRegistrationErrorUtil {
         }
     }
 
+    public static boolean isWifiCallingRegistrationError(int errorcode){
+        switch (errorcode) {
+        case WIFI_CALLING_REGISTRATION_ERROR_02:
+        case WIFI_CALLING_REGISTRATION_ERROR_03:
+        case WIFI_CALLING_REGISTRATION_ERROR_04:
+        case WIFI_CALLING_REGISTRATION_ERROR_041:
+        case WIFI_CALLING_REGISTRATION_ERROR_05:
+        case WIFI_CALLING_REGISTRATION_ERROR_07:
+        case WIFI_CALLING_REGISTRATION_ERROR_081:
+        case WIFI_CALLING_REGISTRATION_ERROR_082:
+        case WIFI_CALLING_REGISTRATION_ERROR_08:
+        case WIFI_CALLING_REGISTRATION_ERROR_10:
+        case WIFI_CALLING_REGISTRATION_ERROR_101:
+        case WIFI_CALLING_REGISTRATION_ERROR_011:
+        case WIFI_CALLING_REGISTRATION_ERROR_111:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG91:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG09:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG99:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG901:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG902:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG903:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG904:
+        case WIFI_CALLING_REGISTRATION_ERROR_REG905:
+            return true;
+
+        default:
+            return false;
+        }
+    }
+
     public static int matchRegistrationError(int errcode, Context context){
         int summary = 0;
         int reason = 0;
