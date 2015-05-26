@@ -60,6 +60,8 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import static android.content.Context.TELEPHONY_SERVICE;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 
 public class AccountCheck  {
     public static final String TAG = "AccountCheck";
@@ -263,11 +265,19 @@ public class AccountCheck  {
         Editor editor = sharedPreferences.edit();
         boolean isFirstUse = sharedPreferences.getBoolean(strKey, true);
         if (isFirstUse) {
-            editor = sharedPreferences.edit();
             editor.putBoolean(strKey, false);
             editor.commit();
         }
         return isFirstUse;
+    }
+
+    public static void needShowHelpLater(final Context ctx) {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(
+                "MY_PERFS", Activity.MODE_PRIVATE);
+        String strKey = "FirstLaunchHotspotTethering";
+        Editor editor = sharedPreferences.edit();
+        editor.putBoolean(strKey, true);
+        editor.commit();
     }
 
     public static void showHelpDialog(final Context ctx,
@@ -277,7 +287,15 @@ public class AccountCheck  {
         build.setTitle(R.string.tether_settings_launch_title);
         build.setMessage(R.string.wifi_tether_first_use_message);
         build.setNegativeButton(R.string.later, laterListener);
-        build.setPositiveButton(R.string.add_device_btn_ok, okListener);
+        build.setPositiveButton(R.string.okay, okListener);
+        build.show();
+    }
+
+    public static void showPasswordEmptyDialog(final Context ctx) {
+        final AlertDialog.Builder build = new AlertDialog.Builder(ctx);
+        build.setTitle(R.string.hotspot_password_empty_title);
+        build.setMessage(R.string.hotspot_password_empty_text);
+        build.setPositiveButton(R.string.okay, null);
         build.show();
     }
 
@@ -330,6 +348,20 @@ public class AccountCheck  {
         }
         build.setPositiveButton("ok",null);
         build.show();
+    }
+
+    public static boolean isPasswordEmpty(WifiManager wifiManager) {
+        if (wifiManager == null) {
+            return false;
+        }
+        WifiConfiguration wifiAPConfig = wifiManager.getWifiApConfiguration();
+        if (wifiAPConfig == null) {
+            return false;
+        }
+        if(TextUtils.isEmpty(wifiAPConfig.preSharedKey)) {
+            return true;
+        }
+        return false;
     }
 
     private class AccoutCheckTask extends AsyncTask<Void, Integer, Boolean>{

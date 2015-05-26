@@ -439,6 +439,7 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                         new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
+                        AccountCheck.needShowHelpLater(activity);
                         mWifiApSwitch.setWifiApSwitchChecked(false);
                     }
                 };
@@ -446,6 +447,13 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                 AccountCheck.showHelpDialog(activity, okListener, laterListener);
             } else {
                 mWifiApSwitch.setSoftapEnabled(true);
+                if (getResources().getBoolean(
+                        com.android.internal.R.bool.
+                        config_regional_use_empty_password_default)) {
+                    if (AccountCheck.isPasswordEmpty(mWifiManager)) {
+                        AccountCheck.showPasswordEmptyDialog(activity);
+                    }
+                }
             }
         }
     }
