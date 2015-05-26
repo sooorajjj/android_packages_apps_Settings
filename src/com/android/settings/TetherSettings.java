@@ -719,6 +719,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                                 new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
+                                AccountCheck.needShowHelpLater(mContext);
                                 mEnableWifiApSwitch.setChecked(false);
                             }
                         };
@@ -726,6 +727,13 @@ public class TetherSettings extends SettingsPreferenceFragment
                         AccountCheck.showHelpDialog(mContext, okListener, laterListener);
                     } else {
                         mWifiApEnablerSwitch.setSoftapEnabled(true);
+                        if (getResources().getBoolean(
+                                com.android.internal.R.bool.
+                                config_regional_use_empty_password_default)) {
+                            if (AccountCheck.isPasswordEmpty(mWifiManager)) {
+                                AccountCheck.showPasswordEmptyDialog(mContext);
+                            }
+                        }
                     }
                 } else {
                     mWifiApEnabler.setSoftapEnabled(true);

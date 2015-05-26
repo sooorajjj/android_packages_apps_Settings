@@ -6403,4 +6403,6 @@
     <string name="mobile_hotspot_help_dialog_text"></string>
     <string name="tethering_help_dialog_title">Help</string>
     <string name="tethering_help_dialog_text"></string>
+    <string name="hotspot_password_empty_title">Warning</string>
+    <string name="hotspot_password_empty_text">You should set the password in Mobile HotSpot configuration screen, otherwise you can not open HotSpot.</string>
 </resources>
