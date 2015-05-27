@@ -254,6 +254,9 @@ public class WifiApEnablerSwitch {
                 mCheckBox.setEnabled(false);
                 break;
             case WifiManager.WIFI_AP_STATE_DISABLED:
+                if (mContext.getResources().getBoolean(R.bool.show_wifi_hotspot_settings)) {
+                    enableWifiCheckBox();
+                }
                 mCheckBox.setChecked(false);
                 mCheckBox.setSummary(mOriginalSummary);
                 if (!mWaitForWifiStateChange) {
