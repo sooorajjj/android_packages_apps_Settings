@@ -130,7 +130,8 @@ public class WifiCallingNotification {
             mBuilder.setContentTitle(context.getResources().getString(
                     R.string.wifi_calling_notification_title));
             activityIntent.setAction(Intent.ACTION_MAIN);
-            activityIntent.setClass(context, WifiCallPreferenceActivity.class);
+            activityIntent.setClassName("com.android.phone",
+                    "com.android.phone.WifiCallingSettings");
             PendingIntent pendingIntent = PendingIntent.getActivity(context,
                     WIFI_CALLING_NOTIFICAION_ID, activityIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
