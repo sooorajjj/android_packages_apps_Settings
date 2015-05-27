@@ -6397,17 +6397,6 @@
     <string name="data_usage_menu_show_time_range">Show time range</string>
     <string name="data_usage_menu_hide_time_range">Hide time range</string>
     <string name="wifi_call_setting_title">Wi-Fi Calling</string>
-    <string name="wifi_call_preferrd_setting_title">Wi-Fi Calling Preferences</string>
-        <string-array name="wifi_call_preferences_entries_title">
-        <item>Wi-Fi Preferred</item>
-        <item>Cellular Network Preferred</item>
-        <item>Never use Cellular Network</item>
-    </string-array>
-    <string-array name="wifi_call_preferences_entries_summary">
-        <item>Use Wi-Fi for calls. If Wi-Fi is unavailable, use Cellular Network. (Default)</item>
-        <item>Use Cellular Network for calls. If Cellular Network is unavailable, use Wi-Fi.</item>
-        <item>Use only Wi-Fi for calls.</item>
-    </string-array>
     <string name="wifi_calling_registration_success_for_user">Registration Success</string>
     <string name="wifi_calling_registration_success_cause">Registration Success</string>
     <string name="wifi_calling_registration_unknow_error_for_user">Unknow error</string>
@@ -6460,4 +6449,5 @@
     <string name="wifi_calling_wizard_content_step_3">There is wifi calling preferences menu. \n Settings --->  More ---> Wifi Calling</string>
     <string name="wifi_calling_notification_title">Calls will be made over Wi-Fi</string>
     <string name="wifi_calling_notification_subtitle">Tap here to access preferences</string>
+    <string name="ims_set_wifi_calling_preference_failed">Failed to set wifi calling preference</string>
 </resources>
