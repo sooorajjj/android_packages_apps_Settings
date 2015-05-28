@@ -143,6 +143,11 @@ public class WifiApEnablerSwitch {
                 /**
                  * Disable Wifi if enabling tethering
                  */
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.
+                        config_regional_hotspot_show_turn_off_wifi_dialog)) {
+                    AccountCheck.showTurnOffWifiDialog(mContext);
+                }
                 mWifiManager.setWifiEnabled(false);
                 WifiApSwitch.setWifiSavedState(mContext, WIFI_STATE_ENABLE_ENABLING);
             }

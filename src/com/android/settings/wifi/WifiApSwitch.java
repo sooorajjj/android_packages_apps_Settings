@@ -133,6 +133,11 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                 /**
                  * Disable Wifi if enabling tethering
                  */
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.
+                        config_regional_hotspot_show_turn_off_wifi_dialog)) {
+                    AccountCheck.showTurnOffWifiDialog(mContext);
+                }
                 mWifiManager.setWifiEnabled(false);
                 setWifiSavedState(mContext, WIFI_STATE_ENABLE_ENABLING);
             }
@@ -233,10 +238,6 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                 if (AccountCheck.showNoSimCardDialog(mContext)) {
                     mSwitch.setChecked(false);
                     return;
-                }
-                mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-                if (mWifiManager.isWifiEnabled()) {
-                    AccountCheck.showTurnOffWifiDialog(mContext);
                 }
                 if (AccountCheck.isCarrierSimCard(mContext)) {
                     AccountCheck.getInstance().checkAccount(mContext,
