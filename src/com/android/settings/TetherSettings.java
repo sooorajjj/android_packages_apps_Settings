@@ -661,12 +661,6 @@ public class TetherSettings extends SettingsPreferenceFragment
                     mAccountHandler.setTetheringOff();
                     return;
                 }
-                if (USB_TETHERING != choice) {
-                    mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-                    if (mWifiManager.isWifiEnabled()) {
-                        AccountCheck.showTurnOffWifiDialog(mContext);
-                    }
-                }
                 if(AccountCheck.isCarrierSimCard(mContext)) {
                     AccountCheck.getInstance().checkAccount(mContext,
                             mAccountHandler.obtainMessage(1));

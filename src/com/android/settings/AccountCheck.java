@@ -72,6 +72,9 @@ public class AccountCheck  {
     private static AccountCheck thisInstance = null;
     private static View mshowAgainView;
     private static CheckBox mShowAgain;
+    private static AlertDialog.Builder mShowDialogBuild = null;
+    private static AlertDialog mShowTurnOffWifiDialog = null;
+    private static boolean mIsShowTurnOffWifiDialog = false;
 
     public String mServerUrl = "";
     public String upsellUrl = "";
@@ -227,34 +230,38 @@ public class AccountCheck  {
         }
         return isCarrierSimCard;
     }
+
     public static void showTurnOffWifiDialog(final Context ctx) {
         LayoutInflater inflater = (LayoutInflater)ctx.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         mshowAgainView = inflater.inflate(R.layout.not_show_again, null);
         mShowAgain = (CheckBox)mshowAgainView.findViewById(R.id.check);
-        SharedPreferences sharedpreferences = ctx.getSharedPreferences(
-                "ShowAgain", Context.MODE_PRIVATE);
-        boolean showagain = sharedpreferences.getBoolean("SsidBroadcast", true);
+        final SharedPreferences sharedpreferences = ctx.getSharedPreferences(
+                "MY_PERFS", Context.MODE_PRIVATE);
+        boolean showagain = sharedpreferences.getBoolean("TurnOffWifiShowAgain", true);
         if (showagain) {
-            AlertDialog.Builder alertdialog =  new AlertDialog.Builder(ctx);
-            alertdialog.setTitle(R.string.turn_off_wifi_dialog_title);
-            alertdialog.setMessage(R.string.turn_off_wifi_dialog_text);
-            alertdialog.setView(mshowAgainView);
-            alertdialog.setPositiveButton("close", new DialogInterface.OnClickListener() {
+            mShowDialogBuild = null;
+            mIsShowTurnOffWifiDialog = true;
+            mShowTurnOffWifiDialog = new AlertDialog.Builder(ctx)
+                    .setTitle(R.string.turn_off_wifi_dialog_title)
+                    .setMessage(R.string.turn_off_wifi_dialog_text)
+                    .setView(mshowAgainView)
+                    .setPositiveButton("close", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick( DialogInterface dialog, int which) {
-                    SharedPreferences sharedpreferences = ctx.getSharedPreferences(
-                        "TurnOffWifiShowAgain", Context.MODE_PRIVATE);
+                public void onClick(DialogInterface dialog, int which) {
                     Editor editor = sharedpreferences.edit();
                     if (mShowAgain.isChecked()) {
-                        editor.putBoolean("SsidBroadcast", false);
+                        editor.putBoolean("TurnOffWifiShowAgain", false);
                     } else {
-                        editor.putBoolean("SsidBroadcast", true);
+                        editor.putBoolean("TurnOffWifiShowAgain", true);
                     }
                     editor.commit();
+                    mIsShowTurnOffWifiDialog = false;
+                    if (mShowDialogBuild != null)
+                        mShowDialogBuild.show();
                 }
-            });
-            alertdialog.show();
+            }).create();
+            mShowTurnOffWifiDialog.show();
         }
     }
 
@@ -296,7 +303,11 @@ public class AccountCheck  {
         build.setTitle(R.string.hotspot_password_empty_title);
         build.setMessage(R.string.hotspot_password_empty_text);
         build.setPositiveButton(R.string.okay, null);
-        build.show();
+        if (mIsShowTurnOffWifiDialog && mShowTurnOffWifiDialog.isShowing()) {
+            mShowDialogBuild = build;
+        } else {
+            build.show();
+        }
     }
 
     public static boolean isNeedShowActivated (Context ctx, final int type) {
@@ -333,8 +344,11 @@ public class AccountCheck  {
                     }
                 });
         build.setNegativeButton("skip",null);
-        build.show();
-
+        if (mIsShowTurnOffWifiDialog && mShowTurnOffWifiDialog.isShowing()) {
+            mShowDialogBuild = build;
+        } else {
+            build.show();
+        }
     }
 
     public static void showMoreAboutActivation(final Context ctx,int type) {
