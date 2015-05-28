@@ -181,7 +181,11 @@ public class DateTimeSettings extends SettingsPreferenceFragment
         // We use 13:00 so we can demonstrate the 12/24 hour options.
         mDummyDate.set(now.get(Calendar.YEAR), 11, 31, 13, 0, 0);
         Date dummyDate = mDummyDate.getTime();
-        mDatePref.setSummary(DateFormat.getLongDateFormat(context).format(now.getTime()));
+        if(getResources().getBoolean(com.android.internal.R.bool.def_custom_dateformat)) {
+            mDatePref.setSummary(DateFormat.format(getResources().getString(
+                    R.string.default_date_format), now.getTime()));
+        } else
+            mDatePref.setSummary(DateFormat.getLongDateFormat(context).format(now.getTime()));
         mTimePref.setSummary(DateFormat.getTimeFormat(getActivity()).format(now.getTime()));
         mTimeZone.setSummary(getTimeZoneText(now.getTimeZone(), true));
         mTime24Pref.setSummary(DateFormat.getTimeFormat(getActivity()).format(dummyDate));
