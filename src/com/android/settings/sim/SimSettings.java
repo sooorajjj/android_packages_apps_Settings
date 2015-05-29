@@ -430,9 +430,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             ((DropDownPreference) simPref).setSelectedValue(ASK_VALUE, false);
         }
         simPref.setTitle(R.string.calls_title);
-        simPref.setSummary((phoneAccount == null || !SubscriptionManager.isValidSlotId(slotId))
-                        ? getResources().getString(R.string.sim_calls_ask_first_prefs_title)
-                        : (String) telecomManager.getPhoneAccount(phoneAccount).getLabel());
+        simPref.setSummary((phoneAccount != null &&
+                (slotId >= SubscriptionManager.MIN_SUBSCRIPTION_ID_VALUE &&
+                        slotId <= SubscriptionManager.MAX_SUBSCRIPTION_ID_VALUE))
+                    ? (String) telecomManager.getPhoneAccount(phoneAccount).getLabel()
+                    : getResources().getString(R.string.sim_calls_ask_first_prefs_title));
         simPref.setEnabled(mSelectableSubInfos == null ? false : mSelectableSubInfos.size() > 1);
     }
 
