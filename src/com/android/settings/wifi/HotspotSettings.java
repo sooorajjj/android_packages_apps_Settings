@@ -291,6 +291,11 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
 
         if (preference == mCreateNetworkPref) {
             showDialog(DIALOG_AP_SETTINGS);
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+                final Activity activity = getActivity();
+                AccountCheck.isWifiApBackKeyEnable(activity, true);
+            }
         } else if (getResources().getBoolean(
                 com.android.internal.R.bool
                 .config_regional_hotspot_show_maximum_connection_enable)) {
@@ -433,6 +438,7 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
                         showDialog(DIALOG_AP_SETTINGS);
+                        AccountCheck.isWifiApBackKeyEnable(activity, false);
                     }
                 };
                 DialogInterface.OnClickListener laterListener =

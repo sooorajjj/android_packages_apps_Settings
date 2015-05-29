@@ -183,6 +183,7 @@ public class AccountCheck  {
             }
         });
         builder.create().show();
+        builder.setCancelable(false);
     }
 
     public static boolean showNoSimCardDialog(Context ctx) {
@@ -261,6 +262,7 @@ public class AccountCheck  {
                         mShowDialogBuild.show();
                 }
             }).create();
+            mShowTurnOffWifiDialog.setCancelable(false);
             mShowTurnOffWifiDialog.show();
         }
     }
@@ -295,7 +297,18 @@ public class AccountCheck  {
         build.setMessage(R.string.wifi_tether_first_use_message);
         build.setNegativeButton(R.string.later, laterListener);
         build.setPositiveButton(R.string.okay, okListener);
+        build.setCancelable(false);
         build.show();
+    }
+
+    public static void isWifiApBackKeyEnable(Context ctx, boolean enable) {
+        SharedPreferences sharedPreferences =
+                ctx.getSharedPreferences("MY_PERFS", ctx.MODE_PRIVATE);
+        boolean WifiApBackKeyEnable = sharedPreferences.getBoolean(
+                "WifiApBackKeyEnable", true);
+        Editor editor = sharedPreferences.edit();
+        editor.putBoolean("WifiApBackKeyEnable", enable);
+        editor.commit();
     }
 
     public static void showPasswordEmptyDialog(final Context ctx) {
@@ -344,6 +357,7 @@ public class AccountCheck  {
                     }
                 });
         build.setNegativeButton("skip",null);
+        build.setCancelable(false);
         if (mIsShowTurnOffWifiDialog && mShowTurnOffWifiDialog.isShowing()) {
             mShowDialogBuild = build;
         } else {
