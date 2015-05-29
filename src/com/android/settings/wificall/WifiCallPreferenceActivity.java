@@ -24,6 +24,8 @@ public class WifiCallPreferenceActivity extends PreferenceActivity
 
     private static final String TAG = "WifiCallPreferenceActivity";
 
+    public static final String KEY_WIFI_CALLING_PREFERRED_SCREEN = "wifi_calling_prefence";
+    public static final String KEY_WIFI_CALLING_WIZARD = "wifi_calling_wizard";
     // Below is the prefence key as the same as the CheckBoxPreference title.
     public static final String KEY_WIFI_CALLING_PREFERRED = "Wi-Fi Preferred";
     public static final String KEY_CELLULAR_NETWORK_PREFERRED = "Cellular Network Preferred";
@@ -40,6 +42,11 @@ public class WifiCallPreferenceActivity extends PreferenceActivity
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.wifi_call_prefenecs);
         mRes = getResources();
+        Preference wizard = findPreference(KEY_WIFI_CALLING_WIZARD);
+        if(wizard != null &&
+                !mRes.getBoolean(com.android.internal.R.bool.config_regional_wifi_calling_wizard)){
+            getPreferenceScreen().removePreference(wizard);
+        }
         initWifiCallSettings();
     }
 
@@ -63,10 +70,7 @@ public class WifiCallPreferenceActivity extends PreferenceActivity
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL
                         | Gravity.RIGHT));
 
-        PreferenceScreen rootPre = getPreferenceScreen();
-        PreferenceCategory prefCate = new PreferenceCategory(this);
-        prefCate.setTitle(mRes.getString(R.string.wifi_call_preferrd_setting_title));
-        rootPre.addPreference(prefCate);
+        PreferenceCategory prefCate = (PreferenceCategory) findPreference(KEY_WIFI_CALLING_PREFERRED_SCREEN);
         // FIX ME : The current wifi-calling Preferred
         int current = 0;// this value should read by devices setting.
         String[] titleArray = mRes.getStringArray(R.array.wifi_call_preferences_entries_title);

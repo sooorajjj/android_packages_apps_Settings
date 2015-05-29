@@ -6428,4 +6428,8 @@
     <string name="wifi_calling_registration_reg904_cause">Error would happen if username and password used instead of SIM based authentication or Unlikely scenario, but potentially happen with tablets</string>
     <string name="wifi_calling_registration_reg905_for_user">Unable to Connect</string>
     <string name="wifi_calling_registration_reg905_cause">Based on EEIR check, handset is blacklisted</string>
+    <string name="wifi_calling_wizard_title">Tutorial of Wi-Fi Calling</string>
+    <string name="wifi_calling_wizard_content_step_1">This is tutorial of wi-fi calling. \n "Skip" will skip the wizard this time. \n "Learn more" will show more info about it</string>
+    <string name="wifi_calling_wizard_content_step_2">When turn on the wi-fi calling switch, you can make call or message over wifi.\n "Next" to last wizard</string>
+    <string name="wifi_calling_wizard_content_step_3">There is wifi calling preferences menu. \n Settings ---> More ---> Wifi Calling</string>
 </resources>

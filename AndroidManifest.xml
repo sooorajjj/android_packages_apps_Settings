@@ -2344,5 +2344,11 @@
                 <action android:name="android.intent.action.MAIN"></action>
             </intent-filter>
         </activity>
+        <activity android:name="com.android.settings.wificall.WifiCallingWizardActivity"
+            android:excludeFromRecents="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
