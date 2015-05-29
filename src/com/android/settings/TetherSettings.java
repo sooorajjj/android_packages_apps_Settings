@@ -707,6 +707,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
                                 showDialog(DIALOG_AP_SETTINGS);
+                                AccountCheck.isWifiApBackKeyEnable(mContext, false);
                             }
                         };
                         DialogInterface.OnClickListener laterListener =
@@ -814,6 +815,10 @@ public class TetherSettings extends SettingsPreferenceFragment
             }
         } else if (preference == mCreateNetwork) {
             showDialog(DIALOG_AP_SETTINGS);
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+                AccountCheck.isWifiApBackKeyEnable(mContext, true);
+            }
         } else if (getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_hotspot_tether_help_enable)
                 && preference == mTetherHelp) {

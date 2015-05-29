@@ -30,6 +30,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -186,6 +187,21 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
                 }
             });
         }
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        final Context context = getContext();
+        if (context.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("MY_PERFS",
+                    context.MODE_PRIVATE);
+            boolean WifiApBackKeyEnable = sharedPreferences.getBoolean(
+                    "WifiApBackKeyEnable", true);
+            if (keyCode == KeyEvent.KEYCODE_BACK && (!WifiApBackKeyEnable)) {
+                return false;
+            }
+        }
+        return super.onKeyDown(keyCode,event);
     }
 
     @Override
