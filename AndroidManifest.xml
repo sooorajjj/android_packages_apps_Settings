@@ -100,11 +100,6 @@
                 android:label="@string/settings_label_launcher"
                 android:launchMode="singleTask"
                 android:targetActivity="Settings">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity-alias>
 
         <receiver android:name="ManagedProfileSetup">
@@ -133,14 +128,6 @@
                 android:taskAffinity="com.android.settings"
                 android:label="@string/wireless_networks_settings_title"
                 android:parentActivityName="Settings">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.settings.WIRELESS_SETTINGS" />
-                <action android:name="android.settings.AIRPLANE_MODE_SETTINGS" />
-                <action android:name="android.settings.NFC_SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE_LAUNCH" />
-            </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.WirelessSettings" />
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
@@ -156,13 +143,6 @@
                 android:taskAffinity=""
                 android:label="@string/wifi_settings"
                 android:configChanges="orientation|keyboardHidden|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.settings.WIFI_SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
-            </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.wifi.WifiSettings" />
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
@@ -324,13 +304,6 @@
                 android:label="@string/bluetooth_settings_title"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:taskAffinity="">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.settings.BLUETOOTH_SETTINGS" />
-                <category android:name="android.intent.category.VOICE_LAUNCH" />
-                <category android:name="com.android.settings.SHORTCUT" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.bluetooth.BluetoothSettings" />
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
