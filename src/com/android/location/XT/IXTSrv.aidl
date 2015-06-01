@@ -10,4 +10,5 @@ interface IXTSrv
     void showDialog();
     void registerCallback(IXTSrvCb cb);
     void unregisterCallback(IXTSrvCb cb);
+    boolean enable();
 }
