@@ -6353,4 +6353,6 @@
 
     <string name="wifi_calling_settings_title">Wifi Calling Settings</string>
     <string name="voice_over_LTE">Voice over LTE</string>
+    <string name="data_usage_menu_show_time_range">Show time range</string>
+    <string name="data_usage_menu_hide_time_range">Hide time range</string>
 </resources>

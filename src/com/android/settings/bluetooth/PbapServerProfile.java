@@ -93,7 +93,12 @@ final class PbapServerProfile implements LocalBluetoothProfile {
 
     public boolean disconnect(BluetoothDevice device) {
         if (mService == null) return false;
-        return mService.disconnect();
+
+        if (getConnectionStatus(device) == BluetoothProfile.STATE_CONNECTED)
+            return mService.disconnect();
+
+        Log.d(TAG, "pbap server not connected to "  + device.getAddress());
+        return false;
     }
 
     public int getConnectionStatus(BluetoothDevice device) {
