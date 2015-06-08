@@ -19,6 +19,7 @@ package com.android.settings.applications;
 import android.content.pm.ActivityInfo;
 import com.android.internal.telephony.ISms;
 import com.android.internal.telephony.SmsUsageMonitor;
+import com.android.internal.util.ArrayUtils;
 import com.android.settings.R;
 import com.android.settings.SettingsActivity;
 import com.android.settings.Utils;
@@ -330,6 +331,20 @@ public class InstalledAppDetails extends Fragment
             mMoveAppButton.setOnClickListener(this);
             mMoveAppButton.setEnabled(true);
         }
+    }
+
+    private boolean isCacheClearableApp(){
+        String currentPkgName = this.mPackageInfo.packageName;
+        String [] coreAppPackageName = getResources().getStringArray(R.array.no_cache_clear_package_list);
+        int length = coreAppPackageName.length;
+        if (!TextUtils.isEmpty(currentPkgName)) {
+            for (int i = 0; i < length; i++) {
+                if (currentPkgName.equals(coreAppPackageName[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean handleDisableable(Button button) {
@@ -1083,7 +1098,7 @@ public class InstalledAppDetails extends Fragment
                 mClearDataButton.setEnabled(true);
                 mClearDataButton.setOnClickListener(this);
             }
-            if (cacheSize <= 0) {
+            if (cacheSize <= 0 || !isCacheClearableApp()) {
                 mClearCacheButton.setEnabled(false);
             } else {
                 mClearCacheButton.setEnabled(true);
