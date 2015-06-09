@@ -38,10 +38,14 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+
+import com.android.settings.AccountCheck;
 
 import java.util.ArrayList;
 
@@ -65,6 +69,7 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
     private final Context mContext;
     private final HotspotSettings mParent;
     private final IntentFilter mIntentFilter;
+    private Handler accountHandler = null;
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -98,6 +103,10 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
         mIntentFilter.addAction(ConnectivityManager.ACTION_TETHER_STATE_CHANGED);
         mIntentFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         mIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        if (mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            accountHandler = new AccountHandler();
+        }
     }
 
     public void resume() {
@@ -172,6 +181,18 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
                 /**
                  * Summary on enable is handled by tether broadcast notice
                  */
+                if (AccountCheck.isHotspotAutoTurnOffEnabled(mContext)) {
+                    String hotsoptServiceClassName = HotsoptService.class.getName();
+                    if (!AccountCheck.isServiceRunning(mContext, hotsoptServiceClassName)) {
+                        Intent intent = new Intent().setClassName(mContext,
+                                hotsoptServiceClassName);
+                        mContext.startService(intent);
+                    }
+                }
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.config_regional_hotspot_show_help)) {
+                    AccountCheck.showActivatedDialog(mContext, WIFI_TETHERING);
+                }
                 setSwitchChecked(true);
                 /* Doesnt need the airplane check */
                 mSwitch.setEnabled(true);
@@ -206,7 +227,24 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
         if (mStateMachineEvent) {
             return;
         }
-
+        if (mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            if (isChecked) {
+                if (AccountCheck.showNoSimCardDialog(mContext)) {
+                    mSwitch.setChecked(false);
+                    return;
+                }
+                mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+                if (mWifiManager.isWifiEnabled()) {
+                    AccountCheck.showTurnOffWifiDialog(mContext);
+                }
+                if (AccountCheck.isCarrierSimCard(mContext)) {
+                    AccountCheck.getInstance().checkAccount(mContext,
+                            accountHandler.obtainMessage(1));
+                    return;
+                }
+            }
+        }
         if (isChecked) {
             mParent.startProvisioningIfNecessary(WIFI_TETHERING);
         } else {
@@ -230,5 +268,17 @@ public class WifiApSwitch implements CompoundButton.OnCheckedChangeListener {
     public static void setWifiSavedState(Context context, int state) {
         Settings.Global.putInt(context.getContentResolver(),
                 Settings.Global.WIFI_SAVED_STATE, state);
+    }
+    private class AccountHandler extends Handler {
+        @Override
+        @SuppressWarnings("unchecked")
+        public void handleMessage(Message message) {
+            Log.d("AccountCheck","message.arg1 in AccountHandler:"+message.arg1);
+            if(message.arg1 == 1) {
+                mParent.startProvisioningIfNecessary(WIFI_TETHERING);
+            } else {
+                setSwitchChecked(false);
+            }
+        }
     }
 }

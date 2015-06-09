@@ -6369,4 +6369,43 @@
     <string name="wifi_calling_settings_title">Wifi Calling Settings</string>
 
     <string name="voice_over_LTE">Voice over LTE</string>
+
+    <string name="allowed_devices_title">Allowed Devices</string>
+    <string name="add_allowed_devices">Add</string>
+    <string name="add_device_dialog_title">Allowed Devices List</string>
+    <string name="add_device_dialog_title">Allowed Devices List</string>
+    <string name="add_device_btn_ok">OK</string>
+    <string name="delete_device">Delete</string>
+    <string name="add_device_name_text">Device Name:</string>
+    <string name="add_device_dialog_split">:</string>
+    <string name="add_devices_summary"> allowed</string>
+    <string name="maximum_connections_button_text">Maximum Connections</string>
+    <string name="maximum_connections_dialog_title_text">Set Maximum Connections</string>
+    <string name="maximum_connections_dialog_positive_text">Yes</string>
+    <string name="maximum_connections_dialog_negative_text">No</string>
+    <string name="wifi_tether_first_use_message">Set up Wi-Fi hotspot at the First Use</string>
+    <string name="tether_settings_launch_title">Mobile HotSpot</string>
+    <string name="later">Later</string>
+    <string name="account_check_msg">Please wait while we verify your account.</string>
+    <string name="service_upgrade_title">Service upgrade</string>
+    <string name="service_upgrade">Upgrade</string>
+    <string name="service_msg"></string>
+    <string name="tethering_no_sim_alert_title">No SIM card</string>
+    <string name="tethering_no_sim_card_text">Please install SIM card in order to share your data connection with other devices using Mobile Wi-Fi HotSpot or USB tethering for Internet access.</string>
+    <string name="dialog_not_show_again">Do not show again</string>
+    <string name="ssid_broadcast_dialog_title">Your HotSpot is not visible now</string>
+    <string name="ssid_broadcast_dialog_text">If you switch the Broadcast Network Name (SSID) option off, your phone will not be visible to other devices and will not appear in the list of available Wi-Fi networks. Other devices can still connect to your HotSpot by entering its network name manually.</string>
+    <string name="wifi_ap_broadcast_ssid">Broadcast network name(SSID)</string>
+    <string name="open_security_settings_note">With Open security, any device can connect to your Mobile HotSpot and use your mobile data connection.</string>
+    <string name="turn_off_wifi_dialog_title">Turn off wifi</string>
+    <string name="turn_off_wifi_dialog_text">Wi-Fi is turned off when Mobile HotSpot is active. To turn on Wi-Fi, please turn off Mobile HotSpot.</string>
+    <string name="learn_usb_dialog_title">USB tethering is activated</string>
+    <string name="learn_usb_dialog_text">Would you like to learn more about USB Tethering on your phone?</string>
+    <string name="learn_hotspot_dialog_title">wifi tethering is activated</string>
+    <string name="learn_hotspot_dialog_text">Would you like to learn more about wifi Tethering on your phone?</string>
+    <string name="mobile_tether_help_dialog_title">Mobile HotSpot Help</string>
+    <string name="mobile_usb_help_dialog_text">Mobile phone connects to the computer via USB, when you open the USB sharing, mobile phone acts as a wireless network card and computer can connect to the Internet.</string>
+    <string name="mobile_hotspot_help_dialog_text"></string>
+    <string name="tethering_help_dialog_title">Help</string>
+    <string name="tethering_help_dialog_text"></string>
 </resources>

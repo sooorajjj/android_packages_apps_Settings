@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2014, The Linux Foundation. All Rights Reserved.
+     Copyright (c) 2014, The Linux Foundation. All Rights Reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
@@ -28,16 +28,20 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.android.settings.wifi;
 
+import com.android.settings.AccountCheck;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.SharedPreferences;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
@@ -48,6 +52,7 @@ import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.provider.Settings.System;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.Gravity;
@@ -61,8 +66,10 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import android.widget.NumberPicker;
 import java.util.ArrayList;
 import java.util.List;
+import com.android.settings.adddevicesinfo.db.AddDevicesInfoDBManager;
 
 /*
  * Displays preferences for Tethering.
@@ -73,11 +80,21 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     public static final String TAG = "HotspotSettings";
     private static final boolean DEBUG = true;
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private int niSelectedMaximum = 8;
+    private String maximumConnectionsDialogTitle = null;
+    private String maximumConnectionsPositive = null;
+    private String maximumConnectionsNegative = null;
+    private WifiConfiguration mWifiConfig = null;
+
+    private static final String MAXIMUM_CONNECTIONS_BUTTON = "maximum_connections";
+    private static final String WIFI_HOTSPOT_MAX_CLIENT_NUM = "WIFI_HOTSPOT_MAX_CLIENT_NUM";
     private static final int PROVISION_REQUEST = 0;
     private static final int DIALOG_AP_SETTINGS = 1;
     private static final int CONFIG_SUBTEXT = R.string.wifi_tether_configure_subtext;
     private static final int MENU_HELP = Menu.FIRST;
-
+    private static final String ALLOWED_DEVICES_PREFERENCE = "allowed_devices";
     private static final String WIFI_AP_SSID_AND_SECURITY = "wifi_ap_ssid_and_security";
     private static final String AP_CONNECTED_STATE_CHANGED_ACTION =
             "android.net.conn.TETHER_CONNECT_STATE_CHANGED";
@@ -101,6 +118,12 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
     private WifiConfiguration mWifiApConfig = null;
     private String[] mProvisionApp;
     private Preference mCreateNetworkPref;
+    private PreferenceScreen mAllowedDevice;
+    private AddDevicesInfoDBManager mdbManager;
+    private PreferenceScreen mMaximumConnections;
+    private boolean mIsShowhelp = false;
+
+    private static final int WIFI_TETHERING = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,7 +149,38 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_accout_check_enable)) {
+            final Activity activity = getActivity();
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_allowed_devices_enable)) {
+            mAllowedDevice = (PreferenceScreen)findPreference(ALLOWED_DEVICES_PREFERENCE);
+            mdbManager = new AddDevicesInfoDBManager(getActivity());
+            mAllowedDevice.setSummary(mdbManager.getDevicesCount() + " "
+                    + getActivity().getResources().getString(R.string.add_devices_summary));
+        } else {
+            getPreferenceScreen().removePreference(findPreference(ALLOWED_DEVICES_PREFERENCE));
+        }
+        if (getResources().getBoolean(
+                com.android.internal.R.bool
+                .config_regional_hotspot_show_maximum_connection_enable)) {
+            final Activity activity = getActivity();
+            sharedPreferences = activity.getSharedPreferences("MY_PERFS",Activity.MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+            mMaximumConnections = (PreferenceScreen) findPreference(MAXIMUM_CONNECTIONS_BUTTON);
+            maximumConnectionsDialogTitle = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_title_text);
+            maximumConnectionsPositive = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_positive_text);
+            maximumConnectionsNegative = activity.getResources().getString(R.string
+                    .maximum_connections_dialog_negative_text);
+            mMaximumConnections.setSummary(""+(sharedPreferences.getInt("maximum",8)));
+        } else {
+            getPreferenceScreen().removePreference(findPreference(MAXIMUM_CONNECTIONS_BUTTON));
+        }
         initWifiTethering();
     }
 
@@ -167,6 +221,11 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
         super.onResume();
         log("onResume..");
         mWifiApSwitch.resume();
+        if (getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hotspot_show_allowed_devices_enable)) {
+            mAllowedDevice.setSummary(mdbManager.getDevicesCount() + " "
+                + getActivity().getResources().getString(R.string.add_devices_summary));
+        }
         getActivity().registerReceiver(mReceiver, mFilter);
     }
 
@@ -227,6 +286,12 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
 
         if (preference == mCreateNetworkPref) {
             showDialog(DIALOG_AP_SETTINGS);
+        } else if (getResources().getBoolean(
+                com.android.internal.R.bool
+                .config_regional_hotspot_show_maximum_connection_enable)) {
+            if (preference == mMaximumConnections) {
+                showMaximumConnectionsDialog();
+            }
         }
 
         return super.onPreferenceTreeClick(screen, preference);
@@ -257,6 +322,12 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
                 mWifiManager.setWifiApEnabled(mWifiApConfig, true);
             } else {
                 mWifiManager.setWifiApConfiguration(mWifiApConfig);
+                if (getResources().getBoolean(
+                        com.android.internal.R.bool.config_regional_hotspot_show_help)
+                        && mIsShowhelp) {
+                    mWifiApSwitch.setSoftapEnabled(true);
+                    mIsShowhelp = false;
+                }
             }
             mCreateNetworkPref.setSummary(String.format(
                     getActivity().getString(CONFIG_SUBTEXT),
@@ -342,7 +413,21 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
             intent.setClassName(mProvisionApp[0], mProvisionApp[1]);
             getActivity().startActivityForResult(intent, PROVISION_REQUEST);
         } else {
-            mWifiApSwitch.setSoftapEnabled(true);
+            final Activity activity = getActivity();
+            if (getResources().getBoolean(
+                    com.android.internal.R.bool.config_regional_hotspot_show_help)
+                    && AccountCheck.isNeedShowHelp(activity, WIFI_TETHERING)) {
+                DialogInterface.OnClickListener Listener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        showDialog(DIALOG_AP_SETTINGS);
+                    }
+                };
+                mIsShowhelp = true;
+                AccountCheck.showHelpDialog(activity, Listener);
+            } else {
+                mWifiApSwitch.setSoftapEnabled(true);
+            }
         }
     }
 
@@ -358,4 +443,44 @@ public class HotspotSettings extends SettingsPreferenceFragment implements
             Log.d(TAG, msg);
         }
     }
+    public void showMaximumConnectionsDialog() {
+        niSelectedMaximum = sharedPreferences.getInt("maximum", 8);
+
+        final Activity activity = getActivity();
+        final AlertDialog dialog = new AlertDialog.Builder(activity).create();
+        dialog.setTitle(maximumConnectionsDialogTitle);
+        final NumberPicker catalogPick = new NumberPicker(activity);
+        dialog.setButton(maximumConnectionsPositive, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                System.putInt(getContentResolver(),
+                    WIFI_HOTSPOT_MAX_CLIENT_NUM, (catalogPick.getValue()));
+                if (mWifiApConfig != null&&mWifiManager.isWifiApEnabled()) {
+                    mWifiManager.setWifiApEnabled(null, false);
+                    mWifiManager.setWifiApEnabled(mWifiApConfig, true);
+                }
+                dialog.dismiss();
+                Log.i("sysout","item:"+catalogPick.getValue());
+                editor.putInt("maximum",catalogPick.getValue());
+                editor.commit();
+                mMaximumConnections.setSummary(""+(catalogPick.getValue()));
+            }
+        });
+
+        dialog.setButton2(maximumConnectionsNegative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        catalogPick.setMaxValue(8);
+        catalogPick.setMinValue(1);
+        catalogPick.setValue(niSelectedMaximum);// default set 8
+        catalogPick.setDescendantFocusability(catalogPick.FOCUS_BLOCK_DESCENDANTS);
+        dialog.setView(catalogPick);
+        dialog.show();
+    }
+
+
 }
