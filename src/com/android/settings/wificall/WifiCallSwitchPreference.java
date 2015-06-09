@@ -45,6 +45,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.State;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.preference.SwitchPreference;
 import android.util.AttributeSet;
@@ -100,10 +105,39 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             this.setChecked(false);
             this.setEnabled(false);
         } else {
-            this.setChecked(getWifiCallingSettingFromStatus(status));
+            boolean turnOn = getWifiCallingSettingFromStatus(status);
+            this.setChecked(turnOn);
+            this.setEnabled(true);
+            setSummary(getSummary(turnOn));
         }
         mState = status;
         mPreference = preference;
+    }
+
+    private int getSummary(boolean turnOn) {
+        if (!turnOn) {
+            return R.string.wifi_call_status_disabled;
+        }
+        if (mPreference == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
+            return R.string.wifi_call_status_cellular_preferred;
+        }
+        WifiManager wifiManager = (WifiManager) getContext().getSystemService(
+                Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            return R.string.wifi_call_status_wifi_off;
+        }
+        ConnectivityManager connManager = (ConnectivityManager) getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifi = connManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiManager.isWifiEnabled() && !wifi.isConnected()) {
+            return R.string.wifi_call_status_not_connected_wifi;
+        }
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo.getRssi() < -85) {
+            return R.string.wifi_call_status_poor_wifi_signal;
+        }
+        return R.string.wifi_call_status_ready;
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs,
@@ -201,6 +235,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             Log.e(TAG, "setWifiCallingPreference failed. Exception = " + e);
             return false;
         }
+        this.setEnabled(false);
+        setSummary(R.string.wifi_call_status_enabling);
         mState = wifiCallingStatus;
         mPreference = wifiCallingPreference;
         return true;

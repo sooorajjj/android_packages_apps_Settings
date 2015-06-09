@@ -6466,4 +6466,11 @@
     <string name="wifi_calling_notification_title">Calls will be made over Wi-Fi</string>
     <string name="wifi_calling_notification_subtitle">Tap here to access preferences</string>
     <string name="ims_set_wifi_calling_preference_failed">Failed to set wifi calling preference</string>
+    <string name="wifi_call_status_disabled">Disabled</string>
+    <string name="wifi_call_status_enabling">Enabling...</string>
+    <string name="wifi_call_status_poor_wifi_signal">Poor Wi-Fi signal</string>
+    <string name="wifi_call_status_cellular_preferred">Cellular Preferred is your Connection Preference</string>
+    <string name="wifi_call_status_ready">Ready for Calls</string>
+    <string name="wifi_call_status_not_connected_wifi">Not Connected to Wi-Fi</string>
+    <string name="wifi_call_status_wifi_off">Wi-Fi Turned Off</string>
 </resources>
