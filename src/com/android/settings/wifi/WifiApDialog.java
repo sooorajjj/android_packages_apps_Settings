@@ -28,6 +28,7 @@ import android.net.wifi.WifiConfiguration.KeyMgmt;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
@@ -148,6 +149,13 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
             mSecurity.setSelection(mSecurityTypeIndex);
             if (mSecurityTypeIndex == WPA2_INDEX) {
                   mPassword.setText(mWifiConfig.preSharedKey);
+                if (context.getResources().getBoolean(
+                        com.android.internal.R.bool.
+                        config_regional_use_empty_password_default)) {
+                    if (TextUtils.isEmpty(mWifiConfig.preSharedKey)) {
+                        mCheckBox.setChecked(true);
+                    }
+                }
             }
         }
 

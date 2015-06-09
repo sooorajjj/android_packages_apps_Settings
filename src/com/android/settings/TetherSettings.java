@@ -221,8 +221,12 @@ public class TetherSettings extends SettingsPreferenceFragment
             getPreferenceScreen().removePreference(mUsbTether);
         }
         if (getResources().getBoolean(
-               com.android.internal.R.bool.config_regional_hotspot_default_ssid_with_imei_enable)) {
-            TetherSettingsAccountHandler.checkDefaultSSID(activity);
+               com.android.internal.R.bool.
+               config_regional_hotspot_default_ssid_with_imei_enable)
+               || getResources().getBoolean(
+               com.android.internal.R.bool.
+               config_regional_use_empty_password_default)) {
+            TetherSettingsAccountHandler.checkDefaultValue(activity);
         }
         if (wifiAvailable && !Utils.isMonkeyRunning()) {
             if (mShowHotspotSetting) {
