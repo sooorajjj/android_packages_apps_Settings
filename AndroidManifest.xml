@@ -86,10 +86,6 @@
                 android:taskAffinity="com.android.settings"
                 android:label="@string/settings_label_launcher"
                 android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.settings.SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
             <meta-data android:name="com.android.settings.PRIMARY_PROFILE_CONTROLLED"
                 android:value="true" />
         </activity>
