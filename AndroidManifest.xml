@@ -2356,5 +2356,13 @@
                 <action android:name="com.android.imscontection.DISCONNECTED"></action>
             </intent-filter>
         </receiver>
+                <receiver android:name="com.android.settings.wificall.WifiCallingStatusContral">
+            <intent-filter>
+                <action android:name="com.android.wificall.TURNON"></action>
+                <action android:name="com.android.wificall.TURNOFF"></action>
+                <action android:name="com.android.wificall.ERRORCODE"></action>
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"></action>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
