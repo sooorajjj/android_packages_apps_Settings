@@ -64,7 +64,7 @@ public class WifiCallingNotification {
         return mWifiCallNoti;
     }
 
-    private static boolean getWifiCallingNotifiEnable(Context context){
+    public static boolean getWifiCallingNotifiEnable(Context context){
         return context.getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_wifi_calling_notificaion_enable);
     }

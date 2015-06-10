@@ -109,6 +109,9 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             this.setChecked(turnOn);
             this.setEnabled(true);
             setSummary(getSummary(turnOn));
+            Intent intent = new Intent(turnOn ? WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_ON
+                    : WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_OFF);
+            getContext().sendBroadcast(intent);
         }
         mState = status;
         mPreference = preference;
@@ -158,6 +161,10 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                                 .isWifiCallingRegistrationError(errorCode)) {
                             setSummaryOn(WifiCallRegistrationErrorUtil
                                     .matchRegistrationError(errorCode, getContext()));
+                            Intent broadcast = new Intent(WifiCallingStatusContral.
+                                    ACTION_WIFI_CALL_ERROR_CODE);
+                            broadcast.putExtra("result", errorCode);
+                            WifiCallSwitchPreference.this.getContext().sendBroadcast(broadcast);
                         }
                     }
                 }
