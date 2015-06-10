@@ -6394,10 +6394,10 @@
     <string name="learn_hotspot_dialog_title">wifi tethering is activated</string>
     <string name="learn_hotspot_dialog_text">Would you like to learn more about wifi Tethering on your phone?</string>
     <string name="mobile_tether_help_dialog_title">Mobile HotSpot Help</string>
-    <string name="mobile_usb_help_dialog_text">Mobile phone connects to the computer via USB, when you open the USB sharing, mobile phone acts as a wireless network card and computer can connect to the Internet.</string>
-    <string name="mobile_hotspot_help_dialog_text"></string>
+    <string name="mobile_usb_help_dialog_text">You can tether your Android device to your computer with a USB cable, to share your device\'s Internet connection with your computer. \n\n1. USB tethering works with Windows Vista, Windows 7, and Linux, the USB drivers for tethering may be needed.\n\n2. If your device has an SD card or USB storage, you can\'t mount it on your computer when USB tethered</string>
+    <string name="mobile_hotspot_help_dialog_text">You can turn your Android device into a portable Wi-Fi hotspot, to share your Android device\'s Internet connection with one or more computers or other devices. \n\n1.When your device is serving as a Wi-Fi hotspot, you can not use your device\'s applications to access the Internet via its Wi-Fi connection (but of course you remain connected to the Internet via your mobile data network). \n\n2.You configure the hotspot with the Wi-Fi hotspot settings</string>
     <string name="tethering_help_dialog_title">Help</string>
-    <string name="tethering_help_dialog_text"></string>
+    <string name="tethering_help_dialog_text"><b>USB tethering</b> \n You can tether your Android device to your computer with a USB cable, to share your device\'s Internet connection with your computer. \n\n1.USB tethering works with Windows Vista, Windows 7, Windows 8, Windows 8.1 and Linux. \n\n2.If your device has an SD card or USB storage, you can\'t mount it on your computer when USB tethered. \n\n <b>Portable Wi-Fi hotspot</b> \n You can turn your Android device into a portable Wi-Fi hotspot, to share your Android device\'s Internet connection with one or more computers or other devices. \n\n1.When your device is serving as a Wi-Fi hotspot, you can\'t use your device\'s applications to access the Internet via its Wi-Fi connection (but of course you remain connected to the Internet via your mobile data network). \n\n2.You configure the hotspot with the Wi-Fi hotspot settings.</string>
     <string name="data_usage_menu_show_time_range">Show time range</string>
     <string name="data_usage_menu_hide_time_range">Hide time range</string>
     <string name="wifi_call_setting_title">Wi-Fi Calling</string>
