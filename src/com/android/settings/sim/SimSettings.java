@@ -43,15 +43,15 @@ import android.preference.PreferenceScreen;
 import android.provider.SearchIndexableResource;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Telephony;
+import android.telephony.CellInfo;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.PhoneStateListener;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telecom.PhoneAccount;
-import android.telephony.CellInfo;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
-import android.telephony.PhoneStateListener;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -133,6 +133,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
     private SubscriptionManager mSubscriptionManager;
     private Utils mUtils;
+    private TelecomManager mTelecommMgr;
 
 
     public SimSettings() {
@@ -145,7 +146,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
         final TelephonyManager tm =
                     (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-
+        mTelecommMgr = (TelecomManager)getActivity().getSystemService(Context.TELECOM_SERVICE);
         mSubscriptionManager = SubscriptionManager.from(getActivity());
 
         if (mSubInfoList == null) {
@@ -585,6 +586,10 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                         if (SubscriptionManager.getDefaultVoiceSubId() != subId) {
                             SubscriptionManager.from(getActivity()).setDefaultVoiceSubId(subId);
                         }
+                        PhoneAccountHandle acc = findPhoneAccountHandleBySubId(subId);
+                        if (acc != null) {
+                            mTelecommMgr.setUserSelectedOutgoingPhoneAccount(acc);
+                        }
                     }
                 } else if (simPref.getKey().equals(KEY_SMS)) {
                     Log.d(TAG, "DefSMSId [" + SubscriptionManager.getDefaultSmsSubId() + "]");
@@ -601,6 +606,26 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 return true;
             }
         });
+    }
+
+    private PhoneAccountHandle findPhoneAccountHandleBySubId(final int SubId) {
+        PhoneAccountHandle account = null;
+        int id = 0;
+        List<PhoneAccountHandle> handles = mTelecommMgr.getAllPhoneAccountHandles();
+        for (PhoneAccountHandle handle : handles) {
+            if (handle.getId() != null) {
+                try {
+                    id = Integer.parseInt(handle.getId());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+                if (id == SubId) {
+                    account = handle;
+                    break;
+                }
+            }
+        }
+        return account;
     }
 
     private void setUserPrefDataSubIdInDb(long subId) {
