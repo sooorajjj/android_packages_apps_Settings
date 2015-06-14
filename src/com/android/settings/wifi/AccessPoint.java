@@ -384,12 +384,8 @@ class AccessPoint extends Preference {
     private boolean isInfoForThisAccessPoint(WifiInfo info) {
         if (networkId != WifiConfiguration.INVALID_NETWORK_ID) {
             return networkId == info.getNetworkId();
-        } else {
-            // Might be an ephemeral connection with no WifiConfiguration. Try matching on SSID.
-            // (Note that we only do this if the WifiConfiguration explicitly equals INVALID).
-            // TODO: Handle hex string SSIDs.
-            return ssid.equals(removeDoubleQuotes(info.getSSID()));
         }
+        return false;
     }
 
     void update(WifiInfo info, NetworkInfo networkInfo) {
