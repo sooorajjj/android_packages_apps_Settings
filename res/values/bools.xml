@@ -106,4 +106,7 @@
 
     <!-- Whether to add SIM/AKA in EAP method for adding network -->
     <bool name="config_eap_sim_function">false</bool>
+
+    <!-- Whether to enable data usage selection -->
+    <bool name="config_data_usage_selection">false</bool>
 </resources>

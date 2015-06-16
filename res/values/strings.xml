@@ -6408,4 +6408,6 @@
     <string name="mobile_hotspot_help_dialog_text"></string>
     <string name="tethering_help_dialog_title">Help</string>
     <string name="tethering_help_dialog_text"></string>
+    <string name="data_usage_menu_show_time_range">Show time range</string>
+    <string name="data_usage_menu_hide_time_range">Hide time range</string>
 </resources>
