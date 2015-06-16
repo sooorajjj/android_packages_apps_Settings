@@ -192,7 +192,7 @@ public class AccountCheck  {
             AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
             alert.setTitle(R.string.tethering_no_sim_alert_title);
             alert.setMessage(R.string.tethering_no_sim_card_text);
-            alert.setPositiveButton("Ok", null);
+            alert.setPositiveButton(R.string.okay, null);
             alert.show();
             return true;
         }
@@ -247,7 +247,7 @@ public class AccountCheck  {
                     .setTitle(R.string.turn_off_wifi_dialog_title)
                     .setMessage(R.string.turn_off_wifi_dialog_text)
                     .setView(mshowAgainView)
-                    .setPositiveButton("close", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Editor editor = sharedpreferences.edit();
@@ -349,14 +349,14 @@ public class AccountCheck  {
             build.setTitle(R.string.learn_hotspot_dialog_title);
             build.setMessage(R.string.learn_hotspot_dialog_text);
         }
-        build.setPositiveButton("yes",
+        build.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
                         showMoreAboutActivation(ctx,type);
                     }
                 });
-        build.setNegativeButton("skip",null);
+        build.setNegativeButton(R.string.skip_label, null);
         build.setCancelable(false);
         if (mIsShowTurnOffWifiDialog && mShowTurnOffWifiDialog.isShowing()) {
             mShowDialogBuild = build;
@@ -374,7 +374,7 @@ public class AccountCheck  {
             build.setTitle(R.string.mobile_tether_help_dialog_title);
             build.setMessage(R.string.mobile_hotspot_help_dialog_text);
         }
-        build.setPositiveButton("ok",null);
+        build.setPositiveButton(R.string.okay, null);
         build.show();
     }
 
