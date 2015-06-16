@@ -1271,12 +1271,6 @@
                 android:label="@string/development_settings_title"
                 android:taskAffinity="com.android.settings"
                 android:parentActivityName="Settings">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.settings.APPLICATION_DEVELOPMENT_SETTINGS" />
-                <action android:name="com.android.settings.APPLICATION_DEVELOPMENT_SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.android.settings.DevelopmentSettings" />
             <meta-data android:name="com.android.settings.TOP_LEVEL_HEADER_ID"
