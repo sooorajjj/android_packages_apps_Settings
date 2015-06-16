@@ -251,6 +251,14 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory {
             mFormatPreference.setSummary(summaryResId);
 
             addPreference(mFormatPreference);
+
+            final String state = mStorageManager.getVolumeState(mVolume
+                    .getPath());
+
+            if (context.getResources().getBoolean(R.bool.config_hide_sdcard_pref)
+                    && !(Environment.MEDIA_MOUNTED.equals(state))) {
+                removePreference(mFormatPreference);
+            }
         }
 
         final IPackageManager pm = ActivityThread.getPackageManager();
