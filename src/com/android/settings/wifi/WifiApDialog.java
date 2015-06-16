@@ -251,7 +251,7 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
             if (mSecurityTypeIndex == OPEN_INDEX) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 alert.setMessage(R.string.open_security_settings_note);
-                alert.setPositiveButton("Ok", null);
+                alert.setPositiveButton(R.string.okay, null);
                 alert.show();
             }
         }
@@ -285,7 +285,7 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
         alertdialog.setTitle(R.string.ssid_broadcast_dialog_title);
         alertdialog.setMessage(R.string.ssid_broadcast_dialog_text);
         alertdialog.setView(mshowAgainView);
-        alertdialog.setPositiveButton("close", new DialogInterface.OnClickListener() {
+        alertdialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
             @Override
             public void onClick( DialogInterface dialog, int which) {
                 SharedPreferences sharedpreferences = context.getSharedPreferences(
