@@ -47,7 +47,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         super(context);
     }
 
-    private void getWifiCallingPreference(){
+    public void getWifiCallingPreference(){
         try {
             if (mImsConfig != null) {
                 mImsConfig.getWifiCallingPreference(imsConfigListener);
@@ -151,7 +151,6 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             mImsConfig = null;
             Log.e(TAG, "ImsService is not running");
         }
-        getWifiCallingPreference();
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs, int defStyleAttr) {
