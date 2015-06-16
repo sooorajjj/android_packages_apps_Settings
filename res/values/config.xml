@@ -85,5 +85,6 @@
 
     <!-- Wifi calling settings -->
     <bool name="config_wifi_calling_settings_supported" translatable="false">false</bool>
+    <bool name="config_hide_sdcard_pref">false</bool>
 
 </resources>
