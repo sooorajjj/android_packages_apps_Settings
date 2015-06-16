@@ -55,6 +55,7 @@ import com.android.internal.telephony.TelephonyProperties;
 import com.android.settings.nfc.NfcEnabler;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settings.search.Indexable;
+import com.android.settings.wificall.WifiCallSwitchPreference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -496,6 +497,10 @@ public class WirelessSettings extends SettingsPreferenceFragment
         super.onStart();
 
         initSmsApplicationSetting();
+        Preference wifiCall = findPreference(KEY_WIFI_CALLING_SETTINGS);
+        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+            ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
+        }
     }
 
     @Override
