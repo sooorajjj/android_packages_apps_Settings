@@ -37,6 +37,7 @@ import android.net.wifi.WifiManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import com.android.ims.ImsConfig;
 
 public class WifiCallingStatusContral extends BroadcastReceiver {
 
@@ -64,6 +65,12 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         boolean turnOn = ACTION_WIFI_CALL_TURN_ON.equals(action);
         if (ACTION_WIFI_CALL_TURN_OFF.equals(action)
                 || ACTION_WIFI_CALL_TURN_ON.equals(action)) {
+            int preference = intent.getIntExtra("preference",
+                    ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+            if (preference ==
+                    ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
+                turnOn = false;
+            }
             WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, turnOn);
         } else if (ACTION_WIFI_CALL_ERROR_CODE.equals(action)) {
             int error = intent.getIntExtra("result", 0);

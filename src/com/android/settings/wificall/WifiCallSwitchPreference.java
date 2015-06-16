@@ -83,6 +83,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             setSummary(getSummary(turnOn));
             Intent intent = new Intent(turnOn ? WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_ON
                     : WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_OFF);
+            intent.putExtra("preference", mPreference);
             getContext().sendBroadcast(intent);
         }
         mState = status;
