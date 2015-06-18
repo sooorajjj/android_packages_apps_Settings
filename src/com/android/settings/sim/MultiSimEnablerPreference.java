@@ -43,6 +43,10 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.Preference;
@@ -55,11 +59,15 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -68,6 +76,7 @@ import com.android.internal.telephony.PhoneConstants;
 import com.android.settings.SelectSubscription;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.settings.R;
+import com.android.settings.Utils;
 
 import java.util.List;
 
@@ -98,6 +107,10 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
     private SubscriptionInfo mSir;
     private boolean mCurrentState;
     private boolean mRequest;
+
+    private int[] mTintArr;
+    private String[] mColorStrings;
+    private int mTintSelectorPos;
 
     private boolean mCmdInProgress = false;
     private int mSwitchVisibility = View.VISIBLE;
@@ -132,6 +145,9 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         mSlotId = slotId;
         mSir = sir;
         mParentHandler = handler;
+        mTintArr = context.getResources().getIntArray(com.android.internal.R.array.sim_colors);
+        mColorStrings = context.getResources().getStringArray(R.array.color_picker);
+        mTintSelectorPos = 0;
     }
 
     private void sendMessage(int event, Handler handler, int delay) {
@@ -173,6 +189,7 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         setTitle(res.getString(R.string.sim_card_number_title, mSlotId + 1));
         if (isSubValid) {
             updateSummary();
+            setIcon(new BitmapDrawable(res, (mSir.createIconBitmap(mContext))));
         } else {
             setSummary(res.getString(R.string.sim_slot_empty));
         }
@@ -527,6 +544,33 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
         nameText.setText(mSir.getDisplayName());
 
+        final Spinner tintSpinner = (Spinner) dialogLayout.findViewById(R.id.spinner);
+        SelectColorAdapter adapter = new SelectColorAdapter(getContext(),
+                 R.layout.settings_color_picker_item, mColorStrings);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tintSpinner.setAdapter(adapter);
+
+        for (int i = 0; i < mTintArr.length; i++) {
+            if (mTintArr[i] == mSir.getIconTint()) {
+                tintSpinner.setSelection(i);
+                mTintSelectorPos = i;
+                break;
+            }
+        }
+
+        tintSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                int pos, long id){
+                tintSpinner.setSelection(pos);
+                mTintSelectorPos = pos;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         TextView numberView = (TextView)dialogLayout.findViewById(R.id.number);
         numberView.setText(mSir.getNumber());
 
@@ -561,6 +605,13 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
                 SubscriptionManager.from(mContext).setDisplayName(mSir.getDisplayName().toString(),
                         mSir.getSubscriptionId(), SubscriptionManager.NAME_SOURCE_USER_INPUT);
 
+                final int tintSelected = tintSpinner.getSelectedItemPosition();
+                int subscriptionId = mSir.getSubscriptionId();
+                int tint = mTintArr[tintSelected];
+                mSir.setIconTint(tint);
+                SubscriptionManager.from(mContext).setIconTint(tint, subscriptionId);
+                Utils.findRecordBySubId(mContext, subscriptionId).setIconTint(tint);
+
                 update();
                 editor.commit();
             }
@@ -574,6 +625,74 @@ public class MultiSimEnablerPreference extends Preference implements OnCheckedCh
         });
 
         builder.create().show();
+    }
+
+    private class SelectColorAdapter extends ArrayAdapter<CharSequence> {
+        private Context mContext;
+        private int mResId;
+
+        public SelectColorAdapter(
+            Context context, int resource, String[] arr) {
+            super(context, resource, arr);
+            mContext = context;
+            mResId = resource;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater)
+                mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View rowView;
+            final ViewHolder holder;
+            Resources res = mContext.getResources();
+            int iconSize = res.getDimensionPixelSize(R.dimen.color_swatch_size);
+            int strokeWidth = res.getDimensionPixelSize(R.dimen.color_swatch_stroke_width);
+
+            if (convertView == null) {
+                // Cache views for faster scrolling
+                rowView = inflater.inflate(mResId, null);
+                holder = new ViewHolder();
+                ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+                drawable.setIntrinsicHeight(iconSize);
+                drawable.setIntrinsicWidth(iconSize);
+                drawable.getPaint().setStrokeWidth(strokeWidth);
+                holder.label = (TextView) rowView.findViewById(R.id.color_text);
+                holder.icon = (ImageView) rowView.findViewById(R.id.color_icon);
+                holder.swatch = drawable;
+                rowView.setTag(holder);
+            } else {
+                rowView = convertView;
+                holder = (ViewHolder) rowView.getTag();
+            }
+
+            holder.label.setText(getItem(position));
+            holder.swatch.getPaint().setColor(mTintArr[position]);
+            holder.swatch.getPaint().setStyle(Paint.Style.FILL_AND_STROKE);
+            holder.icon.setVisibility(View.VISIBLE);
+            holder.icon.setImageDrawable(holder.swatch);
+            return rowView;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View rowView = getView(position, convertView, parent);
+            final ViewHolder holder = (ViewHolder) rowView.getTag();
+
+            if (mTintSelectorPos == position) {
+                holder.swatch.getPaint().setStyle(Paint.Style.FILL_AND_STROKE);
+            } else {
+                holder.swatch.getPaint().setStyle(Paint.Style.STROKE);
+            }
+            holder.icon.setVisibility(View.VISIBLE);
+            return rowView;
+        }
+
+        private class ViewHolder {
+            TextView label;
+            ImageView icon;
+            ShapeDrawable swatch;
+        }
     }
 
     private void logd(String msg) {
