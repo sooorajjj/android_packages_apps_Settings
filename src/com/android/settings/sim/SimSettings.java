@@ -31,7 +31,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -61,11 +60,14 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -642,16 +644,16 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private class SimPreference extends Preference{
         private SubscriptionInfo mSubscriptionInfo;
         private int mSlotId;
-        private int[] mTintArr;
         Context mContext;
+        private int[] mTintArr;
         private String[] mColorStrings;
         private int mTintSelectorPos;
 
         public SimPreference(Context context, SubscriptionInfo subInfoRecord, int slotId) {
             super(context);
 
-            mSubscriptionInfo = subInfoRecord;
             mContext = context;
+            mSubscriptionInfo = subInfoRecord;
             mSlotId = slotId;
             setKey("sim" + mSlotId);
             update();
@@ -670,7 +672,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                         mSubscriptionInfo.getDisplayName(),
                         mSubscriptionInfo.getNumber()));
                 setEnabled(true);
-                setIcon(new BitmapDrawable(res, (mSubInfoRecord.createIconBitmap(mContext))));
+                setIcon(new BitmapDrawable(res, (mSubscriptionInfo.createIconBitmap(mContext))));
             } else {
                 setSummary(R.string.sim_slot_empty);
                 setFragment(null);
@@ -702,17 +704,17 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             SelectColorAdapter adapter = new SelectColorAdapter(getContext(),
                      R.layout.settings_color_picker_item, mColorStrings);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            colorSpinner.setAdapter(adapter);
+            tintSpinner.setAdapter(adapter);
 
             for (int i = 0; i < mTintArr.length; i++) {
-                if (mTintArr[i] == mSubInfoRecord.getIconTint()) {
+                if (mTintArr[i] == mSubscriptionInfo.getIconTint()) {
                     tintSpinner.setSelection(i);
                     mTintSelectorPos = i;
                     break;
                 }
             }
 
-            colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            tintSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view,
                     int pos, long id){
@@ -767,19 +769,18 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 @Override
                 public void onClick(DialogInterface dialog, int whichButton) {
                     final EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
-
-                    mSubInfoRecord.displayName = nameText.getText().toString();
-                    SubscriptionManager.setDisplayName(mSubInfoRecord.displayName,
-                        mSubInfoRecord.subId);
-                    findRecordBySubId(mSubInfoRecord.subId).displayName =
-                        nameText.getText().toString();
+                    mSubscriptionInfo.setDisplayName(nameText.getText());
+                    SubscriptionManager.from(getActivity()).setDisplayName(
+                            mSubscriptionInfo.getDisplayName().toString(),
+                            mSubscriptionInfo.getSubscriptionId(),
+                            SubscriptionManager.NAME_SOURCE_USER_INPUT);
 
                     final int tintSelected = tintSpinner.getSelectedItemPosition();
-                    int subscriptionId = mSubInfoRecord.getSubscriptionId();
+                    int subscriptionId = mSubscriptionInfo.getSubscriptionId();
                     int tint = mTintArr[tintSelected];
-                    mSubInfoRecord.setIconTint(tint);
-                    SubscriptionManager.setIconTint(tint, subscriptionId);
-                    Utils.findRecordBySubId(subscriptionId).setIconTint(tint);
+                    mSubscriptionInfo.setIconTint(tint);
+                    mSubscriptionManager.setIconTint(tint, subscriptionId);
+                    Utils.findRecordBySubId(getActivity(), subscriptionId).setIconTint(tint);
 
                     updateAllOptions();
                     update();
@@ -864,8 +865,6 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 ShapeDrawable swatch;
             }
         }
-
-
     }
 
     // TextWatcher interface
