@@ -152,6 +152,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             mImsConfig = null;
             Log.e(TAG, "ImsService is not running");
         }
+        this.setChecked(true);
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -228,10 +229,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                 ImsConfig.WifiCallingValueConstants.OFF;
         Log.d(TAG, "onPreferenceChange user selected status : wifiStatus " + status +
                 " wifiPreference: " + mPreference);
-        boolean result = setWifiCallingPreference(status, mPreference);
-        if (result) {
-            loadWifiCallingPreference(status, mPreference);
-        }
+        setWifiCallingPreference(status, mPreference);
     }
 
     private ImsConfigListener imsConfigListener = new ImsConfigListener.Stub() {
