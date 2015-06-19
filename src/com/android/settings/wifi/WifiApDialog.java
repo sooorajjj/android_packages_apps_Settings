@@ -193,8 +193,8 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
 
     private void validate() {
         if ((mSsid != null && mSsid.length() == 0) ||
-                   ((mSecurityTypeIndex == WPA2_INDEX)&&
-                        mPassword.length() < 8)) {
+                   ((mSecurityTypeIndex == WPA2_INDEX)&& mPassword.length() < 8) ||
+                        (mSsid != null && mSsid.getText().toString().getBytes().length > 32)) {
             getButton(BUTTON_SUBMIT).setEnabled(false);
         } else {
             getButton(BUTTON_SUBMIT).setEnabled(true);
