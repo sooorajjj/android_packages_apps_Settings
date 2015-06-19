@@ -82,7 +82,8 @@ public class WirelessSettings extends SettingsPreferenceFragment
     private static final String KEY_SMS_APPLICATION = "sms_application";
     private static final String KEY_TOGGLE_NSD = "toggle_nsd"; //network service discovery
     private static final String KEY_CELL_BROADCAST_SETTINGS = "cell_broadcast_settings";
-    private static final String KEY_WIFI_CALLING_SETTINGS = "wifi_call_settings";
+    private static final String KEY_WIFI_CALLING_SETTINGS = "wifi_calling_settings";
+    private static final String KEY_WIFI_CALL_SETTINGS = "wifi_call_settings";
 
     public static final String EXIT_ECM_RESULT = "exit_ecm_result";
     public static final int REQUEST_CODE_EXIT_ECM = 1;
@@ -480,11 +481,10 @@ public class WirelessSettings extends SettingsPreferenceFragment
             Resources res = getResources();
             if (!res.getBoolean(
                     com.android.internal.R.bool.config_regional_wifi_calling_menu_enable)) {
+                removePreference(KEY_WIFI_CALL_SETTINGS);
+            } else if(findPreference(KEY_WIFI_CALL_SETTINGS) != null) {
                 removePreference(KEY_WIFI_CALLING_SETTINGS);
-            } else if(findPreference("wifi_calling_settings") != null) {
-                removePreference("wifi_calling_settings");
             }
-            //FIX ME : init the wificallswitch status
         }
     }
 
@@ -493,7 +493,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
         super.onStart();
 
         initSmsApplicationSetting();
-        Preference wifiCall = findPreference("wifi_call_settings");
+        Preference wifiCall = findPreference(KEY_WIFI_CALL_SETTINGS);
         if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
             ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
         }
