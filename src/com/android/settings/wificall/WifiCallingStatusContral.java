@@ -75,7 +75,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         } else if (ACTION_WIFI_CALL_ERROR_CODE.equals(action)) {
             int error = intent.getIntExtra("result", 0);
             if (DBUG) Log.i(TAG, "error : " + error);
-            WifiCallingNotification.getIntance().updateRegistrationError(mContext, error);
+            WifiCallingNotification.getIntance().updateRegistrationError(mContext, error, null);
         } else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
             SharedPreferences pre = context.getSharedPreferences(
                     WifiCallingWizardActivity.PRIVTE_PREFERENCE, Context.MODE_PRIVATE);

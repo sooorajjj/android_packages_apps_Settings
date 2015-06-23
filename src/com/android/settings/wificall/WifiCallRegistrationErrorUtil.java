@@ -67,13 +67,18 @@ public class WifiCallRegistrationErrorUtil {
         if(value == null){
             return -1;
         }
-        String regEx="[^0-9]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(value);
+
+        Pattern p = Pattern.compile("[-]+");
+        String[] errorCodeStr = p.split(value);
+
+        p = Pattern.compile("[^0-9]");
+        Matcher m = p.matcher(errorCodeStr[0]);
         String errorcode = m.replaceAll("");
         if(!"".equals(errorcode)){
+            Log.i(TAG, "Wifi calling registration error parsed: " + errorcode);
             return Integer.parseInt(errorcode);
         }else{
+            Log.e(TAG, "Wifi calling registration error parsed failed: " + errorcode);
             return -1;
         }
     }

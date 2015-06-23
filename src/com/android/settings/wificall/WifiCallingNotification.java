@@ -36,6 +36,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Telephony;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.android.settings.R;
 
@@ -98,20 +99,25 @@ public class WifiCallingNotification {
         notiManager.notify(WIFI_CALLING_NOTIFICAION_ID, builder.build());
     }
 
-    public static void updateRegistrationError(Context context, int error){
+    public static void updateRegistrationError(Context context, int error, String extraMsg){
         if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         mError = WifiCallRegistrationErrorUtil.matchRegistrationError(error, context);
+
+        //if error code is unknown, try to parse it from extraMessage
+        if ((mError == R.string.wifi_calling_registration_unknow_error_for_user)
+                && (extraMsg != null)) {
+            Log.i(TAG, "parse Wifi calling registration from extraMsg : " + extraMsg);
+            error = WifiCallRegistrationErrorUtil.parserErrorCodeFromString(extraMsg);
+            Log.i(TAG, "parsed error code: " + error);
+            mError = WifiCallRegistrationErrorUtil.matchRegistrationError(error, context);
+        }
+
         Builder builder = buildNotication(context, UPDATE_NOTIFICAION_ERROR_CODE);
         NotificationManager notiManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notiManager.notify(WIFI_CALLING_NOTIFICAION_ID, builder.build());
-    }
-
-    public static void updateRegistrationError(Context context, String error){
-        updateRegistrationError(context,
-                WifiCallRegistrationErrorUtil.parserErrorCodeFromString(error));
     }
 
     private static void cancelNotification(Context context, int id){
