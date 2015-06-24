@@ -49,6 +49,7 @@
 
         </LinearLayout>
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +64,7 @@
 
             <Spinner
                 android:id="@+id/spinner"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/color_picker_width"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/sim_content_padding" />
 

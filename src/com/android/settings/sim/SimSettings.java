@@ -27,6 +27,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,10 +55,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -599,14 +606,22 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private class SimPreference extends Preference{
         private SubscriptionInfo mSubscriptionInfo;
         private int mSlotId;
+        Context mContext;
+        private int[] mTintArr;
+        private String[] mColorStrings;
+        private int mTintSelectorPos;
 
         public SimPreference(Context context, SubscriptionInfo subInfoRecord, int slotId) {
             super(context);
 
+            mContext = context;
             mSubscriptionInfo = subInfoRecord;
             mSlotId = slotId;
             setKey("sim" + mSlotId);
             update();
+            mTintArr = context.getResources().getIntArray(com.android.internal.R.array.sim_colors);
+            mColorStrings = context.getResources().getStringArray(R.array.color_picker);
+            mTintSelectorPos = 0;
         }
 
         public void update() {
@@ -619,6 +634,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                         mSubscriptionInfo.getDisplayName(),
                         mSubscriptionInfo.getNumber()));
                 setEnabled(true);
+                setIcon(new BitmapDrawable(res, (mSubscriptionInfo.createIconBitmap(mContext))));
             } else {
                 setSummary(R.string.sim_slot_empty);
                 setFragment(null);
@@ -645,6 +661,33 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             EditText nameText = (EditText)dialogLayout.findViewById(R.id.sim_name);
             nameText.setText(mSubscriptionInfo.getDisplayName());
             nameText.addTextChangedListener(SimSettings.this);
+
+            final Spinner tintSpinner = (Spinner) dialogLayout.findViewById(R.id.spinner);
+            SelectColorAdapter adapter = new SelectColorAdapter(getContext(),
+                     R.layout.settings_color_picker_item, mColorStrings);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            tintSpinner.setAdapter(adapter);
+
+            for (int i = 0; i < mTintArr.length; i++) {
+                if (mTintArr[i] == mSubscriptionInfo.getIconTint()) {
+                    tintSpinner.setSelection(i);
+                    mTintSelectorPos = i;
+                    break;
+                }
+            }
+
+            tintSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view,
+                    int pos, long id){
+                    tintSpinner.setSelection(pos);
+                    mTintSelectorPos = pos;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
 
             TextView numberView = (TextView)dialogLayout.findViewById(R.id.number);
             final String rawNumber = getPhoneNumber(mSubscriptionInfo);
@@ -694,6 +737,13 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                             mSubscriptionInfo.getSubscriptionId(),
                             SubscriptionManager.NAME_SOURCE_USER_INPUT);
 
+                    final int tintSelected = tintSpinner.getSelectedItemPosition();
+                    int subscriptionId = mSubscriptionInfo.getSubscriptionId();
+                    int tint = mTintArr[tintSelected];
+                    mSubscriptionInfo.setIconTint(tint);
+                    mSubscriptionManager.setIconTint(tint, subscriptionId);
+                    Utils.findRecordBySubId(getActivity(), subscriptionId).setIconTint(tint);
+
                     updateAllOptions();
                     update();
                     editor.commit();
@@ -708,6 +758,74 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             });
             mAlertDialog = builder.create();
             mAlertDialog.show();
+        }
+
+        private class SelectColorAdapter extends ArrayAdapter<CharSequence> {
+            private Context mContext;
+            private int mResId;
+
+            public SelectColorAdapter(
+                Context context, int resource, String[] arr) {
+                super(context, resource, arr);
+                mContext = context;
+                mResId = resource;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater)
+                    mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                View rowView;
+                final ViewHolder holder;
+                Resources res = getResources();
+                int iconSize = res.getDimensionPixelSize(R.dimen.color_swatch_size);
+                int strokeWidth = res.getDimensionPixelSize(R.dimen.color_swatch_stroke_width);
+
+                if (convertView == null) {
+                    // Cache views for faster scrolling
+                    rowView = inflater.inflate(mResId, null);
+                    holder = new ViewHolder();
+                    ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+                    drawable.setIntrinsicHeight(iconSize);
+                    drawable.setIntrinsicWidth(iconSize);
+                    drawable.getPaint().setStrokeWidth(strokeWidth);
+                    holder.label = (TextView) rowView.findViewById(R.id.color_text);
+                    holder.icon = (ImageView) rowView.findViewById(R.id.color_icon);
+                    holder.swatch = drawable;
+                    rowView.setTag(holder);
+                } else {
+                    rowView = convertView;
+                    holder = (ViewHolder) rowView.getTag();
+                }
+
+                holder.label.setText(getItem(position));
+                holder.swatch.getPaint().setColor(mTintArr[position]);
+                holder.swatch.getPaint().setStyle(Paint.Style.FILL_AND_STROKE);
+                holder.icon.setVisibility(View.VISIBLE);
+                holder.icon.setImageDrawable(holder.swatch);
+                return rowView;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View rowView = getView(position, convertView, parent);
+                final ViewHolder holder = (ViewHolder) rowView.getTag();
+
+                if (mTintSelectorPos == position) {
+                    holder.swatch.getPaint().setStyle(Paint.Style.FILL_AND_STROKE);
+                } else {
+                    holder.swatch.getPaint().setStyle(Paint.Style.STROKE);
+                }
+                holder.icon.setVisibility(View.VISIBLE);
+                return rowView;
+            }
+
+            private class ViewHolder {
+                TextView label;
+                ImageView icon;
+                ShapeDrawable swatch;
+            }
         }
     }
 
