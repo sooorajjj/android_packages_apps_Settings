@@ -156,17 +156,17 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                 public void onReceive(Context context, Intent intent) {
                     Parcelable bundle = intent.getParcelableExtra("result");
                     if (bundle != null && bundle instanceof ImsReasonInfo) {
-                        int errorCode = ((ImsReasonInfo) bundle).getExtraCode();
-                        Log.i(TAG, "get errorcode : " + errorCode);
-                        if (WifiCallRegistrationErrorUtil
-                                .isWifiCallingRegistrationError(errorCode)) {
-                            setSummaryOn(WifiCallRegistrationErrorUtil
-                                    .matchRegistrationError(errorCode, getContext()));
-                            Intent broadcast = new Intent(WifiCallingStatusContral.
-                                    ACTION_WIFI_CALL_ERROR_CODE);
-                            broadcast.putExtra("result", errorCode);
-                            WifiCallSwitchPreference.this.getContext().sendBroadcast(broadcast);
-                        }
+                        ImsReasonInfo imsReasonInfo = (ImsReasonInfo)bundle;
+                        int errorCode = imsReasonInfo.getExtraCode();
+                        String extraMsg = (errorCode == 0) ? context.getResources().getString(
+                                R.string.wifi_call_status_ready) : imsReasonInfo.getExtraMessage();
+                        Log.i(TAG, "get ImsDisconnected extracode : " + errorCode);
+                        Log.i(TAG, "get ImsDisconnected getExtraMessage :" + extraMsg );
+                        setSummaryOn(extraMsg);
+                        Intent broadcast = new Intent(WifiCallingStatusContral.
+                                ACTION_WIFI_CALL_ERROR_CODE);
+                        broadcast.putExtra("result", extraMsg);
+                        WifiCallSwitchPreference.this.getContext().sendBroadcast(broadcast);
                     }
                 }
             };
