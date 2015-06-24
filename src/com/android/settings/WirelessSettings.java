@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -486,6 +487,29 @@ public class WirelessSettings extends SettingsPreferenceFragment
                 removePreference(KEY_WIFI_CALLING_SETTINGS);
             }
         }
+        setWifiCallingDefaultForFirstTime();
+    }
+
+   private void setWifiCallingDefaultForFirstTime() {
+       Preference wifiCall = findPreference(KEY_WIFI_CALL_SETTINGS);
+       if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+           SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
+                   "MY_PERFS", getActivity().MODE_PRIVATE);
+           boolean isFirstUseWfc = sharedPreferences.getBoolean("is_first_use_wfc", true);
+           if (isFirstUseWfc) {
+               SharedPreferences.Editor editor = sharedPreferences.edit();
+               editor.putBoolean("is_first_use_wfc", false);
+               editor.commit();
+               //set wifi calling default value
+               boolean default_on = getActivity().getResources().getBoolean(R.bool.def_wifi_calling_enable);
+               Log.i("fangyn", "default_on="+default_on);
+               if (((WifiCallSwitchPreference)wifiCall).isChecked() != default_on) {
+                   Log.i(TAG, "Set wifi calling state for the first time! Default settting is:" + default_on);
+                   ((WifiCallSwitchPreference)wifiCall).setChecked(default_on);
+                   ((WifiCallSwitchPreference)wifiCall).onSwitchClicked();
+               }
+           }
+       }
     }
 
     @Override

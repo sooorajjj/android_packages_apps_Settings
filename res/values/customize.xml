@@ -57,6 +57,9 @@
     <!-- Whether wifi hotspot enable -->
     <bool name="def_wifi_hotspot_enable">false</bool>
 
+    <!-- Whether wifi calling enable by default -->
+    <bool name="def_wifi_calling_enable">false</bool>
+
     <!-- Setting customize default carriers name -->
     <string name="def_custome_carriers_defname"></string>
 

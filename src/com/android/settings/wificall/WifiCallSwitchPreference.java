@@ -222,7 +222,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         return true;
     }
 
-    private void onSwitchClicked(){
+    public void onSwitchClicked(){
         Log.d(TAG, "onSwitchClicked "+isChecked());
         final int status =  isChecked() ?
                 ImsConfig.WifiCallingValueConstants.ON :
