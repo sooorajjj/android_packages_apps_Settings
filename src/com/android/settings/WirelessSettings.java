@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -491,6 +492,26 @@ public class WirelessSettings extends SettingsPreferenceFragment
                 removePreference(KEY_WIFI_CALLING_SETTINGS);
             }
         }
+        setWifiCallingDefaultForFirstTime();
+    }
+
+    private void setWifiCallingDefaultForFirstTime() {
+        Preference wifiCall = findPreference("wifi_call_settings");
+        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
+                    "MY_PERFS", getActivity().MODE_PRIVATE);
+            boolean isFirstUseWfc = sharedPreferences.getBoolean("is_first_use_wfc", true);
+            if (isFirstUseWfc) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("is_first_use_wfc", false);
+                editor.commit();
+                if (!((WifiCallSwitchPreference)wifiCall).isChecked()) {
+                     Log.i(TAG, "Set wifi calling enabled for the first time!");
+                    ((WifiCallSwitchPreference)wifiCall).setChecked(true);
+                    ((WifiCallSwitchPreference)wifiCall).onSwitchClicked();
+                }
+            }
+        }
     }
 
     @Override
@@ -500,6 +521,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
         initSmsApplicationSetting();
         Preference wifiCall = findPreference(KEY_WIFI_CALL_SETTINGS);
         if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+            ((WifiCallSwitchPreference)wifiCall).setParentActivity(getActivity());
             ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
         }
     }
@@ -536,6 +558,16 @@ public class WirelessSettings extends SettingsPreferenceFragment
         }
         if (mNsdEnabler != null) {
             mNsdEnabler.pause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        Preference wifiCall = findPreference("wifi_call_settings");
+        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+            ((WifiCallSwitchPreference)wifiCall).unRegisterReciever();
         }
     }
 

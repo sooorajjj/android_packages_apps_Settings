@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 
 import java.util.regex.Pattern;
 
+import android.app.Activity;
 import com.android.ims.ImsConfigListener;
 import com.android.settings.ImsDisconnectedReceiver;
 import com.android.ims.ImsReasonInfo;
@@ -70,6 +71,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     private ImsConfig mImsConfig;
     private int mState;
     private int mPreference = 1;
+    private Activity mParent = null;
+    private static BroadcastReceiver mReceiver = null;
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
@@ -101,11 +104,14 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     }
 
     private void loadWifiCallingPreference(int status, int preference){
+        mState = status;
+        mPreference = preference;
         if (status == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED) {
             this.setChecked(false);
             this.setEnabled(false);
         } else {
             boolean turnOn = getWifiCallingSettingFromStatus(status);
+
             this.setChecked(turnOn);
             this.setEnabled(true);
             setSummary(getSummary(turnOn));
@@ -114,8 +120,6 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             intent.putExtra("preference", mPreference);
             getContext().sendBroadcast(intent);
         }
-        mState = status;
-        mPreference = preference;
     }
 
     private int getSummary(boolean turnOn) {
@@ -144,14 +148,31 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         return R.string.wifi_call_status_ready;
     }
 
+    public void setParentActivity(Activity act) {
+        mParent = act;
+    }
+
     public WifiCallSwitchPreference(Context context, AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        if (context.getResources().getBoolean(
+        try {
+            ImsManager imsManager = ImsManager.getInstance(getContext(),
+                    SubscriptionManager.getDefaultVoiceSubId());
+            mImsConfig = imsManager.getConfigInterface();
+            Log.d(TAG, "mImsConfig:"+mImsConfig);
+        } catch (ImsException e) {
+            mImsConfig = null;
+            Log.e(TAG, "ImsService is not running");
+        }
+    }
+
+    public void registerReciever() {
+       unRegisterReciever();
+       if (getContext().getResources().getBoolean(
                 com.android.internal.R.bool.config_regional_wifi_calling_registration_errorcode)) {
             IntentFilter filter = new IntentFilter(
                     ImsDisconnectedReceiver.IMSDICONNECTED_ACTION);
-            BroadcastReceiver receiver = new BroadcastReceiver() {
+            mReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     Parcelable bundle = intent.getParcelableExtra("result");
@@ -159,26 +180,20 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                         ImsReasonInfo imsReasonInfo = (ImsReasonInfo)bundle;
                         int errorCode = imsReasonInfo.getExtraCode();
                         String extraMsg = (errorCode == 0) ? context.getResources().getString(
-                                R.string.wifi_call_status_ready) : imsReasonInfo.getExtraMessage();
+                                getSummary(true)) : imsReasonInfo.getExtraMessage();
                         Log.i(TAG, "get ImsDisconnected extracode : " + errorCode);
                         Log.i(TAG, "get ImsDisconnected getExtraMessage :" + extraMsg );
                         setSummaryOn(extraMsg);
-                        Intent broadcast = new Intent(WifiCallingStatusContral.
-                                ACTION_WIFI_CALL_ERROR_CODE);
-                        broadcast.putExtra("result", extraMsg);
-                        WifiCallSwitchPreference.this.getContext().sendBroadcast(broadcast);
                     }
                 }
             };
-            context.registerReceiver(receiver, filter);
+            getContext().registerReceiver(mReceiver, filter);
         }
-        try {
-            ImsManager imsManager = ImsManager.getInstance(getContext(),
-                    SubscriptionManager.getDefaultVoiceSubId());
-            mImsConfig = imsManager.getConfigInterface();
-        } catch (ImsException e) {
-            mImsConfig = null;
-            Log.e(TAG, "ImsService is not running");
+    }
+    public void unRegisterReciever() {
+        if (mReceiver != null) {
+            getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
         }
     }
 
@@ -249,7 +264,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         return true;
     }
 
-    private void onSwitchClicked(){
+    public void onSwitchClicked(){
         Log.d(TAG, "onSwitchClicked "+isChecked());
         final int status =  isChecked() ?
                 ImsConfig.WifiCallingValueConstants.ON :
@@ -287,8 +302,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             //TODO not required as of now
         }
 
-        public void onGetWifiCallingPreference(int status, int wifiCallingStatus,
-                int wifiCallingPreference) {
+        public void onGetWifiCallingPreference(int status, final int wifiCallingStatus,
+                final int wifiCallingPreference) {
             if (hasRequestFailed(status)) {
                 mState = ImsConfig.WifiCallingValueConstants.OFF;
                 mPreference = ImsConfig.WifiCallingPreference.WIFI_PREF_NONE;
@@ -296,7 +311,15 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             }
             Log.d(TAG, "onGetWifiCallingPreference: status = " + wifiCallingStatus +
                     " preference = " + wifiCallingPreference);
-            loadWifiCallingPreference(wifiCallingStatus, wifiCallingPreference);
+            mParent.runOnUiThread(new Runnable() {
+                public void run() {
+                    //here WifiCallSwitchPreference will be recreated, so it needs
+                    //unregisterReceiver and after UI refresh finish to registerReciever
+                    unRegisterReciever();
+                    loadWifiCallingPreference(wifiCallingStatus, wifiCallingPreference);
+                    registerReciever();
+                }
+            });
         }
 
         public void onSetWifiCallingPreference(int status) {
