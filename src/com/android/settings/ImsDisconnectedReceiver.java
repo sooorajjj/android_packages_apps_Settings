@@ -33,13 +33,16 @@ import android.content.BroadcastReceiver;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+import com.android.ims.ImsConfig;
 import com.android.ims.ImsReasonInfo;
 import com.android.settings.wificall.WifiCallRegistrationErrorUtil;
 import com.android.settings.wificall.WifiCallingNotification;
+import com.android.settings.wificall.WifiCallingStatusContral;
 
 public class ImsDisconnectedReceiver extends BroadcastReceiver {
 
@@ -53,11 +56,24 @@ public class ImsDisconnectedReceiver extends BroadcastReceiver {
     private static Handler mHandlerUpdate = new Handler(){
         public void handleMessage(android.os.Message msg) {
             int error = mImsReasonInfo.getExtraCode();
-            String extraMsg = (error == 0) ? mContext.getResources().getString(
-                    R.string.wifi_call_status_ready) : mImsReasonInfo.getExtraMessage();
+            String extraMsg = mImsReasonInfo.getExtraMessage();
             if (DUBG) Log.i(TAG, "get ImsDisconnected extracode : " + error);
             if (DUBG) Log.i(TAG, "get ImsDisconnected getExtraMessage : " + extraMsg);
-            WifiCallingNotification.updateRegistrationError(mContext, extraMsg);
+            if ( error != 0) {
+                WifiCallingNotification.updateRegistrationError(mContext, extraMsg);
+            } else {
+                SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                   "MY_PERFS", mContext.MODE_PRIVATE);
+                 int wifiCallingPreference = sharedPreferences.getInt("currentWifiCallingPrefernce",
+                          ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+                 boolean wifiCallingStatus = sharedPreferences.getBoolean("currentWifiCallingStatus",
+                          true);
+                 Intent intent = new Intent(wifiCallingStatus ?
+                         WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_ON
+                         : WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_OFF);
+                 intent.putExtra("preference", wifiCallingPreference);
+                 mContext.sendBroadcast(intent);
+            }
         }
     };
 

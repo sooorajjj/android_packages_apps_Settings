@@ -60,6 +60,15 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         };
     };
 
+    public void savePreference(int iPreference, boolean status) {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                   "MY_PERFS", mContext.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("currentWifiCallingPrefernce", iPreference);
+        editor.putBoolean("currentWifiCallingStatus", status );
+        editor.commit();
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!WifiCallingNotification.getWifiCallingNotifiEnable(context)) {
@@ -75,6 +84,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             int preference = intent.getIntExtra("preference",
                     ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
             mWifiCallPreference = preference;
+            savePreference(mWifiCallPreference,mWifiCallStatus);
             ConnectivityManager connect = (ConnectivityManager) context
                     .getSystemService(Context.CONNECTIVITY_SERVICE);
             mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -107,6 +117,14 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             ConnectivityManager connect = (ConnectivityManager) context
                     .getSystemService(Context.CONNECTIVITY_SERVICE);
             mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (mWifiCallPreference == -1) {
+                SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                       "MY_PERFS", mContext.MODE_PRIVATE);
+                mWifiCallPreference = sharedPreferences.getInt("currentWifiCallingPrefernce",
+                        ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+                mWifiCallStatus = sharedPreferences.getBoolean("currentWifiCallingStatus",
+                        true);
+            }
             boolean turnOn = mWifiCallStatus;
             if (mWifiCallPreference ==
                     ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED
