@@ -52,7 +52,6 @@ public class WifiCallingNotification {
 
     private static WifiCallingNotification mWifiCallNoti;
     private static Builder mBuilder;
-    private static int mError;
     private static int mCallState = TelephonyManager.CALL_STATE_IDLE;
 
     private WifiCallingNotification(){
@@ -80,7 +79,7 @@ public class WifiCallingNotification {
             cancelNotification(context, WIFI_CALLING_NOTIFICAION_ID);
             return;
         }
-        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_TURN_ON);
+        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_TURN_ON, null);
         if (builder != null) {
             notiManager.notify(WIFI_CALLING_NOTIFICAION_ID, builder.build());
         }
@@ -93,28 +92,18 @@ public class WifiCallingNotification {
         if (mCallState != callState) {
             mCallState = callState;
         }
-        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_CALL_STATE);
+        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_CALL_STATE, null);
         NotificationManager notiManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notiManager.notify(WIFI_CALLING_NOTIFICAION_ID, builder.build());
     }
 
-    public static void updateRegistrationError(Context context, int error, String extraMsg){
+    public static void updateRegistrationError(Context context, String extraMsg){
         if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
-        mError = WifiCallRegistrationErrorUtil.matchRegistrationError(error, context);
 
-        //if error code is unknown, try to parse it from extraMessage
-        if ((mError == R.string.wifi_calling_registration_unknow_error_for_user)
-                && (extraMsg != null)) {
-            Log.i(TAG, "parse Wifi calling registration from extraMsg : " + extraMsg);
-            error = WifiCallRegistrationErrorUtil.parserErrorCodeFromString(extraMsg);
-            Log.i(TAG, "parsed error code: " + error);
-            mError = WifiCallRegistrationErrorUtil.matchRegistrationError(error, context);
-        }
-
-        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_ERROR_CODE);
+        Builder builder = buildNotication(context, UPDATE_NOTIFICAION_ERROR_CODE, extraMsg);
         NotificationManager notiManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notiManager.notify(WIFI_CALLING_NOTIFICAION_ID, builder.build());
@@ -129,7 +118,7 @@ public class WifiCallingNotification {
         notiManager.cancel(id);
     }
 
-    private static Notification.Builder buildNotication(Context context, int flag){
+    private static Notification.Builder buildNotication(Context context, int flag, String strNotification){
         if (mBuilder == null) {
             mBuilder = new Builder(context);
             Intent activityIntent = new Intent();
@@ -152,8 +141,7 @@ public class WifiCallingNotification {
             break;
         case UPDATE_NOTIFICAION_ERROR_CODE:
             mBuilder.setSmallIcon(R.drawable.wifi_calling_noti_error);
-            mBuilder.setContentText(
-                    context.getResources().getString(mError));
+            mBuilder.setContentText(strNotification);
             break;
         case UPDATE_NOTIFICAION_CALL_STATE:
             int icon = mCallState == TelephonyManager.CALL_STATE_IDLE ?

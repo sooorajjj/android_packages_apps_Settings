@@ -53,23 +53,11 @@ public class ImsDisconnectedReceiver extends BroadcastReceiver {
     private static Handler mHandlerUpdate = new Handler(){
         public void handleMessage(android.os.Message msg) {
             int error = mImsReasonInfo.getExtraCode();
-            String extraMsg = mImsReasonInfo.getExtraMessage();
-
-            boolean isWifiCallError =
-                    WifiCallRegistrationErrorUtil.isWifiCallingRegistrationError(error);
-            if(isWifiCallError) {
-                // Fix me: here need to judge wifi calling state ON/OFF
-                if(true) {
-                    WifiCallingNotification.updateRegistrationError(mContext, error, extraMsg);
-                }
-                return;
-            } else {
-                if (DUBG) Log.i(TAG, "ImsDisconnected extracode is " +
-                            "not wifi calling Registration Error");
-                if (DUBG) Log.i(TAG, "get ImsDisconnected extracode : " + error);
-                if (DUBG) Log.i(TAG, "get ImsDisconnected getExtraMessage : "
-                            + mImsReasonInfo.getExtraMessage());
-            }
+            String extraMsg = (error == 0) ? mContext.getResources().getString(
+                    R.string.wifi_call_status_ready) : mImsReasonInfo.getExtraMessage();
+            if (DUBG) Log.i(TAG, "get ImsDisconnected extracode : " + error);
+            if (DUBG) Log.i(TAG, "get ImsDisconnected getExtraMessage : " + extraMsg);
+            WifiCallingNotification.updateRegistrationError(mContext, extraMsg);
         }
     };
 

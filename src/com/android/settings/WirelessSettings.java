@@ -493,7 +493,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
         super.onStart();
 
         initSmsApplicationSetting();
-        Preference wifiCall = findPreference(KEY_WIFI_CALLING_SETTINGS);
+        Preference wifiCall = findPreference("wifi_call_settings");
         if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
             ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
         }
