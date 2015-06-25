@@ -345,7 +345,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                         // p2p-go hotspot can temporarily go offline
                         // responding to DFS events, we don't need to
                         // tamper with tethering in that case
-                        if (reason !=
+                        if (reason ==
                                 WifiP2pManager.WIFI_P2P_GO_STATE_CHANGE_REASON_RADAR_DETECTED) {
                             tetherStatus = cm.tether(
                                       mWifiP2pManager.getP2pTetherInterface());
@@ -367,6 +367,15 @@ public class TetherSettings extends SettingsPreferenceFragment
                                 stopAutoGO();
                                 mAutoGoState = false;
                             }
+                        } else if ((reason ==
+                                    WifiP2pManager.WIFI_P2P_GO_STATE_CHANGE_REASON_CAC_COMPLETED)
+                                    || (reason ==
+                                    WifiP2pManager.WIFI_P2P_GO_STATE_CHANGE_REASON_CSA_FINISHED)) {
+                                Toast.makeText(getActivity(),
+                                           R.string.p2p_go_tether_started,
+                                           Toast.LENGTH_SHORT).show();
+                                mAutoGoState = true;
+
                         }
                         if (mAutoGoState == true) {
                             if (mWifiP2pManager != null) {
@@ -410,6 +419,7 @@ public class TetherSettings extends SettingsPreferenceFragment
                         if(DBG) {
                             Log.d(TAG, "P2P-GO MHS stopped, restarting");
                         }
+                        mAutoGoState = false;
                         if (mP2pGoTether != null) {
                             mP2pGoTether.setChecked(false);
                             mP2pGoTether.setEnabled(false);
@@ -891,26 +901,28 @@ public class TetherSettings extends SettingsPreferenceFragment
 
     @Override
     public void onPersistentGroupInfoAvailable(WifiP2pGroupList groups) {
-        for (WifiP2pGroup group: groups.getGroupList()) {
-            String networkName = group.getNetworkName();
-            String passPhrase = group.getPassphrase();
-            if(DBG) {
-                Log.d(TAG,"Group Info Network Name: " + networkName);
-                Log.d(TAG,"Group Info Passphrase: " + passPhrase);
+        if (mAutoGoState) {
+            for (WifiP2pGroup group: groups.getGroupList()) {
+                 String networkName = group.getNetworkName();
+                 String passPhrase = group.getPassphrase();
+                 if (DBG) {
+                    Log.d(TAG,"Group Info Network Name: " + networkName);
+                    Log.d(TAG,"Group Info Passphrase: " + passPhrase);
+                 }
+                 SharedPreferences.Editor ed = mPrefs.edit();
+                 ed.putString("auto_network_name", networkName);
+                 ed.putString("auto_passphrase", passPhrase);
+                 p2pNetworkName=networkName;
+                 p2pPassphrase=passPhrase;
+                 ed.commit();
+                 setAutoP2PCallSetupInfo();
             }
-            SharedPreferences.Editor ed = mPrefs.edit();
-            ed.putString("auto_network_name", networkName);
-            ed.putString("auto_passphrase", passPhrase);
-            p2pNetworkName=networkName;
-            p2pPassphrase=passPhrase;
-            ed.commit();
-            setAutoP2PCallSetupInfo();
-        }
 
-        // There is no point in enabling the tethering UI before this
-        if (mP2pGoTether != null) {
-            mP2pGoTether.setEnabled(true);
-            mP2pGoTether.setChecked(true);
+            // There is no point in enabling the tethering UI before this
+            if (mP2pGoTether != null) {
+                mP2pGoTether.setEnabled(true);
+                mP2pGoTether.setChecked(true);
+            }
         }
     }
 
