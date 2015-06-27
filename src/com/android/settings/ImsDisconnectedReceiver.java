@@ -82,6 +82,8 @@ public class ImsDisconnectedReceiver extends BroadcastReceiver {
         mContext = context;
         if (DUBG) Log.i(TAG, "Receive action :" + intent.getAction());
         if(IMSDICONNECTED_ACTION.equals(intent.getAction())){
+            boolean stateChanged = intent.getBooleanExtra("stateChanged",true);
+            if (!stateChanged) return;
             Parcelable bundle = intent.getParcelableExtra("result");
             if(bundle == null){
                 if (DUBG) Log.i(TAG, "intent didn't contain not parcelable");
