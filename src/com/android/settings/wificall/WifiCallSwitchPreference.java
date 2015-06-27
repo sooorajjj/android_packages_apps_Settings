@@ -179,6 +179,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     if (bundle != null && bundle instanceof ImsReasonInfo) {
                         ImsReasonInfo imsReasonInfo = (ImsReasonInfo)bundle;
                         int errorCode = imsReasonInfo.getExtraCode();
+                        boolean stateChanged = intent.getBooleanExtra("stateChanged",true);
+                        if (!stateChanged) return;
                         String extraMsg = (errorCode == 0) ? context.getResources().getString(
                                 getSummary(true)) : imsReasonInfo.getExtraMessage();
                         Log.i(TAG, "get ImsDisconnected extracode : " + errorCode);
