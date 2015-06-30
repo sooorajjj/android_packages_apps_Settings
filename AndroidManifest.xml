@@ -403,7 +403,6 @@
                 android:taskAffinity="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.settings.DATE_SETTINGS" />
                 <action android:name="android.intent.action.QUICK_CLOCK" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
                 <category android:name="android.intent.category.DEFAULT" />
