@@ -52,7 +52,7 @@ import com.android.settings.nfc.PaymentBackend.PaymentAppInfo;
 import java.util.List;
 
 public class PaymentSettings extends SettingsPreferenceFragment implements
-        OnClickListener, OnPreferenceChangeListener {
+        OnClickListener, OnLongClickListener, OnPreferenceChangeListener {
     public static final String TAG = "PaymentSettings";
     private LayoutInflater mInflater;
     private PaymentBackend mPaymentBackend;
@@ -78,7 +78,7 @@ public class PaymentSettings extends SettingsPreferenceFragment implements
             // Add all payment apps
             for (PaymentAppInfo appInfo : appInfos) {
                 PaymentAppPreference preference =
-                        new PaymentAppPreference(getActivity(), appInfo, this);
+                        new PaymentAppPreference(getActivity(), appInfo, this, this);
                 preference.setTitle(appInfo.caption);
                 if (appInfo.banner != null) {
                     screen.addPreference(preference);
@@ -150,6 +150,26 @@ public class PaymentSettings extends SettingsPreferenceFragment implements
     }
 
     @Override
+    public boolean onLongClick(View v){
+        if (v.getTag() instanceof PaymentAppInfo) {
+            PaymentAppInfo appInfo = (PaymentAppInfo) v.getTag();
+            if (appInfo.componentName != null) {
+                Log.d(TAG, "LongClick: " + appInfo.componentName.toString());
+                PackageManager pm = getActivity().getPackageManager();
+                Intent gsmaIntent =
+                    pm.getLaunchIntentForPackage(appInfo.componentName.getPackageName());
+                if (gsmaIntent != null) {
+                    gsmaIntent.setAction("com.gsma.services.nfc.SELECT_DEFAULT_SERVICE");
+                    gsmaIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                    gsmaIntent.setPackage(gsmaIntent.getPackage());
+                    getActivity().startActivity(gsmaIntent);
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mSettingsPackageMonitor.register(getActivity(), getActivity().getMainLooper(), false);
@@ -203,45 +223,18 @@ public class PaymentSettings extends SettingsPreferenceFragment implements
         }
     }
 
-    public static class MyLongClickListener implements OnLongClickListener {
-        final Context mContext;
-
-        MyLongClickListener(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        public boolean onLongClick(View v){
-            if (v.getTag() instanceof PaymentAppInfo) {
-                PaymentAppInfo appInfo = (PaymentAppInfo) v.getTag();
-                if (appInfo.componentName != null) {
-                    Log.d(TAG, appInfo.componentName.toString());
-                    PackageManager pm = mContext.getPackageManager();
-                    Intent gsmaIntent =
-                        pm.getLaunchIntentForPackage(appInfo.componentName.getPackageName());
-                    if (gsmaIntent != null) {
-                        gsmaIntent.setAction("com.gsma.services.nfc.SELECT_DEFAULT_SERVICE");
-                        gsmaIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                        gsmaIntent.setPackage(gsmaIntent.getPackage());
-                        mContext.startActivity(gsmaIntent);
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
     public static class PaymentAppPreference extends Preference {
         private final OnClickListener listener;
-        private final OnLongClickListener mLongListener = new MyLongClickListener(getContext());
+        private final OnLongClickListener longListener;
         private final PaymentAppInfo appInfo;
 
         public PaymentAppPreference(Context context, PaymentAppInfo appInfo,
-                OnClickListener listener) {
+                OnClickListener listener, OnLongClickListener longListener) {
             super(context);
             setLayoutResource(R.layout.nfc_payment_option);
             this.appInfo = appInfo;
             this.listener = listener;
+            this.longListener = longListener;
         }
 
         @Override
@@ -256,11 +249,11 @@ public class PaymentSettings extends SettingsPreferenceFragment implements
             ImageView banner = (ImageView) view.findViewById(R.id.banner);
             banner.setImageDrawable(appInfo.banner);
 
-            view.setLongClickable(true);
-            view.setOnLongClickListener(mLongListener);
-
             banner.setOnClickListener(listener);
             banner.setTag(appInfo);
+
+            banner.setLongClickable(true);
+            banner.setOnLongClickListener(longListener);
         }
     }
 
