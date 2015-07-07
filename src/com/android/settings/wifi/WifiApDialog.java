@@ -160,6 +160,8 @@ public class WifiApDialog extends AlertDialog implements View.OnClickListener,
             }
         }
 
+        EditText PassWordEdit = (EditText) mView.findViewById(R.id.password);
+        PassWordEdit.requestFocus();
         mSsid.addTextChangedListener(this);
         mPassword.addTextChangedListener(this);
         mCheckBox.setOnClickListener(this);
