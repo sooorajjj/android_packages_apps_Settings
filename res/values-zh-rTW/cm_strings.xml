@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2015, The Linux Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+    * Neither the name of The Linux Foundation nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!--
+     Copyright (C) 2012-2014 The CyanogenMod Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="button_pref_title">按鍵</string>
+    <string name="hardware_keys_power_key_title">電源鍵</string>
+    <string name="hardware_keys_power_end_call_title">結束通話</string>
+    <string name="hardware_keys_power_end_call_summary">結束通話</string>
+    <string name="hardware_keys_home_key_title">主熒幕鍵</string>
+    <string name="hardware_keys_long_press_title">長按行為</string>
+    <string name="hardware_keys_double_tap_title">雙擊行為</string>
+    <string name="hardware_keys_menu_key_title">菜單鍵</string>
+    <string name="hardware_keys_short_press_title">短按行為</string>
+    <string name="home_answer_ringing_call_title">接入</string>
+    <string name="home_answer_ringing_call_summary">按下主屏幕鍵接聽來電</string>
+    <string name="hardware_keys_volume_keys_title">音量鍵</string>
+    <string name="volbtn_wake_device_title">喚醒</string>
+    <string name="volbtn_wake_device_summary">按下音量鍵喚醒機器</string>
+    <string name="hardware_keys_action_search">搜索助手</string>
+    <string name="hardware_keys_action_voice_search">語音搜索</string>
+    <string name="status_bar_prefs_title">狀態欄</string>
+    <string name="keywords_status_bar">狀態欄圖標</string>
+    <string name="show_battery_percent_title">顯示電池狀態</string>
+    <string name="profiles_settings_title">情景模式</string>
+    <string name="profile_empty_list_profiles_off">如果您想配置並使用系統情景，請先開啟情景模式。</string>
+    <string name="profile_reset_title">重置</string>
+    <string name="new_profile_name">&lt;新情景模式&gt;</string>
+    <string name="profile_reset_message">您確定要刪除所有用戶創建的情景與應用組並且還原為默認值？</string>
+    <string name="profile_profiles_manage">情景</string>
+    <string name="profile_selected">選擇的情景：%1$s</string>
+    <string name="profile_add_nfc_text">此NFC 標籤是與一個未知的情景相連的。把此NFC 標籤連接到一個現有的情景將會允許您以後選擇這個情景。</string>
+    <string name="profile_select">選擇情景</string>
+    <string name="profile_unknown_nfc_tag">未知情景</string>
+    <string name="profile_settings_title">情景</string>
+    <string name="profile_write_success">標籤寫入成功！</string>
+    <string name="profile_nfc_text">將一個情景寫入NFC 標籤能夠允許您通過觸摸標籤的行為更改情景。再次觸摸將會返回到您之前選擇的情景。</string>
+    <string name="profile_write_touch_tag">觸摸標籤以便寫入</string>
+    <string name="profile_write_nfc_tag">寫到 NFC 標籤</string>
+    <string name="profile_write_failed">標籤寫入失敗！</string>
+    <string name="profile_profile_manage">管理情景</string>
+    <string name="profile_setup_actions_title">步驟 2：設置操作</string>
+    <string name="profile_setup_actions_title_config">重新配置操作</string>
+    <string name="profile_menu_delete_title">刪除</string>
+    <string name="profile_menu_fill_from_state">導入當前設備設置</string>
+    <string name="profile_setup_actions_description">現在配置當配置文件激活時，將發生的操作</string>
+    <string name="profile_name_title">名稱</string>
+    <string name="profile_triggers_header">觸發將激活這個設置</string>
+    <string name="profile_connectionoverrides_title">連接覆蓋</string>
+    <string name="profile_volumeoverrides_title">音量覆蓋</string>
+    <string name="profile_system_settings_title">系統設置</string>
+    <string name="profile_airplanemode_title">飛行模式</string>
+    <string name="profile_populate_profile_from_state">利用當前設備設置配置情景？</string>
+    <string name="profile_lockmode_title">鎖屏模式</string>
+    <string name="rename_dialog_message">輸入一個新名稱</string>
+    <string name="rename_dialog_title">重命名</string>
+    <string name="profile_remove_dialog_message">刪除配置文件%1$s 嗎？</string>
+    <string name="ring_mode_title">響鈴模式</string>
+    <string name="profile_volume_override_checkbox_label">重寫音量</string>
+    <string name="profile_setup_setup_triggers_title">步驟 1：添加觸發器</string>
+    <string name="profile_setup_setup_triggers_title_config">修改觸發器：<xliff:g id="profile_name">%1$s</xliff:g></string>
+    <string name="profile_setup_setup_triggers_description">請選擇將激活此配置文件的觸發器</string>
+    <string name="profile_tabs_bluetooth">藍牙</string>
+    <string name="profile_action_enable">啟用</string>
+    <string name="profile_action_disabled">禁用</string>
+    <string name="profile_action_none">無操作</string>
+    <string name="toggleBluetooth">藍牙</string>
+    <string name="toggleData">移動數據</string>
+    <string name="toggleSync">數據同步</string>
+    <string name="toggleWifiAp">Wi-Fi熱點</string>
+    <string name="profile_lockmode_default_summary">使用系統默認值</string>
+    <string name="profile_lockmode_disabled_summary">鎖屏已禁用</string>
+    <string name="profile_lockmode_insecure_summary">使用不安全鎖屏</string>
+    <string name="ring_mode_normal">正常</string>
+    <string name="ring_mode_vibrate">振動</string>
+    <string name="ring_mode_mute">靜音</string>
+    <string name="ring_mode_unchanged">沒有更改</string>
+    <string name="no_triggers_configured_nfc">按一下來設置新的NFC觸發</string>
+    <string name="no_triggers_configured">沒有設置觸發。按一下創建新的觸發</string>
+    <string name="volume_override_summary">設置為 %1$s/%2$s</string>
+    <string name="volume_override_summary_no_override">不要重寫</string>
+    <string name="no_bluetooth_triggers">沒有已配對的藍牙設備。 \n配置觸發器前輕按以配對藍牙設備。</string>
+    <string name="profile_trigger_configure">設定觸發條件</string>
+    <string name="no_wifi_triggers">沒有設置Wi-Fi熱點。先連接Wi-Fi然後設置觸發。</string>
+    <string name="hardware_keys_action_nothing">無作用</string>
+    <string name="hardware_keys_action_menu">開啟/關閉菜單</string>
+    <string name="hardware_keys_action_app_switch">最近使用應用切換器</string>
+    <string name="hardware_keys_action_in_app_search">應用內搜索</string>
+    <string name="hardware_keys_action_launch_camera">啟動相機</string>
+    <string name="hardware_keys_action_sleep">關閉屏幕</string>
+    <string name="profile_lockmode_default">默認</string>
+    <string name="profile_lockmode_insecure">不安全</string>
+    <string name="profile_lockmode_disabled">已禁用</string>
+    <string name="profile_trigger_connect">連接時觸發</string>
+    <string name="profile_trigger_disconnect">斷開時觸發</string>
+    <string name="profile_trigger_a2dp_connect">A2DP 連接時</string>
+    <string name="profile_trigger_a2dp_disconnect">A2DP 斷開時</string>
+    <string name="profile_trigger_notrigger">無觸發</string>
+    <string name="profile_remove_current_profile">無法刪除當前使用的情景模式!</string>
+    <string name="ok">確定</string>
+</resources>
