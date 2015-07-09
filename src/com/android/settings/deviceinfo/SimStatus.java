@@ -339,8 +339,7 @@ public class SimStatus extends PreferenceActivity {
         }
         // If formattedNumber is null or empty, it'll display as "Unknown".
         setSummaryText(KEY_PHONE_NUMBER, formattedNumber);
-        final String imei = mPhone.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA
-                ? mPhone.getImei() : mPhone.getDeviceId();
+        final String imei = mPhone.getDeviceId();
         setSummaryText(KEY_IMEI, imei);
         setSummaryText(KEY_IMEI_SV, mTelephonyManager.getDeviceSoftwareVersion(/*slotId*/));
 
