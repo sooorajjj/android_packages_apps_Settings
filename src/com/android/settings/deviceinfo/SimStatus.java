@@ -289,6 +289,8 @@ public class SimStatus extends PreferenceActivity {
             setSummaryText(KEY_ROAMING_STATE, mRes.getString(R.string.radioInfo_roaming_not));
         }
         setSummaryText(KEY_OPERATOR_NAME, serviceState.getOperatorAlphaLong());
+        //Service State is changed, update the signal strength values as well.
+        updateSignalStrength(mPhone.getSignalStrength());
     }
 
     private void updateAreaInfo(String areaInfo) {
