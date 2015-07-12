@@ -397,7 +397,7 @@
     <string name="choose_timezone">Choose time zone</string>
 
 
-    <string name="default_date_format"><xliff:g id="default_date_format">MM/dd/yyyy</xliff:g></string>
+    <string name="default_date_format" translatable="false"><xliff:g id="default_date_format">MM/dd/yyyy</xliff:g></string>
      <!-- The option in the date-format picker for using the normal format
         called for by the user's locale. -->
     <string name="normal_date_format">Regional (<xliff:g id="date" example="12-31-2009">%s</xliff:g>)</string>
