@@ -483,16 +483,13 @@ public class WirelessSettings extends SettingsPreferenceFragment
             removePreference(KEY_WIFI_CALLING_SETTINGS);
         }
 
-        if(findPreference(KEY_WIFI_CALLING_SETTINGS) != null){
-            Resources res = getResources();
-            if (!res.getBoolean(
-                    com.android.internal.R.bool.config_regional_wifi_calling_menu_enable)) {
-                removePreference(KEY_WIFI_CALL_SETTINGS);
-            } else if(findPreference(KEY_WIFI_CALL_SETTINGS) != null) {
-                removePreference(KEY_WIFI_CALLING_SETTINGS);
-            }
-        }
-        setWifiCallingDefaultForFirstTime();
+	if (!getResources().getBoolean(
+		com.android.internal.R.bool.config_regional_wifi_calling_menu_enable)) {
+            removePreference(KEY_WIFI_CALL_SETTINGS);
+	} else if(findPreference(KEY_WIFI_CALL_SETTINGS) != null) {
+	    removePreference(KEY_WIFI_CALLING_SETTINGS);
+	    setWifiCallingDefaultForFirstTime();
+	}
     }
 
     private void setWifiCallingDefaultForFirstTime() {
