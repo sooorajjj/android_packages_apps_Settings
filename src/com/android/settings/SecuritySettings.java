@@ -33,6 +33,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.os.SystemProperties;
 import android.preference.SwitchPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -113,6 +114,8 @@ public class SecuritySettings extends SettingsPreferenceFragment
     private static final String DM_AUTOBOOT_SETTING = "dm_selfregist_autoboot";
     private static final int DM_AUTOBOOT_SETTING_ENABLE = 1;
     private static final int DM_AUTOBOOT_SETTING_DISABLE = 0;
+    private static final int VIRTUAL_KEY_DISABLE = 1;
+    private static final int VIRTUAL_KEY_ENABLE = 0;
 
     // These switch preferences need special handling since they're not all stored in Settings.
     private static final String SWITCH_PREFERENCE_KEYS[] = { KEY_LOCK_AFTER_TIMEOUT,
@@ -442,12 +445,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
         PreferenceGroup advancedCategory =
                 (PreferenceGroup)root.findPreference(KEY_ADVANCED_SECURITY);
         if (advancedCategory != null) {
-
+            boolean isVirtualKeyEnable = SystemProperties.getInt("qemu.hw.mainkeys",
+                    VIRTUAL_KEY_DISABLE) == VIRTUAL_KEY_ENABLE;
             boolean hasNavBar = getActivity().getResources().getBoolean(
                     com.android.internal.R.bool.config_showNavigationBar);
+
             Preference screenPinning =
                     advancedCategory.findPreference(KEY_SCREEN_PINNING);
-            if (!hasNavBar) {
+            if (!(isVirtualKeyEnable || hasNavBar)) {
                 advancedCategory.removePreference(screenPinning);
             }
 
