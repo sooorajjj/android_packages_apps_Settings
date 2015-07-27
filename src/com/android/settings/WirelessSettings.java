@@ -479,7 +479,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
             if (ps != null) root.removePreference(ps);
         }
 
-        if (!isWifiCallingSettingsSupported()) {
+        if (!isWifiCallingSettingsSupported(activity)) {
             removePreference(KEY_WIFI_CALLING_SETTINGS);
         }
 
@@ -697,12 +697,16 @@ public class WirelessSettings extends SettingsPreferenceFragment
                     result.add(KEY_CELL_BROADCAST_SETTINGS);
                 }
 
+                if (!isWifiCallingSettingsSupported(context)) {
+                    result.add(KEY_WIFI_CALLING_SETTINGS);
+                }
+
                 return result;
             }
         };
 
-    private boolean isWifiCallingSettingsSupported() {
-        return getActivity().getResources().getBoolean(
+    private static boolean isWifiCallingSettingsSupported(Context context) {
+        return context.getResources().getBoolean(
                 R.bool.config_wifi_calling_settings_supported);
     }
 }
