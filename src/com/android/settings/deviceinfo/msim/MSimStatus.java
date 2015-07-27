@@ -619,6 +619,8 @@ public class MSimStatus extends PreferenceActivity {
             mOperatorNameSummary[phoneId] = getSimSummary(phoneId, operatorName);
             setMSimSummary(KEY_OPERATOR_NAME, mOperatorNameSummary);
         }
+        //Service State is changed, update the signal strength values as well.
+        updateSignalStrength(phoneId);
     }
 
     private void updateAreaInfo(String areaInfo, int phoneId) {

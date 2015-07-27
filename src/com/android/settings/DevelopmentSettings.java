@@ -75,6 +75,9 @@ import com.android.settings.search.Index;
 import com.android.settings.search.Indexable;
 import com.android.settings.widget.SwitchBar;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
@@ -161,7 +164,8 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
     private static final String SELECT_LOGD_SIZE_KEY = "select_logd_size";
     private static final String SELECT_LOGD_SIZE_PROPERTY = "persist.logd.size";
     private static final String SELECT_LOGD_DEFAULT_SIZE_PROPERTY = "ro.logd.size";
-
+    private static final String FILENAME_META_VERSION = "/firmware/verinfo/ver_info.txt";
+    private static final String KEY_META_VERSION = "meta_info";
     private static final String OPENGL_TRACES_KEY = "enable_opengl_traces";
 
     private static final String IMMEDIATELY_DESTROY_ACTIVITIES_KEY
@@ -302,7 +306,13 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
 
         final PreferenceGroup debugDebuggingCategory = (PreferenceGroup)
                 findPreference(DEBUG_DEBUGGING_CATEGORY_KEY);
-
+        Preference metaInfo = findPreference(KEY_META_VERSION);
+        try {
+            String meta = readLine(FILENAME_META_VERSION);
+            metaInfo.setSummary(meta);
+        } catch (IOException e) {
+            Log.e(TAG, "IO Exception when getting meta version for Device Info screen", e);
+        }
         mEnableAdb = findAndInitSwitchPref(ENABLE_ADB);
         mClearAdbKeys = findPreference(CLEAR_ADB_KEYS);
         if (!SystemProperties.getBoolean("ro.adb.secure", false)) {
@@ -402,6 +412,16 @@ public class DevelopmentSettings extends SettingsPreferenceFragment
         mAllPrefs.add(mProcessStats);
 
     }
+
+    private String readLine(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename), 256);
+        try {
+            return reader.readLine();
+        } finally {
+            reader.close();
+        }
+    }
+
     private SwitchPreference findAndInitCheckboxPref(String key) {
                 SwitchPreference pref = (SwitchPreference) findPreference(key);
         if (pref == null) {
