@@ -2339,6 +2339,7 @@
             </intent-filter>
         </receiver>
         <activity android:name="com.android.settings.wificall.WifiCallingWizardActivity"
+            android:label="@string/wifi_calling_wizard_title"
             android:excludeFromRecents="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"></action>

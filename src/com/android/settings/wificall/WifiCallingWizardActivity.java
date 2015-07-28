@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.settings.R;
@@ -42,6 +43,8 @@ public class WifiCallingWizardActivity extends Activity{
         private Button mLeftButton;
         private Button mRightButton;
         private TextView mContentText;
+        private ImageView mImage;
+        private TextView mStepText;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,10 @@ public class WifiCallingWizardActivity extends Activity{
                 mLeftButton = (Button)view.findViewById(R.id.leftbutton);
                 mRightButton = (Button)view.findViewById(R.id.rightbutton);
                 mContentText = (TextView)view.findViewById(R.id.content_view);
+                mImage = (ImageView)view.findViewById(R.id.content_view_icon);
+                mStepText = (TextView)view.findViewById(R.id.content_view_step_4);
+                mImage.setVisibility(View.INVISIBLE);
+                mStepText.setVisibility(View.INVISIBLE);
                 mLeftButton.setOnClickListener(this);
                 mRightButton.setOnClickListener(this);
             }
@@ -98,6 +105,8 @@ public class WifiCallingWizardActivity extends Activity{
                 mContentText.setText(R.string.wifi_calling_wizard_content_step_2);
                 break;
             case THIRD_WIZARD:
+                mImage.setVisibility(View.VISIBLE);
+                mStepText.setVisibility(View.VISIBLE);
                 mLeftButton.setVisibility(View.GONE);
                 mRightButton.setText(R.string.wifi_display_options_done);
                 mContentText.setText(R.string.wifi_calling_wizard_content_step_3);
