@@ -70,7 +70,7 @@ public class ImeiInformation extends PreferenceActivity {
 
         if (phone != null) {
             if (phone.getPhoneType() == TelephonyManager.PHONE_TYPE_CDMA) {
-                setSummaryText(KEY_MEID_NUMBER, phone.getMeid());
+                setSummaryText(KEY_MEID_NUMBER, phone.getDeviceId());
                 setSummaryText(KEY_MIN_NUMBER, phone.getCdmaMin());
 
                 if (getResources().getBoolean(R.bool.config_msid_enable)) {
@@ -83,7 +83,7 @@ public class ImeiInformation extends PreferenceActivity {
                 if (phone.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE) {
                     // Show ICC ID and IMEI for LTE device
                     setSummaryText(KEY_ICC_ID, phone.getIccSerialNumber());
-                    setSummaryText(KEY_IMEI, phone.getImei());
+                    setSummaryText(KEY_IMEI, phone.getDeviceId());
                 } else {
                     // device is not GSM/UMTS, do not display GSM/UMTS features
                     // check Null in case no specified preference in overlay xml
