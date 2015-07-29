@@ -396,7 +396,7 @@ public class MSimStatus extends PreferenceActivity {
                 if (i == indexOfCDMA) {
                     mPrlVersionSummary[i] = getSimSummary(i, mPhone[i].getCdmaPrlVersion());
                     mEsnNumberSummary[i] = getSimSummary(i, mPhone[i].getEsn());
-                    mMeidNumberSummary[i] = getSimSummary(i, mPhone[i].getMeid());
+                    mMeidNumberSummary[i] = getSimSummary(i, mPhone[i].getDeviceId());
                     mMinNumberSummary[i] = getSimSummary(i, mPhone[i].getCdmaMin());
 
                     if (getResources().getBoolean(R.bool.config_msid_enable)) {
