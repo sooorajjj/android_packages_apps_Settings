@@ -210,7 +210,7 @@ public class ButtonSettings extends SettingsPreferenceFragment implements
 
         if (hasMenuKey) {
             int pressAction = Settings.System.getInt(resolver,
-                    Settings.System.KEY_MENU_ACTION, ACTION_MENU);
+                    Settings.System.KEY_MENU_ACTION, ACTION_APP_SWITCH);
             mMenuPressAction = initActionList(KEY_MENU_PRESS, pressAction);
             if (!assistAvailable) {
                 filterEntry(mMenuPressAction,
