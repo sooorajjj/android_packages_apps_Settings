@@ -56,7 +56,9 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     private static NetworkInfo mWifiNetwork = null;
     private static PhoneStateListener mPhoneStateListener = new PhoneStateListener(){
         public void onCallStateChanged(int state, String incomingNumber) {
-            WifiCallingNotification.updateWFCCallStateChange(mContext, state);
+            if (isUsingWifiCall()) {
+                WifiCallingNotification.updateWFCCallStateChange(mContext, state);
+            }
         };
     };
 
@@ -147,4 +149,25 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         }
     }
 
+    private static boolean isUsingWifiCall() {
+        if (!WifiCallingNotification.getWifiCallingNotifiEnable(mContext)) {
+            return false;
+        }
+        ConnectivityManager connect = (ConnectivityManager) mContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (mWifiNetwork == null || !mWifiNetwork.isConnected()) {
+            return false;
+        }
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                "MY_PERFS", mContext.MODE_PRIVATE);
+        mWifiCallPreference = sharedPreferences.getInt("currentWifiCallingPrefernce",
+                ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+        mWifiCallStatus = sharedPreferences.getBoolean("currentWifiCallingStatus", true);
+        if (mWifiCallStatus == false || mWifiCallPreference ==
+                ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
+            return false;
+        }
+        return true;
+    }
 }
