@@ -496,7 +496,7 @@ public final class BluetoothSettings extends DeviceListPreferenceFragment implem
                public void afterTextChanged(Editable s) {
                       Button mOkButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
                       if(mOkButton != null)
-                         mOkButton.setEnabled(s.length() != 0 && !(s.toString().trim().isEmpty()));
+                         mOkButton.setEnabled(s.length() != 0);
                }
                @Override
                public void onTextChanged(CharSequence s, int start, int before, int count) {
