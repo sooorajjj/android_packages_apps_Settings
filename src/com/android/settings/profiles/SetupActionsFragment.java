@@ -171,10 +171,13 @@ public class SetupActionsFragment extends SettingsPreferenceFragment
             mItems.add(generateConnectionOverrideItem(PROFILE_CONNECTION_MOBILEDATA));
             mItems.add(generateConnectionOverrideItem(PROFILE_CONNECTION_WIFIAP));
 
-            final TelephonyManager tm =
-                    (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-            if (tm.getPhoneType() == TelephonyManager.PHONE_TYPE_GSM) {
-                mItems.add(generateConnectionOverrideItem(PROFILE_CONNECTION_2G3G4G));
+            if (false) {
+                final TelephonyManager tm =
+                        (TelephonyManager) getActivity()
+                                .getSystemService(Context.TELEPHONY_SERVICE);
+                if (tm.getPhoneType() == TelephonyManager.PHONE_TYPE_GSM) {
+                    mItems.add(generateConnectionOverrideItem(PROFILE_CONNECTION_2G3G4G));
+                }
             }
         }
         if (WimaxHelper.isWimaxSupported(getActivity())) {
