@@ -583,11 +583,11 @@ public class RunningState {
                 mLastNumProcesses = numProcesses;
                 mLastNumServices = numServices;
                 int resid = R.string.running_processes_item_description_s_s;
-                if (numProcesses != 1) {
-                    resid = numServices != 1
+                if (numProcesses > 1) {
+                    resid = numServices > 1
                             ? R.string.running_processes_item_description_p_p
                             : R.string.running_processes_item_description_p_s;
-                } else if (numServices != 1) {
+                } else if (numServices > 1) {
                     resid = R.string.running_processes_item_description_s_p;
                 }
                 mDescription = context.getResources().getString(resid, numProcesses,
