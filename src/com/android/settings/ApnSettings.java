@@ -84,7 +84,6 @@ public class ApnSettings extends SettingsPreferenceFragment implements
     private static final int APN_INDEX = 2;
     private static final int TYPES_INDEX = 3;
     private static final int RO_INDEX = 4;
-    private static final int LOCALIZED_NAME_INDEX = 5;
 
     private static final int MENU_NEW = Menu.FIRST;
     private static final int MENU_RESTORE = Menu.FIRST + 1;
@@ -276,7 +275,7 @@ public class ApnSettings extends SettingsPreferenceFragment implements
         }
 
         Cursor cursor = getContentResolver().query(getUri(Telephony.Carriers.CONTENT_URI),
-                new String[] {"_id", "name", "apn", "type", "read_only", "localized_name"}, where, null,
+                new String[] {"_id", "name", "apn", "type", "read_only"}, where, null,
                 Telephony.Carriers.DEFAULT_SORT_ORDER);
 
         if (cursor != null) {
@@ -294,7 +293,7 @@ public class ApnSettings extends SettingsPreferenceFragment implements
                 String type = cursor.getString(TYPES_INDEX);
                 boolean readOnly = (cursor.getInt(RO_INDEX) == 1);
 
-                String localizedName = getLocalizedName(getActivity(), cursor, LOCALIZED_NAME_INDEX);
+                String localizedName = getLocalizedName(getActivity(), cursor, NAME_INDEX);
                 if (!TextUtils.isEmpty(localizedName)) {
                     name = localizedName;
                 }

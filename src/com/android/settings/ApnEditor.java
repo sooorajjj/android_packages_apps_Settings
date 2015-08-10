@@ -130,8 +130,7 @@ public class ApnEditor extends PreferenceActivity
             Telephony.Carriers.ROAMING_PROTOCOL, // 19
             Telephony.Carriers.MVNO_TYPE,   // 20
             Telephony.Carriers.MVNO_MATCH_DATA,  // 21
-            "ppp_number",  // 22
-            "localized_name"  //23
+            "ppp_number"  // 22
     };
 
     private static final int ID_INDEX = 0;
@@ -156,7 +155,6 @@ public class ApnEditor extends PreferenceActivity
     private static final int MVNO_TYPE_INDEX = 20;
     private static final int MVNO_MATCH_DATA_INDEX = 21;
     private static final int PPP_NUMBER_INDEX = 22;
-    private static final int LOCALIZED_NAME_INDEX = 23;
 
 
     @Override
@@ -319,7 +317,7 @@ public class ApnEditor extends PreferenceActivity
             }
 
             String localizedName = ApnSettings.getLocalizedName(
-                    this, mCursor,LOCALIZED_NAME_INDEX);
+                    this, mCursor,NAME_INDEX);
             if (!TextUtils.isEmpty(localizedName)) {
                 mName.setText(localizedName);
             }
