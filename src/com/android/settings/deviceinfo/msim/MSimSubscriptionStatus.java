@@ -182,7 +182,7 @@ public class MSimSubscriptionStatus extends PreferenceActivity {
             //  the IMEI in GSM and the MEID in CDMA
             if (mPhone.getPhoneName().equals("CDMA")) {
                 setSummaryText(KEY_ESN_NUMBER, mPhone.getEsn());
-                setSummaryText(KEY_MEID_NUMBER, mPhone.getMeid());
+                setSummaryText(KEY_MEID_NUMBER, mPhone.getDeviceId());
                 setSummaryText(KEY_MIN_NUMBER, mPhone.getCdmaMin());
                 if (getResources().getBoolean(R.bool.config_msid_enable)) {
                     findPreference(KEY_MIN_NUMBER).setTitle(R.string.status_msid_number);
@@ -193,7 +193,7 @@ public class MSimSubscriptionStatus extends PreferenceActivity {
                 if (mPhone.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE) {
                     // Show ICC ID and IMEI for LTE device
                     setSummaryText(KEY_ICC_ID, mPhone.getIccSerialNumber());
-                    setSummaryText(KEY_IMEI, mPhone.getImei());
+                    setSummaryText(KEY_IMEI, mPhone.getDeviceId());
                 } else {
                     // device is not GSM/UMTS, do not display GSM/UMTS features
                     // check Null in case no specified preference in overlay xml

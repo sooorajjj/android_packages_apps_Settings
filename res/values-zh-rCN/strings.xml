@@ -2581,7 +2581,7 @@
 
     <string name="show_search_function">搜索</string>
     <!-- string resources for USB OTG & UICC features -->
-    <string name="storage_usb">"USB 存储器"</string>
+    <string name="storage_usb">"USB存储器"</string>
     <string name="storage_uicc">"电话卡存储设备"</string>
     <string name="usb_eject" product="default">"卸载 USB 存储设备"</string>
     <string name="usb_eject_summary" product="default">"需要先卸载 USB 存储设备，然后才能将其安全移除"</string>
