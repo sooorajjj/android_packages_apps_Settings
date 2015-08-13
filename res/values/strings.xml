@@ -6363,4 +6363,5 @@
     <string name="data_usage_menu_hide_time_range">Hide time range</string>
     <string name="app_ops_permiss_name">App network access</string>
     <string name="meta_info">Software version</string>
+    <string name="storage_menu_cleanup">Storage Cleanup</string>
 </resources>

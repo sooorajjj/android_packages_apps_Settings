@@ -72,6 +72,8 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
 
     private static final int DLG_CONFIRM_UNMOUNT = 1;
     private static final int DLG_ERROR_UNMOUNT = 2;
+    private static final String STORAGE_CLEANUP_PACKAGE = "com.qti.storagecleaner";
+    private static final String STORAGE_CLENUP_CLASS = "com.qti.storagecleaner.CleanerActivity";
 
     // The mountToggle Preference that has last been clicked.
     // Assumes no two successive unmount event on 2 different volumes are performed before the first
@@ -208,6 +210,8 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
         boolean usbItemVisible = !isMassStorageEnabled()
                 && !um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER);
         usb.setVisible(usbItemVisible);
+        final MenuItem cleanup = menu.findItem(R.id.storage_cleanup);
+        cleanup.setVisible(getResources().getBoolean(R.bool.enable_storage_cleanup));
     }
 
     @Override
@@ -223,10 +227,22 @@ public class Memory extends SettingsPreferenceFragment implements Indexable {
                             R.string.storage_title_usb, -1, null);
                 }
                 return true;
+            case R.id.storage_cleanup:
+                startStorageCleanupActivity();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void startStorageCleanupActivity() {
+        try {
+            Intent i = new Intent();
+            i.setClassName(STORAGE_CLEANUP_PACKAGE, STORAGE_CLENUP_CLASS);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "Can't start storage cleanup activity");
+        }
+    }
     private synchronized IMountService getMountService() {
        if (mMountService == null) {
            IBinder service = ServiceManager.getService("mount");
