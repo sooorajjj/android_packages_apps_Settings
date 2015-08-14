@@ -347,13 +347,28 @@ public class InstalledAppDetails extends Fragment
         return true;
     }
 
+    private boolean isDisableApp(){
+        String currentPkgName = this.mPackageInfo.packageName;
+        String [] coreAppPackageName = getResources().getStringArray(
+                R.array.no_disable_package_list);
+        int length = coreAppPackageName.length;
+        if (!TextUtils.isEmpty(currentPkgName)) {
+            for (int i = 0; i < length; i++) {
+                if (currentPkgName.equals(coreAppPackageName[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private boolean handleDisableable(Button button) {
         boolean disableable = false;
         // Try to prevent the user from bricking their phone
         // by not allowing disabling of apps signed with the
         // system cert and any launcher app in the system.
         if (mHomePackages.contains(mAppEntry.info.packageName)
-                || Utils.isSystemPackage(mPm, mPackageInfo)) {
+                || Utils.isSystemPackage(mPm, mPackageInfo) || (!isDisableApp())) {
             // Disable button for core system applications.
             button.setText(R.string.disable_text);
         } else if (mAppEntry.info.enabled) {
