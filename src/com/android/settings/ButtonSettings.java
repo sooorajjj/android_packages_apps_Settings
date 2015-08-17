@@ -28,6 +28,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.Handler;
+import android.os.SystemProperties;
 import android.preference.CheckBoxPreference;
 import android.os.UserHandle;
 import android.preference.ListPreference;
@@ -117,11 +118,11 @@ public class ButtonSettings extends SettingsPreferenceFragment implements
 
         final int deviceKeys = getResources().getInteger(
                 com.android.internal.R.integer.config_deviceHardwareKeys);
-
+        final boolean useHwKey = (SystemProperties.getInt("qemu.hw.mainkeys", 1) == 1);
         final boolean hasPowerKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_POWER);
-        final boolean hasHomeKey = (deviceKeys & KEY_MASK_HOME) != 0;
-        final boolean hasMenuKey = (deviceKeys & KEY_MASK_MENU) != 0;
-        final boolean hasAssistKey = (deviceKeys & KEY_MASK_ASSIST) != 0;
+        final boolean hasHomeKey = ((deviceKeys & KEY_MASK_HOME) != 0) && useHwKey;
+        final boolean hasMenuKey = ((deviceKeys & KEY_MASK_MENU) != 0) && useHwKey;
+        final boolean hasAssistKey = ((deviceKeys & KEY_MASK_ASSIST) != 0) && useHwKey;
 
         boolean hasAnyBindableKey = false;
         final PreferenceCategory homeCategory =
