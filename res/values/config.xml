@@ -86,4 +86,7 @@
     <!-- Wifi calling settings -->
     <bool name="config_wifi_calling_settings_supported" translatable="false">false</bool>
 
+    <!-- DDS Switch setting -->
+    <bool name="config_dds_switch_alert_dialog_supported" translatable="false">false</bool>
+
 </resources>
