@@ -6322,6 +6322,8 @@
     <string name="hotspot_settings_indication_step4">4. Start using the Internet on PC/Mobile device.</string>
     <string name="hotspot_turn_on_hint">To use WLAN hotspot, turn it on.</string>
     <string name="switch_data_subscription">Default data preference set to SIM%1$s.</string>
+    <string name="data_switch_warning_title">Select Data in SIM%1$s</string>
+    <string name="data_switch_warning_text">Changing data access will stop all LTE services. Do you want to continue?</string>
     <string name="notify_connect">CMCC WLAN prompt</string>
     <string name="notify_connect_summary">Prompt me when access to CMCC WLAN</string>
 
