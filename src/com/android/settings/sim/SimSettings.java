@@ -44,6 +44,7 @@ import android.provider.SearchIndexableResource;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Telephony;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.ServiceState;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -123,6 +124,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
     private int mPhoneCount;
     private int[] mCallState;
+    private int[] mVoiceNetworkType;
+    private int[] mDataNetworkType;
     private PhoneStateListener[] mPhoneStateListener;
 
     private boolean inActivity;
@@ -157,6 +160,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         mNumSlots = tm.getSimCount();
         mPhoneCount = TelephonyManager.getDefault().getPhoneCount();
         mCallState = new int[mPhoneCount];
+        mVoiceNetworkType = new int[mPhoneCount];
+        mDataNetworkType = new int[mPhoneCount];
         mPhoneStateListener = new PhoneStateListener[mPhoneCount];
         listen();
 
@@ -297,8 +302,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
             if (subId != null) {
                 if (subId[0] > 0) {
                     mCallState[i] = tm.getCallState(subId[0]);
+                    mVoiceNetworkType[i] = tm.getVoiceNetworkType(subId[0]);
+                    mDataNetworkType[i] = tm.getDataNetworkType(subId[0]);
                     tm.listen(getPhoneStateListener(i, subId[0]),
-                            PhoneStateListener.LISTEN_CALL_STATE);
+                            PhoneStateListener.LISTEN_CALL_STATE |
+                            PhoneStateListener.LISTEN_SERVICE_STATE );
                 }
             }
         }
@@ -312,6 +320,16 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 Log.d(TAG, "onCallStateChanged: " + state);
                 mCallState[i] = state;
                 updateCellularDataValues();
+            }
+
+            @Override
+            public void onServiceStateChanged(ServiceState serviceState) {
+                if (ServiceState.STATE_IN_SERVICE == serviceState.getState()) {
+                    mVoiceNetworkType[i] = serviceState.getVoiceNetworkType();
+                }
+                if (ServiceState.STATE_IN_SERVICE == serviceState.getDataRegState()) {
+                    mDataNetworkType[i] = serviceState.getDataNetworkType();
+                }
             }
         };
         return mPhoneStateListener[phoneId];
@@ -559,19 +577,58 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         simPref.setCallback(new DropDownPreference.Callback() {
             @Override
             public boolean onItemSelected(int pos, Object value) {
-                int subId = (Integer) value == ASK_VALUE ? ASK_VALUE :
+                final int subId = (Integer) value == ASK_VALUE ? ASK_VALUE :
                         mSubscriptionManager.getSubId((Integer) value)[0];
                 Log.d(TAG, "Preference[" + simPref.getKey() + "]select value :" + (Integer) value
                         + "with subid(" + subId + ")");
                 if (simPref.getKey().equals(KEY_CELLULAR_DATA)) {
-                    Log.d(TAG, "DefDataId [" + SubscriptionManager.getDefaultDataSubId() + "]");
-                    if (SubscriptionManager.getDefaultDataSubId() != subId) {
-                        mSubscriptionManager.setDefaultDataSubId(subId);
-                        if (subSelectableSize > 1) {
-                            setUserPrefDataSubIdInDb(subId);
+                    int defaultDataSubId = SubscriptionManager.getDefaultDataSubId();
+                    Log.d(TAG, "DefDataId [" + defaultDataSubId + "]");
+                    if (defaultDataSubId != subId) {
+                        int phoneId = SubscriptionManager.getPhoneId(defaultDataSubId);
+
+                        if (isDdsSwitchAlertDialogSupported(defaultDataSubId) &&
+                               ((mVoiceNetworkType[phoneId] == TelephonyManager.NETWORK_TYPE_LTE) |
+                                (mDataNetworkType[phoneId] == TelephonyManager.NETWORK_TYPE_LTE))) {
+                            Log.d(TAG, "DDS switch request from LTE sub");
+                            AlertDialog alertDlg = new AlertDialog.Builder(getActivity()).create();
+                            String title = getResources().getString(
+                                    R.string.data_switch_warning_title,
+                                    SubscriptionManager.getSlotId(subId) + 1);
+                            alertDlg.setTitle(title);
+                            String warningString = getResources().getString(
+                                    R.string.data_switch_warning_text);
+                            alertDlg.setMessage(warningString);
+                            alertDlg.setCancelable(false);
+                            alertDlg.setButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Log.d(TAG, "Switch DDS to subId: " + subId );
+                                    mSubscriptionManager.setDefaultDataSubId(subId);
+                                    if (subSelectableSize > 1) {
+                                        setUserPrefDataSubIdInDb(subId);
+                                    }
+                                }
+                            });
+
+                            alertDlg.setButton2("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Log.d(TAG, "Cancelled switch DDS to subId: " + subId);
+                                    updateCellularDataValues();
+                                    dialog.cancel();
+                                    return;
+                                }
+                            });
+
+                            alertDlg.show();
+                        } else {
+                            Log.d(TAG, "setDefaultDataSubId: " + subId);
+                            mSubscriptionManager.setDefaultDataSubId(subId);
+                            if (subSelectableSize > 1) {
+                                setUserPrefDataSubIdInDb(subId);
+                            }
                         }
                     }
-
+                    //DDS error dialogue end
                 } else if (simPref.getKey().equals(KEY_CALLS)) {
                     //subId 0 is meant for "Ask First"/"Prompt" option as per AOSP
                     Log.d(TAG, "DefVoiceId [" + SubscriptionManager.getDefaultVoiceSubId() + "]");
@@ -960,6 +1017,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         final TelephonyManager tm =
             (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
         return tm.getLine1NumberForSubscriber(info.getSubscriptionId());
+    }
+
+    private boolean isDdsSwitchAlertDialogSupported(int subId) {
+        Resources res = SubscriptionManager.getResourcesForSubId(getActivity(), subId);
+        return res.getBoolean(R.bool.config_dds_switch_alert_dialog_supported);
     }
 
     private void log(String s) {
