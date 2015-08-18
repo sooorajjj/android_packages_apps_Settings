@@ -147,7 +147,7 @@
     <string name="profile_lockmode_insecure_summary">使用不安全锁屏</string>
     <string name="profile_add_nfc_text">此 NFC 标签是与一个未知的情景相连的。把此 NFC 标签连接到一个现有的情景将会允许您以后选择这个情景。</string>
     <string name="profile_triggers">触发条件</string>
-    <string name="sms_security_check_limit_summary">显示警告来防止应用发送短信</string>
+    <string name="sms_security_check_limit_summary">将会弹出警示框以防止短信发送过于频繁。当前限制：15分钟内%d条</string>
     <string name="button_wake_title">唤醒</string>
     <string name="profile_trigger_configure">设定触发条件</string>
     <string name="hardware_keys_volume_keys_title">音量键</string>
