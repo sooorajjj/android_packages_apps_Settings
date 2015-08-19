@@ -112,4 +112,8 @@
 
     <!-- Whether to enable app network access control -->
     <bool name="config_app_network_access_enabled">false</bool>
+
+    <!-- Whether add storage cleanup menu in storage setting-->
+    <bool name="enable_storage_cleanup">false</bool>
+
 </resources>
