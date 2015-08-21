@@ -123,6 +123,7 @@
     <string name="pa_login_password_hint">密码</string>
     <string name="ring_mode_normal">正常</string>
     <string name="duplicate_appgroup_name">此应用组名称已被使用！</string>
+    <string name="rename_dialog_hint">输入一个新名称</string>
     <string name="profile_trigger_disconnect">断开时触发</string>
     <string name="profile_action_enable">启用</string>
     <string name="home_answer_ringing_call_summary">按下主屏幕键接听来电</string>
