@@ -73,8 +73,8 @@ public class RecentLocationApps {
             // start new fragment to display extended information
             Bundle args = new Bundle();
             args.putString(InstalledAppDetails.ARG_PACKAGE_NAME, mPackage);
-            mActivity.startPreferencePanelAsUser(InstalledAppDetails.class.getName(), args,
-                    R.string.application_info_label, null, mUserHandle);
+            mActivity.startPreferencePanel(InstalledAppDetails.class.getName(), args,
+                    R.string.application_info_label, null, null, 0);
             return true;
         }
     }
