@@ -62,10 +62,17 @@ import android.widget.Toast;
 import android.widget.SearchView.OnSuggestionListener;
 import android.widget.Switch;
 import android.telephony.SubscriptionManager;
+import android.text.TextUtils;
+
 
 public class WifiCallSwitchPreference extends SwitchPreference {
 
     private static final String TAG = "WifiCallSwitchPreference";
+
+    // Below is the registration state
+    private final int WIFI_CALLING_STATE_REGISTERED = 1;
+    private final int WIFI_CALLING_STATE_NOT_REGISTERED = 2;
+    private final int WIFI_CALLING_STATE_REGISTERING = 3;
 
     private boolean mCheckedStatus;
     private ImsConfig mImsConfig;
@@ -73,6 +80,9 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     private int mPreference = 1;
     private Activity mParent = null;
     private static BroadcastReceiver mReceiver = null;
+    private int oldErrorCode = -1;
+    private int mRegState = WIFI_CALLING_STATE_NOT_REGISTERED; //NOT_REGISTERED
+    private String oldErrorMessage = "";
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
@@ -114,7 +124,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
 
             this.setChecked(turnOn);
             this.setEnabled(true);
-            setSummary(getSummary(turnOn));
+            setSummary(getStringIDForSummary());
             Intent intent = new Intent(turnOn ? WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_ON
                     : WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_OFF);
             intent.putExtra("preference", mPreference);
@@ -122,10 +132,11 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         }
     }
 
-    private int getSummary(boolean turnOn) {
-        if (!turnOn) {
+    private int getStringIDForSummary() {
+        if (!isChecked()) {
             return R.string.wifi_call_status_disabled;
         }
+
         if (mPreference == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
             return R.string.wifi_call_status_cellular_preferred;
         }
@@ -141,11 +152,17 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         if (wifiManager.isWifiEnabled() && !wifi.isConnected()) {
             return R.string.wifi_call_status_not_connected_wifi;
         }
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo.getRssi() < -85) {
-            return R.string.wifi_call_status_poor_wifi_signal;
+
+        if (mRegState == WIFI_CALLING_STATE_REGISTERED) {
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            if (wifiInfo.getRssi() < -85) {
+                return R.string.wifi_call_status_poor_wifi_signal;
+            }
+            return R.string.wifi_call_status_ready;
         }
-        return R.string.wifi_call_status_ready;
+
+        // for unknown state or unknow errors
+        return R.string.wifi_call_status_error_unknown;
     }
 
     public void setParentActivity(Activity act) {
@@ -179,13 +196,44 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     if (bundle != null && bundle instanceof ImsReasonInfo) {
                         ImsReasonInfo imsReasonInfo = (ImsReasonInfo)bundle;
                         int errorCode = imsReasonInfo.getExtraCode();
-                        boolean stateChanged = intent.getBooleanExtra("stateChanged",true);
-                        if (!stateChanged) return;
-                        String extraMsg = (errorCode == 0) ? context.getResources().getString(
-                                getSummary(true)) : imsReasonInfo.getExtraMessage();
+                        String extraMsg = imsReasonInfo.getExtraMessage();
+                        mRegState = intent.getIntExtra("stateChanged", WIFI_CALLING_STATE_NOT_REGISTERED);
+                        Log.i(TAG, "mRegState =" + mRegState);
                         Log.i(TAG, "get ImsDisconnected extracode : " + errorCode);
-                        Log.i(TAG, "get ImsDisconnected getExtraMessage :" + extraMsg );
-                        setSummaryOn(extraMsg);
+                        Log.i(TAG, "get ImsDisconnected getExtraMessage :" + extraMsg);
+                        if (mRegState == WIFI_CALLING_STATE_REGISTERING) {
+                            Log.i(TAG, "Do nothing for Registering state. Directly return.");
+                            return;
+                        } else if (mRegState == WIFI_CALLING_STATE_REGISTERED) {
+                            Log.i(TAG, "Re-initialized for Registered state.");
+                            oldErrorCode = 0;
+                            oldErrorMessage = "";
+                            setSummary(getStringIDForSummary());
+                        } else if (mRegState == WIFI_CALLING_STATE_NOT_REGISTERED) {
+                            if (extraMsg != null && !TextUtils.isEmpty(extraMsg)) {
+                                Log.i(TAG, "valid error message received");
+                            } else {
+                                Log.i(TAG, "get null error message from low layer. Still use original one");
+                                extraMsg = oldErrorMessage;
+                                if (errorCode != oldErrorCode) {
+                                    extraMsg = "";
+                                }
+                            }
+
+                            if ((extraMsg == null) || (TextUtils.isEmpty(extraMsg))) {
+                                Log.i(TAG, "display status message");
+                                setSummary(getStringIDForSummary());
+                            } else {
+                                Log.i(TAG, "display extra error message if any");
+                                setSummaryOn(extraMsg);
+                            }
+
+                            oldErrorCode = errorCode;
+                            oldErrorMessage = extraMsg;
+                        } else {
+                            // also display error message for unexpected state
+                            setSummary(getStringIDForSummary());
+                        }
                     }
                 }
             };

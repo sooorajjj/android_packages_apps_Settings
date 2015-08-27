@@ -6477,6 +6477,7 @@
     <string name="wifi_call_status_ready">Ready for Calls</string>
     <string name="wifi_call_status_not_connected_wifi">Not Connected to Wi-Fi</string>
     <string name="wifi_call_status_wifi_off">Wi-Fi Turned Off</string>
+    <string name="wifi_call_status_error_unknown">Wi-Fi Call Not Ready</string>
     <string name="usb_tethering_title">USB tethering</string>
     <string name="usb_tethering_summary">Share network via usb connection</string>
     <string name="app_ops_permiss_name">App network access</string>
