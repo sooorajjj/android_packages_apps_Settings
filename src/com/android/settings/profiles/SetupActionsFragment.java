@@ -156,8 +156,11 @@ public class SetupActionsFragment extends SettingsPreferenceFragment
         mItems.add(new Header(getString(R.string.profile_triggers_header)));
         mItems.add(generateTriggerItem(TriggerItem.WIFI));
         mItems.add(generateTriggerItem(TriggerItem.BLUETOOTH));
-        mItems.add(generateTriggerItem(TriggerItem.NFC));
 
+        NfcManager nfcManager = (NfcManager) getSystemService(Context.NFC_SERVICE);
+        if( nfcManager.getDefaultAdapter() != null ) {
+            mItems.add(generateTriggerItem(TriggerItem.NFC));
+        }
         // connection overrides
         mItems.add(new Header(getString(R.string.profile_connectionoverrides_title)));
         if (DeviceUtils.deviceSupportsBluetooth()) {
@@ -347,9 +350,11 @@ public class SetupActionsFragment extends SettingsPreferenceFragment
 
                 // nfc
                 NfcManager nfcManager = (NfcManager) getSystemService(Context.NFC_SERVICE);
-                mProfile.setConnectionSettings(
+                if( nfcManager.getDefaultAdapter() != null ) {
+                    mProfile.setConnectionSettings(
                         new ConnectionSettings(ConnectionSettings.PROFILE_CONNECTION_NFC,
-                                nfcManager.getDefaultAdapter().isEnabled() ? 1 : 0, true));
+                            nfcManager.getDefaultAdapter().isEnabled() ? 1 : 0, true));
+                }
 
                 // alarm volume
                 final AudioManager am = (AudioManager) getActivity()
