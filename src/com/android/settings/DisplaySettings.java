@@ -87,6 +87,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
     private Preference mBrightnessSettingsPreference;
     private Preference mScreenColorPreference;
+    private Preference mWifiDisplayrPreference;
     private WarnedListPreference mFontSizePref;
 
     private final Configuration mCurConfig = new Configuration();
@@ -114,6 +115,13 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                 && getResources().getBoolean(
                         com.android.internal.R.bool.config_dreamsSupported) == false) {
             getPreferenceScreen().removePreference(mScreenSaverPreference);
+        }
+
+        mWifiDisplayrPreference = findPreference(KEY_CAST_SCREEN);
+        if (mWifiDisplayrPreference != null
+                && getResources().getBoolean(
+                com.android.internal.R.bool.config_regional_hide_cast_screen) == true) {
+            getPreferenceScreen().removePreference(mWifiDisplayrPreference);
         }
 
         mScreenColorPreference = findPreference(KEY_SCREENCOLOR);
