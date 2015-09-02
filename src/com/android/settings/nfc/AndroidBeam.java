@@ -68,7 +68,8 @@ public class AndroidBeam extends Fragment
         SettingsActivity activity = (SettingsActivity) getActivity();
 
         mSwitchBar = activity.getSwitchBar();
-        mSwitchBar.setChecked(!mBeamDisallowed && mNfcAdapter.isNdefPushEnabled());
+        mSwitchBar.setChecked(!mBeamDisallowed && mNfcAdapter != null
+                && mNfcAdapter.isNdefPushEnabled());
         mSwitchBar.addOnSwitchChangeListener(this);
         mSwitchBar.setEnabled(!mBeamDisallowed);
         mSwitchBar.show();
@@ -88,10 +89,12 @@ public class AndroidBeam extends Fragment
     public void onSwitchChanged(Switch switchView, boolean desiredState) {
         boolean success = false;
         mSwitchBar.setEnabled(false);
-        if (desiredState) {
-            success = mNfcAdapter.enableNdefPush();
-        } else {
-            success = mNfcAdapter.disableNdefPush();
+        if (mNfcAdapter != null) {
+            if (desiredState) {
+                success = mNfcAdapter.enableNdefPush();
+            } else {
+                success = mNfcAdapter.disableNdefPush();
+            }
         }
         if (success) {
             mSwitchBar.setChecked(desiredState);

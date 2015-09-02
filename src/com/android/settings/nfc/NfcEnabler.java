@@ -97,10 +97,12 @@ public class NfcEnabler implements Preference.OnPreferenceChangeListener {
         final boolean desiredState = (Boolean) value;
         mSwitch.setEnabled(false);
 
-        if (desiredState) {
-            mNfcAdapter.enable();
-        } else {
-            mNfcAdapter.disable();
+        if (mNfcAdapter != null) {
+            if (desiredState) {
+                mNfcAdapter.enable();
+            } else {
+                mNfcAdapter.disable();
+            }
         }
 
         return false;
@@ -117,8 +119,8 @@ public class NfcEnabler implements Preference.OnPreferenceChangeListener {
         case NfcAdapter.STATE_ON:
             mSwitch.setChecked(true);
             mSwitch.setEnabled(true);
-            mAndroidBeam.setEnabled(!mBeamDisallowed);
-            if (mNfcAdapter.isNdefPushEnabled() && !mBeamDisallowed) {
+            mAndroidBeam.setEnabled((mNfcAdapter != null) && !mBeamDisallowed);
+            if (mNfcAdapter != null && mNfcAdapter.isNdefPushEnabled() && !mBeamDisallowed) {
                 mAndroidBeam.setSummary(R.string.android_beam_on_summary);
             } else {
                 mAndroidBeam.setSummary(R.string.android_beam_off_summary);

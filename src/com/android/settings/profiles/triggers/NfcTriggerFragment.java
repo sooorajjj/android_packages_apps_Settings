@@ -95,7 +95,9 @@ public class NfcTriggerFragment extends Fragment implements NFCProfileTagCallbac
     }
 
     private void disableTagWriteMode() {
-        mNfcAdapter.disableForegroundDispatch(getActivity());
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(getActivity());
+        }
     }
 
     private void enableTagWriteMode() {
@@ -103,7 +105,9 @@ public class NfcTriggerFragment extends Fragment implements NFCProfileTagCallbac
         mWriteTagFilters = new IntentFilter[] {
             tagDetected
         };
-        mNfcAdapter.enableForegroundDispatch(getActivity(), getPendingIntent(), mWriteTagFilters, null);
+        if (mNfcAdapter != null) {
+            mNfcAdapter.enableForegroundDispatch(getActivity(), getPendingIntent(), mWriteTagFilters, null);
+        }
     }
 
     @Override

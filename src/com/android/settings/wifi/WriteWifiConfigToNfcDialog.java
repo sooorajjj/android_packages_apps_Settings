@@ -135,18 +135,19 @@ class WriteWifiConfigToNfcDialog extends AlertDialog
 
             Activity activity = getOwnerActivity();
             NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(activity);
-
-            nfcAdapter.enableReaderMode(activity, new NfcAdapter.ReaderCallback() {
-                @Override
-                public void onTagDiscovered(Tag tag) {
-                    handleWriteNfcEvent(tag);
-                }
-            }, NfcAdapter.FLAG_READER_NFC_A |
-                    NfcAdapter.FLAG_READER_NFC_B |
-                    NfcAdapter.FLAG_READER_NFC_BARCODE |
-                    NfcAdapter.FLAG_READER_NFC_F |
-                    NfcAdapter.FLAG_READER_NFC_V,
-                    null);
+            if (nfcAdapter != null) {
+                nfcAdapter.enableReaderMode(activity, new NfcAdapter.ReaderCallback() {
+                    @Override
+                    public void onTagDiscovered(Tag tag) {
+                        handleWriteNfcEvent(tag);
+                    }
+                }, NfcAdapter.FLAG_READER_NFC_A |
+                        NfcAdapter.FLAG_READER_NFC_B |
+                        NfcAdapter.FLAG_READER_NFC_BARCODE |
+                        NfcAdapter.FLAG_READER_NFC_F |
+                        NfcAdapter.FLAG_READER_NFC_V,
+                        null);
+            }
 
             mPasswordView.setVisibility(View.GONE);
             mPasswordCheckBox.setVisibility(View.GONE);

@@ -87,7 +87,8 @@ public class NFCProfileWriter extends Activity {
     }
 
     private void disableTagWriteMode() {
-        mNfcAdapter.disableForegroundDispatch(this);
+        if (mNfcAdapter != null)
+            mNfcAdapter.disableForegroundDispatch(this);
     }
 
     private void enableTagWriteMode() {
@@ -95,7 +96,8 @@ public class NFCProfileWriter extends Activity {
         mWriteTagFilters = new IntentFilter[] {
             tagDetected
         };
-        mNfcAdapter.enableForegroundDispatch(this, getPendingIntent(), mWriteTagFilters, null);
+        if (mNfcAdapter != null)
+            mNfcAdapter.enableForegroundDispatch(this, getPendingIntent(), mWriteTagFilters, null);
     }
 
     @Override
