@@ -1111,20 +1111,22 @@ public class InstalledAppDetails extends Fragment
                 mTotalSize.setText(getSizeStr(mAppEntry.size));
             }
             
-            if ((mAppEntry.dataSize+ mAppEntry.externalDataSize) <= 0 || !mCanClearData) {
-                mClearDataButton.setEnabled(false);
-            } else {
-                mClearDataButton.setEnabled(true);
-                mClearDataButton.setOnClickListener(this);
-            }
-            if (cacheSize <= 0 || !isCacheClearableApp()) {
-                mClearCacheButton.setEnabled(false);
-            } else {
-                mClearCacheButton.setEnabled(true);
-                mClearCacheButton.setOnClickListener(this);
+            if (mClearDataButton != null && mClearCacheButton != null) {
+                if ((mAppEntry.dataSize + mAppEntry.externalDataSize) <= 0 || !mCanClearData) {
+                    mClearDataButton.setEnabled(false);
+                } else {
+                    mClearDataButton.setEnabled(true);
+                    mClearDataButton.setOnClickListener(this);
+                }
+                if (cacheSize <= 0 || !isCacheClearableApp()) {
+                    mClearCacheButton.setEnabled(false);
+                } else {
+                    mClearCacheButton.setEnabled(true);
+                    mClearCacheButton.setOnClickListener(this);
+                }
             }
         }
-        if (mAppControlRestricted) {
+        if (mAppControlRestricted && mClearCacheButton != null && mClearDataButton != null) {
             mClearCacheButton.setEnabled(false);
             mClearDataButton.setEnabled(false);
         }
