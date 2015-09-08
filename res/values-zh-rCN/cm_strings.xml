@@ -213,4 +213,5 @@
     <string name="lockscreen_message">点击左侧或右侧图标可以重新指定锁屏快捷键。</string>
     <string name="lockscreen_choose_action_title">选择操作</string>
     <string name="select_custom_app_title">选择定制应用</string>
+    <string name="select_custom_activity_title">选择定制窗体</string>
 </resources>
