@@ -53,7 +53,7 @@ public class ImsDisconnectedReceiver extends BroadcastReceiver {
     private static ImsReasonInfo mImsReasonInfo;
     private static Context mContext;
 
-    private static Handler mHandlerUpdate = new Handler(){
+    private static Handler mHandlerUpdate = new Handler() {
         public void handleMessage(android.os.Message msg) {
             int error = mImsReasonInfo.getExtraCode();
             String extraMsg = mImsReasonInfo.getExtraMessage();
@@ -82,8 +82,6 @@ public class ImsDisconnectedReceiver extends BroadcastReceiver {
         mContext = context;
         if (DUBG) Log.i(TAG, "Receive action :" + intent.getAction());
         if(IMSDICONNECTED_ACTION.equals(intent.getAction())){
-            boolean stateChanged = intent.getBooleanExtra("stateChanged",true);
-            if (!stateChanged) return;
             Parcelable bundle = intent.getParcelableExtra("result");
             if(bundle == null){
                 if (DUBG) Log.i(TAG, "intent didn't contain not parcelable");
