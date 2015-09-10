@@ -124,8 +124,6 @@ public class ApnSettings extends SettingsPreferenceFragment implements
                 case CONNECTED:
                     if (!mRestoreDefaultApnMode) {
                         fillList();
-                    } else {
-                        showDialog(DIALOG_RESTORE_DEFAULTAPN);
                     }
                     break;
                 }
