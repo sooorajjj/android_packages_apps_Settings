@@ -2542,4 +2542,7 @@
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI 相關資訊"</string>
     <string name="slot_number" msgid="3762676044904653577">"(插槽 <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
     <string name="timer_switch_settings_title">定時開關機</string>
+    <string name="sim_enabler_title">SIM開關</string>
+    <string name="lte_4g_settings_title">啟用 4G</string>
+    <string name="label_global_roaming_settings">國際漫遊設置</string>
 </resources>
