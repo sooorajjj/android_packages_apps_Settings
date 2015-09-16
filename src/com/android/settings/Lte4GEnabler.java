@@ -55,6 +55,7 @@ public class Lte4GEnabler {
     private Switch mSwitch;
     private boolean mDialogClicked = false;
     private static MyHandler mHandler;
+    private AlertDialog mAlertDialog;
 
     public static final String SETTING_PRE_NW_MODE_DEFAULT = "preferred_network_mode_default";
     public static final String SETTING_PREF_NETWORK_BAND = "network_band_preferred";
@@ -78,6 +79,9 @@ public class Lte4GEnabler {
 
     public void pause() {
         mSwitch.setOnCheckedChangeListener(null);
+        if (mAlertDialog != null){
+            mAlertDialog.dismiss();
+        }
     }
 
     public void setSwitch(Switch switch_) {
@@ -118,7 +122,7 @@ public class Lte4GEnabler {
     }
 
     private void promptUser() {
-        AlertDialog alertDialog = new AlertDialog.Builder(mContext)
+        mAlertDialog = new AlertDialog.Builder(mContext)
                 .setMessage(mContext.getString(R.string.lte_4g_switch_prompt))
                 .setNeutralButton(R.string.no,
                         new DialogInterface.OnClickListener() {
@@ -137,14 +141,14 @@ public class Lte4GEnabler {
                                 mDialogClicked = true;
                             }
                         }).create();
-        alertDialog.setOnDismissListener(
+        mAlertDialog.setOnDismissListener(
                 new DialogInterface.OnDismissListener() {
                     public void onDismiss(DialogInterface dialog) {
                         if (!mDialogClicked)
                             mSwitch.setChecked(false);
                     }
                 });
-        alertDialog.show();
+        mAlertDialog.show();
     }
 
 
