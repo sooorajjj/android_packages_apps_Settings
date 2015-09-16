@@ -2740,11 +2740,9 @@
     <string name="sub_activate_failed">启动失败</string>
     <string name="bluetooth_sap_profile_summary_use_for">用于SIM卡</string>
     <string name="sim_pin_enable_failed">无法启动PIN</string>
-    <string name="sim_disabled">使无效</string>
     <string name="lock_to_app_start_step2">开启你的应用</string>
     <string name="bluetooth_profile_dun">check</string>
     <string name="slot_name">SIM</string>
-    <string name="sim_enabler_summary">SIM卡</string>
     <string name="sim_enabler_both_inactive">不能同时禁用两张SIM卡！</string>
     <string name="data_disabled_in_active_call">通话过程中移动网络被禁用</string>
     <!-- blur effect -->
