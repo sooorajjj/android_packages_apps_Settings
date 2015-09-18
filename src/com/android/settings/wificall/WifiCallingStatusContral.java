@@ -36,33 +36,43 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
+import android.os.Parcelable;
+import android.telephony.CellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import com.android.ims.ImsConfig;
+import com.android.ims.ImsReasonInfo;
+import java.util.List;
 
 public class WifiCallingStatusContral extends BroadcastReceiver {
 
     private static final String TAG = WifiCallingStatusContral.class.getSimpleName();
-    private static final boolean DBUG = true;
+    private static final boolean DEBUG = true;
+
     public static final String ACTION_WIFI_CALL_TURN_ON = "com.android.wificall.TURNON";
     public static final String ACTION_WIFI_CALL_TURN_OFF = "com.android.wificall.TURNOFF";
     public static final String ACTION_WIFI_CALL_ERROR_CODE = "com.android.wificall.ERRORCODE";
+    public static final String ACTION_IMS_STATE_CHANGE = "com.android.imscontection.DISCONNECTED";
+
     private static Context mContext;
-    private static boolean mIsAddlisten = false;
-    private static boolean mWifiCallStatus = false;
-    private static int mWifiCallPreference = -1;
+    private static int mWifiCallPreferred = -1;
     private static int mErrorCode = -1;
     private static NetworkInfo mWifiNetwork = null;
     private static PhoneStateListener mPhoneStateListener = new PhoneStateListener(){
         public void onCallStateChanged(int state, String incomingNumber) {
-            if (isUsingWifiCall()) {
-                WifiCallingNotification.updateWFCCallStateChange(mContext, state);
-            }
+            WifiCallingNotification.updateWFCCallStateChange(mContext, state);
         };
     };
 
-    public void savePreference(int iPreference, boolean status) {
+    private final int WIFI_CALLING_STATE_REGISTERED = 1;
+    private final int WIFI_CALLING_STATE_NOT_REGISTERED = 2;
+
+    private static boolean mWifiTurnOn = false;
+    private static boolean mWifiCallTurnOn = false;
+    private static boolean mImsRegisted = false;
+
+    private void savePreference(int iPreference, boolean status) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(
                    "MY_PERFS", mContext.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -71,103 +81,165 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         editor.commit();
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (!WifiCallingNotification.getWifiCallingNotifiEnable(context)) {
-            if (DBUG) Log.i(TAG, "getIntent : " + intent.getAction() + " flag : false");
-            return;
-        }
-        mContext = context;
-        String action = intent.getAction();
-        if (ACTION_WIFI_CALL_TURN_OFF.equals(action)
-                || ACTION_WIFI_CALL_TURN_ON.equals(action)) {
-            boolean turnOn = ACTION_WIFI_CALL_TURN_ON.equals(action);
-            mWifiCallStatus = turnOn;
-            int preference = intent.getIntExtra("preference",
-                    ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
-            mWifiCallPreference = preference;
-            savePreference(mWifiCallPreference,mWifiCallStatus);
-            ConnectivityManager connect = (ConnectivityManager) context
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-            mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            if (preference ==
-                    ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED
-                    || (mWifiNetwork == null || !mWifiNetwork.isConnected())) {
-                turnOn = false;
-            }
-            WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, turnOn);
-        } else if (ACTION_WIFI_CALL_ERROR_CODE.equals(action)) {
-            String error = intent.getStringExtra("result");
-            if (DBUG) Log.i(TAG, "error : " + error);
-            WifiCallingNotification.getIntance().updateRegistrationError(mContext, error);
-        } else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
-            SharedPreferences pre = context.getSharedPreferences(
-                    WifiCallingWizardActivity.PRIVTE_PREFERENCE, Context.MODE_PRIVATE);
-            boolean show = pre.getBoolean(WifiCallingWizardActivity.WIZARD_SHOW_PREFERENCE, true);
-            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
-            if (DBUG)
-                Log.i(TAG, "Intent action : " + action
-                        + " WifiCallingWizardActivity : " + show
-                        + " wifiState : " + wifiState);
-            if(show && wifiState == WifiManager.WIFI_STATE_ENABLED){
-                Intent start = new Intent(context, WifiCallingWizardActivity.class);
-                start.setAction("android.intent.action.MAIN");
-                start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(start);
-            }
-        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-            ConnectivityManager connect = (ConnectivityManager) context
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-            mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            if (mWifiCallPreference == -1) {
-                SharedPreferences sharedPreferences = mContext.getSharedPreferences(
-                       "MY_PERFS", mContext.MODE_PRIVATE);
-                mWifiCallPreference = sharedPreferences.getInt("currentWifiCallingPrefernce",
-                        ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
-                mWifiCallStatus = sharedPreferences.getBoolean("currentWifiCallingStatus",
-                        true);
-            }
-            boolean turnOn = mWifiCallStatus;
-            if (mWifiCallPreference ==
-                    ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED
-                    || (mWifiNetwork == null || !mWifiNetwork.isConnected())) {
-                turnOn = false;
-            }
-            WifiCallingNotification.getIntance().updateWFCStatusChange(context,
-                    turnOn);
-            if (DBUG) {
-                Log.i(TAG, "ConnectivityManager.CONNECTIVITY_ACTION info : " + mWifiNetwork
-                        + " turnOn:" + turnOn);
+    private void readPreference() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                "MY_PERFS", mContext.MODE_PRIVATE);
+        mWifiCallPreferred = sharedPreferences.getInt("currentWifiCallingPrefernce",
+                ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+        mWifiCallTurnOn = sharedPreferences.getBoolean("currentWifiCallingStatus", true);
+        if (DEBUG) Log.d(TAG, "readPreference, mWifiCallPreferred = " + mWifiCallPreferred);
+        if (DEBUG) Log.d(TAG, "readPreference, mWifiCallTurnOn = " + mWifiCallTurnOn);
+    }
+
+    private boolean cellularNetworkIsAbailable() {
+        boolean cellularNetworkAvailable = false;
+
+        TelephonyManager tm = (TelephonyManager)mContext.
+                 getSystemService(Context.TELEPHONY_SERVICE);
+        List<CellInfo> cellInfoList = tm.getAllCellInfo();
+
+        if (cellInfoList != null) {
+            for (CellInfo cellinfo : cellInfoList) {
+                if (cellinfo.isRegistered()) {
+                    cellularNetworkAvailable = true;
+                }
             }
         }
 
-        if (mWifiCallStatus && !mIsAddlisten) {
-            TelephonyManager teleMana = (TelephonyManager) context
-                    .getSystemService(Context.TELEPHONY_SERVICE);
-            mIsAddlisten = true;
-            teleMana.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        return cellularNetworkAvailable;
+    }
+
+    private void isWifiCallTurnOn(Intent intent, String action) {
+        if (ACTION_WIFI_CALL_TURN_OFF.equals(action)
+                || ACTION_WIFI_CALL_TURN_ON.equals(action)) {
+            if (DEBUG) Log.d(TAG, "isWifiCallTurnOn");
+            mWifiCallTurnOn = ACTION_WIFI_CALL_TURN_ON.equals(action);
+            mWifiCallPreferred = intent.getIntExtra("preference",
+                    ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+            savePreference(mWifiCallPreferred, mWifiCallTurnOn);
+        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+            if (DEBUG) Log.d(TAG, "isWifiCallTurnOn - CONNECTIVITY_ACTION");
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                    "MY_PERFS", mContext.MODE_PRIVATE);
+            mWifiCallTurnOn = sharedPreferences.getBoolean("currentWifiCallingStatus", true);
+            mWifiCallPreferred = sharedPreferences.getInt("currentWifiCallingPrefernce",
+                    ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
+        }
+
+        if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
+            if (cellularNetworkIsAbailable()) {
+                mWifiCallTurnOn = false;
+            } else {
+                mWifiCallTurnOn = true;
+            }
+        }
+        if (DEBUG) Log.d(TAG, "mWifiCallPreferred = " + mWifiCallPreferred);
+        if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn);
+    }
+
+    private void isWifiTurnOn(Intent intent, String action) {
+        if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
+            if (DEBUG) Log.d(TAG, "isWifiTurnOn");
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                    WifiCallingWizardActivity.PRIVTE_PREFERENCE, Context.MODE_PRIVATE);
+            boolean showWifiCallWizard = sharedPreferences.getBoolean(
+                    WifiCallingWizardActivity.WIZARD_SHOW_PREFERENCE, true);
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
+            if (DEBUG) Log.d(TAG, "showWifiCallingWizardActivity = " + showWifiCallWizard);
+
+            if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
+                mWifiTurnOn = true;
+                if (showWifiCallWizard) {
+                    Intent start = new Intent(mContext, WifiCallingWizardActivity.class);
+                    start.setAction("android.intent.action.MAIN");
+                    start.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(start);
+                }
+            } else {
+                mWifiTurnOn = false;
+            }
+        }
+
+        ConnectivityManager connect = (ConnectivityManager) mContext
+               .getSystemService(Context.CONNECTIVITY_SERVICE);
+        mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (mWifiNetwork == null) {
+            mWifiTurnOn = false;
+        } else {
+            if (mWifiNetwork.isConnected()) {
+                mWifiTurnOn = true;
+            } else {
+                mWifiTurnOn = false;
+            }
+        }
+        if (DEBUG) Log.d(TAG, "mWifiTurnOn = " + mWifiTurnOn);
+    }
+
+    private void isImsRegisted(Intent intent, String action) {
+        if (ACTION_IMS_STATE_CHANGE.equals(action) ) {
+            if (DEBUG) Log.d(TAG, "isImsRegisted");
+            int regState = intent.getIntExtra("stateChanged", WIFI_CALLING_STATE_NOT_REGISTERED);
+            if (regState == WIFI_CALLING_STATE_REGISTERED) {
+                mImsRegisted = true;
+            } else {
+                mImsRegisted = false;
+            }
+
+            if (DEBUG) Log.d(TAG, "regState =" + regState + ", mImsRegisted = " + mImsRegisted);
         }
     }
 
-    private static boolean isUsingWifiCall() {
-        if (!WifiCallingNotification.getWifiCallingNotifiEnable(mContext)) {
-            return false;
+    private void registerWFCInCallListener() {
+        TelephonyManager tm = (TelephonyManager)mContext.
+                getSystemService(Context.TELEPHONY_SERVICE);
+        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+    }
+
+    private void unregisterWFCInCallListener() {
+        TelephonyManager tm = (TelephonyManager)mContext.
+                getSystemService(Context.TELEPHONY_SERVICE);
+        tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
+    }
+
+    private void updateWFCReadyIcon() {
+        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted) {
+            WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, true);
+        } else {
+            WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, false);
         }
-        ConnectivityManager connect = (ConnectivityManager) mContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (mWifiNetwork == null || !mWifiNetwork.isConnected()) {
-            return false;
+    }
+
+    private void updateWFCInCallIcon() {
+        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted) {
+            registerWFCInCallListener();
+        } else {
+            unregisterWFCInCallListener();
         }
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(
-                "MY_PERFS", mContext.MODE_PRIVATE);
-        mWifiCallPreference = sharedPreferences.getInt("currentWifiCallingPrefernce",
-                ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
-        mWifiCallStatus = sharedPreferences.getBoolean("currentWifiCallingStatus", true);
-        if (mWifiCallStatus == false || mWifiCallPreference ==
-                ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
-            return false;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (!WifiCallingNotification.getWifiCallingNotifiEnable(context)) {
+            if (DEBUG) Log.d(TAG, "getIntent : " + intent.getAction() + " flag : false");
+            return;
         }
-        return true;
+
+        mContext = context;
+        if (mWifiCallPreferred == -1) {
+            readPreference();
+        }
+
+        String action = intent.getAction();
+        if (DEBUG) Log.d(TAG, "WifiCallingStatusContral, onReceive, action = " + action);
+
+        isWifiCallTurnOn(intent, action);
+        isWifiTurnOn(intent, action);
+        isImsRegisted(intent, action);
+
+        if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn
+                + ", mWifiTurnOn = " + mWifiTurnOn + ", mImsRegisted = " + mImsRegisted);
+
+        updateWFCReadyIcon();
+        updateWFCInCallIcon();
     }
 }

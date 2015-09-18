@@ -69,13 +69,16 @@ public class WifiCallingNotification {
                 com.android.internal.R.bool.config_regional_wifi_calling_notificaion_enable);
     }
 
-    public static void updateWFCStatusChange(Context context, boolean turnon){
+    public static void updateWFCStatusChange(Context context, boolean ready){
         if (!getWifiCallingNotifiEnable(context)) {
             return;
         }
         NotificationManager notiManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (!turnon) {
+        if (!ready) {
+            if (DEBUG) {
+                Log.d(TAG, "updateWFCStatusChange, cancelNotification");
+            }
             cancelNotification(context, WIFI_CALLING_NOTIFICAION_ID);
             return;
         }
