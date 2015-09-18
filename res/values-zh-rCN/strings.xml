@@ -2728,7 +2728,7 @@
     <string name="bluetooth_enter_pin_msg_hs">设备需要更高安全的16字符密码</string>
     <string name="sub_deactivate_not_supported">使无效失败</string>
     <string name="lock_to_app_screen_lock">使用锁屏</string>
-    <string name="sim_enabler_in_call"></string>
+    <string name="sim_enabler_in_call">错误，通话中！</string>
     <string name="processor_info">处理器信息</string>
     <string name="data_to_wifi_connect_value_manul">check</string>
     <string name="wifi_hotsopt_mode_title">继续WIFI热点</string>
