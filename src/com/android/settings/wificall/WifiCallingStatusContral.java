@@ -54,6 +54,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     public static final String ACTION_WIFI_CALL_TURN_OFF = "com.android.wificall.TURNOFF";
     public static final String ACTION_WIFI_CALL_ERROR_CODE = "com.android.wificall.ERRORCODE";
     public static final String ACTION_IMS_STATE_CHANGE = "com.android.imscontection.DISCONNECTED";
+    public static final int WIFI_CALLING_ROVE_IN_THRESHOD = -75;
 
     private static Context mContext;
     private static int mWifiCallPreferred = -1;
@@ -71,6 +72,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     private static boolean mWifiTurnOn = false;
     private static boolean mWifiCallTurnOn = false;
     private static boolean mImsRegisted = false;
+    private static boolean mIsWifiSignalWeak = false;
 
     private void savePreference(int iPreference, boolean status) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(
@@ -137,7 +139,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn);
     }
 
-    private void isWifiTurnOn(Intent intent, String action) {
+    private void isWifiStatusChange(Intent intent, String action) {
         if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
             if (DEBUG) Log.d(TAG, "isWifiTurnOn");
             SharedPreferences sharedPreferences = mContext.getSharedPreferences(
@@ -158,8 +160,20 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             } else {
                 mWifiTurnOn = false;
             }
+        } else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
+            if (DEBUG) Log.d (TAG, "Wifi RSSI change");
+
+                WifiManager wifiManager = (WifiManager) mContext.getSystemService(
+                        Context.WIFI_SERVICE);
+                if ((wifiManager == null) || (wifiManager.getConnectionInfo() == null)) {
+                    mIsWifiSignalWeak = false;
+                } else {
+                    if (DEBUG) Log.d (TAG, "Wifi RSSI = "+wifiManager.getConnectionInfo().getRssi() +"dbm");
+                    mIsWifiSignalWeak = (wifiManager.getConnectionInfo().getRssi() < WIFI_CALLING_ROVE_IN_THRESHOD);
+                }
         }
 
+        //check wifi contivity state
         ConnectivityManager connect = (ConnectivityManager) mContext
                .getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -202,7 +216,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     }
 
     private void updateWFCReadyIcon() {
-        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted) {
+        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted && !mIsWifiSignalWeak) {
             WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, true);
         } else {
             WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, false);
@@ -233,7 +247,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         if (DEBUG) Log.d(TAG, "WifiCallingStatusContral, onReceive, action = " + action);
 
         isWifiCallTurnOn(intent, action);
-        isWifiTurnOn(intent, action);
+        isWifiStatusChange(intent, action);
         isImsRegisted(intent, action);
 
         if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn
