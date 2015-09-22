@@ -2512,4 +2512,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"IMEI-információ"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"Relatív IMEI-információ"</string>
     <string name="slot_number" msgid="3762676044904653577">"(Hely: <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">Hardverrel kapcsolatos visszajelzés</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Jelentésküldés</string>
 </resources>

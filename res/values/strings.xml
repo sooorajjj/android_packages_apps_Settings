@@ -6475,4 +6475,6 @@
     <string name="usb_tethering_title">USB tethering</string>
     <string name="usb_tethering_summary">Share network via usb connection</string>
     <string name="storage_menu_cleanup">Storage Cleanup</string>
+    <string name="qtifeedback_settings_title">Hardware Feedback</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Reporting</string>
 </resources>

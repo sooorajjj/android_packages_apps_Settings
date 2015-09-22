@@ -2512,4 +2512,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"Информации за IMEI"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"Информации во врска со IMEI"</string>
     <string name="slot_number" msgid="3762676044904653577">"(Отвор<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">Повратни информации за хардверот</string>
+    <string name="qtifeedback_settings_subtitle">Праќање извештаи на компанијата Qualcomm Technologies</string>
 </resources>

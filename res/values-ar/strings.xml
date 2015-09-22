@@ -2515,4 +2515,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"‏معلومات IMEI"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"‏المعلومات ذات الصلة بـ IMEI"</string>
     <string name="slot_number" msgid="3762676044904653577">"(فتحة <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">الإبلاغ عن</string>
+    <string name="qtifeedback_settings_subtitle">ملاحظات حول أجهزة Qualcomm Technologies</string>
 </resources>

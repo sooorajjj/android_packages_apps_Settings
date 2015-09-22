@@ -2513,4 +2513,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"Informations sur le code IMEI"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"Informations relatives au code IMEI"</string>
     <string name="slot_number" msgid="3762676044904653577">"(Emplacement <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">Avis sur le matériel</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Transmission de rapports</string>
 </resources>

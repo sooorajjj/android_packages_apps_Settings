@@ -2512,4 +2512,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"IMEI വിവരങ്ങൾ"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI അനുബന്ധ വിവരങ്ങൾ"</string>
     <string name="slot_number" msgid="3762676044904653577">"(സ്ലോട്ട്<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">ഹാർഡ്‌വെയർ ഫീഡ്‌ബാക്ക്</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies റിപ്പോർട്ടുചെയ്യൽ</string>
 </resources>

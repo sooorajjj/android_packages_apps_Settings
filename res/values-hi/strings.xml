@@ -2513,4 +2513,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"IMEI जानकारी"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI संबंधी जानकारी"</string>
     <string name="slot_number" msgid="3762676044904653577">"(स्लॉट<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title"> हार्डवेयर प्रतिसाद</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies रिपोर्टिंग</string>
 </resources>

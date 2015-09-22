@@ -2545,4 +2545,6 @@
     <string name="sim_enabler_title">SIM開關</string>
     <string name="lte_4g_settings_title">啟用 4G</string>
     <string name="label_global_roaming_settings">國際漫遊設置</string>
+    <string name="qtifeedback_settings_title">硬體使用情況回報</string>
+    <string name="qtifeedback_settings_subtitle"> Qualcomm Technologies 報告</string>
 </resources>
