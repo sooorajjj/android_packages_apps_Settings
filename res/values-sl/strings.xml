@@ -2512,4 +2512,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"Podatki o IMEI"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"Relativni podatki o IMEI"</string>
     <string name="slot_number" msgid="3762676044904653577">"(Reža <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">Povratne informacije o strojni opremi</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Poročilo</string>
 </resources>

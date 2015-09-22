@@ -224,6 +224,8 @@ public class SettingsActivity extends Activity
 
     private NFCProfileTagCallback mNfcProfileCallback;
 
+    private SmqSettings mSMQ;
+
     // Show only these settings for restricted users
     private int[] SETTINGS_FOR_RESTRICTED = {
             R.id.wireless_section,
@@ -528,6 +530,8 @@ public class SettingsActivity extends Activity
             getWindow().setUiOptions(intent.getIntExtra(EXTRA_UI_OPTIONS, 0));
         }
 
+        mSMQ = new SmqSettings(getApplicationContext());
+
         mDevelopmentPreferences = getSharedPreferences(DevelopmentSettings.PREF_FILE,
                 Context.MODE_PRIVATE);
 
@@ -788,6 +792,8 @@ public class SettingsActivity extends Activity
     @Override
     public void onResume() {
         super.onResume();
+
+        mSMQ.onResume();
 
         final int newHomeActivityCount = getHomeActivitiesCount();
         if (newHomeActivityCount != mHomeActivitiesCount) {
@@ -1283,6 +1289,10 @@ public class SettingsActivity extends Activity
                     } else {
                         tile.title = infos.get(0).activityInfo.loadLabel(getPackageManager());
                         tile.intent = intent;
+                    }
+                } else if (id == R.id.qtifeedback_settings){
+                	if (!mSMQ.isShowSmqSettings()) {
+                        removeTile = true;
                     }
                 }
 

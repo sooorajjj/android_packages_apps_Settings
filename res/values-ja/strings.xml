@@ -2519,4 +2519,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"IMEI情報"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI関連情報"</string>
     <string name="slot_number" msgid="3762676044904653577">"（スロット<xliff:g id="SLOT_NUM">%1$d</xliff:g>）"</string>
+    <string name="qtifeedback_settings_title"> ハードウェアに関するフィードバック</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologiesレポート</string>
 </resources>

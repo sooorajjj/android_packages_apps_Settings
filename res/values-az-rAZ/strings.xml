@@ -2002,4 +2002,6 @@
     <string name="user_image_take_photo" msgid="1280274310152803669">"Fotoşəkil çəkin"</string>
     <string name="user_image_choose_photo" msgid="7940990613897477057">"Qalereyadan şəkil silin"</string>
     <string name="regulatory_info_text" msgid="5623087902354026557"></string>
+    <string name="qtifeedback_settings_title"> Avadanlığa dair sorğu</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies üçün hesabat</string>
 </resources>

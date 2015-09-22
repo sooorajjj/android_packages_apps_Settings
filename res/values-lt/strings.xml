@@ -2512,4 +2512,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"IMEI informacija"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI susijusi informacija"</string>
     <string name="slot_number" msgid="3762676044904653577">"(<xliff:g id="SLOT_NUM">%1$d</xliff:g> lizdas)"</string>
+    <string name="qtifeedback_settings_title">Atsiliepimas apie aparatinę įrangą</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Ataskaitų teikimas</string>
 </resources>

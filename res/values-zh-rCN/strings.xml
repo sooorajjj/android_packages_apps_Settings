@@ -2763,4 +2763,6 @@
     <string name="data_usage_menu_hide_time_range">隐藏时间区间</string>
     <string name="app_ops_permiss_name">应用联网限制</string>
     <string name="storage_menu_cleanup">垃圾清理</string>
+    <string name="qtifeedback_settings_title">硬件反馈</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies 报告</string>
 </resources>

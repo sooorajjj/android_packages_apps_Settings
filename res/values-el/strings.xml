@@ -2514,4 +2514,6 @@
     <string name="imei_information_title" msgid="8499085421609752290">"Πληροφορίες IMEI"</string>
     <string name="imei_information_summary" msgid="2074095606556565233">"Σχετικές πληροφορίες IMEI"</string>
     <string name="slot_number" msgid="3762676044904653577">"(Υποδοχή <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
+    <string name="qtifeedback_settings_title">Ανάδραση υλικού</string>
+    <string name="qtifeedback_settings_subtitle">Αναφορά στην Qualcomm Technologies</string>
 </resources>

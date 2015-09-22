@@ -6364,4 +6364,6 @@
     <string name="app_ops_permiss_name">App network access</string>
     <string name="meta_info">Software version</string>
     <string name="storage_menu_cleanup">Storage Cleanup</string>
+    <string name="qtifeedback_settings_title">Hardware Feedback</string>
+    <string name="qtifeedback_settings_subtitle">Qualcomm Technologies Reporting</string>
 </resources>
