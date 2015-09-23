@@ -37,6 +37,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
+import android.os.SystemProperties;
 import android.telephony.CellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -57,6 +58,8 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     public static final int WIFI_CALLING_ROVE_IN_THRESHOD = -75;
     public static final String ACTION_WIFI_CALL_READY_STATUS_CHANGE = "com.android.wificall.READY";
     public static final String ACTION_WIFI_CALL_READY_EXTRA = "com.android.wificall.ready.extra";
+    public static final String SYSTEM_PROPERTY_WIFI_CALL_READY = "persist.sys.wificall.ready";
+    public static final String SYSTEM_PROPERTY_WIFI_CALL_STATUS_MSG = "persist.sys.wificall.status.msg";
 
     private static Context mContext;
     private static int mWifiCallPreferred = -1;
@@ -77,6 +80,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     private static boolean mIsWifiSignalWeak = false;
     private static boolean mWifiCallReady = false;
     private static NetworkInfo mWifiNetwork = null;
+    private static String mWifiCallStatusMsg = "Not Ready";
 
     private void savePreference(int iPreference, boolean status) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(
@@ -245,6 +249,14 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         mContext.sendBroadcast(intent);
     }
 
+    private void broadcastWifiCallErrorCode() {
+        if (mWifiCallTurnOn) {
+            Intent intent = new Intent(ACTION_WIFI_CALL_ERROR_CODE);
+            intent.putExtra(ACTION_WIFI_CALL_ERROR_CODE_EXTRA, mWifiCallStatusMsg);
+            mContext.sendBroadcast(intent);
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!WifiCallingNotification.getWifiCallingNotifiEnable(context)) {
@@ -272,6 +284,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             mWifiCallReady = mWifiCallTurnOn && mWifiConnected && mImsRegisted && !mIsWifiSignalWeak;
             updateWFCReadyIcon();
             updateWFCInCallIcon();
+            SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_READY, (mWifiCallReady? "yes" : "no"));
             broadcastWifiCallReadyStatus();
         }
     }
