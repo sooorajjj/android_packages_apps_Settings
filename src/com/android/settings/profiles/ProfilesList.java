@@ -21,7 +21,9 @@ import java.util.UUID;
 import android.app.Profile;
 import android.app.ProfileManager;
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.text.TextUtils;
@@ -112,6 +114,9 @@ public class ProfilesList extends SettingsPreferenceFragment implements
         try {
             UUID selectedUuid = UUID.fromString(key);
             mProfileManager.setActiveProfile(selectedUuid);
+            AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            boolean isSilent = mAudioManager.isSilentMode();
+            SystemProperties.set("persist.sys.silent", isSilent ? "1" : "0");
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
         }
