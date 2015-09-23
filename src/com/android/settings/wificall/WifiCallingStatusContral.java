@@ -55,11 +55,12 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     public static final String ACTION_WIFI_CALL_ERROR_CODE = "com.android.wificall.ERRORCODE";
     public static final String ACTION_IMS_STATE_CHANGE = "com.android.imscontection.DISCONNECTED";
     public static final int WIFI_CALLING_ROVE_IN_THRESHOD = -75;
+    public static final String ACTION_WIFI_CALL_READY_STATUS_CHANGE = "com.android.wificall.READY";
+    public static final String ACTION_WIFI_CALL_READY_EXTRA = "com.android.wificall.ready.extra";
 
     private static Context mContext;
     private static int mWifiCallPreferred = -1;
     private static int mErrorCode = -1;
-    private static NetworkInfo mWifiNetwork = null;
     private static PhoneStateListener mPhoneStateListener = new PhoneStateListener(){
         public void onCallStateChanged(int state, String incomingNumber) {
             WifiCallingNotification.updateWFCCallStateChange(mContext, state);
@@ -70,9 +71,12 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     private final int WIFI_CALLING_STATE_NOT_REGISTERED = 2;
 
     private static boolean mWifiTurnOn = false;
+    private static boolean mWifiConnected = false;
     private static boolean mWifiCallTurnOn = false;
     private static boolean mImsRegisted = false;
     private static boolean mIsWifiSignalWeak = false;
+    private static boolean mWifiCallReady = false;
+    private static NetworkInfo mWifiNetwork = null;
 
     private void savePreference(int iPreference, boolean status) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(
@@ -150,7 +154,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             if (DEBUG) Log.d(TAG, "showWifiCallingWizardActivity = " + showWifiCallWizard);
 
             if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
-                mWifiTurnOn = true;
+                mWifiConnected = true;
                 if (showWifiCallWizard) {
                     Intent start = new Intent(mContext, WifiCallingWizardActivity.class);
                     start.setAction("android.intent.action.MAIN");
@@ -158,8 +162,16 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
                     mContext.startActivity(start);
                 }
             } else {
+                mWifiConnected = false;
+            }
+
+            WifiManager wifimgr = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            if (wifimgr != null && wifimgr.isWifiEnabled()) {
+                mWifiTurnOn = true;
+            } else {
                 mWifiTurnOn = false;
             }
+
         } else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
             if (DEBUG) Log.d (TAG, "Wifi RSSI change");
 
@@ -216,19 +228,21 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     }
 
     private void updateWFCReadyIcon() {
-        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted && !mIsWifiSignalWeak) {
-            WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, true);
-        } else {
-            WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, false);
-        }
+        WifiCallingNotification.getIntance().updateWFCStatusChange(mContext, mWifiCallReady);
     }
 
     private void updateWFCInCallIcon() {
-        if (mWifiCallTurnOn && mWifiTurnOn && mImsRegisted) {
+        if (mWifiCallReady) {
             registerWFCInCallListener();
         } else {
             unregisterWFCInCallListener();
         }
+    }
+
+    private void broadcastWifiCallReadyStatus() {
+        Intent intent = new Intent(ACTION_WIFI_CALL_READY_STATUS_CHANGE);
+        intent.putExtra(ACTION_WIFI_CALL_READY_EXTRA, mWifiCallReady);
+        mContext.sendBroadcast(intent);
     }
 
     @Override
@@ -251,9 +265,14 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         isImsRegisted(intent, action);
 
         if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn
-                + ", mWifiTurnOn = " + mWifiTurnOn + ", mImsRegisted = " + mImsRegisted);
+                + ", mWifiConnected = " + mWifiConnected + ", mImsRegisted = " + mImsRegisted);
 
-        updateWFCReadyIcon();
-        updateWFCInCallIcon();
+        if (mWifiCallReady != (mWifiCallTurnOn &&
+                    mWifiConnected && mImsRegisted && !mIsWifiSignalWeak)) {
+            mWifiCallReady = mWifiCallTurnOn && mWifiConnected && mImsRegisted && !mIsWifiSignalWeak;
+            updateWFCReadyIcon();
+            updateWFCInCallIcon();
+            broadcastWifiCallReadyStatus();
+        }
     }
 }
