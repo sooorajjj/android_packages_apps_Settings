@@ -52,10 +52,13 @@ import android.telephony.SubscriptionManager;
 import com.android.ims.ImsConfig;
 import com.android.ims.ImsManager;
 import com.android.ims.ImsException;
+import com.android.ims.ImsConfigListener;
 
 public class WifiCallSwitchPreference extends SwitchPreference {
 
     private static final String TAG = "WifiCallSwitchPreference";
+    private int mState = ImsConfig.WifiCallingValueConstants.ON;
+    private int mPreference = ImsConfig.WifiCallingPreference.WIFI_PREFERRED;
     private Activity mParent = null;
     private ImsConfig mImsConfig;
 
@@ -93,6 +96,19 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     }
 
     public void getWifiCallingPreference() {
+        Log.d(TAG, "getWifiCallingPreference called");
+        try {
+            if (mImsConfig != null) {
+                mImsConfig.getWifiCallingPreference(imsConfigListener);
+            } else {
+                mState = isChecked()? ImsConfig.WifiCallingValueConstants.ON:
+                        ImsConfig.WifiCallingValueConstants.OFF;
+                mPreference = 1;
+                Log.e(TAG, "getWifiCallingPreference failed. mImsConfig is null");
+            }
+        } catch (ImsException e) {
+            Log.e(TAG, "getWifiCallingPreference failed. Exception = " + e);
+        }
     }
 
     public void setParentActivity(Activity act) {
@@ -127,9 +143,12 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                             CompoundButton buttonView, boolean isChecked) {
                         Log.i(TAG, "start onCheckedChanged isChecked : " + isChecked);
                         if (!callChangeListener(isChecked)) {
+                            Log.e(TAG, "onCheckedChanged does not like it. Change it back.");
                             buttonView.setChecked(!isChecked);
                             return;
                         }
+                        Log.i(TAG, "start onCheckedChanged isChecked : " + isChecked);
+
                         WifiCallSwitchPreference.this.setChecked(isChecked);
                         onSwitchClicked();
                     }
@@ -139,7 +158,93 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     }
 
     public void onSwitchClicked() {
-        Log.d(TAG, "onSwitchClicked "+isChecked());
+        Log.d(TAG, "onSwitchClicked " + isChecked());
+        getWifiCallingPreference();
     }
+
+    private boolean setWifiCallingPreference(int state, int preference) {
+        Log.d(TAG, "setWifiCallingPreference:");
+        boolean result = false;
+        try {
+            if (mImsConfig != null) {
+                mImsConfig.setWifiCallingPreference(state,
+                        preference, imsConfigListener);
+                Log.d(TAG, "setWifiCallingPreference:");
+                result = true;
+            } else {
+                Log.e(TAG, "setWifiCallingPreference failed. mImsConfig is null");
+            }
+        } catch (ImsException e) {
+            Log.e(TAG, "setWifiCallingPreference failed. Exception = " + e);
+        }
+        return result;
+    }
+
+    private void checkWifiCallingCapability(int state) {
+        Log.d(TAG, "checkWifiCallingCapability:");
+        if (state == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED) {
+            this.setEnabled(false);
+            Log.e(TAG, "checkWifiCallingCapability: wificalling not supported.");
+        }
+    }
+
+    private ImsConfigListener imsConfigListener = new ImsConfigListener.Stub() {
+        public void onGetVideoQuality(int status, int quality) {
+            //TODO not required as of now
+        }
+
+        public void onSetVideoQuality(int status) {
+            //TODO not required as of now
+        }
+
+        public void onGetFeatureResponse(int feature, int network, int value, int status) {
+            //TODO not required as of now
+        }
+
+        public void onSetFeatureResponse(int feature, int network, int value, int status) {
+            //TODO not required as of now
+        }
+
+        public void onGetPacketCount(int status, long packetCount) {
+            //TODO not required as of now
+        }
+
+        public void onGetPacketErrorCount(int status, long packetErrorCount) {
+            //TODO not required as of now
+        }
+
+        public void onSetWifiCallingPreference(int status) {
+            Log.d(TAG, "onSetWifiCallingPreference");
+            if (hasRequestFailed(status)) {
+                Log.e(TAG, "onSetWifiCallingPreference : set failed. errorCode = " + status);
+
+                //load default value as per isChecked
+                mState = isChecked()? ImsConfig.WifiCallingValueConstants.ON:
+                        ImsConfig.WifiCallingValueConstants.OFF;
+                mPreference = 1;
+            } else {
+                Log.d(TAG, "onSetWifiCallingPreference: set succeeded.");
+            }
+        }
+
+        public void onGetWifiCallingPreference(int status, final int wifiCallingStatus,
+                final int wifiCallingPreference) {
+            if (hasRequestFailed(status)) {
+                Log.e(TAG, "onGetWifiCallingPreference: failed. errorCode = " + status);
+                //load default value as per isChecked
+                mState = isChecked()? ImsConfig.WifiCallingValueConstants.ON:
+                        ImsConfig.WifiCallingValueConstants.OFF;
+                mPreference = ImsConfig.WifiCallingPreference.WIFI_PREFERRED;
+            } else {
+                Log.d(TAG, "onGetWifiCallingPreference");
+                checkWifiCallingCapability(wifiCallingStatus);
+            }
+
+        }
+
+        private boolean hasRequestFailed(int result) {
+            return (result != ImsConfig.OperationStatusConstants.SUCCESS);
+        }
+    };
 
 }
