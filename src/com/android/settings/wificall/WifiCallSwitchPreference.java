@@ -48,31 +48,48 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.SearchView.OnSuggestionListener;
 import android.widget.Switch;
+import android.telephony.SubscriptionManager;
+import com.android.ims.ImsConfig;
+import com.android.ims.ImsManager;
+import com.android.ims.ImsException;
 
 public class WifiCallSwitchPreference extends SwitchPreference {
 
     private static final String TAG = "WifiCallSwitchPreference";
     private Activity mParent = null;
+    private ImsConfig mImsConfig;
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
-        Log.d(TAG, "WifiCallSwitchPreference constructor 1: this=" + this);
+        initImsConfig();
+        Log.d(TAG, "WifiCallSwitchPreference constructor 1");
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        initImsConfig();
         Log.d(TAG, "WifiCallSwitchPreference constructor 2");
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
-        Log.d(TAG, "WifiCallSwitchPreference constructor 3");
     }
 
     public WifiCallSwitchPreference(Context context, AttributeSet attrs) {
         this(context, attrs, com.android.internal.R.attr.switchPreferenceStyle);
-        Log.d(TAG, "WifiCallSwitchPreference constructor 4");
+    }
+
+    private void initImsConfig() {
+        try {
+            ImsManager imsManager = ImsManager.getInstance(getContext(),
+                    SubscriptionManager.getDefaultVoiceSubId());
+            mImsConfig = imsManager.getConfigInterface();
+            Log.d(TAG, "mImsConfig:"+mImsConfig);
+        } catch (ImsException e) {
+            mImsConfig = null;
+            Log.e(TAG, "ImsService is not running");
+        }
     }
 
     public void getWifiCallingPreference() {
