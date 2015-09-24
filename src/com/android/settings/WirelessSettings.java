@@ -519,7 +519,6 @@ public class WirelessSettings extends SettingsPreferenceFragment
         Preference wifiCall = findPreference(KEY_WIFI_CALL_SETTINGS);
         if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
             ((WifiCallSwitchPreference)wifiCall).setParentActivity(getActivity());
-            ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
         }
     }
 
