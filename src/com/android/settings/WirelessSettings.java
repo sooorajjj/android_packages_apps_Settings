@@ -533,6 +533,12 @@ public class WirelessSettings extends SettingsPreferenceFragment
         if (mNsdEnabler != null) {
             mNsdEnabler.resume();
         }
+
+        Preference wifiCall = findPreference(KEY_WIFI_CALL_SETTINGS);
+        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+            ((WifiCallSwitchPreference)wifiCall).registerReciever();
+            ((WifiCallSwitchPreference)wifiCall).getWifiCallingPreference();
+        }
     }
 
     @Override
@@ -555,16 +561,16 @@ public class WirelessSettings extends SettingsPreferenceFragment
         if (mNsdEnabler != null) {
             mNsdEnabler.pause();
         }
+
+        Preference wifiCall = findPreference("wifi_call_settings");
+        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
+           ((WifiCallSwitchPreference)wifiCall).unRegisterReciever();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        Preference wifiCall = findPreference("wifi_call_settings");
-        if (wifiCall != null && wifiCall instanceof WifiCallSwitchPreference) {
-            ((WifiCallSwitchPreference)wifiCall).unRegisterReciever();
-        }
     }
 
     @Override

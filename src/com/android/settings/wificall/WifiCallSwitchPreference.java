@@ -60,8 +60,10 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     private int mState = ImsConfig.WifiCallingValueConstants.ON;
     private int mPreference = ImsConfig.WifiCallingPreference.WIFI_PREFERRED;
     private Activity mParent = null;
+    private static BroadcastReceiver mReceiver = null;
     private ImsConfig mImsConfig;
     private boolean mSwitchClicked = false;
+    private String mWFCStatusMsgDisplay = "";
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
@@ -116,6 +118,53 @@ public class WifiCallSwitchPreference extends SwitchPreference {
 
     public void setParentActivity(Activity act) {
         mParent = act;
+    }
+
+    public void registerReciever() {
+        Log.d(TAG, "registerReciever");
+        unRegisterReciever();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiCallingStatusContral.ACTION_WIFI_CALL_READY_STATUS_CHANGE);
+        filter.addAction(WifiCallingStatusContral.ACTION_WIFI_CALL_ERROR_CODE);
+
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (!isChecked()) {
+                    Log.d(TAG, "do not handle any intent when wificall turned off");
+                    return;
+                }
+
+                if (WifiCallingStatusContral.ACTION_WIFI_CALL_ERROR_CODE.
+                            equals(intent.getAction()) ||
+                    WifiCallingStatusContral.ACTION_WIFI_CALL_READY_STATUS_CHANGE.
+                            equals(intent.getAction())) {
+                    updateWFCStatusFromIntent(intent);
+                    setSummary(mWFCStatusMsgDisplay);
+                }
+            } //end onReceive
+        };
+        getContext().registerReceiver(mReceiver, filter);
+    }
+
+    public void unRegisterReciever() {
+        if (mReceiver != null) {
+            getContext().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+    }
+
+    private void updateWFCStatusFromIntent(Intent intent) {
+        if (intent == null) {
+            Log.e(TAG, "updateWFCStatusDisplay: empty intent!");
+        } else if (WifiCallingStatusContral.ACTION_WIFI_CALL_ERROR_CODE.
+                equals(intent.getAction())) {
+            mWFCStatusMsgDisplay = intent.getStringExtra(
+                    WifiCallingStatusContral.ACTION_WIFI_CALL_ERROR_CODE_EXTRA);
+        } else {
+            Log.e(TAG, "unexpected intent handled.");
+        }
+        Log.d(TAG, "updateWFCStatusFromIntent called. mWFCStatusMsgDisplay:" + mWFCStatusMsgDisplay);
     }
 
     @Override
