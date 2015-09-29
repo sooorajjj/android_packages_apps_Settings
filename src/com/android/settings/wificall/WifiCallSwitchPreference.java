@@ -61,10 +61,12 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     private int mPreference = ImsConfig.WifiCallingPreference.WIFI_PREFERRED;
     private Activity mParent = null;
     private ImsConfig mImsConfig;
+    private boolean mSwitchClicked = false;
 
     public WifiCallSwitchPreference(Context context) {
         super(context);
         initImsConfig();
+        mSwitchClicked = false;
         Log.d(TAG, "WifiCallSwitchPreference constructor 1");
     }
 
@@ -72,6 +74,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initImsConfig();
+        mSwitchClicked = false;
         Log.d(TAG, "WifiCallSwitchPreference constructor 2");
     }
 
@@ -159,6 +162,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
 
     public void onSwitchClicked() {
         Log.d(TAG, "onSwitchClicked " + isChecked());
+        mSwitchClicked = true;
         getWifiCallingPreference();
     }
 
@@ -186,6 +190,23 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             this.setEnabled(false);
             Log.e(TAG, "checkWifiCallingCapability: wificalling not supported.");
         }
+    }
+
+    private void syncUserSetting2Modem(int state, int pref) {
+        Log.d(TAG, "sync user setting to modem: state=" + state + " Preference=" + pref);
+        setWifiCallingPreference(state, pref);
+        Intent intent = new Intent(state == ImsConfig.WifiCallingValueConstants.ON ?
+                WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_ON :
+                WifiCallingStatusContral.ACTION_WIFI_CALL_TURN_OFF);
+        intent.putExtra("preference", pref);
+        getContext().sendBroadcast(intent);
+    }
+
+    private void syncUserSettingFromModem(int state, int pref) {
+        Log.d(TAG, "sync user setting from modem: state=" + state + " Preference=" + pref);
+        this.setChecked(state == ImsConfig.WifiCallingValueConstants.ON);
+        mState = state;
+        mPreference = pref;
     }
 
     private ImsConfigListener imsConfigListener = new ImsConfigListener.Stub() {
@@ -238,6 +259,16 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             } else {
                 Log.d(TAG, "onGetWifiCallingPreference");
                 checkWifiCallingCapability(wifiCallingStatus);
+                if (mSwitchClicked) {
+                    Log.d (TAG, "mSwitchClicked is true.");
+                    int state = isChecked() ? ImsConfig.WifiCallingValueConstants.ON:
+                            ImsConfig.WifiCallingValueConstants.OFF;
+                    //add check if change happen
+                    syncUserSetting2Modem(state, mPreference);
+                    mSwitchClicked = false;
+                } else {
+                    syncUserSettingFromModem(wifiCallingStatus, wifiCallingPreference);
+                }
             }
 
         }
