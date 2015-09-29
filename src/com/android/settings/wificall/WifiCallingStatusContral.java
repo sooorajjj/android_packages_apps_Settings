@@ -35,16 +35,20 @@ import android.net.NetworkInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.os.SystemProperties;
 import android.telephony.CellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import com.android.ims.ImsConfig;
 import com.android.ims.ImsReasonInfo;
+import com.android.settings.R;
 import java.util.List;
+
 
 public class WifiCallingStatusContral extends BroadcastReceiver {
 
@@ -54,6 +58,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     public static final String ACTION_WIFI_CALL_TURN_ON = "com.android.wificall.TURNON";
     public static final String ACTION_WIFI_CALL_TURN_OFF = "com.android.wificall.TURNOFF";
     public static final String ACTION_WIFI_CALL_ERROR_CODE = "com.android.wificall.ERRORCODE";
+    public static final String ACTION_WIFI_CALL_ERROR_CODE_EXTRA = "com.android.wificall.errorcode.extra";
     public static final String ACTION_IMS_STATE_CHANGE = "com.android.imscontection.DISCONNECTED";
     public static final int WIFI_CALLING_ROVE_IN_THRESHOD = -75;
     public static final String ACTION_WIFI_CALL_READY_STATUS_CHANGE = "com.android.wificall.READY";
@@ -71,8 +76,9 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         };
     };
 
-    private final int WIFI_CALLING_STATE_REGISTERED = 1;
-    private final int WIFI_CALLING_STATE_NOT_REGISTERED = 2;
+    private static final int WIFI_CALLING_STATE_REGISTERED = 1;
+    private static final int WIFI_CALLING_STATE_NOT_REGISTERED = 2;
+    private static final int WIFI_CALLING_STATE_REGISTERING = 3;
 
     private static boolean mWifiTurnOn = false;
     private static boolean mWifiConnected = false;
@@ -82,6 +88,10 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     private static boolean mWifiCallReady = false;
     private static NetworkInfo mWifiNetwork = null;
     private static String mWifiCallStatusMsg = "Not Ready";
+    private static String mExtraMsg = "";
+    private static int oldErrorCode = -1;
+    private static int mRegState = WIFI_CALLING_STATE_NOT_REGISTERED;
+    private static String oldErrorMessage = "";
 
     private void savePreference(int iPreference, boolean status) {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(
@@ -198,28 +208,107 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
                .getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (mWifiNetwork == null) {
-            mWifiTurnOn = false;
+            mWifiConnected = false;
         } else {
             if (mWifiNetwork.isConnected()) {
-                mWifiTurnOn = true;
+                mWifiConnected = true;
             } else {
-                mWifiTurnOn = false;
+                mWifiConnected = false;
             }
         }
-        if (DEBUG) Log.d(TAG, "mWifiTurnOn = " + mWifiTurnOn);
+        if (DEBUG) Log.d(TAG, "mWifiConnected = " + mWifiConnected);
     }
 
     private void isImsRegisted(Intent intent, String action) {
         if (ACTION_IMS_STATE_CHANGE.equals(action) ) {
             if (DEBUG) Log.d(TAG, "isImsRegisted");
-            int regState = intent.getIntExtra("stateChanged", WIFI_CALLING_STATE_NOT_REGISTERED);
-            if (regState == WIFI_CALLING_STATE_REGISTERED) {
+            mRegState = intent.getIntExtra("stateChanged", WIFI_CALLING_STATE_NOT_REGISTERED);
+            if (mRegState == WIFI_CALLING_STATE_REGISTERED) {
                 mImsRegisted = true;
             } else {
                 mImsRegisted = false;
             }
 
-            if (DEBUG) Log.d(TAG, "regState =" + regState + ", mImsRegisted = " + mImsRegisted);
+            if (DEBUG) Log.d(TAG, "mRegState =" + mRegState + ", mImsRegisted = " + mImsRegisted);
+
+            //handle IMS fail reason
+            if (mRegState == WIFI_CALLING_STATE_NOT_REGISTERED) {
+                Parcelable bundle = intent.getParcelableExtra("result");
+                if (bundle != null && bundle instanceof ImsReasonInfo) {
+                    ImsReasonInfo imsReasonInfo = (ImsReasonInfo)bundle;
+                    Log.i(TAG, "mRegState =" + mRegState);
+                    mErrorCode = imsReasonInfo.getExtraCode();
+                    mExtraMsg = imsReasonInfo.getExtraMessage();
+                    Log.i(TAG, "get ImsDisconnected extracode : " + mErrorCode);
+                    Log.i(TAG, "get ImsDisconnected getExtraMessage :" + mExtraMsg);
+                }
+            }
+        }
+    }
+
+    private void handleWFCErrorMsg() {
+        Log.i(TAG, "handleWFCErrorMsg");
+        int stringID = 0;
+        boolean checkErrorMsg = true;
+        boolean displayErrorCode = false;
+
+        if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
+            stringID = R.string.wifi_call_status_cellular_preferred;
+        } else if (!mWifiTurnOn) {
+            stringID = R.string.wifi_call_status_wifi_off;
+            checkErrorMsg = false;
+        } else if (!mWifiConnected) {
+            stringID = R.string.wifi_call_status_not_connected_wifi;
+            checkErrorMsg = false;
+        } else if (mIsWifiSignalWeak) {
+            Log.i(TAG, "debug: Wifi is Weak");
+            stringID = R.string.wifi_call_status_poor_wifi_signal;
+        } else if (mRegState == WIFI_CALLING_STATE_REGISTERED) {
+            stringID = R.string.wifi_call_status_ready;
+            checkErrorMsg = false;
+        } else if (mRegState == WIFI_CALLING_STATE_REGISTERING) {
+            checkErrorMsg = false;
+            stringID = R.string.wifi_call_status_enabling;
+        } else {
+            stringID = R.string.wifi_call_status_error_unknown;
+        }
+
+        Log.i(TAG, "stringID=" + stringID + "checkErrorMsg=" + checkErrorMsg);
+        // Check if there is error message to display.
+        // The error message will override the status message above.
+        if ((mRegState == WIFI_CALLING_STATE_NOT_REGISTERED) && checkErrorMsg) {
+            // For IMS NOT registered state, show the right error message.
+            Log.i (TAG, "process error message for ims not registered state.");
+            if ((mExtraMsg != null) && (!TextUtils.isEmpty(mExtraMsg))) {
+                Log.i(TAG, "valid error message received");
+            } else {
+                Log.i(TAG, "get null error message from low layer. Still use original one");
+                mExtraMsg = oldErrorMessage;
+                if (mErrorCode != oldErrorCode) {
+                    mExtraMsg = "";
+                }
+            }
+
+            if ((mExtraMsg != null) && (!TextUtils.isEmpty(mExtraMsg))) {
+                Log.i(TAG, "display extra error message");
+                displayErrorCode = true;
+            }
+
+            oldErrorCode = mErrorCode;
+            oldErrorMessage = mExtraMsg;
+        }
+
+        Log.i(TAG, "Save WFC status Msg to system property. mExtraMsg="
+                + mExtraMsg + "stringID=" + stringID + "displayErrorCode=" + displayErrorCode);
+
+        if (mWifiCallTurnOn) {
+            if (displayErrorCode) {
+                mWifiCallStatusMsg = mExtraMsg;
+            } else {
+                mWifiCallStatusMsg = mContext.getString(stringID);
+            }
+
+            SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_STATUS_MSG, mWifiCallStatusMsg);
         }
     }
 
@@ -263,6 +352,17 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        if (!ACTION_WIFI_CALL_TURN_OFF.equals(action)
+                && !ACTION_WIFI_CALL_TURN_ON.equals(action)
+                && !WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)
+                && !"android.net.conn.CONNECTIVITY_CHANGE".equals(action)
+                && !WifiManager.RSSI_CHANGED_ACTION.equals(action)
+                && !ACTION_IMS_STATE_CHANGE.equals(action)) {
+            Log.e(TAG, "unexpected intents. action:" + action);
+            return;
+        }
+
         if (!WifiCallingNotification.getWifiCallingNotifiEnable(context)) {
             if (DEBUG) Log.d(TAG, "getIntent : " + intent.getAction() + " flag : false");
             return;
@@ -273,7 +373,6 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             readPreference();
         }
 
-        String action = intent.getAction();
         if (DEBUG) Log.d(TAG, "WifiCallingStatusContral, onReceive, action = " + action);
 
         isWifiCallTurnOn(intent, action);
@@ -291,5 +390,8 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_READY, (mWifiCallReady? "yes" : "no"));
             broadcastWifiCallReadyStatus();
         }
+
+        handleWFCErrorMsg();
+        broadcastWifiCallErrorCode();
     }
 }
