@@ -145,6 +145,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private SubscriptionManager mSubscriptionManager;
     private Utils mUtils;
     private TelecomManager mTelecommMgr;
+    private Context mContext;
 
 
     public SimSettings() {
@@ -154,11 +155,12 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     @Override
     public void onCreate(final Bundle bundle) {
         super.onCreate(bundle);
+        mContext = getActivity();
 
         final TelephonyManager tm =
-                    (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        mTelecommMgr = (TelecomManager)getActivity().getSystemService(Context.TELECOM_SERVICE);
-        mSubscriptionManager = SubscriptionManager.from(getActivity());
+                    (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        mTelecommMgr = (TelecomManager)mContext.getSystemService(Context.TELECOM_SERVICE);
+        mSubscriptionManager = SubscriptionManager.from(mContext);
 
         if (mSubInfoList == null) {
             mSubInfoList = mSubscriptionManager.getActiveSubscriptionInfoList();
@@ -184,11 +186,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         intentFilter.addAction(TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED);
         intentFilter.addAction(TelephonyIntents.ACTION_SUBSCRIPTION_SET_UICC_RESULT);
 
-        getActivity().registerReceiver(mDdsSwitchReceiver, intentFilter);
+        mContext.registerReceiver(mDdsSwitchReceiver, intentFilter);
 
         IntentFilter intentRadioFilter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         intentFilter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
-        getActivity().registerReceiver(mRadioReceiver, intentRadioFilter);
+        mContext.registerReceiver(mRadioReceiver, intentRadioFilter);
     }
 
     @Override
@@ -203,11 +205,11 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 simEnabler.destroy();
             }
         }
-        super.onDestroy();
         Log.d(TAG,"on onDestroy");
         getActivity().unregisterReceiver(mDdsSwitchReceiver);
         getActivity().unregisterReceiver(mRadioReceiver);
         unRegisterPhoneStateListener();
+        super.onDestroy();
     }
 
     private void unRegisterPhoneStateListener() {
@@ -233,7 +235,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                     mPreferredDataSubscription = preferredDataSubscription;
                     String status = getResources().getString(R.string.switch_data_subscription,
                             SubscriptionManager.getSlotId(preferredDataSubscription) + 1);
-                    Toast.makeText(getActivity(), status, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, status, Toast.LENGTH_SHORT).show();
                 }
             } else if (TelephonyIntents.ACTION_SUBINFO_CONTENT_CHANGE.equals(action)
                     || TelephonyIntents.ACTION_SUBINFO_RECORD_UPDATED.equals(action)
@@ -241,7 +243,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 mSelectableSubInfos.clear();
                 mSubInfoList = SubscriptionManager.from(context).getActiveSubscriptionInfoList();
                 for (int i = 0; i < mNumSlots; ++i) {
-                    final SubscriptionInfo sir = Utils.findRecordBySlotId(getActivity(), i);
+                    final SubscriptionInfo sir = Utils.findRecordBySlotId(mContext, i);
                     // Do not display deactivated subInfo in preference list
                     if ((sir != null) && (sir.getStatus() == SubscriptionManager.ACTIVE)) {
                         mSelectableSubInfos.add(sir);
@@ -363,11 +365,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         boolean disableDataSub2 = false;
         if (getResources().getBoolean(R.bool.disable_data_sub2) &&
                 !SystemProperties.getBoolean("persist.radio.ct_class_c", false)) {
-            if (TelephonyManager.getDefault().getMultiSimConfiguration().
-                equals(TelephonyManager.MultiSimVariants.DSDS)) {
-                if (mSubInfoList.size() == 2) {
-                    disableDataSub2 = true;
-                }
+            if (mSubInfoList != null && mSubInfoList.size() == 2) {
+                disableDataSub2 = true;
             }
         }
         return disableDataSub2;
@@ -375,21 +374,14 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
     //If device is in primary card with 7+5 mode and CT card is present, then disable DDS option in UI
     private boolean disableDds() {
-        boolean disableDds = false;
         boolean ctCardPresent = false;
         boolean is7_5_modeEnabled =
                 SystemProperties.getBoolean("persist.radio.primary_7_5_mode", false);
         if (is7_5_modeEnabled) {
-            if (TelephonyManager.getDefault().getMultiSimConfiguration().
-                equals(TelephonyManager.MultiSimVariants.DSDS)) {
-                if (mSubInfoList.size() == 2) {
-                    disableDds = true;
-                }
-            }
             ctCardPresent = android.provider.Settings.Global.getInt(
                     this.getContentResolver(), CONFIG_CT_CARD_PRESENT, 0) == 1;
         }
-        return disableDds && ctCardPresent;
+        return is7_5_modeEnabled && ctCardPresent;
      }
 
     private void updateActivitesCategory() {
@@ -418,7 +410,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
     private void updateCellularDataValues() {
         final Preference simPref = findPreference(KEY_CELLULAR_DATA);
-        final SubscriptionInfo sir = Utils.findRecordBySubId(getActivity(),
+        final SubscriptionInfo sir = Utils.findRecordBySubId(mContext,
                 SubscriptionManager.getDefaultDataSubId());
         boolean isCellularDataEnabled = false;
         boolean disableCellulardata = getResources().getBoolean(R.bool.disbale_cellular_data) &&
@@ -447,7 +439,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         // Display toast only once when the user enters the activity even though the call moves
         // through multiple call states (eg - ringing to offhook for incoming calls)
         if (callStateIdle == false && inActivity && dataDisableToastDisplayed == false) {
-            Toast.makeText(getActivity(), R.string.data_disabled_in_active_call,
+            Toast.makeText(mContext, R.string.data_disabled_in_active_call,
                     Toast.LENGTH_SHORT).show();
             dataDisableToastDisplayed = true;
         }
@@ -479,7 +471,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                 subId);
         if(sir == null) {
             simPref.setSummary(R.string.sim_selection_required_pref);
-            simPref.setEnabled(false);
+            simPref.setEnabled(
+                    mSelectableSubInfos == null ? false : mSelectableSubInfos.size() > 1);
             return;
         }
         if (phoneAccount != null && SubscriptionManager.isValidSlotId(slotId)) {
@@ -543,7 +536,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
 
         logd("init LTE primary slot : " + primarySlot + " isManualMode :" + isManualMode);
         if (-1 != primarySlot) {
-            SubscriptionInfo subInfo = Utils.findRecordBySlotId(getActivity(), primarySlot);
+            SubscriptionInfo subInfo = Utils.findRecordBySlotId(mContext, primarySlot);
             CharSequence lteSummary = (subInfo == null ) ? null : subInfo.getDisplayName();
             mPrimarySubSelect.setSummary(lteSummary);
         } else {
@@ -750,7 +743,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         }
 
         public void update() {
-            mSubscriptionInfo = Utils.findRecordBySlotId(getActivity(), mSlotId);
+            mSubscriptionInfo = Utils.findRecordBySlotId(mContext, mSlotId);
             final Resources res = getResources();
 
             setTitle(res.getString(R.string.sim_card_number_title, mSlotId + 1));
