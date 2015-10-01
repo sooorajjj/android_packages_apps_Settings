@@ -148,12 +148,9 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
                     ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
         }
 
-        if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
-            if (cellularNetworkIsAbailable()) {
-                mWifiCallTurnOn = false;
-            } else {
-                mWifiCallTurnOn = true;
-            }
+        if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED
+                && cellularNetworkIsAbailable()) {
+            mWifiCallTurnOn = false;
         }
 
         SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_TURNON, (mWifiCallTurnOn? "yes" : "no"));
