@@ -39,7 +39,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Parcelable;
+import android.os.SystemProperties;
 import android.preference.SwitchPreference;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -130,7 +132,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (!isChecked()) {
+                if ((mState == ImsConfig.WifiCallingValueConstants.OFF) ||
+                        (mState == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED)){
                     Log.d(TAG, "do not handle any intent when wificall turned off");
                     return;
                 }
@@ -140,7 +143,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     WifiCallingStatusContral.ACTION_WIFI_CALL_READY_STATUS_CHANGE.
                             equals(intent.getAction())) {
                     updateWFCStatusFromIntent(intent);
-                    setSummary(mWFCStatusMsgDisplay);
+                    refreshSwitchSummary(mWFCStatusMsgDisplay);
                 }
             } //end onReceive
         };
@@ -165,6 +168,29 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             Log.e(TAG, "unexpected intent handled.");
         }
         Log.d(TAG, "updateWFCStatusFromIntent called. mWFCStatusMsgDisplay:" + mWFCStatusMsgDisplay);
+    }
+
+    private void updateWFCStatusFromProp() {
+        if ((mState == ImsConfig.WifiCallingValueConstants.OFF) ||
+                (mState == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED)) {
+            mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_disabled);
+        } else {
+            if (mSwitchClicked) {
+                //Display "enabling..." if user just turns on WFC.
+                //This message will be updated upon other intents.
+                mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_enabling);
+            } else {
+                String msg = SystemProperties.get(
+                        WifiCallingStatusContral.SYSTEM_PROPERTY_WIFI_CALL_STATUS_MSG, "");
+                if (!TextUtils.isEmpty(msg)) {
+                    mWFCStatusMsgDisplay = msg;
+                } else {
+                    mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_error_unknown);
+                }
+            }
+        }
+
+        Log.d(TAG, "updateWFCStatusFromProp called. mWFCStatusMsgDisplay:" + mWFCStatusMsgDisplay);
     }
 
     @Override
@@ -213,6 +239,8 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         Log.d(TAG, "onSwitchClicked " + isChecked());
         mSwitchClicked = true;
         getWifiCallingPreference();
+        updateWFCStatusFromProp();
+        refreshSwitchSummary(mWFCStatusMsgDisplay);
     }
 
     private boolean setWifiCallingPreference(int state, int preference) {
@@ -236,7 +264,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     private void checkWifiCallingCapability(int state) {
         Log.d(TAG, "checkWifiCallingCapability:");
         if (state == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED) {
-            this.setEnabled(false);
+            refreshSwitchEnabled(true);
             Log.e(TAG, "checkWifiCallingCapability: wificalling not supported.");
         }
     }
@@ -253,9 +281,55 @@ public class WifiCallSwitchPreference extends SwitchPreference {
 
     private void syncUserSettingFromModem(int state, int pref) {
         Log.d(TAG, "sync user setting from modem: state=" + state + " Preference=" + pref);
-        this.setChecked(state == ImsConfig.WifiCallingValueConstants.ON);
-        mState = state;
         mPreference = pref;
+        if (state != mState) {
+            mState = state;
+            updateWFCStatusFromProp();
+            refreshSwitchState(mState);
+            refreshSwitchSummary(mWFCStatusMsgDisplay);
+        }
+    }
+
+    private void refreshSwitchState(final int state) {
+        Log.d(TAG, "refreshSwitchState");
+        if (mParent == null) {
+            Log.e(TAG, "refreshSwitchState: mParent = null!");
+        } else {
+            mParent.runOnUiThread(new Runnable() {
+                public void run() {
+                    Log.d (TAG, "new UI thread.");
+                    setChecked((state == ImsConfig.WifiCallingValueConstants.ON));
+                }
+            });
+        }
+    }
+
+    private void refreshSwitchEnabled(final boolean isGreyOut) {
+        Log.d(TAG, "refreshSwitchEnabled");
+        if (mParent == null) {
+            Log.e(TAG, "refreshSwitchEnabled: mParent = null!");
+        } else {
+            mParent.runOnUiThread(new Runnable() {
+                public void run() {
+                    Log.d (TAG, "new UI thread.");
+                    setEnabled(!isGreyOut);
+                }
+            });
+        }
+    }
+
+    private void refreshSwitchSummary(final String msg) {
+        Log.d(TAG, "refreshSwitchSummary");
+        if ((mParent == null) && (msg == null)) {
+            Log.e(TAG, "refreshSwitchSummary: mParent = null or message = null");
+        } else {
+            mParent.runOnUiThread(new Runnable() {
+                public void run() {
+                    Log.d (TAG, "new UI thread.");
+                    setSummary(msg);
+                }
+            });
+        }
     }
 
     private ImsConfigListener imsConfigListener = new ImsConfigListener.Stub() {
@@ -317,6 +391,9 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     mSwitchClicked = false;
                 } else {
                     syncUserSettingFromModem(wifiCallingStatus, wifiCallingPreference);
+                    updateWFCStatusFromProp();
+                    refreshSwitchState(wifiCallingStatus);
+                    refreshSwitchSummary(mWFCStatusMsgDisplay);
                 }
             }
 
