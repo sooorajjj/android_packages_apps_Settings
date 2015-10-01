@@ -657,7 +657,10 @@ public class WirelessSettings extends SettingsPreferenceFragment
         };
 
     private static boolean isWifiCallingSettingsSupported(Context context) {
+        boolean isWfcNonImsPdn = SystemProperties.getBoolean(
+                "persist.radio.wfc_non-ims_pdn", false);
+
         return context.getResources().getBoolean(
-                R.bool.config_wifi_calling_settings_supported);
+                R.bool.config_wifi_calling_settings_supported) || isWfcNonImsPdn;
     }
 }
