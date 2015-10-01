@@ -60,6 +60,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
     public static final String ACTION_WIFI_CALL_READY_EXTRA = "com.android.wificall.ready.extra";
     public static final String SYSTEM_PROPERTY_WIFI_CALL_READY = "persist.sys.wificall.ready";
     public static final String SYSTEM_PROPERTY_WIFI_CALL_STATUS_MSG = "persist.sys.wificall.status.msg";
+    public static final String SYSTEM_PROPERTY_WIFI_CALL_TURNON = "persist.sys.wificall.turnon";
 
     private static Context mContext;
     private static int mWifiCallPreferred = -1;
@@ -97,6 +98,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         mWifiCallPreferred = sharedPreferences.getInt("currentWifiCallingPrefernce",
                 ImsConfig.WifiCallingPreference.WIFI_PREFERRED);
         mWifiCallTurnOn = sharedPreferences.getBoolean("currentWifiCallingStatus", true);
+        SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_TURNON, (mWifiCallTurnOn? "yes" : "no"));
         if (DEBUG) Log.d(TAG, "readPreference, mWifiCallPreferred = " + mWifiCallPreferred);
         if (DEBUG) Log.d(TAG, "readPreference, mWifiCallTurnOn = " + mWifiCallTurnOn);
     }
@@ -143,6 +145,8 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
                 mWifiCallTurnOn = true;
             }
         }
+
+        SystemProperties.set(SYSTEM_PROPERTY_WIFI_CALL_TURNON, (mWifiCallTurnOn? "yes" : "no"));
         if (DEBUG) Log.d(TAG, "mWifiCallPreferred = " + mWifiCallPreferred);
         if (DEBUG) Log.d(TAG, "mWifiCallTurnOn = " + mWifiCallTurnOn);
     }
