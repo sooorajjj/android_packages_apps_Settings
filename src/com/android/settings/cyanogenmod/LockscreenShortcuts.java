@@ -34,6 +34,14 @@ public class LockscreenShortcuts extends Fragment implements View.OnClickListene
     private ColorStateList mDefaultTintList;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        mPicker = new ShortcutPickHelper(getActivity(), this);
+    }
+
+    @Override
     public void shortcutPicked(String uri, String friendlyName, boolean isApplication) {
         onTargetChange(uri);
     }
@@ -96,7 +104,6 @@ public class LockscreenShortcuts extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPicker = new ShortcutPickHelper(getActivity(), this);
         mShortcutHelper = new LockscreenShortcutsHelper(getActivity(), null);
         createActionList();
         initiateViews(view);
@@ -218,8 +225,13 @@ public class LockscreenShortcuts extends Fragment implements View.OnClickListene
     private void saveCustomActions() {
         ArrayList<String> targets = new ArrayList<String>();
         for (int id : sIconIds) {
+            String uri;
             View v = getView().findViewById(id);
-            String uri = (String) v.getTag();
+            if(v.getId() == mSelectedView.getId()) {
+                uri = (String) mSelectedView.getTag();
+            } else {
+                uri = (String) v.getTag();
+            }
             targets.add(uri);
         }
         mShortcutHelper.saveTargets(targets);
