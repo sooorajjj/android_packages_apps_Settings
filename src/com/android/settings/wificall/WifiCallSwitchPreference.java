@@ -145,6 +145,14 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     updateWFCStatusFromIntent(intent);
                     refreshSwitchSummary(mWFCStatusMsgDisplay);
                 }
+
+                if (WifiCallingStatusContral.ACTION_WIFI_CALL_READY_STATUS_CHANGE.
+                        equals(intent.getAction()) ||
+                    WifiCallingStatusContral.ACTION_WIFI_CALL_ERROR_CODE.
+                        equals(intent.getAction())) {
+                    refreshSwitchEnabled(false);
+                }
+
             } //end onReceive
         };
         getContext().registerReceiver(mReceiver, filter);
@@ -236,8 +244,14 @@ public class WifiCallSwitchPreference extends SwitchPreference {
     }
 
     public void onSwitchClicked() {
-        Log.d(TAG, "onSwitchClicked " + isChecked());
+        boolean ischeck = isChecked();
+        Log.d(TAG, "onSwitchClicked " + ischeck);
         mSwitchClicked = true;
+        mState = ischeck ? ImsConfig.WifiCallingValueConstants.ON :
+                ImsConfig.WifiCallingValueConstants.OFF;
+        if (ischeck) {
+            setEnabled(false);
+        }
         getWifiCallingPreference();
         updateWFCStatusFromProp();
         refreshSwitchSummary(mWFCStatusMsgDisplay);
