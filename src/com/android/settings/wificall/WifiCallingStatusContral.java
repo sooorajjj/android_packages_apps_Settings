@@ -39,6 +39,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.os.SystemProperties;
+import android.provider.Settings;
 import android.telephony.CellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -48,7 +49,6 @@ import com.android.ims.ImsConfig;
 import com.android.ims.ImsReasonInfo;
 import com.android.settings.R;
 import java.util.List;
-
 
 public class WifiCallingStatusContral extends BroadcastReceiver {
 
@@ -113,12 +113,14 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         if (DEBUG) Log.d(TAG, "readPreference, mWifiCallTurnOn = " + mWifiCallTurnOn);
     }
 
-    private boolean cellularNetworkIsAbailable() {
+    private TelephonyManager getTelephonyManager() {
+        return (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+    }
+
+    private boolean cellularNetworkIsAvailable() {
         boolean cellularNetworkAvailable = false;
 
-        TelephonyManager tm = (TelephonyManager)mContext.
-                 getSystemService(Context.TELEPHONY_SERVICE);
-        List<CellInfo> cellInfoList = tm.getAllCellInfo();
+        List<CellInfo> cellInfoList = getTelephonyManager().getAllCellInfo();
 
         if (cellInfoList != null) {
             for (CellInfo cellinfo : cellInfoList) {
@@ -128,6 +130,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             }
         }
 
+        Log.d(TAG, "cellularNetworkIsAvailable = " + cellularNetworkAvailable);
         return cellularNetworkAvailable;
     }
 
@@ -149,7 +152,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         }
 
         if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED
-                && cellularNetworkIsAbailable()) {
+                && cellularNetworkIsAvailable()) {
             mWifiCallTurnOn = false;
         }
 
@@ -333,6 +336,39 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         }
     }
 
+    private  boolean isAirplaneModeOn() {
+        Log.d(TAG, "airplane mode is = " + Settings.Global.getInt(
+                mContext.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0));
+        return (Settings.Global.getInt(
+                mContext.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) == 1);
+    }
+
+    private static boolean mSetRadioPowerOff = false;
+    private static boolean mSetRadioPowerOn = false;
+    private void updateRadioStatus() {
+        if (cellularNetworkIsAvailable()) {
+            mSetRadioPowerOn = true;
+            mSetRadioPowerOff = false;
+        } else {
+            mSetRadioPowerOff = true;
+            mSetRadioPowerOn = false;
+        }
+        Log.d(TAG, "mSetRadioPowerOff = " + mSetRadioPowerOff
+                + ", mSetRadioPowerOn = " + mSetRadioPowerOn);
+        if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.WIFI_ONLY) {
+            if (!mSetRadioPowerOff && mWifiCallTurnOn
+                    && !isAirplaneModeOn() && cellularNetworkIsAvailable()) {
+                getTelephonyManager().setRadioPower(false);
+                Log.d(TAG, "updateRadioStatus, turn radio off");
+            }
+        } else {
+            if (!mSetRadioPowerOn && !cellularNetworkIsAvailable() && !isAirplaneModeOn()) {
+                getTelephonyManager().setRadioPower(true);
+                Log.d(TAG, "updateRadioStatus, turn radio on");
+            }
+        }
+    }
+
     private void broadcastWifiCallReadyStatus() {
         Intent intent = new Intent(ACTION_WIFI_CALL_READY_STATUS_CHANGE);
         intent.putExtra(ACTION_WIFI_CALL_READY_EXTRA, mWifiCallReady);
@@ -390,5 +426,6 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
 
         handleWFCErrorMsg();
         broadcastWifiCallErrorCode();
+        updateRadioStatus();
     }
 }
