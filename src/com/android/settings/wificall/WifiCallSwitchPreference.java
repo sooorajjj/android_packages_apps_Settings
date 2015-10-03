@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.os.Parcelable;
 import android.os.SystemProperties;
 import android.preference.SwitchPreference;
@@ -346,6 +347,22 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         }
     }
 
+    private boolean isWifiCallUsedFirstTime() {
+        if (mParent == null) {
+            return false;
+        }
+        SharedPreferences sharedPreferences = mParent.getSharedPreferences(
+                "MY_PERFS", mParent.MODE_PRIVATE);
+        boolean isFirstUseWfc = sharedPreferences.getBoolean("is_first_use_wfc", true);
+        if (isFirstUseWfc) {
+            Log.d(TAG, "first time use WifiCall.");
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("is_first_use_wfc", false);
+            editor.commit();
+        }
+        return isFirstUseWfc;
+    }
+
     private ImsConfigListener imsConfigListener = new ImsConfigListener.Stub() {
         public void onGetVideoQuality(int status, int quality) {
             //TODO not required as of now
@@ -404,7 +421,16 @@ public class WifiCallSwitchPreference extends SwitchPreference {
                     syncUserSetting2Modem(state, mPreference);
                     mSwitchClicked = false;
                 } else {
-                    syncUserSettingFromModem(wifiCallingStatus, wifiCallingPreference);
+                    if (isWifiCallUsedFirstTime() &&
+                            ((wifiCallingPreference != ImsConfig.WifiCallingPreference.WIFI_PREFERRED)
+                            || (wifiCallingStatus != ImsConfig.WifiCallingValueConstants.ON))) {
+                        Log.d(TAG, "Config default setting when first time use wificall");
+                        mState = ImsConfig.WifiCallingValueConstants.ON;
+                        mPreference = ImsConfig.WifiCallingPreference.WIFI_PREFERRED;
+                        syncUserSetting2Modem(mState, mPreference);
+                    } else {
+                        syncUserSettingFromModem(wifiCallingStatus, wifiCallingPreference);
+                    }
                     updateWFCStatusFromProp();
                     refreshSwitchState(wifiCallingStatus);
                     refreshSwitchSummary(mWFCStatusMsgDisplay);
