@@ -113,6 +113,12 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         if (DEBUG) Log.d(TAG, "readPreference, mWifiCallTurnOn = " + mWifiCallTurnOn);
     }
 
+    private void getWifiStatus() {
+        WifiManager wifiManager =
+                (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        mWifiTurnOn = wifiManager.isWifiEnabled();
+    }
+
     private TelephonyManager getTelephonyManager() {
         return (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
     }
@@ -172,7 +178,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
             if (DEBUG) Log.d(TAG, "showWifiCallingWizardActivity = " + showWifiCallWizard);
 
             if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
-                mWifiConnected = true;
+                mWifiTurnOn = true;
                 if (showWifiCallWizard) {
                     Intent start = new Intent(mContext, WifiCallingWizardActivity.class);
                     start.setAction("android.intent.action.MAIN");
@@ -180,41 +186,28 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
                     mContext.startActivity(start);
                 }
             } else {
-                mWifiConnected = false;
-            }
-
-            WifiManager wifimgr = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-            if (wifimgr != null && wifimgr.isWifiEnabled()) {
-                mWifiTurnOn = true;
-            } else {
                 mWifiTurnOn = false;
             }
-
         } else if (WifiManager.RSSI_CHANGED_ACTION.equals(action)) {
-            if (DEBUG) Log.d (TAG, "Wifi RSSI change");
-
-                WifiManager wifiManager = (WifiManager) mContext.getSystemService(
-                        Context.WIFI_SERVICE);
-                if ((wifiManager == null) || (wifiManager.getConnectionInfo() == null)) {
-                    mIsWifiSignalWeak = false;
-                } else {
-                    if (DEBUG) Log.d (TAG, "Wifi RSSI = "+wifiManager.getConnectionInfo().getRssi() +"dbm");
-                    mIsWifiSignalWeak = (wifiManager.getConnectionInfo().getRssi() < WIFI_CALLING_ROVE_IN_THRESHOD);
-                }
+            WifiManager wifiManager =
+                    (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+            if ((wifiManager == null) || (wifiManager.getConnectionInfo() == null)) {
+                mIsWifiSignalWeak = false;
+            } else {
+                if (DEBUG) Log.d (TAG, "isWifiStatusChange, Wifi RSSI = "
+                        + wifiManager.getConnectionInfo().getRssi() + "dbm");
+                mIsWifiSignalWeak = (wifiManager.getConnectionInfo().getRssi() < WIFI_CALLING_ROVE_IN_THRESHOD);
+            }
         }
 
         //check wifi contivity state
         ConnectivityManager connect = (ConnectivityManager) mContext
                .getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifiNetwork = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (mWifiNetwork == null) {
-            mWifiConnected = false;
+        if (mWifiNetwork != null && mWifiNetwork.isConnected()) {
+            mWifiConnected = true;
         } else {
-            if (mWifiNetwork.isConnected()) {
-                mWifiConnected = true;
-            } else {
-                mWifiConnected = false;
-            }
+            mWifiConnected = false;
         }
         if (DEBUG) Log.d(TAG, "mWifiConnected = " + mWifiConnected);
     }
@@ -404,6 +397,7 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
         mContext = context;
         if (mWifiCallPreferred == -1) {
             readPreference();
+            getWifiStatus();
         }
 
         if (DEBUG) Log.d(TAG, "WifiCallingStatusContral, onReceive, action = " + action);

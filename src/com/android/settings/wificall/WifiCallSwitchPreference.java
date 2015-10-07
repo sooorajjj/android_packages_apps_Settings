@@ -39,6 +39,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.os.SystemProperties;
 import android.preference.SwitchPreference;
@@ -183,6 +187,10 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         if ((mState == ImsConfig.WifiCallingValueConstants.OFF) ||
                 (mState == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED)) {
             mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_disabled);
+        } else if (!isWifiTurnedOn()) {
+            mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_wifi_off);
+        } else if (!isWifiConnected()) {
+            mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_not_connected_wifi);
         } else {
             if (mSwitchClicked) {
                 //Display "enabling..." if user just turns on WFC.
@@ -200,6 +208,30 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         }
 
         Log.d(TAG, "updateWFCStatusFromProp called. mWFCStatusMsgDisplay:" + mWFCStatusMsgDisplay);
+    }
+
+    private boolean isWifiTurnedOn() {
+        boolean isWifiOn = false;
+        WifiManager wifimgr = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifimgr != null && wifimgr.isWifiEnabled()) {
+            isWifiOn = true;
+        } else {
+            isWifiOn = false;
+        }
+        Log.d(TAG, "isWifiTurnedOn = " + isWifiOn);
+        return isWifiOn;
+    }
+
+    private boolean isWifiConnected() {
+        boolean isWifiConnected = false;
+        ConnectivityManager connect = (ConnectivityManager) getContext()
+               .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connect != null) {
+            NetworkInfo wifiNet = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            isWifiConnected = (wifiNet == null) ? false : (wifiNet.isConnected());
+        }
+        Log.d(TAG, "isWifiConnected = " + isWifiConnected);
+        return isWifiConnected;
     }
 
     @Override
