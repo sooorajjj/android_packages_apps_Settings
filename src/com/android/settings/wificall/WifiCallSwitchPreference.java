@@ -46,6 +46,8 @@ import android.net.wifi.WifiManager;
 import android.os.Parcelable;
 import android.os.SystemProperties;
 import android.preference.SwitchPreference;
+import android.telephony.CellInfo;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -60,6 +62,7 @@ import com.android.ims.ImsConfig;
 import com.android.ims.ImsManager;
 import com.android.ims.ImsException;
 import com.android.ims.ImsConfigListener;
+import java.util.List;
 
 public class WifiCallSwitchPreference extends SwitchPreference {
 
@@ -187,6 +190,9 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         if ((mState == ImsConfig.WifiCallingValueConstants.OFF) ||
                 (mState == ImsConfig.WifiCallingValueConstants.NOT_SUPPORTED)) {
             mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_disabled);
+        } else if ((mPreference == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED)
+                    && isCellularNetworkAvailable()) {
+            mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_cellular_preferred);
         } else if (!isWifiTurnedOn()) {
             mWFCStatusMsgDisplay = getContext().getString(R.string.wifi_call_status_wifi_off);
         } else if (!isWifiConnected()) {
@@ -232,6 +238,26 @@ public class WifiCallSwitchPreference extends SwitchPreference {
         }
         Log.d(TAG, "isWifiConnected = " + isWifiConnected);
         return isWifiConnected;
+    }
+
+    private boolean isCellularNetworkAvailable() {
+        boolean cellularNetworkAvailable = false;
+        try {
+            List<CellInfo> cellInfoList = ((TelephonyManager) getContext().getSystemService(
+                    Context.TELEPHONY_SERVICE)).getAllCellInfo();
+            if (cellInfoList != null) {
+                for (CellInfo cellinfo : cellInfoList) {
+                    if (cellinfo.isRegistered()) {
+                        cellularNetworkAvailable = true;
+                    }
+                }
+            }
+            Log.d(TAG, "mPreference=" + mPreference + ", cellularNetworkIsAvailable="
+                    + cellularNetworkAvailable);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "null pointer exception" + e);
+        }
+        return cellularNetworkAvailable;
     }
 
     @Override

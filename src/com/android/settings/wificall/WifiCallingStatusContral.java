@@ -247,6 +247,13 @@ public class WifiCallingStatusContral extends BroadcastReceiver {
 
         if (mWifiCallPreferred == ImsConfig.WifiCallingPreference.CELLULAR_PREFERRED) {
             stringID = R.string.wifi_call_status_cellular_preferred;
+            SystemProperties.set(
+                    SYSTEM_PROPERTY_WIFI_CALL_STATUS_MSG, mContext.getString(stringID));
+            if (cellularNetworkIsAvailable()) {
+                checkErrorMsg = false;
+            } else {
+                checkErrorMsg = true;
+            }
         } else if (!mWifiTurnOn) {
             stringID = R.string.wifi_call_status_wifi_off;
             checkErrorMsg = false;
