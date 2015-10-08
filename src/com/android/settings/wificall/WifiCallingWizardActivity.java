@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,15 +27,27 @@ public class WifiCallingWizardActivity extends Activity{
     private static final int FIRST_WIZARD = 1;
     private static final int SECOUND_WIZARD = 2;
     private static final int THIRD_WIZARD = 3;
+    private static boolean isWizard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        if (intent != null) {
+            isWizard = intent.getBooleanExtra("triggeredFromHelp", true);
+        }
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        WizardFragment fragment = new WizardFragment();
-        fragmentTransaction.add(com.android.internal.R.id.content, fragment);
+        if (isWizard) {
+            getActionBar().setTitle(getString(R.string.wifi_calling_tutorial_title));
+            WizardFragment fragment = new WizardFragment();
+            fragmentTransaction.add(com.android.internal.R.id.content, fragment);
+        } else {
+            getActionBar().setTitle(getString(R.string.wifi_calling_questions_title));
+            QuestionFragment fragment = new QuestionFragment();
+            fragmentTransaction.add(com.android.internal.R.id.content, fragment);
+        }
         fragmentTransaction.commit();
     }
 
@@ -115,6 +128,26 @@ public class WifiCallingWizardActivity extends Activity{
             default:
                 break;
             }
+        }
+    }
+
+    public class QuestionFragment extends Fragment{
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            // TODO Auto-generated method stub
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+            View view = inflater.inflate(R.layout.wifi_call_top_questions, container, false);
+            if(view != null){
+                Log.i(TAG, "init wifi call top questions");
+            }
+            return view;
         }
     }
 }
