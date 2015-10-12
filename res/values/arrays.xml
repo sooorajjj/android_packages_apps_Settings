@@ -1367,6 +1367,9 @@
 
     <string-array name="hidesupl_plmn_list">
         <item>46001</item>
+        <item>46003</item>
+        <item>46011</item>
+        <item>45507</item>
     </string-array>
 
     <string-array name="origin_carrier_names" translateable="false">

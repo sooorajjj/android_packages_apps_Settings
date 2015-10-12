@@ -231,9 +231,10 @@ public class ApnSettings extends SettingsPreferenceFragment implements
                 where += " and type <>\"" + PhoneConstants.APN_TYPE_DUN + "\"";
                 where += " and type <>\"" + PhoneConstants.APN_TYPE_IMS + "\"";
             }
+
+            String operatorMccMnc = TelephonyManager.getDefault().getIccOperatorNumeric(mSubId);
             // Filer fota and dm for specail carrier
             if (getResources().getBoolean(R.bool.config_hide_dm_enabled)) {
-                String operatorMccMnc = TelephonyManager.getDefault().getIccOperatorNumeric(mSubId);
                 for (String plmn : getResources().getStringArray(R.array.hidedm_plmn_list)) {
                     if (plmn.equals(operatorMccMnc)) {
                         where += " and type <>\"" + PhoneConstants.APN_TYPE_FOTA + "\"";
@@ -246,8 +247,7 @@ public class ApnSettings extends SettingsPreferenceFragment implements
             if (getResources().getBoolean(R.bool.config_hidesupl_enable)) {
                 boolean needHideSupl = false;
                 for (String plmn : getResources().getStringArray(R.array.hidesupl_plmn_list)) {
-                    if (plmn.equals(TelephonyManager.getDefault()
-                               .getSimOperator(mSubId))) {
+                    if (plmn.equals(operatorMccMnc)) {
                         needHideSupl = true;
                         break;
                     }
