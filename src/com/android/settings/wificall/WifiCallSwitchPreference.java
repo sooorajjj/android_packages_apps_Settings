@@ -120,6 +120,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             intent.putExtra("preference", mPreference);
             getContext().sendBroadcast(intent);
         }
+        ImsManager.setWfcSetting(getContext(), mState);
     }
 
     private int getSummary(boolean turnOn) {
