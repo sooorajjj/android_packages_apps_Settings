@@ -458,6 +458,7 @@ public class WifiCallSwitchPreference extends SwitchPreference {
             } else {
                 Log.d(TAG, "onSetWifiCallingPreference: set succeeded.");
             }
+            ImsManager.setWfcSetting(getContext(), mState);
         }
 
         public void onGetWifiCallingPreference(int status, final int wifiCallingStatus,
