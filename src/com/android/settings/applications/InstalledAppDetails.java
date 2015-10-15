@@ -119,6 +119,7 @@ public class InstalledAppDetails extends Fragment
     private boolean mInitialized;
     private boolean mShowUninstalled;
     private PackageInfo mPackageInfo;
+    private List<ResolveInfo> mPackageActivities;
     private CanBeOnSdCardChecker mCanBeOnSdCardChecker;
     private View mRootView;
     private Button mUninstallButton;
@@ -685,12 +686,13 @@ public class InstalledAppDetails extends Fragment
         @Override
         protected Void doInBackground(Void... params) {
             ArrayList<ComponentName> components = new ArrayList<ComponentName>();
-            for (ActivityInfo aInfo : mPackageInfo.activities) {
-                components.add(new ComponentName(aInfo.packageName, aInfo.name));
+            for (ResolveInfo aInfo : mPackageActivities) {
+                components.add(new ComponentName(aInfo.activityInfo.packageName,
+                    aInfo.activityInfo.name));
             }
 
             ProtectedAppsReceiver.updateProtectedAppComponentsAndNotify(getActivity(),
-                    components, PackageManager.COMPONENT_VISIBLE_STATUS);
+                        components, PackageManager.COMPONENT_VISIBLE_STATUS);
             return null;
         }
     }
@@ -792,11 +794,16 @@ public class InstalledAppDetails extends Fragment
                 mPackageInfo = mPm.getPackageInfo(mAppEntry.info.packageName,
                         PackageManager.GET_DISABLED_COMPONENTS |
                         PackageManager.GET_UNINSTALLED_PACKAGES |
-                        PackageManager.GET_SIGNATURES |
-                        PackageManager.GET_ACTIVITIES);
+                        PackageManager.GET_SIGNATURES);
+
+                Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+                mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                mainIntent.setPackage(mAppEntry.info.packageName);
+                List<ResolveInfo> mPackageActivities = mPm.queryIntentActivities(mainIntent, 0);
             } catch (NameNotFoundException e) {
                 Log.e(TAG, "Exception when retrieving package:" + mAppEntry.info.packageName, e);
             }
+
         } else {
             Log.w(TAG, "Missing AppEntry; maybe reinstalling?");
             mPackageInfo = null;
