@@ -40,4 +40,17 @@
 
     <!-- Whether notify user that switch data service -->
     <bool name="confirm_to_switch_data_service">false</bool>
+
+    <!-- Whether to hide IMS and DUN Apns -->
+    <bool name="config_hide_ims_and_dun_apns">true</bool>
+
+    <!-- Whether to hide dm apn for carrier -->
+    <bool name="config_hide_dm_enabled">true</bool>
+
+    <!-- Whether to hide SUPL apn for China Union -->
+    <bool name="config_hidesupl_enable">false</bool>
+
+    <!-- Whether to hide mms apn-->
+    <bool name="config_hide_mms_enable">false</bool>
+
 </resources>
