@@ -2871,4 +2871,5 @@
     <string name="write_settings_off" msgid="5156104383386336233">"不允许"</string>
 
     <string name="primary_sub_select_title">默认4G/3G SIM卡</string>
+    <string name="switch_data_subscription">即将切换到卡%1$s进行数据业务.</string>
 </resources>

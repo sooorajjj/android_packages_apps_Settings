@@ -51,9 +51,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Toast;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.telephony.PhoneConstants;
+import com.android.internal.telephony.TelephonyIntents;
 import com.android.settings.RestrictedSettingsFragment;
 import com.android.settings.Utils;
 import com.android.settings.search.BaseSearchIndexProvider;
@@ -99,6 +101,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
     private List<SubscriptionInfo> mSelectableSubInfos = null;
     private PreferenceCategory mSimCards = null;
     private SubscriptionManager mSubscriptionManager;
+    private int mPreferredDataSub;
     private int mNumSlots;
     private Context mContext;
 
@@ -134,6 +137,8 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         mContext = getActivity();
 
         mSubscriptionManager = SubscriptionManager.from(getActivity());
+        mPreferredDataSub = SubscriptionManager.getDefaultDataSubId();
+
         final TelephonyManager tm =
                 (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
         addPreferencesFromResource(R.xml.sim_settings);
@@ -146,6 +151,7 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
         SimSelectNotification.cancelNotification(getActivity());
 
         IntentFilter intentFilter = new IntentFilter(ACTION_UICC_MANUAL_PROVISION_STATUS_CHANGED);
+        intentFilter.addAction(TelephonyIntents.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED);
         mContext.registerReceiver(mReceiver, intentFilter);
     }
 
@@ -920,6 +926,14 @@ public class SimSettings extends RestrictedSettingsFragment implements Indexable
                  updateSubscriptions();
                  Log.d(TAG, "Received ACTION_UICC_MANUAL_PROVISION_STATUS_CHANGED on phoneId: "
                          + phoneId + " new sub state " + newProvisionedState);
+            } else if (TelephonyIntents.ACTION_DEFAULT_DATA_SUBSCRIPTION_CHANGED.equals(action)) {
+                int preferredDataSub = SubscriptionManager.getDefaultDataSubId();
+                if (preferredDataSub != mPreferredDataSub) {
+                    mPreferredDataSub = preferredDataSub;
+                    String status = getResources().getString(R.string.switch_data_subscription,
+                            SubscriptionManager.getSlotId(preferredDataSub) + 1);
+                    Toast.makeText(getActivity(), status, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     };
