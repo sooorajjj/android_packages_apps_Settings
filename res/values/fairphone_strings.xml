@@ -36,6 +36,8 @@
     <string name="opengles3_summary">Enable OpenGL ES 3.0</string>
 
     <!-- About --> <skip />
+    <!-- About phone, status item label.  The hardware assembly number (set at the factory). -->
+    <string name="assembly_number">Assembly number</string>
     <!-- About phone, status item label.  The device's processor. -->
     <string name="processor_info">Processor</string>
 </resources>

@@ -63,6 +63,18 @@
 
         <TextView
             style="@style/device_info_dialog_label"
+            android:id="@+id/assembly_number_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/assembly_number" />
+        <TextView
+            style="@style/device_info_dialog_value"
+            android:id="@+id/assembly_number_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/device_info_dialog_label"
             android:id="@+id/processor_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

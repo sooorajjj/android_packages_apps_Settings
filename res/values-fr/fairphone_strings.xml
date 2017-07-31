@@ -20,5 +20,6 @@
     <string name="hiccup_summary">"Rapport de stabilité"</string>
     <string name="opengles3_title">"Support graphique 3D amélioré"</string>
     <string name="opengles3_summary">"Activer OpenGL ES 3.0"</string>
+    <string name="assembly_number">"Numéro d'assemblage"</string>
     <string name="processor_info">"Processeur"</string>
 </resources>

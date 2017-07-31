@@ -34,6 +34,9 @@ import com.android.settings.R;
 import com.android.settings.core.instrumentation.InstrumentedDialogFragment;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -43,6 +46,7 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
     public static final String TAG = "HardwareInfo";
 
+    private static final String ASSEMBLY_NUMBER_FILE = "/persist/phoneid.bin";
     private static final String FILENAME_PROC_CPUINFO = "/proc/cpuinfo";
 
     @Override
@@ -73,6 +77,10 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
         setText(content, R.id.hardware_rev_label, R.id.hardware_rev_value,
                 SystemProperties.get("ro.boot.hardware.revision"));
 
+        // Assembly number
+        setText(content, R.id.assembly_number_label, R.id.assembly_number_value,
+                getAssemblyNumber());
+
         // Processor
         setText(content, R.id.processor_label, R.id.processor_value, getProcessorInfo());
 
@@ -99,6 +107,33 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
     @VisibleForTesting
     String getSerialNumber() {
         return Build.getSerial();
+    }
+
+    private static String getAssemblyNumber() {
+        String assemblyNumber = null;
+        FileInputStream input = null;
+
+        try {
+            input = new FileInputStream(new File(ASSEMBLY_NUMBER_FILE));
+            final byte[] bytes = new byte[input.available()];
+
+            input.read(bytes);
+            assemblyNumber = new String(bytes, "ASCII");
+        } catch (FileNotFoundException e) {
+            Log.wtf(TAG, "Assembly number file not found", e);
+        } catch(IOException e) {
+            Log.wtf(TAG, "Could not read the assembly number file", e);
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (Exception e) {
+                Log.wtf(TAG, e);
+            }
+        }
+
+        return assemblyNumber;
     }
 
     /**

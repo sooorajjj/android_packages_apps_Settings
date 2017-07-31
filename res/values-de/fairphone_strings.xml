@@ -20,5 +20,6 @@
     <string name="hiccup_summary">"Stabilitätsberichte"</string>
     <string name="opengles3_title">"Erweiterte 3D-Graphik-Unterstützung"</string>
     <string name="opengles3_summary">"OpenGL ES 3.0 aktivieren"</string>
+    <string name="assembly_number">"Fertigungsnummer"</string>
     <string name="processor_info">"Prozessor"</string>
 </resources>
