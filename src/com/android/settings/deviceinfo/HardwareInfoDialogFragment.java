@@ -33,6 +33,8 @@ import com.android.internal.logging.nano.MetricsProto;
 import com.android.settings.R;
 import com.android.settings.core.instrumentation.InstrumentedDialogFragment;
 
+import com.fairphone.common.modules.BatteryModule;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,6 +58,7 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
     private static final String PROPERTY_MAIN_CAMERA_SENSOR = "fp2.cam.main.sensor";
     private static final String VALUE_MAIN_CAMERA_SENSOR_OV8865 = "ov8865_q8v18a";
     private static final String VALUE_MAIN_CAMERA_SENSOR_OV12870 = "ov12870";
+    private static final String KEY_BATTERY_MODULE_INFO = "battery_module_info";
 
     @Override
     public int getMetricsCategory() {
@@ -98,6 +101,10 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
         // Camera module
         setText(content, R.id.camera_module_label, R.id.camera_module_value, getCameraModuleInfo());
+
+        // Battery module
+        setText(content, R.id.battery_module_label, R.id.battery_module_value,
+                getBatteryModuleInfo());
 
         return builder.setView(content).create();
     }
@@ -220,4 +227,21 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
         return info;
     }
+
+    private String getBatteryModuleInfo() {
+       final BatteryModule module = BatteryModule.getModule(getContext());
+       String info;
+
+       if (module != null) {
+           info = getResources().getString(R.string.battery_module_summary,
+                   module.getVersionId(), module.getDesignCapacity());
+       } else {
+           info = getResources().getString(R.string.device_info_default);
+
+           Log.w(TAG, "Unknown battery module, property " + KEY_BATTERY_MODULE_INFO
+                   + " set to default value");
+       }
+
+       return info;
+   }
 }
