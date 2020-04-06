@@ -48,6 +48,14 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
     private static final String ASSEMBLY_NUMBER_FILE = "/persist/phoneid.bin";
     private static final String FILENAME_PROC_CPUINFO = "/proc/cpuinfo";
+    private static final String KEY_RECEIVER_MODULE_INFO = "receiver_module_info";
+    private static final String PROPERTY_FRONT_CAMERA_SENSOR = "fp2.cam.front.sensor";
+    private static final String VALUE_FRONT_CAMERA_SENSOR_OV2685 = "ov2685";
+    private static final String VALUE_FRONT_CAMERA_SENSOR_OV5670 = "ov5670";
+    private static final String KEY_CAMERA_MODULE_INFO = "camera_module_info";
+    private static final String PROPERTY_MAIN_CAMERA_SENSOR = "fp2.cam.main.sensor";
+    private static final String VALUE_MAIN_CAMERA_SENSOR_OV8865 = "ov8865_q8v18a";
+    private static final String VALUE_MAIN_CAMERA_SENSOR_OV12870 = "ov12870";
 
     @Override
     public int getMetricsCategory() {
@@ -83,6 +91,13 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
         // Processor
         setText(content, R.id.processor_label, R.id.processor_value, getProcessorInfo());
+
+        // Receiver module
+        setText(content, R.id.receiver_module_label, R.id.receiver_module_value,
+                getReceiverModuleInfo());
+
+        // Camera module
+        setText(content, R.id.camera_module_label, R.id.camera_module_value, getCameraModuleInfo());
 
         return builder.setView(content).create();
     }
@@ -168,5 +183,41 @@ public class HardwareInfoDialogFragment extends InstrumentedDialogFragment {
 
             return "Unknown";
         }
+    }
+
+    private String getReceiverModuleInfo() {
+        final String frontCameraSensor = SystemProperties.get(PROPERTY_FRONT_CAMERA_SENSOR);
+        String info;
+
+        if (VALUE_FRONT_CAMERA_SENSOR_OV2685.equals(frontCameraSensor)) {
+            info = getResources().getString(R.string.receiver_module_ov2685);
+        } else if (VALUE_FRONT_CAMERA_SENSOR_OV5670.equals(frontCameraSensor)) {
+            info = getResources().getString(R.string.receiver_module_ov5670);
+        } else {
+            // Unexpected property value, or missing
+            info = getResources().getString(R.string.device_info_default);
+            Log.w(TAG, "Property " + PROPERTY_FRONT_CAMERA_SENSOR
+                    + " has an unknown value of " + frontCameraSensor);
+        }
+
+        return info;
+    }
+
+    private String getCameraModuleInfo() {
+        final String mainCameraSensor = SystemProperties.get(PROPERTY_MAIN_CAMERA_SENSOR);
+        String info;
+
+        if (VALUE_MAIN_CAMERA_SENSOR_OV8865.equals(mainCameraSensor)) {
+            info = getResources().getString(R.string.camera_module_ov8865);
+        } else if (VALUE_MAIN_CAMERA_SENSOR_OV12870.equals(mainCameraSensor)) {
+            info = getResources().getString(R.string.camera_module_ov12870);
+        } else {
+            // Unexpected property value, or missing
+            info = getResources().getString(R.string.device_info_default);
+            Log.w(TAG, "Property " + PROPERTY_MAIN_CAMERA_SENSOR
+                    + " has an unknown value of " + mainCameraSensor);
+        }
+
+        return info;
     }
 }
