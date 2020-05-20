@@ -2878,6 +2878,7 @@
         <activity android:name=".sim.SimDialogActivity"
                 android:theme="@*android:style/Theme.DeviceDefault.Settings.Dialog.NoActionBar"
                 android:label="@string/sim_settings_title"
+                android:process="com.android.phone"
                 android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
