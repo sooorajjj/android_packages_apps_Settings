@@ -40,6 +40,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.settings.R;
+import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -96,6 +98,7 @@ public class SimDialogActivity extends Activity {
                     PhoneAccountHandle phoneAccountHandle =
                             subscriptionIdToPhoneAccountHandle(subId);
                     setDefaultDataSubId(context, subId);
+                    setPreferredNetworkMode(context, subId);
                     setDefaultSmsSubId(context, subId);
                     setUserSelectedOutgoingPhoneAccount(phoneAccountHandle);
                     finish();
@@ -113,6 +116,41 @@ public class SimDialogActivity extends Activity {
         } else {
             finish();
         }
+    }
+
+    private void setPreferredNetworkMode(Context context,int subId) {
+        final Phone[] phones = (Phone[])PhoneFactory.getPhones();
+        final Phone mPhone1, mPhone2;
+
+        // As we have only 2 slot
+        mPhone1 = phones[0];
+        mPhone2 = phones[1];
+
+        if (mPhone1.getSubId() == subId ) {
+            android.provider.Settings.Global.putInt(
+                context.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + mPhone2.getSubId(),
+                Phone.NT_MODE_GSM_ONLY);
+            mPhone2.setPreferredNetworkType(Phone.NT_MODE_GSM_ONLY, null);
+
+            android.provider.Settings.Global.putInt(
+                context.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + mPhone1.getSubId(),
+                Phone.NT_MODE_LTE_GSM_WCDMA);
+            mPhone1.setPreferredNetworkType(Phone.NT_MODE_LTE_GSM_WCDMA, null);
+          } else {
+            android.provider.Settings.Global.putInt(
+                context.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + mPhone1.getSubId(),
+                Phone.NT_MODE_GSM_ONLY);
+            mPhone1.setPreferredNetworkType(Phone.NT_MODE_GSM_ONLY, null);
+
+            android.provider.Settings.Global.putInt(
+                context.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + mPhone2.getSubId(),
+                Phone.NT_MODE_LTE_GSM_WCDMA);
+            mPhone2.setPreferredNetworkType(Phone.NT_MODE_LTE_GSM_WCDMA, null);
+          }
     }
 
     private static void setDefaultDataSubId(final Context context, final int subId) {
@@ -166,6 +204,7 @@ public class SimDialogActivity extends Activity {
                             case DATA_PICK:
                                 sir = subInfoList.get(value);
                                 setDefaultDataSubId(context, sir.getSubscriptionId());
+                                setPreferredNetworkMode(context, sir.getSubscriptionId());
                                 break;
                             case CALLS_PICK:
                                 final TelecomManager telecomManager =
