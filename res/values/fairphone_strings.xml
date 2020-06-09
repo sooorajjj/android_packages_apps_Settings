@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018-2020 Fairphone B.V.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Maintenance settings --> <skip />
+    <!-- Preference title for maintenance settings -->
+    <string name="maintenance_preference_title">Maintenance</string>
+    <!-- Maintenance settings screen, the title for the item to take the user to Checkup. -->
+    <string name="checkup_title" translatable="false">Checkup</string>
+    <!-- Maintenance settings screen, the summary for the item to take the user to Checkup. -->
+    <string name="checkup_summary">Hardware diagnostics</string>
+    <!-- Maintenance settings screen, the title for the item to take the user to the Proximity Sensor app. -->
+    <string name="proximity_sensor_title">Proximity sensor</string>
+    <!-- Maintenance settings screen, the summary for the item to take the user to the Proximity Sensor app. -->
+    <string name="proximity_sensor_summary">Calibrate the proximity sensor</string>
+    <!-- Maintenance settings screen, the title for the item to take the user to the Hiccup settings. -->
+    <string name="hiccup_title" translatable="false">Hiccup</string>
+    <!-- Maintenance settings screen, the summary for the item to take the user to the Hiccup settings. -->
+    <string name="hiccup_summary">Stability reporting</string>
+    <!-- Maintenance settings screen, the title for the item to take the user to the OpenGL ES settings. -->
+    <string name="opengles3_title">Enhanced 3D graphics support</string>
+    <!-- Maintenance settings screen, the summary for the item to take the user to the OpenGL ES settings. -->
+    <string name="opengles3_summary">Enable OpenGL ES 3.0</string>
+
+    <!-- About --> <skip />
+    <!-- About phone, status item label.  The hardware assembly number (set at the factory). -->
+    <string name="assembly_number">Assembly number</string>
+    <!-- About phone, status item label.  The device's processor. -->
+    <string name="processor_info">Processor</string>
+    <!-- About phone, status item label.  The installed receiver module. -->
+    <string name="receiver_module_info">Top module info</string>
+    <!-- About phone, status item value.  Original receiver module with OV2685 sensor. -->
+    <string name="receiver_module_ov2685">Front camera 2MP &#8211; OmniVision OV2685</string>
+    <!-- About phone, status item value.  2017 receiver module with OV5670 sensor. -->
+    <string name="receiver_module_ov5670">Front camera 5MP &#8211; OmniVision OV5670</string>
+    <!-- About phone, status item label.  The installed camera module. -->
+    <string name="camera_module_info">Camera module info</string>
+    <!-- About phone, status item value.  Original camera module with OV8865 sensor. -->
+    <string name="camera_module_ov8865">Main camera 8MP &#8211; OmniVision OV8865</string>
+    <!-- About phone, status item value.  2017 camera module with OV12870 sensor. -->
+    <string name="camera_module_ov12870">Main camera 12MP &#8211; OmniVision OV12870</string>
+    <!-- About phone, status item label.  The installed battery module. -->
+    <string name="battery_module_info">Battery info</string>
+    <!-- About phone, status item value.  Battery module info. -->
+    <string name="battery_module_summary" translatable="false"><xliff:g id="version"
+            example="FP2-BAT01">%1$s</xliff:g> &#8211; <xliff:g id="capacity"
+            example="2420">%2$d</xliff:g> mAh</string>
+</resources>

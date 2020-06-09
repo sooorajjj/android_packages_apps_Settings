@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018-2020 Fairphone B.V.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+    <string name="maintenance_preference_title">"Maintenance"</string>
+    <string name="proximity_sensor_title">"Capteur de proximité"</string>
+    <string name="hiccup_summary">"Rapport de stabilité"</string>
+    <string name="opengles3_title">"Support graphique 3D amélioré"</string>
+    <string name="opengles3_summary">"Activer OpenGL ES 3.0"</string>
+    <string name="assembly_number">"Numéro d'assemblage"</string>
+    <string name="processor_info">"Processeur"</string>
+    <string name="receiver_module_info">"Informations sur le module supérieur"</string>
+    <string name="receiver_module_ov2685">"Caméra frontale 2MP &#8211; OmniVision OV2685"</string>
+    <string name="receiver_module_ov5670">"Caméra frontale 5MP &#8211; OmniVision OV5670"</string>
+    <string name="camera_module_info">"Informations sur le module caméra"</string>
+    <string name="camera_module_ov8865">"Caméra principale 8MP &#8211; OmniVision OV8865"</string>
+    <string name="camera_module_ov12870">"Caméra principale 12MP &#8211; OmniVision OV12870"</string>
+    <string name="battery_module_info">"Informations sur la batterie"</string>
+</resources>
