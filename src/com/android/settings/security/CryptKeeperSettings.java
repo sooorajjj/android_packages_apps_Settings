@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2020-2021 Fairphone B.V.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +59,7 @@ public class CryptKeeperSettings extends InstrumentedPreferenceFragment {
     private Button mInitiateButton;
     private View mPowerWarning;
     private View mBatteryWarning;
+    private View mUnsupportedMesssage;
     private IntentFilter mIntentFilter;
 
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
@@ -76,9 +78,12 @@ public class CryptKeeperSettings extends InstrumentedPreferenceFragment {
                      invalidCharger == 0;
 
                 // Update UI elements based on power/battery status
-                mInitiateButton.setEnabled(levelOk && pluggedOk);
-                mPowerWarning.setVisibility(pluggedOk ? View.GONE : View.VISIBLE );
-                mBatteryWarning.setVisibility(levelOk ? View.GONE : View.VISIBLE);
+                // mInitiateButton.setEnabled(levelOk && pluggedOk);
+                // mPowerWarning.setVisibility(pluggedOk ? View.GONE : View.VISIBLE );
+                // mBatteryWarning.setVisibility(levelOk ? View.GONE : View.VISIBLE);
+
+                // Encryption is disabled in the current version of Fairphone OS.
+                mInitiateButton.setEnabled(false);
             }
         }
     };
@@ -116,6 +121,7 @@ public class CryptKeeperSettings extends InstrumentedPreferenceFragment {
 
         mPowerWarning = mContentView.findViewById(R.id.warning_unplugged);
         mBatteryWarning = mContentView.findViewById(R.id.warning_low_charge);
+        mUnsupportedMesssage = mContentView.findViewById(R.id.message_unsupported);
 
         return mContentView;
     }
